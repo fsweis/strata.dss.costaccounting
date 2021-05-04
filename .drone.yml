@@ -49,7 +49,7 @@ steps:
     commands:
       - VERSION=$(cat .version)
       - . /ci-kit/setup-build.sh ${DRONE_REPO_NAME}-api $VERSION
-      - | 
+      - |
         docker build . -f Dockerfile.api \
         -t $ECR/${DRONE_REPO_NAME}-api:$VERSION \
         --build-arg SONARLOGIN=$SONARLOGIN \
@@ -58,7 +58,7 @@ steps:
       - docker push $ECR/${DRONE_REPO_NAME}-api:$VERSION
 
 
-   - name: build web
+  - name: build web
     image: ecr.ops.stratanetwork.net/ci-kit:latest
     pull: always
     environment:
@@ -75,7 +75,7 @@ steps:
     commands:
       - VERSION=$(cat .version)
       - . /ci-kit/setup-build.sh $DRONE_REPO_NAME $VERSION
-      - | 
+      - |
         docker build . -f Dockerfile.web \
         -t $ECR/${DRONE_REPO_NAME}-web:$VERSION \
         --build-arg SONARLOGIN=$SONARLOGIN \
@@ -99,7 +99,7 @@ steps:
     commands:
       - VERSION=$(cat .version)
       - . /ci-kit/setup-build.sh $DRONE_REPO_NAME $VERSION
-      - | 
+      - |
         docker build . -f Dockerfile.hangfire \
         -t $ECR/${DRONE_REPO_NAME}-hangfire:$VERSION \
         --build-arg VERSION=$VERSION
@@ -121,7 +121,7 @@ steps:
     commands:
       - VERSION=$(cat .version)
       - . /ci-kit/setup-build.sh $DRONE_REPO_NAME $VERSION
-      - | 
+      - |
         docker build . -f Dockerfile.dashboard \
         -t $ECR/${DRONE_REPO_NAME}-dashboard:$VERSION \
         --build-arg VERSION=$VERSION
@@ -136,7 +136,7 @@ steps:
         from_secret: OCTOPUS_CLI_API_KEY
     commands:
       - export VERSION=$(cat .version)
-      - octo create-release --project=$DRONE_REPO_NAME --version=$VERSION --package=${DRONE_REPO_NAME}.Hangfire:$VERSION --ignoreSslErrors --ignoreExisting 
+      - octo create-release --project=$DRONE_REPO_NAME --version=$VERSION --package=${DRONE_REPO_NAME}.Hangfire:$VERSION --ignoreSslErrors --ignoreExisting
   - name: deploy octopus release
     image: ecr.ops.stratanetwork.net/octopusdeploy/octo
     pull: always
