@@ -1,0 +1,85 @@
+ARG PROJECT=Strata.DSS.CostAccounting
+ARG VERSION=0.0.0
+ARG SONARLOGIN=''
+
+##############
+# Base image #
+##############
+FROM ecr.ops.stratanetwork.net/strata.microsoft.dotnetcore.aspnet:3.1.5.1 AS base
+
+###############
+# Build image #
+###############
+FROM ecr.ops.stratanetwork.net/strata.microsoft.dotnetcore.sdk:3.1.2011 AS build
+ARG PROJECT
+ARG VERSION
+ARG SONARLOGIN
+
+WORKDIR /src
+
+# Copy project files and restore
+COPY ["${PROJECT}.sln", "${PROJECT}.sln"]
+COPY src/**/*.csproj ./
+RUN for file in $(ls *.csproj); do mkdir -p src/${file%.*}/ && mv $file src/${file%.*}/; done
+COPY tests/**/*.csproj ./
+RUN for file in $(ls *.csproj); do mkdir -p tests/${file%.*}/ && mv $file tests/${file%.*}/; done
+
+RUN dotnet restore "${PROJECT}.sln" \
+    --source https://api.nuget.org/v3/index.json \
+    --source https://proget.sdt.local/nuget/nuget/v3/index.json
+
+
+# Copy files and build
+COPY . .
+
+RUN if [ "${SONARLOGIN}" != "" ] ; then dotnet sonarscanner begin \
+   /k:"${PROJECT}" \
+   /d:sonar.scm.provider=git \
+   /d:sonar.host.url="https://sonarqube.sdt.local" \
+   /d:sonar.login="${SONARLOGIN}" \
+   /d:sonar.cs.opencover.reportsPaths="/src/cover.xml" \
+   /d:sonar.dependencyCheck.jsonReportPath=/src/buildlogs/dependency-check-report.json \
+   /d:sonar.dependencyCheck.htmlReportPath=/src/buildlogs/dependency-check-report.html \
+   /v:sonar.projectVersion="${VERSION}"; fi
+
+
+RUN dotnet build "${PROJECT}.sln" \
+    --configuration Release \
+    --no-restore
+
+# Run unit tests
+RUN dotnet test "${PROJECT}.sln" \
+    --configuration Release \
+    --no-restore \
+    --no-build \
+    --verbosity=normal \
+    -p:CollectCoverage=true \
+    -p:CoverletOutputFormat="opencover" \
+    -p:CoverletOutput=/src/cover.xml
+
+# Publish project
+RUN dotnet publish "src/${PROJECT}.Api/${PROJECT}.Api.csproj" \
+    --configuration Release \
+    --no-restore \
+    --no-build \
+    --output /app
+
+
+RUN if [ "${SONARLOGIN}" != "" ] ; then \
+   /dc/dependency-check/bin/dependency-check.sh -f JSON -f HTML -s . -o ./buildlogs && \
+   dotnet sonarscanner end /d:sonar.login="${SONARLOGIN}"; \
+   fi
+
+###############
+# Final image #
+###############
+FROM base AS final
+ARG PROJECT
+WORKDIR /app
+ARG PROJECT
+ENV PROJECTDLL=${PROJECT}.Api.dll
+ENV DOTNET_ENVIRONMENT=Development
+ENV ASPNETCORE_ENVIRONMENT=Development
+
+COPY --from=build /app /app
+ENTRYPOINT dotnet ${PROJECTDLL}

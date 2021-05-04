@@ -1,0 +1,55 @@
+ARG PROJECT=Strata.DSS.CostAccounting
+ARG VERSION=0.0.0
+
+##############
+# Base image #
+##############
+FROM ecr.ops.stratanetwork.net/strata.microsoft.dotnetcore.aspnet:3.1.5.1 AS base
+
+###############
+# Build image #
+###############
+FROM ecr.ops.stratanetwork.net/strata.microsoft.dotnetcore.sdk:3.1.2011 AS build
+ARG PROJECT
+ARG VERSION
+
+WORKDIR /src
+
+# Copy project files and restore
+COPY ["${PROJECT}.sln", "${PROJECT}.sln"]
+COPY src/**/*.csproj ./
+RUN for file in $(ls *.csproj); do mkdir -p src/${file%.*}/ && mv $file src/${file%.*}/; done
+COPY tests/**/*.csproj ./
+RUN for file in $(ls *.csproj); do mkdir -p tests/${file%.*}/ && mv $file tests/${file%.*}/; done
+
+RUN dotnet restore "${PROJECT}.sln" \
+    --source https://api.nuget.org/v3/index.json \
+    --source https://proget.sdt.local/nuget/nuget/v3/index.json
+
+# Copy files and build
+COPY . .
+
+RUN dotnet build "${PROJECT}.sln" \
+    --configuration Release \
+    --no-restore
+
+# Publish project
+RUN dotnet publish "src/${PROJECT}.Hangfire.Dashboard/${PROJECT}.Hangfire.Dashboard.csproj" \
+    --configuration Release \
+    --no-restore \
+    --no-build \
+    --output /app
+
+###############
+# Final image #
+###############
+FROM base AS final
+ARG PROJECT
+WORKDIR /app
+ARG PROJECT
+ENV PROJECTDLL=${PROJECT}.Api.dll
+ENV DOTNET_ENVIRONMENT=Development
+ENV ASPNETCORE_ENVIRONMENT=Development
+
+COPY --from=build /app /app
+ENTRYPOINT dotnet ${PROJECTDLL}

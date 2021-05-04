@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Strata.Hangfire" Version="0.5.0" />
+    <PackageReference Include="Strata.SqlTools.Configuration.SqlServer" Version="0.16.0" />
+    <PackageReference Include="Strata.SMC.Client" Version="1.15.0" />
+  </ItemGroup>
+
+</Project>

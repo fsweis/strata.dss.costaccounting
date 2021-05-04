@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk.Worker">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <UserSecretsId>dotnet-Strata.DSS.CostAccounting.Jobs.Service-D8B8B3CF-E629-4481-AAC6-26BC6694D20B</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Strata.Configuration.Client" Version="5.21.2" />
+    <PackageReference Include="Strata.Hangfire.NetCore" Version="0.5.0" />
+    <PackageReference Include="Strata.Logging" Version="3.5.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Strata.DSS.CostAccounting.Biz\Strata.DSS.CostAccounting.Biz.csproj" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,14 @@
+﻿{
+  "profiles": {
+    "Strata.DSS.CostAccounting.Hangfire.Dashboard": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "applicationUrl": "https://localhost:5001;http://localhost:5000",
+      "environmentVariables": {
+        "Hangfire__RunLocally": "true",
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "AWS_Profile": "809820578507_SDT-Dev-Developers"
+      }
+    }
+  }
+}

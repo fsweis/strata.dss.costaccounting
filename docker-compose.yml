@@ -1,0 +1,48 @@
+version: "3"
+
+services:
+  costaccounting-api:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    ports:
+      - "8080:80"
+      - "8443:443"
+    environment:
+      - hangfire__redis__prefix=costaccounting
+      - hangfire__redis__configOptions=redis:6379
+  costaccounting-hangfire:
+    build:
+      context: .
+      dockerfile: Dockerfile.hangfire
+    environment:
+      - hangfire__redis__prefix=costaccounting
+      - hangfire__redis__configOptions=redis:6379
+  costaccounting-hangfire-dashboard:
+    build:
+      context: .
+      dockerfile: Dockerfile.dashboard
+    ports:
+      - 8082:80
+    environment:
+      - hangfire__redis__prefix=costaccounting
+      - hangfire__redis__configOptions=redis:6379
+  redis:
+    image: redis:alpine
+    ports:
+      - 6379:6379
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redis-data:/data
+  redis-commander:
+    image: rediscommander/redis-commander:latest
+    environment:
+      - REDIS_HOSTS=local:redis:6379
+      - HTTP_USER=root
+      - HTTP_PASSWORD=pass
+    ports:
+      - 8081:8081
+    depends_on:
+      - redis
+volumes:
+  redis-data:

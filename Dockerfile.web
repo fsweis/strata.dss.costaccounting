@@ -1,0 +1,18 @@
+FROM node:12.13.1-stretch
+
+# Set working directory
+WORKDIR /app
+
+# Install dependencies
+RUN npm config set @strata:registry http://proget.sdt.local/npm/npm
+COPY src/Strata.DSS.CostAccounting.Web/costaccounting/package*.json ./
+RUN npm install 
+
+# Copy in rest of app and build
+COPY src/Strata.DSS.CostAccounting.Web/costaccounting .
+RUN npm run build
+
+# Build release container
+FROM nginx:alpine
+COPY --from=0 /app/build /usr/share/nginx/html
+COPY nginx.conf /etc/nginx/conf.d/default.conf
