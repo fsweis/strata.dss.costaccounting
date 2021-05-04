@@ -5,11 +5,11 @@ WORKDIR /app
 
 # Install dependencies
 RUN npm config set @strata:registry http://proget.sdt.local/npm/npm
-COPY src/Strata.DSS.CostAccounting.Web/costaccounting/package*.json ./
+COPY src/Strata.DSS.CostAccounting.Web/dss.costaccounting/package*.json ./
 RUN npm install 
 
 # Copy in rest of app and build
-COPY src/Strata.DSS.CostAccounting.Web/costaccounting .
+COPY src/Strata.DSS.CostAccounting.Web/dss.costaccounting .
 RUN npm run build
 
 # Build release container
