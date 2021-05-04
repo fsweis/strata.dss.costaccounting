@@ -162,3 +162,8 @@ steps:
     commands:
       - export VERSION=$(cat .version)
       - octo deploy-release --project=$DRONE_REPO_NAME --version=$VERSION --deployTo=dev --progress --ignoreSslErrors
+      
+volumes:
+  - name: docker-socket
+    host:
+      path: /var/run
