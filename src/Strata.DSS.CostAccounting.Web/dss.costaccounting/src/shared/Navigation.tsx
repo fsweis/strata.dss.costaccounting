@@ -1,8 +1,8 @@
 import React from 'react';
 import { useLocation } from 'react-router-dom';
 import Header from '@strata/tempo/lib/header';
-import Tabs from '@strata/tempo/lib/tabs';
 import Layout from '@strata/tempo/lib/layout';
+import Menu from '@strata/tempo/lib/menu';
 import { Switch, Route } from 'react-router-dom';
 import ExampleUser from '../user-example/ExampleUser';
 import ExampleDatabase from '../database-example/ExampleDatabase';
@@ -13,10 +13,10 @@ const Navigation: React.FC = () => {
 
   const getActiveUrlKey = () => {
     if (location.pathname === '/') {
-      return '/users';
+      return ['/users'];
     }
 
-    return location.pathname;
+    return [location.pathname];
   };
 
   return (
@@ -25,17 +25,27 @@ const Navigation: React.FC = () => {
         <Layout.Nav>
           <InternalNavbar />
         </Layout.Nav>
-        <Layout.Content>
-          <Header title='Strata CostAccounting'></Header>
-          <Tabs activeKey={getActiveUrlKey()}>
-            <Tabs.TabPane key='/users' tab='Users' href='/users' />
-            <Tabs.TabPane key='/databases' tab='Databases' href='/databases' />
-          </Tabs>
-          <Switch>
-            <Route path={['/', '/users']} exact component={ExampleUser} key='users'></Route>
-            <Route path='/databases' exact component={ExampleDatabase} key='databases'></Route>
-          </Switch>
-        </Layout.Content>
+        <Layout>
+          <Layout.Sider collapsible>
+            <Header title='Cost Accounting' />
+            <Menu selectedKeys={getActiveUrlKey()}>
+              <Menu.ItemGroup title='Menu Group 1'>
+                <Menu.Item key='/users' href='/users'>
+                  Users
+                </Menu.Item>
+                <Menu.Item key='/databases' href='/databases'>
+                  Databases
+                </Menu.Item>
+              </Menu.ItemGroup>
+            </Menu>
+          </Layout.Sider>
+          <Layout.Content>
+            <Switch>
+              <Route path={['/', '/users']} exact component={ExampleUser} key='users'></Route>
+              <Route path='/databases' exact component={ExampleDatabase} key='databases'></Route>
+            </Switch>
+          </Layout.Content>
+        </Layout>
       </Layout>
     </>
   );

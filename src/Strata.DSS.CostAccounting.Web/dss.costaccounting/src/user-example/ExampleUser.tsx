@@ -1,5 +1,6 @@
 import React from 'react';
 import DataGrid from '@strata/tempo/lib/datagrid';
+import Header from '@strata/tempo/lib/header';
 import { IExampleUserData } from './data/IExampleUserData';
 import { useEffect, useState } from 'react';
 import { exampleUserService } from './data/exampleUserService';
@@ -17,6 +18,7 @@ const ExampleUser: React.FC = () => {
 
   return (
     <>
+      <Header title='Users' />
       <DataGrid key='UserGrid' value={exampleUserData} sortOrder={1} sortField='firstName'>
         <DataGrid.RowNumber key='numberRow'></DataGrid.RowNumber>
         <DataGrid.Column key='firstName' header='First Name' filter field='firstName' sortable width={200} />

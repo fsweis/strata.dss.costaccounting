@@ -3,6 +3,7 @@ import DataGrid from '@strata/tempo/lib/datagrid';
 import ActionBar from '@strata/tempo/lib/actionbar';
 import Button from '@strata/tempo/lib/button';
 import Modal from '@strata/tempo/lib/modal';
+import Header from '@strata/tempo/lib/header';
 import { exampleDatabaseService } from './data/exampleDatabaseService';
 import { IExampleDatabaseData } from './data/IExampleDatabaseData';
 import { useEffect, useState } from 'react';
@@ -30,6 +31,7 @@ const ExampleDatabase: React.FC = () => {
 
   return (
     <>
+      <Header title='Databases' />
       <ActionBar actions={<Button onClick={() => infoAlert('Hello!')}>Click me</Button>} />
       <DataGrid key='DatabaseGrid' value={exampleDBData} sortOrder={1} sortField='databaseName'>
         <DataGrid.RowNumber key='numberRow'></DataGrid.RowNumber>
