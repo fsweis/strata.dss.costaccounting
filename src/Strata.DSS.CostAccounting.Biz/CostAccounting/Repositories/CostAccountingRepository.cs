@@ -43,5 +43,45 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.Repositories
                 Name = entity.Name
             };
         }
+        public async Task<IList<DriverConfig>> GetStatisticDrivers(CancellationToken cancellationToken)
+        {
+            await using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
+            var drivers = await dbContext.DriverConfigs.ToListAsync(cancellationToken);
+            var allOnesGuid = new Guid(CostingConstants.ALL_ONES_GUID_STRING);
+            drivers = drivers.Where(dc => dc.DriverConfigGuid != Guid.Empty && dc.DriverConfigGuid != allOnesGuid && dc.CostingConfigGuid == Guid.Empty).OrderBy(dr => dr.Name).ToList();
+            return drivers;
+        }
+        public async Task<CostingConfig> GetCostingConfig(Guid costingConfigGuid, CancellationToken cancellationToken)
+        {
+            await using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
+            var costingConfigs = await dbContext.CostingConfigs.ToListAsync(cancellationToken);
+            var costingConfig = costingConfigs.Where(cc => cc.CostingConfigGuid == costingConfigGuid).FirstOrDefault();
+            return costingConfig;
+        }
+
+        public async Task<List<Measure>> GetMeasures(List<DataTable> dataTables, CancellationToken cancellationToken)
+        {
+            await using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
+            var measures = await dbContext.Measures.ToListAsync(cancellationToken);
+            var guids = dataTables.Select(x => x.DataTableGUID).ToList();
+            measures = measures.Where(m => guids.Contains(m.DataTableGUID) && m.MeasureGUID != Guid.Empty).ToList();
+            return measures;
+        }
+        public async Task<List<DataTable>> GetDataTables(List<string> globalIDs, CancellationToken cancellationToken)
+        {
+            await using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
+            var dataTables = await dbContext.DataTables.ToListAsync(cancellationToken);
+            dataTables = dataTables.Where(dt => globalIDs.Contains(dt.GlobalID) && dt.GlobalID != "").ToList();
+            return dataTables;
+        }
+
+
+        public async Task<List<RuleEngineIncludedMeasure>> GetRuleEngineIncludedMeasures(CancellationToken cancellationToken)
+        {
+            await using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
+            var measures = await dbContext.RuleEngineIncludedMeasures.ToListAsync(cancellationToken);
+            return measures;
+        }
+
     }
 }
