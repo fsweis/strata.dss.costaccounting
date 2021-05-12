@@ -65,10 +65,7 @@ RUN dotnet publish "src/${PROJECT}.Api/${PROJECT}.Api.csproj" \
     --output /app
 
 
-RUN if [ "${SONARLOGIN}" != "" ] ; then \
-   /dc/dependency-check/bin/dependency-check.sh -f JSON -f HTML -s . -o ./buildlogs && \
-   dotnet sonarscanner end /d:sonar.login="${SONARLOGIN}"; \
-   fi
+RUN if [ "${SONARLOGIN}" != "" ] ; then dotnet sonarscanner end /d:sonar.login="${SONARLOGIN}"; fi
 
 ###############
 # Final image #

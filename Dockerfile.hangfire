@@ -32,17 +32,6 @@ RUN dotnet restore "${PROJECT}.sln" \
 # Copy files and build
 COPY . .
 
-RUN if [ "${SONARLOGIN}" != "" ] ; then dotnet sonarscanner begin \
-   /k:"${PROJECT}" \
-   /d:sonar.scm.provider=git \
-   /d:sonar.host.url="https://sonarqube.sdt.local" \
-   /d:sonar.login="${SONARLOGIN}" \
-   /d:sonar.cs.opencover.reportsPaths="/src/cover.xml" \
-   /d:sonar.dependencyCheck.jsonReportPath=/src/buildlogs/dependency-check-report.json \
-   /d:sonar.dependencyCheck.htmlReportPath=/src/buildlogs/dependency-check-report.html \
-   /v:sonar.projectVersion="${VERSION}"; fi
-
-
 RUN dotnet build "${PROJECT}.sln" \
     --configuration Release \
     --no-restore
@@ -63,11 +52,6 @@ RUN dotnet publish "src/${PROJECT}.Hangfire/${PROJECT}.Hangfire.csproj" \
     --no-restore \
     --no-build \
     --output /app
-
-RUN if [ "${SONARLOGIN}" != "" ] ; then \
-   /dc/dependency-check/bin/dependency-check.sh -f JSON -f HTML -s . -o ./buildlogs && \
-   dotnet sonarscanner end /d:sonar.login="${SONARLOGIN}"; \
-   fi
 
 ###############
 # Final image #
