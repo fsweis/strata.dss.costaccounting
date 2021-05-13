@@ -50,6 +50,7 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
                 globalIds.Add(DataTableConstants.PayrollSampled);
             }
             
+            //Get score data
             var dataTables = await _costaccountingRepository.GetDataTables(globalIds, cancellationToken);
             var measures = await _costaccountingRepository.GetMeasures(dataTables, cancellationToken);
             var ruleEngineIncludedMeaures = await _costaccountingRepository.GetRuleEngineIncludedMeasures(cancellationToken);
@@ -69,7 +70,13 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
             var statDriverDataTableGuid = statDriverDataTable.DataTableGUID;
             var summaryDataTableGuid = dataTables.Where(x => x.GlobalID == DataTableConstants.PatientEncounterSummary).Select(x => x.DataTableGUID).FirstOrDefault();
             var GL_PAYROLL_DATASOURCE_ID = new Guid("72533379-57ad-44c3-8365-b6187a0c6d48");
-
+            //claims
+            var claimDetailDataTable = dataTables.Where(x => x.GlobalID == DataTableConstants.PatientClaimChargeLineItemDetail).FirstOrDefault();
+            claimDetailDataTable.FriendlyName = "Claim Detail";
+            var claimCostingStatisticDriverDataTable = dataTables.Where(x => x.GlobalID == DataTableConstants.ClaimCostingStatisticDriver).FirstOrDefault();
+            claimCostingStatisticDriverDataTable.FriendlyName = "Claims Statistics";
+            var claimSummaryDataTableGuid = dataTables.Where(x => x.GlobalID == DataTableConstants.PatientClaimSummary).Select(x => x.DataTableGUID).FirstOrDefault();
+            var claimStatisticDriverDataTable = dataTables.Where(x => x.GlobalID == DataTableConstants.ClaimStatisticDriver).FirstOrDefault();
 
             var dataSourceLinks = new List<DataSourceLink>();
             if ((eCostingType)costingConfig.Type != eCostingType.Claims)
@@ -108,7 +115,29 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
                 var glPDataTable = new DataTable() { DataTableGUID = GL_PAYROLL_DATASOURCE_ID, FriendlyName = "GL and Payroll", GlobalID = "GL and Payroll" };
                 dataTables.Add(glPDataTable);
                 dataSourceLinks.Add(new DataSourceLink(GL_PAYROLL_DATASOURCE_ID, "Dollars", GL_PAYROLL_DATASOURCE_ID, true));
+            }
+            else
+            {
+                //Load GL Sampled Measures
+                var glSampledMeasures = measures.Where(x => x.DataTableGUID == glSampledDataTableGuid && x.SQLColumnName == MeasureConstants.YTDDollarsMeasure);
+                foreach (var measure in glSampledMeasures)
+                {
+                    dataSourceLinks.Add(new DataSourceLink(measure.MeasureGUID, "Dollars", glSampledDataTableGuid, true));
+                }
+                // Load Claim Summary Measure
+                var claimsMeasure = measures.Single(x => x.DataTableGUID == claimSummaryDataTableGuid && string.Equals(x.SQLColumnName, MeasureConstants.PCS_ClaimRecordNumber_ColumnName));
+                dataSourceLinks.Add(new DataSourceLink(claimsMeasure.MeasureGUID, "Claims", claimsMeasure.DataTableGUID, false));
 
+                //Load Detail Table Measures
+                var claimDetailMeasures = measures.Where(x => x.DataTableGUID == detailDataTableGuid).ToList(); //&& x.IsNumericMeasure).ToList();
+                foreach (var measure in claimDetailMeasures)
+                {
+                    dataSourceLinks.Add(new DataSourceLink(measure.MeasureGUID, measure.FriendlyName, measure.DataTableGUID, false));
+                }
+
+                //Load Statistics datasource & metrics 
+                var unitsMeasure = measures.Single(x => x.DataTableGUID == claimStatisticDriverDataTable.DataTableGUID && string.Equals(x.SQLColumnName, "Amount01"));
+                dataSourceLinks.Add(new DataSourceLink(unitsMeasure.MeasureGUID, "Amount", unitsMeasure.DataTableGUID, true));
             }
             
 
@@ -139,6 +168,16 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
                 {
                     dtGUID = GL_PAYROLL_DATASOURCE_ID;
                 }
+                else if (measures.Any(m => m.MeasureGUID == driverConfigTemp.MeasureGUID && m.DataTableGUID == claimStatisticDriverDataTable.DataTableGUID))
+                {
+                    dtGUID = claimStatisticDriverDataTable.DataTableGUID;
+                }
+                else if (measures.Any(m => m.MeasureGUID == driverConfigTemp.MeasureGUID && m.DataTableGUID == claimDetailDataTable.DataTableGUID) ||
+                        measures.Any(m => m.MeasureGUID == driverConfigTemp.MeasureGUID && m.DataTableGUID == claimSummaryDataTableGuid))
+                {
+                    dtGUID = claimDetailDataTable.DataTableGUID;
+                }
+
 
                 statisticDrivers.Add(new StatisticDriver(driverConfigTemp, dtGUID));
             }
