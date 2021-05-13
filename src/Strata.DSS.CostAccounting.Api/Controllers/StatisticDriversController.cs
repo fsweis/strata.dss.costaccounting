@@ -71,13 +71,15 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
             var summaryDataTableGuid = dataTables.Where(x => x.GlobalID == DataTableConstants.PatientEncounterSummary).Select(x => x.DataTableGUID).FirstOrDefault();
             var GL_PAYROLL_DATASOURCE_ID = new Guid("72533379-57ad-44c3-8365-b6187a0c6d48");
             //claims
+   
             var claimDetailDataTable = dataTables.Where(x => x.GlobalID == DataTableConstants.PatientClaimChargeLineItemDetail).FirstOrDefault();
-            claimDetailDataTable.FriendlyName = "Claim Detail";
+           
             var claimCostingStatisticDriverDataTable = dataTables.Where(x => x.GlobalID == DataTableConstants.ClaimCostingStatisticDriver).FirstOrDefault();
-            claimCostingStatisticDriverDataTable.FriendlyName = "Claims Statistics";
+          
             var claimSummaryDataTableGuid = dataTables.Where(x => x.GlobalID == DataTableConstants.PatientClaimSummary).Select(x => x.DataTableGUID).FirstOrDefault();
             var claimStatisticDriverDataTable = dataTables.Where(x => x.GlobalID == DataTableConstants.ClaimStatisticDriver).FirstOrDefault();
 
+          
             var dataSourceLinks = new List<DataSourceLink>();
             if ((eCostingType)costingConfig.Type != eCostingType.Claims)
             {
@@ -118,6 +120,8 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
             }
             else
             {
+                claimDetailDataTable.FriendlyName = "Claim Detail";
+                claimCostingStatisticDriverDataTable.FriendlyName = "Claims Statistics";
                 //Load GL Sampled Measures
                 var glSampledMeasures = measures.Where(x => x.DataTableGUID == glSampledDataTableGuid && x.SQLColumnName == MeasureConstants.YTDDollarsMeasure);
                 foreach (var measure in glSampledMeasures)
