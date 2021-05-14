@@ -98,7 +98,7 @@ const StatisticDrivers: React.FC = () => {
           field='dataTableGUID'
           header='Data Source'
           editable
-          sortable
+          filter
           width={300}
           itemValueField='dataTableGUID'
           itemTextField='friendlyName'
@@ -109,7 +109,7 @@ const StatisticDrivers: React.FC = () => {
           field='measureGUID'
           header='Measure'
           editable
-          sortable
+          filter
           width={300}
           itemValueField='measureGUID'
           itemTextField='friendlyName'

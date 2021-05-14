@@ -1,6 +1,7 @@
-﻿using System;
+﻿using Strata.DSS.CostAccounting.Biz.CostAccounting.Models;
+using System;
 
-namespace Strata.DSS.CostAccounting.Biz.CostAccounting.Models
+namespace Strata.DSS.CostAccounting.Biz.StatisticDrivers.Models
 {
     public class DataSourceLink
     {

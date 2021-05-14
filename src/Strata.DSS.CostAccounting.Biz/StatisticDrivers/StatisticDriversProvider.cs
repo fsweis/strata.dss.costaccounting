@@ -1,12 +1,14 @@
 ﻿using Strata.DSS.CostAccounting.Biz.CostAccounting.Models;
 using Strata.DSS.CostAccounting.Biz.CostAccounting.Repositories;
 using Strata.DSS.CostAccounting.Biz.Enums;
+using Strata.DSS.CostAccounting.Biz.StatisticDrivers.Models;
 using Strata.DSS.CostAccounting.Biz.StatisticDrivers.Repositories;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace Strata.DSS.CostAccounting.Biz.StatisticDrivers
 {
@@ -15,10 +17,11 @@ namespace Strata.DSS.CostAccounting.Biz.StatisticDrivers
         public List<DataTable> DataSources;
         public List<DataSourceLink> DataSourceLinks;
         public List<StatisticDriver> StatisticDrivers;
-        public bool IsClaims;
+
         private readonly ICostAccountingRepository _costaccountingRepository;
         private readonly IStatisticDriversRepository _statisticDriversRepository;
         private readonly CancellationToken _cancellationToken;
+
         public List<string> GlobalIDs;
         private List<DataTable> dataTables;
         private List<Measure> measures;
@@ -28,95 +31,35 @@ namespace Strata.DSS.CostAccounting.Biz.StatisticDrivers
         {
             _costaccountingRepository = costaccountingRepository;
             _cancellationToken = cancellationToken;
+            _statisticDriversRepository = statisticDriversRepository;
         }
-        public async void LoadStatisticDrivers(CostingConfig costingConfig)
+        public async Task LoadStatisticDrivers(CostingConfig costingConfig)
         {
+            var isClaims = false;
             if ((eCostingType)costingConfig.Type == eCostingType.Claims)
             {
-                IsClaims = true;
-            }
-            else
-            {
-                IsClaims = false;
-            }
-            //////The following code will be moved into its own area, here for now to show what our provider/engine does
-
-            GlobalIDs = GetGlobalIDs(IsClaims);
-            //Get score data
-            dataTables = await _costaccountingRepository.GetDataTables(GlobalIDs, _cancellationToken);
-            measures = await _costaccountingRepository.GetMeasures(dataTables, _cancellationToken);
-            ruleEngineIncludedMeaures = await _costaccountingRepository.GetRuleEngineIncludedMeasures(_cancellationToken);
-
-            if(IsClaims)
-            {
-                SetClaimsDataSources();
-            }
-            else
-            {
-                SetDataSources();
+                isClaims = true;
             }
 
-            //modify friendly names and get guids, bc thats what jazz does :( 
-         
-
-
-           
-
-            var driverConfigs = await _statisticDriversRepository.GetStatisticDrivers(_cancellationToken);
-            var statisticDrivers = new List<StatisticDriver>();
-            /*
-            foreach (var driverConfigTemp in driverConfigs)
-            {
-                Guid dtGUID = Guid.Empty;
-
-                if (!IsClaims)
-                {
-
-                    if (measures.Any(m => m.MeasureGUID == driverConfigTemp.MeasureGUID && m.DataTableGUID == glSampledDataTable.DataTableGUID))
-                    {
-                        dtGUID = glSampledDataTable.DataTableGUID;
-                    }
-                    if (measures.Any(m => m.MeasureGUID == driverConfigTemp.MeasureGUID && m.DataTableGUID == payrollDataTable.DataTableGUID))
-                    {
-                        dtGUID = payrollDataTable.DataTableGUID;
-                    }
-                    else if (measures.Any(m => m.MeasureGUID == driverConfigTemp.MeasureGUID && m.DataTableGUID == statDriverDataTable.DataTableGUID))
-                    {
-                        dtGUID = statDriverDataTable.DataTableGUID;
-                    }
-                    else if (measures.Any(m => m.MeasureGUID == driverConfigTemp.MeasureGUID && m.DataTableGUID == detailDataTable.DataTableGUID) ||
-                             measures.Any(m => m.MeasureGUID == driverConfigTemp.MeasureGUID && m.DataTableGUID == summaryDataTableGuid))
-                    {
-                        dtGUID = detailDataTable.DataTableGUID;
-                    }
-                    else if (driverConfigTemp.MeasureGUID == GL_PAYROLL_DATASOURCE_ID) //gl & payroll
-                    {
-                        dtGUID = GL_PAYROLL_DATASOURCE_ID;
-                    }
-                }
-                else
-                {
-                    if (measures.Any(m => m.MeasureGUID == driverConfigTemp.MeasureGUID && m.DataTableGUID == glSampledDataTable.DataTableGUID))
-                    {
-                        dtGUID = glSampledDataTable.DataTableGUID;
-                    }
-                    else if (measures.Any(m => m.MeasureGUID == driverConfigTemp.MeasureGUID && m.DataTableGUID == claimStatisticDriverDataTable.DataTableGUID))
-                    {
-                        dtGUID = claimStatisticDriverDataTable.DataTableGUID;
-                    }
-                    else if (measures.Any(m => m.MeasureGUID == driverConfigTemp.MeasureGUID && m.DataTableGUID == claimDetailDataTable.DataTableGUID) ||
-                            measures.Any(m => m.MeasureGUID == driverConfigTemp.MeasureGUID && m.DataTableGUID == claimSummaryDataTableGuid))
-                    {
-                        dtGUID = claimDetailDataTable.DataTableGUID;
-                    }
-                }
+            //Get Data Tables for Costing Type
+            GlobalIDs = GetGlobalIDs(isClaims);
             
+            //Get Score Data for those data tables
+            dataTables = await _costaccountingRepository.GetDataTablesAsync(GlobalIDs, _cancellationToken);
+            measures = await _costaccountingRepository.GetMeasuresAsync(dataTables, _cancellationToken);
+            ruleEngineIncludedMeaures = await _costaccountingRepository.GetRuleEngineIncludedMeasuresAsync(_cancellationToken);
 
-                statisticDrivers.Add(new StatisticDriver(driverConfigTemp, dtGUID));
+            //Set the data sources 
+            if(isClaims)
+            {
+                await SetClaimsDataSourcesAsync(costingConfig, _cancellationToken);
             }
-            */
-
+            else
+            {
+               await SetDataSourcesAsync(costingConfig, _cancellationToken);
+            }
         }
+
         public List<string> GetGlobalIDs(bool isClaims)
         {
             var globalIds = new List<string>();
@@ -138,7 +81,7 @@ namespace Strata.DSS.CostAccounting.Biz.StatisticDrivers
             }
             return globalIds;
         }
-        public void SetDataSources()
+        public async Task SetDataSourcesAsync(CostingConfig costingConfig, CancellationToken _cancellationToken)
         {
             var glSampledDataTable = dataTables.Where(x => x.GlobalID == DataTableConstants.DSSGL).FirstOrDefault();
             glSampledDataTable.FriendlyName = "GL";
@@ -186,8 +129,45 @@ namespace Strata.DSS.CostAccounting.Biz.StatisticDrivers
             var glPDataTable = new DataTable() { DataTableGUID = GL_PAYROLL_DATASOURCE_ID, FriendlyName = "GL and Payroll", GlobalID = "GL and Payroll" };
             dataTables.Add(glPDataTable);
             dataSourceLinks.Add(new DataSourceLink(GL_PAYROLL_DATASOURCE_ID, "Dollars", GL_PAYROLL_DATASOURCE_ID, true));
+
+            var driverConfigs = await _statisticDriversRepository.GetStatisticDriversAsync(costingConfig.Type, _cancellationToken);
+            var statisticDrivers = new List<StatisticDriver>();
+            
+            foreach (var driverConfigTemp in driverConfigs)
+            {
+                Guid dtGUID = Guid.Empty;
+
+                if (measures.Any(m => m.MeasureGUID == driverConfigTemp.MeasureGUID && m.DataTableGUID == glSampledDataTable.DataTableGUID))
+                {
+                    dtGUID = glSampledDataTable.DataTableGUID;
+                }
+                if (measures.Any(m => m.MeasureGUID == driverConfigTemp.MeasureGUID && m.DataTableGUID == payrollDataTable.DataTableGUID))
+                {
+                    dtGUID = payrollDataTable.DataTableGUID;
+                }
+                else if (measures.Any(m => m.MeasureGUID == driverConfigTemp.MeasureGUID && m.DataTableGUID == statDriverDataTable.DataTableGUID))
+                {
+                    dtGUID = statDriverDataTable.DataTableGUID;
+                }
+                else if (measures.Any(m => m.MeasureGUID == driverConfigTemp.MeasureGUID && m.DataTableGUID == detailDataTable.DataTableGUID) ||
+                            measures.Any(m => m.MeasureGUID == driverConfigTemp.MeasureGUID && m.DataTableGUID == summaryDataTableGuid))
+                {
+                    dtGUID = detailDataTable.DataTableGUID;
+                }
+                else if (driverConfigTemp.MeasureGUID == GL_PAYROLL_DATASOURCE_ID) //gl & payroll
+                {
+                    dtGUID = GL_PAYROLL_DATASOURCE_ID;
+                }
+
+                statisticDrivers.Add(new StatisticDriver(driverConfigTemp, dtGUID));
+            }
+
+            DataSources = dataTables;
+            DataSourceLinks = dataSourceLinks;
+            StatisticDrivers = statisticDrivers;
+           
         }
-        public void SetClaimsDataSources()
+        public async Task SetClaimsDataSourcesAsync(CostingConfig costingConfig, CancellationToken _cancellationToken)
         {
             var glSampledDataTable = dataTables.Where(x => x.GlobalID == DataTableConstants.DSSGL).FirstOrDefault();
             glSampledDataTable.FriendlyName = "GL";
@@ -219,6 +199,35 @@ namespace Strata.DSS.CostAccounting.Biz.StatisticDrivers
             //Load Statistics datasource & metrics 
             var unitsMeasure = measures.Single(x => x.DataTableGUID == claimStatisticDriverDataTable.DataTableGUID && string.Equals(x.SQLColumnName, "Amount01"));
             dataSourceLinks.Add(new DataSourceLink(unitsMeasure.MeasureGUID, "Amount", unitsMeasure.DataTableGUID, true));
+
+
+            var driverConfigs = await _statisticDriversRepository.GetStatisticDriversAsync(costingConfig.Type, _cancellationToken);
+            var statisticDrivers = new List<StatisticDriver>();
+
+            foreach (var driverConfigTemp in driverConfigs)
+            {
+                Guid dtGUID = Guid.Empty;
+
+                if (measures.Any(m => m.MeasureGUID == driverConfigTemp.MeasureGUID && m.DataTableGUID == glSampledDataTable.DataTableGUID))
+                {
+                    dtGUID = glSampledDataTable.DataTableGUID;
+                }
+                else if (measures.Any(m => m.MeasureGUID == driverConfigTemp.MeasureGUID && m.DataTableGUID == claimStatisticDriverDataTable.DataTableGUID))
+                {
+                    dtGUID = claimStatisticDriverDataTable.DataTableGUID;
+                }
+                else if (measures.Any(m => m.MeasureGUID == driverConfigTemp.MeasureGUID && m.DataTableGUID == claimDetailDataTable.DataTableGUID) ||
+                        measures.Any(m => m.MeasureGUID == driverConfigTemp.MeasureGUID && m.DataTableGUID == claimSummaryDataTableGuid))
+                {
+                    dtGUID = claimDetailDataTable.DataTableGUID;
+                }
+
+                statisticDrivers.Add(new StatisticDriver(driverConfigTemp, dtGUID));
+            }
+
+            DataSources = dataTables;
+            DataSourceLinks = dataSourceLinks;
+            StatisticDrivers = statisticDrivers;
         }
     }
 }

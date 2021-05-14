@@ -1,9 +1,10 @@
-﻿using Strata.DSS.CostAccounting.Biz.StatisticDrivers.Models;
+﻿using Strata.DSS.CostAccounting.Biz.CostAccounting.Models;
+using Strata.DSS.CostAccounting.Biz.StatisticDrivers.Models;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Strata.DSS.CostAccounting.Biz.CostAccounting.Models
+namespace Strata.DSS.CostAccounting.Biz.StatisticDrivers.Models
 {
     public class StatisticDriver
     {

@@ -44,29 +44,27 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.Repositories
             };
         }
 
-        public async Task<CostingConfig> GetCostingConfig(Guid costingConfigGuid, CancellationToken cancellationToken)
+        public async Task<CostingConfig> GetCostingConfigAsync(Guid costingConfigGuid, CancellationToken cancellationToken)
         {
             await using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
             var costingConfigs = await dbContext.CostingConfigs.Where(cc => cc.CostingConfigGUID == costingConfigGuid).ToListAsync(cancellationToken); 
             return costingConfigs.FirstOrDefault();
         }
 
-        public async Task<List<Measure>> GetMeasures(List<DataTable> dataTables, CancellationToken cancellationToken)
+        public async Task<List<Measure>> GetMeasuresAsync(List<DataTable> dataTables, CancellationToken cancellationToken)
         {
             await using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
             var guids = dataTables.Select(x => x.DataTableGUID).ToList();
             var measures = await dbContext.Measures.Where(m => guids.Contains(m.DataTableGUID) && m.MeasureGUID != Guid.Empty).ToListAsync(cancellationToken);
             return measures;
         }
-        public async Task<List<DataTable>> GetDataTables(List<string> globalIDs, CancellationToken cancellationToken)
+        public async Task<List<DataTable>> GetDataTablesAsync(List<string> globalIDs, CancellationToken cancellationToken)
         {
             await using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
             var dataTables = await dbContext.DataTables.Where(dt => globalIDs.Contains(dt.GlobalID) && dt.GlobalID != "").ToListAsync(cancellationToken);
             return dataTables;
         }
-
-
-        public async Task<List<RuleEngineIncludedMeasure>> GetRuleEngineIncludedMeasures(CancellationToken cancellationToken)
+        public async Task<List<RuleEngineIncludedMeasure>> GetRuleEngineIncludedMeasuresAsync(CancellationToken cancellationToken)
         {
             await using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
             var measures = await dbContext.RuleEngineIncludedMeasures.ToListAsync(cancellationToken);

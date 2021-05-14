@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Strata.SqlTools.Configuration.Common.AsyncFactory;
 using System.Linq;
 using Strata.DSS.CostAccounting.Biz.CostAccounting.DbContexts;
+using Strata.DSS.CostAccounting.Biz.Enums;
 
 namespace Strata.DSS.CostAccounting.Biz.StatisticDrivers.Repositories
 {
@@ -19,11 +20,11 @@ namespace Strata.DSS.CostAccounting.Biz.StatisticDrivers.Repositories
         {
             _dbContextFactory = dbContextFactory;
         }
-        public async Task<IEnumerable<DriverConfig>> GetStatisticDrivers(CancellationToken cancellationToken)
+        public async Task<IEnumerable<DriverConfig>> GetStatisticDriversAsync(byte costingType, CancellationToken cancellationToken)
         {
             await using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
             var allOnesGuid = new Guid(CostingConstants.ALL_ONES_GUID_STRING);
-            var drivers = await dbContext.DriverConfigs.Where(dc => dc.DriverConfigGUID != Guid.Empty && dc.DriverConfigGUID != allOnesGuid && dc.CostingConfigGUID == Guid.Empty).OrderBy(dr => dr.Name).ToListAsync(cancellationToken);
+            var drivers = await dbContext.DriverConfigs.Where(dc => dc.DriverConfigGUID != Guid.Empty && dc.DriverConfigGUID != allOnesGuid && dc.CostingConfigGUID == Guid.Empty && dc.CostingType==costingType).OrderBy(dr => dr.Name).ToListAsync(cancellationToken);
             return drivers;
         }
     }
