@@ -6,5 +6,4 @@ export interface IStatisticDriver {
   isNew: boolean;
   measureGUID: string;
   name: string;
-  childRulesets: string[];
 }

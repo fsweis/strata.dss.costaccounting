@@ -1,13 +1,17 @@
 import React from 'react';
 import DataGrid from '@strata/tempo/lib/datagrid';
 import Header from '@strata/tempo/lib/header';
-import { Tooltip, Button, Toast, ActionBar, Spacing, DropDown } from '@strata/tempo/lib';
+import { Tooltip, Button, Toast, ActionBar, Spacing, DropDown, IDropDownColumnProps } from '@strata/tempo/lib';
 import { IStatisticDriverData } from './data/IStatisticDriverData';
+import { IStatisticDriver } from './data/IStatisticDriver';
 import { useEffect, useState } from 'react';
 import { statisticDriverService } from './data/statisticDriverService';
+import { IDataSourceLink } from './data/IDataSourceLink';
 
 const StatisticDrivers: React.FC = () => {
   const [statDriverData, setStatDriverData] = useState<IStatisticDriverData>();
+  const [statDrivers, setStatDrivers] = useState<IStatisticDriver[]>([]);
+
   const gridRef = React.useRef();
 
   useEffect(() => {
@@ -17,12 +21,40 @@ const StatisticDrivers: React.FC = () => {
     };
     fetchData();
   }, []);
+  useEffect(() => {
+    if (statDriverData?.statisticDrivers) {
+      const statDrivers = statDriverData.statisticDrivers;
+      setStatDrivers(statDrivers);
+    }
+  }, [statDriverData]);
 
   const handleCancel = () => {
     //setData(origData);
     Toast.show({
       message: 'Changes discarded'
     });
+  };
+
+  const handleAdd = () => {
+    const newDriver: IStatisticDriver = {
+      driverConfigGUID: '',
+      dataTableGUID: '',
+      measureGUID: '',
+      hasRules: false,
+      isInverted: false,
+      isNew: true,
+      name: ''
+    };
+    setStatDrivers([newDriver].concat(statDrivers));
+  };
+
+  const handleEditRules = function (driverConfigGUID: string) {
+    const url = 'https://dev.sdt.local/StrataJazz202123/DSS/HealthPlan/Statistics/HealthPlanRulesEditWindow.aspx?hpAdminStatisticDriverGuid=' + driverConfigGUID;
+    const winid = driverConfigGUID;
+    const options = 'scrollbars=0,toolbar=0,location=0,statusbar=0,menubar=0, resizable=1,width=1000,height=700,left=50,top=50';
+    const win = window.open(url, winid, options);
+    win?.focus();
+    return win;
   };
 
   const handleSave = () => {
@@ -68,15 +100,18 @@ const StatisticDrivers: React.FC = () => {
       <ActionBar
         actions={
           <>
-            <Button icon='Plus'>Add Driver</Button>
+            <Button icon='Plus' onClick={handleAdd}>
+              Add Driver
+            </Button>
             <Button icon='DoubleRight'>Run Patient Drivers</Button>
           </>
         }
       />
       <DataGrid
+        dataKey='driverConfigGUID'
         key='StatDriverGrid'
         ref={gridRef.current}
-        value={statDriverData?.statisticDrivers}
+        value={statDrivers}
         sortOrder={1}
         sortField='name'
         pager={{
@@ -92,7 +127,7 @@ const StatisticDrivers: React.FC = () => {
         }}
       >
         <DataGrid.RowNumber key='numberRow'></DataGrid.RowNumber>
-        <DataGrid.Column key='name' header='Name' filter field='name' sortable width={200} />
+        <DataGrid.Column key='name' header='Name' filter editable field='name' sortable width={200} />
         <DataGrid.DropDownColumn
           key='dataSource'
           field='dataTableGUID'
@@ -105,6 +140,7 @@ const StatisticDrivers: React.FC = () => {
           items={statDriverData?.dataSources}
         />
         <DataGrid.DropDownColumn
+          inputProps={{ onChange: (e) => console.log(e) }}
           key='measure'
           field='measureGUID'
           header='Measure'
@@ -123,7 +159,7 @@ const StatisticDrivers: React.FC = () => {
           body={(rowData) => (
             <>
               <Tooltip title='Edit Rules'>
-                <Button type='link' icon='Edit' onClick={() => alert('Edit ' + rowData.name)} />
+                <Button type='link' icon='Edit' onClick={() => handleEditRules(rowData.driverConfigGUID)} />
               </Tooltip>
               <Tooltip title='Delete'>
                 <Button type='link' icon='Delete' onClick={() => alert('Delete ' + rowData.name)} />

@@ -27,7 +27,7 @@ namespace Strata.DSS.CostAccounting.Biz.StatisticDrivers
         private List<Measure> measures;
         private List<RuleEngineIncludedMeasure> ruleEngineIncludedMeaures;
 
-        public StatisticDriversProvider(ICostAccountingRepository costaccountingRepository,IStatisticDriversRepository statisticDriversRepository, CancellationToken cancellationToken)
+        public StatisticDriversProvider(ICostAccountingRepository costaccountingRepository, IStatisticDriversRepository statisticDriversRepository, CancellationToken cancellationToken)
         {
             _costaccountingRepository = costaccountingRepository;
             _cancellationToken = cancellationToken;
@@ -43,20 +43,20 @@ namespace Strata.DSS.CostAccounting.Biz.StatisticDrivers
 
             //Get Data Tables for Costing Type
             GlobalIDs = GetGlobalIDs(isClaims);
-            
+
             //Get Score Data for those data tables
             dataTables = await _costaccountingRepository.GetDataTablesAsync(GlobalIDs, _cancellationToken);
             measures = await _costaccountingRepository.GetMeasuresAsync(dataTables, _cancellationToken);
             ruleEngineIncludedMeaures = await _costaccountingRepository.GetRuleEngineIncludedMeasuresAsync(_cancellationToken);
 
             //Set the data sources 
-            if(isClaims)
+            if (isClaims)
             {
                 await SetClaimsDataSourcesAsync(costingConfig, _cancellationToken);
             }
             else
             {
-               await SetDataSourcesAsync(costingConfig, _cancellationToken);
+                await SetDataSourcesAsync(costingConfig, _cancellationToken);
             }
         }
 
@@ -132,7 +132,7 @@ namespace Strata.DSS.CostAccounting.Biz.StatisticDrivers
 
             var driverConfigs = await _statisticDriversRepository.GetStatisticDriversAsync(costingConfig.Type, _cancellationToken);
             var statisticDrivers = new List<StatisticDriver>();
-            
+
             foreach (var driverConfigTemp in driverConfigs)
             {
                 Guid dtGUID = Guid.Empty;
@@ -165,7 +165,7 @@ namespace Strata.DSS.CostAccounting.Biz.StatisticDrivers
             DataSources = dataTables;
             DataSourceLinks = dataSourceLinks;
             StatisticDrivers = statisticDrivers;
-           
+
         }
         public async Task SetClaimsDataSourcesAsync(CostingConfig costingConfig, CancellationToken _cancellationToken)
         {
@@ -190,7 +190,7 @@ namespace Strata.DSS.CostAccounting.Biz.StatisticDrivers
             dataSourceLinks.Add(new DataSourceLink(claimsMeasure.MeasureGUID, "Claims", claimsMeasure.DataTableGUID, false));
 
             //Load Detail Table Measures
-            var claimDetailMeasures = measures.Where(x => x.DataTableGUID == claimDetailDataTable.DataTableGUID).ToList(); //&& x.IsNumericMeasure).ToList();
+            var claimDetailMeasures = measures.Where(x => x.DataTableGUID == claimDetailDataTable.DataTableGUID && x.IsNumericMeasure()).ToList();
             foreach (var measure in claimDetailMeasures)
             {
                 dataSourceLinks.Add(new DataSourceLink(measure.MeasureGUID, measure.FriendlyName, measure.DataTableGUID, false));
@@ -229,5 +229,6 @@ namespace Strata.DSS.CostAccounting.Biz.StatisticDrivers
             DataSourceLinks = dataSourceLinks;
             StatisticDrivers = statisticDrivers;
         }
+
     }
 }
