@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Strata.DSS.CostAccounting.Biz.StatisticDrivers.Models
 {
-    public partial class DriverConfig
+    public class DriverConfig
     {
         public string Name { get; set; }
         public Guid DriverConfigGUID{ get; set; }

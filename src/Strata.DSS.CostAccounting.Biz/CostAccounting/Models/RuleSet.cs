@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Strata.DSS.CostAccounting.Biz.CostAccounting.Models
 {
-    public partial class RuleSet
+    public class RuleSet
     {
         public string Category { get; set; }
         public int ExecutionOrder { get; set; }

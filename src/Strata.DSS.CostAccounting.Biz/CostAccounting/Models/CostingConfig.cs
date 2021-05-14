@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Strata.DSS.CostAccounting.Biz.CostAccounting.Models
 {
-    public partial class CostingConfig
+    public class CostingConfig
     {
         public Guid CostingConfigGUID { get; set; }
         public string Name { get; set; }

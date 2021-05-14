@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Strata.DSS.CostAccounting.Biz.CostAccounting.Models
 {
-    public partial class RuleEngineIncludedMeasure
+    public class RuleEngineIncludedMeasure
     {
         public Guid RuleEngineIncludedMeasureGUID { get; set; }
         public Guid DataTableGUID { get; set; }
