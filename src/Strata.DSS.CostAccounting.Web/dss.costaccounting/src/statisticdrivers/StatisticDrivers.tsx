@@ -1,7 +1,7 @@
 import React from 'react';
 import DataGrid from '@strata/tempo/lib/datagrid';
 import Header from '@strata/tempo/lib/header';
-import { Tooltip, Button, Toast, Modal, ActionBar, Input, Spacing, DropDown } from '@strata/tempo/lib';
+import { Tooltip, Button, Toast, ActionBar, Spacing, DropDown } from '@strata/tempo/lib';
 import { IStatisticDriverData } from './data/IStatisticDriverData';
 import { useEffect, useState } from 'react';
 import { statisticDriverService } from './data/statisticDriverService';
@@ -116,6 +116,7 @@ const StatisticDrivers: React.FC = () => {
           items={statDriverData?.dataSourceLinks}
         />
         <DataGrid.CheckboxColumn key='inverted' header='Inverted' editable field='isInverted' sortable width={150} />
+        <DataGrid.EmptyColumn />
         <DataGrid.Column
           align='right'
           width={80}
@@ -130,7 +131,6 @@ const StatisticDrivers: React.FC = () => {
             </>
           )}
         />
-        <DataGrid.EmptyColumn />
       </DataGrid>
     </>
   );

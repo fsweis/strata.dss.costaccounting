@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Strata.DSS.CostAccounting.Biz.StatisticDrivers.Models;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -21,7 +22,7 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.Models
 
         public StatisticDriver(DriverConfig driverConfigTemp, Guid dataTableGUID)
         {
-            DriverConfigGUID = driverConfigTemp.DriverConfigGuid;
+            DriverConfigGUID = driverConfigTemp.DriverConfigGUID;
             MeasureGUID = driverConfigTemp.MeasureGUID;
             DataTableGUID = dataTableGUID;
             Name = driverConfigTemp.Name;

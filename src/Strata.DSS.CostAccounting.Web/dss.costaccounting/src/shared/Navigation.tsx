@@ -7,7 +7,7 @@ import { Switch, Route } from 'react-router-dom';
 import ExampleUser from '../user-example/ExampleUser';
 import ExampleDatabase from '../database-example/ExampleDatabase';
 import StatisticDrivers from '../statisticdrivers/StatisticDrivers';
-import { InternalNavbar } from '@strata/navbar/lib';
+import { Navbar } from '@strata/navbar/lib';
 
 const Navigation: React.FC = () => {
   const location = useLocation();
@@ -24,7 +24,7 @@ const Navigation: React.FC = () => {
     <>
       <Layout>
         <Layout.Nav>
-          <InternalNavbar />
+          <Navbar />
         </Layout.Nav>
         <Layout>
           <Layout.Sider collapsible>

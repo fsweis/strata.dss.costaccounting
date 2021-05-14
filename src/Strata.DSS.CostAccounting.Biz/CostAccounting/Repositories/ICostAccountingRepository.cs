@@ -12,8 +12,6 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.Repositories
 
         public Task<CostAccountingModel> GetCostAccountingAsync(Guid id, CancellationToken cancellationToken);
 
-        public Task<IList<DriverConfig>> GetStatisticDrivers(CancellationToken cancellationToken);
-
         public Task<CostingConfig> GetCostingConfig(Guid costingConfigGuid, CancellationToken cancellationToken);
         public Task<List<DataTable>> GetDataTables(List<string> globalIds, CancellationToken cancellationToken);
         public Task<List<Measure>> GetMeasures(List<DataTable> dataTables, CancellationToken cancellationToken);
