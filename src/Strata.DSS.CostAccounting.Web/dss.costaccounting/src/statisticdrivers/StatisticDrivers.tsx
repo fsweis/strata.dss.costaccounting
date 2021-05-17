@@ -1,12 +1,13 @@
 import React from 'react';
 import DataGrid from '@strata/tempo/lib/datagrid';
 import Header from '@strata/tempo/lib/header';
-import { Tooltip, Button, Toast, ActionBar, Spacing, DropDown, IDropDownColumnProps } from '@strata/tempo/lib';
+import { Tooltip, Button, Toast, ActionBar, Spacing, DropDown, IDropDownProps, Modal } from '@strata/tempo/lib';
 import { IStatisticDriverData } from './data/IStatisticDriverData';
 import { IStatisticDriver } from './data/IStatisticDriver';
 import { useEffect, useState } from 'react';
 import { statisticDriverService } from './data/statisticDriverService';
 import { IDataSourceLink } from './data/IDataSourceLink';
+import { IDataSource } from './data/IDataSource';
 
 const StatisticDrivers: React.FC = () => {
   const [statDriverData, setStatDriverData] = useState<IStatisticDriverData>();
@@ -21,6 +22,7 @@ const StatisticDrivers: React.FC = () => {
     };
     fetchData();
   }, []);
+
   useEffect(() => {
     if (statDriverData?.statisticDrivers) {
       const statDrivers = statDriverData.statisticDrivers;
@@ -37,7 +39,7 @@ const StatisticDrivers: React.FC = () => {
 
   const handleAdd = () => {
     const newDriver: IStatisticDriver = {
-      driverConfigGUID: '',
+      driverConfigGUID: '00000000-0000-0000-0000-000000000000',
       dataTableGUID: '',
       measureGUID: '',
       hasRules: false,
@@ -45,7 +47,10 @@ const StatisticDrivers: React.FC = () => {
       isNew: true,
       name: ''
     };
-    setStatDrivers([newDriver].concat(statDrivers));
+    if (statDrivers !== undefined) {
+      const drivers = [newDriver].concat(statDrivers);
+      setStatDrivers(drivers);
+    }
   };
 
   const handleEditRules = function (driverConfigGUID: string) {
@@ -112,7 +117,6 @@ const StatisticDrivers: React.FC = () => {
         key='StatDriverGrid'
         ref={gridRef.current}
         value={statDrivers}
-        sortOrder={1}
         sortField='name'
         pager={{
           pageSize: 10,
@@ -133,23 +137,71 @@ const StatisticDrivers: React.FC = () => {
           field='dataTableGUID'
           header='Data Source'
           editable
-          filter
           width={300}
           itemValueField='dataTableGUID'
           itemTextField='friendlyName'
           items={statDriverData?.dataSources}
+          editor={(cellEditorArgs) => (
+            <>
+              <DropDown
+                onChange={(value) => {
+                  if (value !== cellEditorArgs.rowData.dataTableGUID) {
+                    cellEditorArgs.rowData.dataTableGUID = value;
+                    const defaultValue = statDriverData?.dataSourceLinks.filter((x) => x.dataTableGUID === value && x.isFirstSelect === true);
+                    if (defaultValue !== undefined && defaultValue.length > 0) {
+                      const updatedDrivers = statDrivers.map((driver) => {
+                        if (driver.driverConfigGUID === cellEditorArgs.rowData.driverConfigGUID) {
+                          return { ...driver, measureGUID: defaultValue[0].measureGUID };
+                        }
+                        return driver;
+                      });
+                      setStatDrivers(updatedDrivers);
+                    } else {
+                      const nonDefaultValue = statDriverData?.dataSourceLinks.filter((x) => x.dataTableGUID === value);
+                      if (nonDefaultValue !== undefined && nonDefaultValue.length > 0) {
+                        const updatedDrivers = statDrivers.map((driver) => {
+                          if (driver.driverConfigGUID === cellEditorArgs.rowData.driverConfigGUID) {
+                            return { ...driver, measureGUID: nonDefaultValue[0].measureGUID };
+                          }
+                          return driver;
+                        });
+                        setStatDrivers(updatedDrivers);
+                      }
+                    }
+                  }
+                }}
+                width={300}
+                itemValueField='dataTableGUID'
+                itemTextField='friendlyName'
+                items={statDriverData?.dataSources}
+              />
+            </>
+          )}
         />
         <DataGrid.DropDownColumn
-          inputProps={{ onChange: (e) => console.log(e) }}
-          key='measure'
+          key='dataSourceLink'
           field='measureGUID'
           header='Measure'
           editable
-          filter
           width={300}
           itemValueField='measureGUID'
           itemTextField='friendlyName'
           items={statDriverData?.dataSourceLinks}
+          editor={(cellEditorArgs) => (
+            <>
+              <DropDown
+                onChange={(value) => {
+                  cellEditorArgs.rowData.measureGUID = value;
+                }}
+                width={300}
+                itemValueField='measureGUID'
+                itemTextField='friendlyName'
+                items={statDriverData?.dataSourceLinks.filter((x: IDataSourceLink) => {
+                  return x.dataTableGUID === cellEditorArgs.rowData.dataTableGUID;
+                })}
+              />
+            </>
+          )}
         />
         <DataGrid.CheckboxColumn key='inverted' header='Inverted' editable field='isInverted' sortable width={150} />
         <DataGrid.EmptyColumn />
@@ -162,7 +214,28 @@ const StatisticDrivers: React.FC = () => {
                 <Button type='link' icon='Edit' onClick={() => handleEditRules(rowData.driverConfigGUID)} />
               </Tooltip>
               <Tooltip title='Delete'>
-                <Button type='link' icon='Delete' onClick={() => alert('Delete ' + rowData.name)} />
+                <Button
+                  type='link'
+                  icon='Delete'
+                  onClick={() =>
+                    Modal.confirm({
+                      title: 'Permanently delete ' + rowData.name + '?',
+                      okText: 'Delete Driver',
+                      cancelText: 'Keep Driver',
+                      onOk() {
+                        if (statDrivers !== undefined) {
+                          const newStatDrivers = statDrivers.filter(function (obj) {
+                            return obj.driverConfigGUID !== rowData.driverConfigGUID;
+                          });
+                          setStatDrivers(newStatDrivers);
+                        }
+                      },
+                      onCancel() {
+                        console.log('Changes kept');
+                      }
+                    })
+                  }
+                />
               </Tooltip>
             </>
           )}

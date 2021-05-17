@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Strata.DSS.CostAccounting.Biz.Enums
 {
-    public enum eSQLDataType
+    public enum SQLDataType
     {
         Unknown = 0,
         Image = 34,

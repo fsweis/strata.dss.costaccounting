@@ -15,25 +15,25 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.Models
 
         public bool IsNumericMeasure()
         {
-            switch ((eSQLDataType)ColumnTypeValue)
+            switch ((SQLDataType)ColumnTypeValue)
             {
-                case eSQLDataType.BigInt:
+                case SQLDataType.BigInt:
                     return true;
-                case eSQLDataType.Decimal:
+                case SQLDataType.Decimal:
                     return true;
-                case eSQLDataType.Float:
+                case SQLDataType.Float:
                     return true;
-                case eSQLDataType.Int:
+                case SQLDataType.Int:
                     return true;
-                case eSQLDataType.Money:
+                case SQLDataType.Money:
                     return true;
-                case eSQLDataType.Real:
+                case SQLDataType.Real:
                     return true;
-                case eSQLDataType.SmallInt:
+                case SQLDataType.SmallInt:
                     return true;
-                case eSQLDataType.SmallMoney:
+                case SQLDataType.SmallMoney:
                     return true;
-                case eSQLDataType.TinyInt:
+                case SQLDataType.TinyInt:
                     return true;
                 default:
                     return false;
