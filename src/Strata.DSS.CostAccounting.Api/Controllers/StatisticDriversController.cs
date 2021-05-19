@@ -50,5 +50,42 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
             };
             return Ok(statisticDriverDto);
         }
+
+        [HttpGet("{driverConfigGUID}")]
+        [ProducesResponseType(200)]
+        public async Task<ActionResult<bool>> ValidateRemove([FromRoute] Guid driverConfigGUID, CancellationToken cancellationToken)
+        {
+            return  await _statisticDriversRepository.ValidateRemoveAsync(driverConfigGUID, cancellationToken);
+        }
+
+
+        [HttpPost("SaveStatisticDrivers")]
+        [ProducesResponseType(200)]
+        public async Task<ActionResult<bool>>  SaveStatisticDrivers([FromBody] StatisticDriverSaveData statisticDriverSaveData, CancellationToken cancellationToken)
+        {
+            if(statisticDriverSaveData.AddedStatDrivers.Count>0)
+            {
+                if (! await _statisticDriversRepository.AddStatisticDriversAsync(statisticDriverSaveData.AddedStatDrivers, cancellationToken))
+                {
+                    return false;
+                };
+            }
+            if (statisticDriverSaveData.UpdatedStatDrivers.Count > 0)
+            {
+                if (!await _statisticDriversRepository.UpdateStatisticDriversAsync(statisticDriverSaveData.UpdatedStatDrivers, cancellationToken))
+                {
+                    return false;
+                };
+            }
+            if (statisticDriverSaveData.DeletedStatDrivers.Count > 0)
+            {
+                if (!await _statisticDriversRepository.DeleteStatisticDriversAsync(statisticDriverSaveData.DeletedStatDrivers, cancellationToken))
+                {
+                    return false;
+                };
+            }
+
+            return true;
+        }
     }
 }

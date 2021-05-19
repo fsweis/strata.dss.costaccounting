@@ -1,25 +1,32 @@
 import React from 'react';
 import DataGrid from '@strata/tempo/lib/datagrid';
 import Header from '@strata/tempo/lib/header';
-import { Tooltip, Button, Toast, ActionBar, Spacing, DropDown, IDropDownProps, Modal } from '@strata/tempo/lib';
+import Tooltip from '@strata/tempo/lib/tooltip';
+import Button from '@strata/tempo/lib/button';
+import Toast from '@strata/tempo/lib/toast';
+import ActionBar from '@strata/tempo/lib/actionbar';
+import Spacing from '@strata/tempo/lib/spacing';
+import DropDown from '@strata/tempo/lib/dropdown';
+import Modal from '@strata/tempo/lib/modal';
 import { IStatisticDriverData } from './data/IStatisticDriverData';
+import { IStatisticDriverSaveData } from './data/IStatisticDriverSaveData';
 import { IStatisticDriver } from './data/IStatisticDriver';
 import { useEffect, useState } from 'react';
 import { statisticDriverService } from './data/statisticDriverService';
 import { IDataSourceLink } from './data/IDataSourceLink';
-import { IDataSource } from './data/IDataSource';
+import { getNewGuid, getEmptyGuid } from '../shared/Utils';
 
 const StatisticDrivers: React.FC = () => {
   const [statDriverData, setStatDriverData] = useState<IStatisticDriverData>();
   const [statDrivers, setStatDrivers] = useState<IStatisticDriver[]>([]);
-
-  const gridRef = React.useRef();
+  const [deletedDrivers, setDeletedDrivers] = useState<string[]>([]);
+  const [updatedDrivers, setUpdatedDrivers] = useState<string[]>([]);
+  const fetchData = async () => {
+    setStatDriverData(await statisticDriverService.getStatisticDrivers());
+  };
 
   useEffect(() => {
     // runs once when component mounts
-    const fetchData = async () => {
-      setStatDriverData(await statisticDriverService.getStatisticDrivers());
-    };
     fetchData();
   }, []);
 
@@ -31,22 +38,28 @@ const StatisticDrivers: React.FC = () => {
   }, [statDriverData]);
 
   const handleCancel = () => {
-    //setData(origData);
+    if (statDriverData) {
+      setStatDrivers(statDriverData?.statisticDrivers);
+    }
+
     Toast.show({
       message: 'Changes discarded'
     });
   };
 
   const handleAdd = () => {
+    const newGuid = getNewGuid();
+
     const newDriver: IStatisticDriver = {
-      driverConfigGUID: '00000000-0000-0000-0000-000000000000',
-      dataTableGUID: '',
-      measureGUID: '',
+      driverConfigGUID: newGuid,
+      dataTableGUID: getEmptyGuid(),
+      measureGUID: getEmptyGuid(),
       hasRules: false,
       isInverted: false,
       isNew: true,
       name: ''
     };
+
     if (statDrivers !== undefined) {
       const drivers = [newDriver].concat(statDrivers);
       setStatDrivers(drivers);
@@ -62,33 +75,100 @@ const StatisticDrivers: React.FC = () => {
     return win;
   };
 
-  const handleSave = () => {
-    /*
-    if(gridRef!==null)
-    {
-      current.validateGrid().then((invalidCells: any[]) => {
-        if (invalidCells.length > 0) {
-          const invalidKeys = invalidCells.map((cell) => cell.rowKey);
-          const invalidRows = statDriverData?.statisticDrivers.filter((row) => invalidKeys.includes(row.driverConfigGUID));
-          const invalidNames = invalidRows
-            .map((row) => row.name)
-            .sort()
-            .join(', ');
-  
-          Modal.alert({
-            title: 'Changes not saved',
-            content: 'Fix errors in ' + invalidNames + '.',
-            alertType: 'error'
-          });
-        } else {
-          Toast.show({
-            toastType: 'success',
-            message: 'Changes saved'
+  const handleSave = async () => {
+    if (validateStatisticDrivers()) {
+      //clean up update lists
+      let driversToUpdate = updatedDrivers;
+      deletedDrivers.forEach(function (d) {
+        if (updatedDrivers.indexOf(d) >= 0) {
+          driversToUpdate = driversToUpdate.filter(function (u) {
+            return u !== d;
           });
         }
       });
+      //get stats to update
+      const statDriversToUpdate = statDrivers.filter(function (stat) {
+        return driversToUpdate.indexOf(stat.driverConfigGUID) >= 0 && stat.isNew === false;
+      });
+      //get stats to add
+      const statDriversToAdd = statDrivers.filter(function (stat) {
+        return driversToUpdate.indexOf(stat.driverConfigGUID) >= 0 && stat.isNew === true;
+      });
+
+      const statDriverSaveData: IStatisticDriverSaveData = {
+        addedStatDrivers: statDriversToAdd,
+        updatedStatDrivers: statDriversToUpdate,
+        deletedStatDrivers: deletedDrivers
+      };
+      console.log(statDriverSaveData);
+      await statisticDriverService.saveStatisticDrivers(statDriverSaveData);
+      //reset Update Lists
+      setUpdatedDrivers([]);
+      setDeletedDrivers([]);
+      //call save
+
+      Toast.show({
+        toastType: 'success',
+        message: 'Changes saved'
+      });
+      handleRefresh();
     }
-    */
+  };
+
+  const handleRefresh = () => {
+    fetchData();
+  };
+
+  const validateStatisticDrivers = () => {
+    const data = statDrivers;
+    const dupeNames = [];
+    const statDriverErrorCells = [];
+    const errorCells: [{ columnIndex: number; rows: number[] }] = [{ columnIndex: 0, rows: [] }];
+
+    for (let i = 0; i < data.length; i++) {
+      if (data[i].name === '') {
+        errorCells[0].rows.push(i);
+        statDriverErrorCells.push(errorCells);
+        Modal.alert({
+          title: 'Changes not saved',
+          content: 'Statistic driver name cannot be blank. Column: 0 , Row: ' + i + '.',
+          alertType: 'error'
+        });
+        return false;
+      }
+      if (data[i].dataTableGUID === getEmptyGuid()) {
+        errorCells[0].rows.push(i);
+        Modal.alert({
+          title: 'Changes not saved',
+          content: 'Data Source cannot be empty. Column: 1 , Row: ' + i + '.',
+          alertType: 'error'
+        });
+        return false;
+      }
+      if (data[i].measureGUID === getEmptyGuid()) {
+        errorCells[0].rows.push(i);
+        Modal.alert({
+          title: 'Changes not saved',
+          content: 'Measure cannot be empty. Column: 2 , Row: ' + i + '.',
+          alertType: 'error'
+        });
+        return false;
+      }
+      if (dupeNames.indexOf(data[i].name) > -1) {
+        errorCells[0].rows.push(i);
+        statDriverErrorCells.push(errorCells);
+        Modal.alert({
+          title: 'Changes not saved',
+          content: 'Statistic driver name must be unique. Column: 0 , Row: ' + i + '.',
+          alertType: 'error'
+        });
+        return false;
+      } else {
+        dupeNames.push(data[i].name);
+      }
+    }
+
+    return true;
   };
 
   return (
@@ -113,11 +193,15 @@ const StatisticDrivers: React.FC = () => {
         }
       />
       <DataGrid
-        dataKey='driverConfigGUID'
         key='StatDriverGrid'
-        ref={gridRef.current}
         value={statDrivers}
-        sortField='name'
+        onCellEdit={(e) => {
+          //add to updated drivers
+          if (updatedDrivers.indexOf(e.rowData.driverConfigGUID) < 0) {
+            const driversToUpdate = [e.rowData.driverConfigGUID].concat(updatedDrivers);
+            setUpdatedDrivers(driversToUpdate);
+          }
+        }}
         pager={{
           pageSize: 10,
           extra: (
@@ -131,7 +215,30 @@ const StatisticDrivers: React.FC = () => {
         }}
       >
         <DataGrid.RowNumber key='numberRow'></DataGrid.RowNumber>
-        <DataGrid.Column key='name' header='Name' filter editable field='name' sortable width={200} />
+        <DataGrid.Column
+          key='name'
+          header='Name'
+          filter
+          editable
+          field='name'
+          width={200}
+          validationRules={[
+            {
+              required: true
+            },
+            {
+              type: 'string'
+            },
+            {
+              validator: (rule, value, callback, source, options) => {
+                // options.cellArgs as ICellEditorArgs contain additional info
+                // rule.message allows you to customize the validation message dynamically
+                return value !== '';
+              },
+              message: 'Enter a name'
+            }
+          ]}
+        />
         <DataGrid.DropDownColumn
           key='dataSource'
           field='dataTableGUID'
@@ -155,6 +262,7 @@ const StatisticDrivers: React.FC = () => {
                         }
                         return driver;
                       });
+                      //need to refresh grid data
                       setStatDrivers(updatedDrivers);
                     } else {
                       const nonDefaultValue = statDriverData?.dataSourceLinks.filter((x) => x.dataTableGUID === value);
@@ -165,9 +273,15 @@ const StatisticDrivers: React.FC = () => {
                           }
                           return driver;
                         });
+                        //need to refresh grid data
                         setStatDrivers(updatedDrivers);
                       }
                     }
+                  }
+                  //add to updated drivers
+                  if (updatedDrivers.indexOf(cellEditorArgs.rowData.driverConfigGUID) < 0) {
+                    const driversToUpdate = [cellEditorArgs.rowData.driverConfigGUID].concat(updatedDrivers);
+                    setUpdatedDrivers(driversToUpdate);
                   }
                 }}
                 width={300}
@@ -177,6 +291,22 @@ const StatisticDrivers: React.FC = () => {
               />
             </>
           )}
+          validationRules={[
+            {
+              required: true
+            },
+            {
+              type: 'string'
+            },
+            {
+              validator: (rule, value, callback, source, options) => {
+                // options.cellArgs as ICellEditorArgs contain additional info
+                // rule.message allows you to customize the validation message dynamically
+                return value !== '';
+              },
+              message: 'Enter a data source'
+            }
+          ]}
         />
         <DataGrid.DropDownColumn
           key='dataSourceLink'
@@ -192,6 +322,11 @@ const StatisticDrivers: React.FC = () => {
               <DropDown
                 onChange={(value) => {
                   cellEditorArgs.rowData.measureGUID = value;
+                  //add to updated drivers
+                  if (updatedDrivers.indexOf(cellEditorArgs.rowData.driverConfigGUID) < 0) {
+                    const driversToUpdate = [cellEditorArgs.rowData.driverConfigGUID].concat(updatedDrivers);
+                    setUpdatedDrivers(driversToUpdate);
+                  }
                 }}
                 width={300}
                 itemValueField='measureGUID'
@@ -224,6 +359,10 @@ const StatisticDrivers: React.FC = () => {
                       cancelText: 'Keep Driver',
                       onOk() {
                         if (statDrivers !== undefined) {
+                          //add to deleted drivers
+                          const driversToDelete = [rowData.driverConfigGUID].concat(deletedDrivers);
+                          setDeletedDrivers(driversToDelete);
+                          //refresh the grid
                           const newStatDrivers = statDrivers.filter(function (obj) {
                             return obj.driverConfigGUID !== rowData.driverConfigGUID;
                           });

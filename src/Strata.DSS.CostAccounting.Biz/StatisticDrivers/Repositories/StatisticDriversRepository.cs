@@ -26,6 +26,81 @@ namespace Strata.DSS.CostAccounting.Biz.StatisticDrivers.Repositories
             var allOnesGuid = new Guid(CostingConstants.ALL_ONES_GUID_STRING);
             var drivers = await dbContext.DriverConfigs.Where(dc => dc.DriverConfigGUID != Guid.Empty && dc.DriverConfigGUID != allOnesGuid && dc.CostingConfigGUID == Guid.Empty && dc.CostingType==costingType).OrderBy(dr => dr.Name).ToListAsync(cancellationToken);
             return drivers;
+           
+        }
+
+        public async Task<bool> ValidateRemoveAsync(Guid driverConfigGUID, CancellationToken cancellationToken)
+        {
+            await using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
+            var sql = @"select DriverConfigGUID from DSS.AccountReclass
+                        UNION
+                        select DriverConfigGUID from DSS.PayCodeJobCodeReclass
+                        UNION
+                        select DriverConfigGUID from DSS.DepartmentReclass
+                        UNION
+                        select DriverConfigGUID from DSS.AllocationConfig
+                        UNION
+                        select DriverConfigGUID from DSS.AllocationConfigOverride";  
+
+           
+            return true;
+        }
+
+        public async Task<Boolean> UpdateStatisticDriversAsync(List<StatisticDriver>statisticDrivers, CancellationToken cancellationToken)
+        {
+            await using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
+            foreach (var statDriver in statisticDrivers)
+           {
+                var driver = await dbContext.DriverConfigs.Where(dc => dc.DriverConfigGUID == statDriver.DriverConfigGUID).FirstOrDefaultAsync();
+                driver.MeasureGUID = statDriver.MeasureGUID;
+                driver.IsInverted = statDriver.IsInverted;
+                driver.Name = statDriver.Name;
+           }
+
+            var saveChange = await dbContext.SaveChangesAsync(cancellationToken);
+
+            return saveChange > 0;
+        }
+
+        public async Task<Boolean> AddStatisticDriversAsync(List<StatisticDriver> statisticDrivers, CancellationToken cancellationToken)
+        {
+            await using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
+
+            foreach (var statDriver in statisticDrivers)
+            {
+                var driverConfig = new DriverConfig()
+                {
+                    DriverConfigGUID = statDriver.DriverConfigGUID,
+                    MeasureGUID = statDriver.MeasureGUID,
+                    IsInverted = statDriver.IsInverted,
+                    Name = statDriver.Name
+                    //Need costing type!
+                };
+
+                dbContext.DriverConfigs.Add(driverConfig);
+            }
+
+            try { 
+             await dbContext.SaveChangesAsync(cancellationToken);
+            }catch(Exception e)
+            {
+                Console.WriteLine(e);
+            }
+
+            return true;
+        }
+
+        public async Task<Boolean> DeleteStatisticDriversAsync(List<Guid> statisticDriverGUIDs, CancellationToken cancellationToken)
+        {
+            await using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
+            foreach (var statDriverGUID in statisticDriverGUIDs)
+            {
+                var driver = await dbContext.DriverConfigs.Where(dc => dc.DriverConfigGUID == statDriverGUID).FirstOrDefaultAsync();
+                dbContext.Remove(driver);
+            }
+
+            var saveChange = await dbContext.SaveChangesAsync(cancellationToken);
+            return saveChange > 0;
         }
     }
 }

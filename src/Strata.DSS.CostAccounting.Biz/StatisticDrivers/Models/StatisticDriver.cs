@@ -3,6 +3,7 @@ using Strata.DSS.CostAccounting.Biz.StatisticDrivers.Models;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Text.Json.Serialization;
 
 namespace Strata.DSS.CostAccounting.Biz.StatisticDrivers.Models
 {
@@ -14,8 +15,10 @@ namespace Strata.DSS.CostAccounting.Biz.StatisticDrivers.Models
         public string Name { get; set; }
         public bool IsNew { get; set; }
         public bool IsInverted { get; set; }
+        [JsonIgnore]
         public List<RuleSet> ChildRuleSets { get; set; }
         public bool HasRules { get; set; }
+
 
         public StatisticDriver()
         {

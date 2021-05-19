@@ -67,8 +67,8 @@ namespace Strata.DSS.CostAccounting.Biz.StatisticDrivers
             if (isClaims)
             {
                 globalIds.Add(DataTableConstants.PatientClaimChargeLineItemDetail);
-                globalIds.Add(DataTableConstants.PatientClaimSummary);
-                globalIds.Add(DataTableConstants.ClaimCostingStatisticDriver);
+                //globalIds.Add(DataTableConstants.PatientClaimSummary);
+                //globalIds.Add(DataTableConstants.ClaimCostingStatisticDriver);
                 globalIds.Add(DataTableConstants.ClaimStatisticDriver);
             }
             else
@@ -175,9 +175,9 @@ namespace Strata.DSS.CostAccounting.Biz.StatisticDrivers
             var claimDetailDataTable = dataTables.Where(x => x.GlobalID == DataTableConstants.PatientClaimChargeLineItemDetail).FirstOrDefault();
             claimDetailDataTable.FriendlyName = "Claim Detail";
             var claimCostingStatisticDriverDataTable = dataTables.Where(x => x.GlobalID == DataTableConstants.ClaimCostingStatisticDriver).FirstOrDefault();
-            claimCostingStatisticDriverDataTable.FriendlyName = "Claims Statistics";
             var claimSummaryDataTableGuid = dataTables.Where(x => x.GlobalID == DataTableConstants.PatientClaimSummary).Select(x => x.DataTableGUID).FirstOrDefault();
             var claimStatisticDriverDataTable = dataTables.Where(x => x.GlobalID == DataTableConstants.ClaimStatisticDriver).FirstOrDefault();
+            claimStatisticDriverDataTable.FriendlyName = "Claims Statistics";
             var dataSourceLinks = new List<DataSourceLink>();
             //Load GL Sampled Measures
             var glSampledMeasures = measures.Where(x => x.DataTableGUID == glSampledDataTable.DataTableGUID && x.SQLColumnName == MeasureConstants.YTDDollarsMeasure);
@@ -186,8 +186,8 @@ namespace Strata.DSS.CostAccounting.Biz.StatisticDrivers
                 dataSourceLinks.Add(new DataSourceLink(measure.MeasureGUID, "Dollars", glSampledDataTable.DataTableGUID, true));
             }
             // Load Claim Summary Measure
-            var claimsMeasure = measures.Single(x => x.DataTableGUID == claimSummaryDataTableGuid && string.Equals(x.SQLColumnName, MeasureConstants.PCS_ClaimRecordNumber_ColumnName));
-            dataSourceLinks.Add(new DataSourceLink(claimsMeasure.MeasureGUID, "Claims", claimsMeasure.DataTableGUID, false));
+            // var claimsMeasure = measures.Single(x => x.DataTableGUID == claimSummaryDataTableGuid && string.Equals(x.SQLColumnName, MeasureConstants.PCS_ClaimRecordNumber_ColumnName));
+            // dataSourceLinks.Add(new DataSourceLink(claimsMeasure.MeasureGUID, "Claims", claimsMeasure.DataTableGUID, false));
 
             //Load Detail Table Measures
             var claimDetailMeasures = measures.Where(x => x.DataTableGUID == claimDetailDataTable.DataTableGUID && x.IsNumericMeasure()).ToList();
