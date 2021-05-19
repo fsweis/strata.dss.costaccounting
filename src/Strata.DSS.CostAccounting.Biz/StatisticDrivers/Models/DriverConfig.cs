@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Strata.DSS.CostAccounting.Biz.Enums;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -10,7 +11,7 @@ namespace Strata.DSS.CostAccounting.Biz.StatisticDrivers.Models
         public Guid DriverConfigGUID{ get; set; }
         public Guid CostingConfigGUID { get; set; }
         public Guid MeasureGUID { get; set; }
-        public byte CostingType { get; set; }
+        public CostingType CostingType { get; set; }
         public bool IsInverted { get; set; }
     }
 }

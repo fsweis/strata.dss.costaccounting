@@ -7,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Strata.DSS.CostAccounting.Biz.CostAccounting.DbContexts;
 using Microsoft.EntityFrameworkCore;
 using Strata.DSS.CostAccounting.Biz.StatisticDrivers.Repositories;
+using Strata.DSS.CostAccounting.Biz.StatisticDrivers.Services;
 
 // ReSharper disable once CheckNamespace
 namespace Microsoft.Extensions.DependencyInjection
@@ -17,6 +18,7 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             services.AddScoped<ICostAccountingRepository, CostAccountingRepository>();
             services.AddScoped<IStatisticDriversRepository, StatisticDriversRepository>();
+            services.AddScoped<IStatisticDriversService, StatisticDriversService>();
             services.AddCachedSmcServiceClient();
             services.AddHttpContextAccessor();
             services.TryAddScoped<IClaimsPrincipalAccessor, ClaimsPrincipalAccessor>();

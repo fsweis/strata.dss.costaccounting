@@ -8,10 +8,10 @@ using Strata.DSS.CostAccounting.Biz.CostAccounting.Models;
 using Strata.DSS.CostAccounting.Biz.CostAccounting.Repositories;
 using Strata.DSS.CostAccounting.Biz.Enums;
 using Strata.DSS.CostAccounting.Biz;
-using Strata.DSS.CostAccounting.Api.DTOs;
 using Strata.DSS.CostAccounting.Biz.StatisticDrivers;
 using Strata.DSS.CostAccounting.Biz.StatisticDrivers.Repositories;
 using Strata.DSS.CostAccounting.Biz.StatisticDrivers.Models;
+using Strata.DSS.CostAccounting.Biz.StatisticDrivers.Services;
 
 namespace Strata.DSS.CostAccounting.Api.Controllers
 {
@@ -22,11 +22,13 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
     {
         private readonly ICostAccountingRepository _costaccountingRepository;
         private readonly IStatisticDriversRepository _statisticDriversRepository;
+        private readonly IStatisticDriversService _statisticDriversService;
 
-        public StatisticDriversController(ICostAccountingRepository costaccountingRepository, IStatisticDriversRepository statisticDriversRepository)
+        public StatisticDriversController(ICostAccountingRepository costaccountingRepository, IStatisticDriversRepository statisticDriversRepository, IStatisticDriversService statisticDriversService)
         {
             _costaccountingRepository = costaccountingRepository;
             _statisticDriversRepository = statisticDriversRepository;
+            _statisticDriversService = statisticDriversService;
         }
 
         [HttpGet("")]
@@ -34,21 +36,15 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
         public async Task<ActionResult<IEnumerable<StatisticDriverDTO>>> GetStatisticDrivers(CancellationToken cancellationToken)
         {
             //dev patient
-            //var costingConfig = await _costaccountingRepository.GetCostingConfig(new Guid("da9eef04-3c9d-445b-b0c4-3a7812ca76d8"), cancellationToken);
+            //var costingConfig = await _costaccountingRepository.GetCostingConfigAsync(new Guid("da9eef04-3c9d-445b-b0c4-3a7812ca76d8"), cancellationToken);
             ///kaiser patient
             //var costingConfig = await _costaccountingRepository.GetCostingConfig(new Guid("0f559827-4df4-4f1d-843e-d49a1e1c649d"), cancellationToken);
             //kaiser claims
             var costingConfig = await _costaccountingRepository.GetCostingConfigAsync(new Guid("2adafbaa-c365-472a-94f1-79b823d8547a"), cancellationToken);
-            
-            StatisticDriversProvider statisticDriversProvider = new StatisticDriversProvider(_costaccountingRepository,_statisticDriversRepository, cancellationToken);
-            await statisticDriversProvider.LoadStatisticDrivers(costingConfig);
 
-            var statisticDriverDto = new StatisticDriverDTO() { 
-                StatisticDrivers = statisticDriversProvider.StatisticDrivers, 
-                DataSources = statisticDriversProvider.DataSources, 
-                DataSourceLinks = statisticDriversProvider.DataSourceLinks
-            };
-            return Ok(statisticDriverDto);
+
+            var statisticDriverDTO = await _statisticDriversService.LoadStatisticDrivers(costingConfig);
+            return Ok(statisticDriverDTO);
         }
 
         [HttpGet("{driverConfigGUID}")]

@@ -1,4 +1,4 @@
-﻿using Strata.DSS.CostAccounting.Biz.StatisticDrivers.Models;
+using Strata.DSS.CostAccounting.Biz.StatisticDrivers.Models;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -20,7 +20,7 @@ namespace Strata.DSS.CostAccounting.Biz.StatisticDrivers.Repositories
         {
             _dbContextFactory = dbContextFactory;
         }
-        public async Task<IEnumerable<DriverConfig>> GetStatisticDriversAsync(byte costingType, CancellationToken cancellationToken)
+        public async Task<IEnumerable<DriverConfig>> GetDriverConfigsAsync(CostingType costingType, CancellationToken cancellationToken)
         {
             await using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
             var allOnesGuid = new Guid(CostingConstants.ALL_ONES_GUID_STRING);
@@ -57,9 +57,15 @@ namespace Strata.DSS.CostAccounting.Biz.StatisticDrivers.Repositories
                 driver.Name = statDriver.Name;
            }
 
-            var saveChange = await dbContext.SaveChangesAsync(cancellationToken);
-
-            return saveChange > 0;
+            try
+            {
+                await dbContext.SaveChangesAsync(cancellationToken);
+            }
+            catch (Exception e)
+            {
+                return false;
+            }
+            return true;
         }
 
         public async Task<Boolean> AddStatisticDriversAsync(List<StatisticDriver> statisticDrivers, CancellationToken cancellationToken)
@@ -84,7 +90,7 @@ namespace Strata.DSS.CostAccounting.Biz.StatisticDrivers.Repositories
              await dbContext.SaveChangesAsync(cancellationToken);
             }catch(Exception e)
             {
-                Console.WriteLine(e);
+                return false;
             }
 
             return true;
@@ -99,8 +105,15 @@ namespace Strata.DSS.CostAccounting.Biz.StatisticDrivers.Repositories
                 dbContext.Remove(driver);
             }
 
-            var saveChange = await dbContext.SaveChangesAsync(cancellationToken);
-            return saveChange > 0;
+            try
+            {
+                await dbContext.SaveChangesAsync(cancellationToken);
+            }
+            catch (Exception e)
+            {
+                return false;
+            }
+            return true;
         }
     }
 }

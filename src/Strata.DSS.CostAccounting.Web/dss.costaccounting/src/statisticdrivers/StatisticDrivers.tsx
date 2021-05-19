@@ -101,16 +101,23 @@ const StatisticDrivers: React.FC = () => {
         deletedStatDrivers: deletedDrivers
       };
       console.log(statDriverSaveData);
-      await statisticDriverService.saveStatisticDrivers(statDriverSaveData);
-      //reset Update Lists
-      setUpdatedDrivers([]);
-      setDeletedDrivers([]);
-      //call save
+      const success = await statisticDriverService.saveStatisticDrivers(statDriverSaveData);
 
-      Toast.show({
-        toastType: 'success',
-        message: 'Changes saved'
-      });
+      if (success) {
+        //reset Update Lists
+        setUpdatedDrivers([]);
+        setDeletedDrivers([]);
+        Toast.show({
+          toastType: 'success',
+          message: 'Changes saved'
+        });
+      } else {
+        Toast.show({
+          toastType: 'error',
+          message: 'Changed not saved'
+        });
+      }
+      //refresh grid
       handleRefresh();
     }
   };
@@ -122,52 +129,37 @@ const StatisticDrivers: React.FC = () => {
   const validateStatisticDrivers = () => {
     const data = statDrivers;
     const dupeNames = [];
-    const statDriverErrorCells = [];
-    const errorCells: [{ columnIndex: number; rows: number[] }] = [{ columnIndex: 0, rows: [] }];
+    let message = '';
 
     for (let i = 0; i < data.length; i++) {
       if (data[i].name === '') {
-        errorCells[0].rows.push(i);
-        statDriverErrorCells.push(errorCells);
-        Modal.alert({
-          title: 'Changes not saved',
-          content: 'Statistic driver name cannot be blank. Column: 0 , Row: ' + i + '.',
-          alertType: 'error'
-        });
-        return false;
+        message = 'Statistic driver name cannot be blank. Column: 0 , Row: ' + i + '.';
+        break;
       }
       if (data[i].dataTableGUID === getEmptyGuid()) {
-        errorCells[0].rows.push(i);
-        Modal.alert({
-          title: 'Changes not saved',
-          content: 'Data Source cannot be empty. Column: 1 , Row: ' + i + '.',
-          alertType: 'error'
-        });
-        return false;
+        message = 'Data Source cannot be empty. Column: 1 , Row: ' + i + '.';
+        break;
       }
       if (data[i].measureGUID === getEmptyGuid()) {
-        errorCells[0].rows.push(i);
-        Modal.alert({
-          title: 'Changes not saved',
-          content: 'Measure cannot be empty. Column: 2 , Row: ' + i + '.',
-          alertType: 'error'
-        });
-        return false;
+        message = 'Measure cannot be empty. Column: 2 , Row: ' + i + '.';
+        break;
       }
       if (dupeNames.indexOf(data[i].name) > -1) {
-        errorCells[0].rows.push(i);
-        statDriverErrorCells.push(errorCells);
-        Modal.alert({
-          title: 'Changes not saved',
-          content: 'Statistic driver name must be unique. Column: 0 , Row: ' + i + '.',
-          alertType: 'error'
-        });
-        return false;
+        message = 'Statistic driver name must be unique. Column: 0 , Row: ' + i + '.';
+        break;
       } else {
         dupeNames.push(data[i].name);
       }
     }
 
+    if (message !== '') {
+      Modal.alert({
+        title: 'Changes not saved',
+        content: message,
+        alertType: 'error'
+      });
+      return false;
+    }
     return true;
   };
 

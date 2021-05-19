@@ -10,57 +10,63 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Strata.DSS.CostAccounting.Biz.StatisticDrivers
+namespace Strata.DSS.CostAccounting.Biz.StatisticDrivers.Services
 {
-    public class StatisticDriversProvider
+    public class StatisticDriversService: IStatisticDriversService
     {
-        public List<DataTable> DataSources;
-        public List<DataSourceLink> DataSourceLinks;
-        public List<StatisticDriver> StatisticDrivers;
+        public IList<DataTable> DataSources;
+        public IList<DataSourceLink> DataSourceLinks;
+        public IList<StatisticDriver> StatisticDrivers;
 
         private readonly ICostAccountingRepository _costaccountingRepository;
         private readonly IStatisticDriversRepository _statisticDriversRepository;
-        private readonly CancellationToken _cancellationToken;
 
-        public List<string> GlobalIDs;
-        private List<DataTable> dataTables;
-        private List<Measure> measures;
-        private List<RuleEngineIncludedMeasure> ruleEngineIncludedMeaures;
+        private IList<DataTable> dataTables;
+        private IList<Measure> measures;
+        private IList<RuleEngineIncludedMeasure> ruleEngineIncludedMeaures;
 
-        public StatisticDriversProvider(ICostAccountingRepository costaccountingRepository, IStatisticDriversRepository statisticDriversRepository, CancellationToken cancellationToken)
+        public StatisticDriversService(ICostAccountingRepository costaccountingRepository, IStatisticDriversRepository statisticDriversRepository)
         {
             _costaccountingRepository = costaccountingRepository;
-            _cancellationToken = cancellationToken;
             _statisticDriversRepository = statisticDriversRepository;
+           
         }
-        public async Task LoadStatisticDrivers(CostingConfig costingConfig)
+        public async Task<StatisticDriverDTO> LoadStatisticDrivers(CostingConfig costingConfig)
         {
             var isClaims = false;
-            if ((eCostingType)costingConfig.Type == eCostingType.Claims)
+            if ((CostingType)costingConfig.Type == CostingType.Claims)
             {
                 isClaims = true;
             }
 
             //Get Data Tables for Costing Type
-            GlobalIDs = GetGlobalIDs(isClaims);
+             var globalIDs = GetGlobalIDs(isClaims);
 
             //Get Score Data for those data tables
-            dataTables = await _costaccountingRepository.GetDataTablesAsync(GlobalIDs, _cancellationToken);
-            measures = await _costaccountingRepository.GetMeasuresAsync(dataTables, _cancellationToken);
-            ruleEngineIncludedMeaures = await _costaccountingRepository.GetRuleEngineIncludedMeasuresAsync(_cancellationToken);
+            dataTables = await _costaccountingRepository.GetDataTablesAsync(globalIDs, default);
+            measures = await _costaccountingRepository.GetMeasuresAsync(dataTables, default);
+            ruleEngineIncludedMeaures = await _costaccountingRepository.GetRuleEngineIncludedMeasuresAsync(default);
 
             //Set the data sources 
             if (isClaims)
             {
-                await SetClaimsDataSourcesAsync(costingConfig, _cancellationToken);
+                await SetClaimsDataSourcesAsync(costingConfig);
             }
             else
             {
-                await SetDataSourcesAsync(costingConfig, _cancellationToken);
+                await SetDataSourcesAsync(costingConfig);
             }
+
+            var statisticDriverDto = new StatisticDriverDTO()
+            {
+                StatisticDrivers = StatisticDrivers,
+                DataSources = DataSources,
+                DataSourceLinks = DataSourceLinks
+            };
+            return statisticDriverDto;
         }
 
-        public List<string> GetGlobalIDs(bool isClaims)
+        private IList<string> GetGlobalIDs(bool isClaims)
         {
             var globalIds = new List<string>();
             globalIds.Add(DataTableConstants.DSSGL);
@@ -81,7 +87,8 @@ namespace Strata.DSS.CostAccounting.Biz.StatisticDrivers
             }
             return globalIds;
         }
-        public async Task SetDataSourcesAsync(CostingConfig costingConfig, CancellationToken _cancellationToken)
+
+        private async Task SetDataSourcesAsync(CostingConfig costingConfig)
         {
             var glSampledDataTable = dataTables.Where(x => x.GlobalID == DataTableConstants.DSSGL).FirstOrDefault();
             glSampledDataTable.FriendlyName = "GL";
@@ -130,7 +137,7 @@ namespace Strata.DSS.CostAccounting.Biz.StatisticDrivers
             dataTables.Add(glPDataTable);
             dataSourceLinks.Add(new DataSourceLink(GL_PAYROLL_DATASOURCE_ID, "Dollars", GL_PAYROLL_DATASOURCE_ID, true));
 
-            var driverConfigs = await _statisticDriversRepository.GetStatisticDriversAsync(costingConfig.Type, _cancellationToken);
+            var driverConfigs = await _statisticDriversRepository.GetDriverConfigsAsync(costingConfig.Type, default);
             var statisticDrivers = new List<StatisticDriver>();
 
             foreach (var driverConfigTemp in driverConfigs)
@@ -167,7 +174,7 @@ namespace Strata.DSS.CostAccounting.Biz.StatisticDrivers
             StatisticDrivers = statisticDrivers;
 
         }
-        public async Task SetClaimsDataSourcesAsync(CostingConfig costingConfig, CancellationToken _cancellationToken)
+        private async Task SetClaimsDataSourcesAsync(CostingConfig costingConfig)
         {
             var glSampledDataTable = dataTables.Where(x => x.GlobalID == DataTableConstants.DSSGL).FirstOrDefault();
             glSampledDataTable.FriendlyName = "GL";
@@ -201,7 +208,7 @@ namespace Strata.DSS.CostAccounting.Biz.StatisticDrivers
             dataSourceLinks.Add(new DataSourceLink(unitsMeasure.MeasureGUID, "Amount", unitsMeasure.DataTableGUID, true));
 
 
-            var driverConfigs = await _statisticDriversRepository.GetStatisticDriversAsync(costingConfig.Type, _cancellationToken);
+            var driverConfigs = await _statisticDriversRepository.GetDriverConfigsAsync(costingConfig.Type, default);
             var statisticDrivers = new List<StatisticDriver>();
 
             foreach (var driverConfigTemp in driverConfigs)
@@ -229,6 +236,5 @@ namespace Strata.DSS.CostAccounting.Biz.StatisticDrivers
             DataSourceLinks = dataSourceLinks;
             StatisticDrivers = statisticDrivers;
         }
-
     }
 }

@@ -37,7 +37,7 @@ const Navigation: React.FC = () => {
                 <Menu.Item key='/databases' href='/databases'>
                   Databases
                 </Menu.Item>
-                <Menu.Item key='/statisticdrivers' href='/statisticdrivers'>
+                <Menu.Item key='/statisticdrivers' href='/statistic-drivers'>
                   Statistic Drivers
                 </Menu.Item>
               </Menu.ItemGroup>
@@ -47,7 +47,7 @@ const Navigation: React.FC = () => {
             <Switch>
               <Route path={['/', '/users']} exact component={ExampleUser} key='users'></Route>
               <Route path='/databases' exact component={ExampleDatabase} key='databases'></Route>
-              <Route path='/statisticdrivers' exact component={StatisticDrivers} key='statisticdrivers'></Route>
+              <Route path='/statistic-drivers' exact component={StatisticDrivers} key='statisticdrivers'></Route>
             </Switch>
           </Layout.Content>
         </Layout>
