@@ -138,35 +138,17 @@ namespace Strata.DSS.CostAccounting.Biz.StatisticDrivers.Services
             dataSourceLinks.Add(new DataSourceLink(GL_PAYROLL_DATASOURCE_ID, "Dollars", GL_PAYROLL_DATASOURCE_ID, true));
 
             var driverConfigs = await _statisticDriversRepository.GetDriverConfigsAsync(costingConfig.Type, default);
+            var usedDriverConfigGUIDs = await _statisticDriversRepository.GetUsedDriverConfigs(default);
             var statisticDrivers = new List<StatisticDriver>();
 
             foreach (var driverConfigTemp in driverConfigs)
             {
-                Guid dtGUID = Guid.Empty;
-
-                if (measures.Any(m => m.MeasureGUID == driverConfigTemp.MeasureGUID && m.DataTableGUID == glSampledDataTable.DataTableGUID))
+                var isUsed = false;
+                if (usedDriverConfigGUIDs.Any(x => x == driverConfigTemp.DriverConfigGUID))
                 {
-                    dtGUID = glSampledDataTable.DataTableGUID;
+                    isUsed = true;
                 }
-                if (measures.Any(m => m.MeasureGUID == driverConfigTemp.MeasureGUID && m.DataTableGUID == payrollDataTable.DataTableGUID))
-                {
-                    dtGUID = payrollDataTable.DataTableGUID;
-                }
-                else if (measures.Any(m => m.MeasureGUID == driverConfigTemp.MeasureGUID && m.DataTableGUID == statDriverDataTable.DataTableGUID))
-                {
-                    dtGUID = statDriverDataTable.DataTableGUID;
-                }
-                else if (measures.Any(m => m.MeasureGUID == driverConfigTemp.MeasureGUID && m.DataTableGUID == detailDataTable.DataTableGUID) ||
-                            measures.Any(m => m.MeasureGUID == driverConfigTemp.MeasureGUID && m.DataTableGUID == summaryDataTableGuid))
-                {
-                    dtGUID = detailDataTable.DataTableGUID;
-                }
-                else if (driverConfigTemp.MeasureGUID == GL_PAYROLL_DATASOURCE_ID) //gl & payroll
-                {
-                    dtGUID = GL_PAYROLL_DATASOURCE_ID;
-                }
-
-                statisticDrivers.Add(new StatisticDriver(driverConfigTemp, dtGUID));
+                statisticDrivers.Add(new StatisticDriver(driverConfigTemp, isUsed, summaryDataTableGuid, detailDataTable.DataTableGUID));
             }
 
             DataSources = dataTables;
@@ -207,29 +189,18 @@ namespace Strata.DSS.CostAccounting.Biz.StatisticDrivers.Services
             var unitsMeasure = measures.Single(x => x.DataTableGUID == claimStatisticDriverDataTable.DataTableGUID && string.Equals(x.SQLColumnName, "Amount01"));
             dataSourceLinks.Add(new DataSourceLink(unitsMeasure.MeasureGUID, "Amount", unitsMeasure.DataTableGUID, true));
 
-
             var driverConfigs = await _statisticDriversRepository.GetDriverConfigsAsync(costingConfig.Type, default);
+            var usedDriverConfigGUIDs = await _statisticDriversRepository.GetUsedDriverConfigs(default);
             var statisticDrivers = new List<StatisticDriver>();
 
             foreach (var driverConfigTemp in driverConfigs)
             {
-                Guid dtGUID = Guid.Empty;
-
-                if (measures.Any(m => m.MeasureGUID == driverConfigTemp.MeasureGUID && m.DataTableGUID == glSampledDataTable.DataTableGUID))
+                var isUsed = false;
+                if(usedDriverConfigGUIDs.Any(x=>x ==driverConfigTemp.DriverConfigGUID))
                 {
-                    dtGUID = glSampledDataTable.DataTableGUID;
+                    isUsed = true;
                 }
-                else if (measures.Any(m => m.MeasureGUID == driverConfigTemp.MeasureGUID && m.DataTableGUID == claimStatisticDriverDataTable.DataTableGUID))
-                {
-                    dtGUID = claimStatisticDriverDataTable.DataTableGUID;
-                }
-                else if (measures.Any(m => m.MeasureGUID == driverConfigTemp.MeasureGUID && m.DataTableGUID == claimDetailDataTable.DataTableGUID) ||
-                        measures.Any(m => m.MeasureGUID == driverConfigTemp.MeasureGUID && m.DataTableGUID == claimSummaryDataTableGuid))
-                {
-                    dtGUID = claimDetailDataTable.DataTableGUID;
-                }
-
-                statisticDrivers.Add(new StatisticDriver(driverConfigTemp, dtGUID));
+                statisticDrivers.Add(new StatisticDriver(driverConfigTemp, isUsed, claimSummaryDataTableGuid, claimDetailDataTable.DataTableGUID));
             }
 
             DataSources = dataTables;

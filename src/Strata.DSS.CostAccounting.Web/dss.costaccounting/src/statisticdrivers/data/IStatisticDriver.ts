@@ -4,6 +4,7 @@ export interface IStatisticDriver {
   hasRules: boolean;
   isInverted: boolean;
   isNew: boolean;
+  isUsed: boolean;
   measureGUID: string;
   name: string;
 }

@@ -66,7 +66,7 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.DbContexts
             modelBuilder.Entity<DriverConfig>(entity =>
             {
                 entity.HasKey(e => e.DriverConfigGUID);
-                entity.ToTable("DriverConfig", "dss");
+                entity.ToTable("viewDriverConfigInfo", "dss");
             });
 
             modelBuilder.Entity<AccountReclass>(entity =>
@@ -97,6 +97,12 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.DbContexts
             {
                 entity.HasKey(e => e.AllocationConfigOverrideGUID);
                 entity.ToTable("AllocationConfigOverride", "dss");
+            });
+
+            modelBuilder.Entity<RuleSet>(entity =>
+            {
+                entity.HasKey(e => e.RuleSetID);
+                entity.ToTable("RuleSet", "dbo");
             });
         }
     }

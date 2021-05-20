@@ -10,8 +10,7 @@ import DropDown from '@strata/tempo/lib/dropdown';
 import Modal from '@strata/tempo/lib/modal';
 import Banner from '@strata/tempo/lib/banner';
 import Input from '@strata/tempo/lib/input';
-import Toggle from '@strata/tempo/lib/toggle';
-import Tree from '@strata/tempo/lib/tree';
+import Tree, { CheckInfo, Key } from '@strata/tempo/lib/tree';
 import { IStatisticDriverData } from './data/IStatisticDriverData';
 import { IStatisticDriverSaveData } from './data/IStatisticDriverSaveData';
 import { IStatisticDriver } from './data/IStatisticDriver';
@@ -26,8 +25,8 @@ const StatisticDrivers: React.FC = () => {
   const [deletedDrivers, setDeletedDrivers] = useState<string[]>([]);
   const [updatedDrivers, setUpdatedDrivers] = useState<string[]>([]);
   const [runDriversModalVisible, setRunDriversModalVisible] = useState<boolean>(false);
-  //
-  const runPatientDriverTreeChildren = statDrivers.slice(0, 100).map((statDriver) => {
+  const [patientDriversToRun, setPatientDriversToRun] = useState<Key[]>([]);
+  const runPatientDriverTreeChildren = statDrivers.map((statDriver) => {
     return { key: statDriver.driverConfigGUID, title: statDriver.name };
   });
   const runPatientDriverTree = [
@@ -38,10 +37,6 @@ const StatisticDrivers: React.FC = () => {
     }
   ];
 
-  //
-  const handleCheck = () => {
-    // console.log('onCheck', checkedKeys);
-  };
   useEffect(() => {
     // runs once when component mounts
     const fetchData = async () => {
@@ -77,6 +72,7 @@ const StatisticDrivers: React.FC = () => {
       hasRules: false,
       isInverted: false,
       isNew: true,
+      isUsed: false,
       name: ''
     };
 
@@ -363,45 +359,38 @@ const StatisticDrivers: React.FC = () => {
             <>
               <Tooltip
                 title={() => {
-                  return rowData.isNew ? 'Add Rules' : 'EditRules';
+                  return rowData.hasRules ? 'Edit Rules' : 'Add Rules';
                 }}
               >
                 <Button type='link' onClick={() => handleEditRules(rowData.driverConfigGUID)} disabled={rowData.isNew}>
-                  {rowData.isNew ? 'Add Rules' : 'EditRules'}
+                  {rowData.hasRules ? 'Edit Rules' : 'Add Rules'}
                 </Button>
               </Tooltip>
-              <Tooltip title='Delete'>
+              <Tooltip
+                title={() => {
+                  return rowData.isUsed ? 'Driver in use.' : 'Delete';
+                }}
+              >
                 <Button
                   type='link'
                   icon='Delete'
+                  disabled={rowData.isUsed}
                   onClick={() =>
                     Modal.confirm({
-                      title: 'Permanently delete ' + rowData.name + '?',
+                      title: 'Delete ' + rowData.name + '?',
                       okText: 'Delete Driver',
                       cancelText: 'Keep Driver',
                       onOk() {
                         if (statDrivers !== undefined) {
-                          const canDeleteDriver = statisticDriverService.validateRemoveDriver(rowData.driverConfigGUID);
-                          if (canDeleteDriver) {
-                            //add to deleted drivers
-                            const driversToDelete = [rowData.driverConfigGUID].concat(deletedDrivers);
-                            setDeletedDrivers(driversToDelete);
-                            //refresh the grid
-                            const newStatDrivers = statDrivers.filter(function (obj) {
-                              return obj.driverConfigGUID !== rowData.driverConfigGUID;
-                            });
-                            setStatDrivers(newStatDrivers);
-                          } else {
-                            Modal.alert({
-                              title: 'Statistic Drivers',
-                              content: rowData.name + ' is in use by one or more costing configurations. Unable to delete this statistic.',
-                              alertType: 'error'
-                            });
-                          }
+                          //add to deleted drivers
+                          const driversToDelete = [rowData.driverConfigGUID].concat(deletedDrivers);
+                          setDeletedDrivers(driversToDelete);
+                          //refresh the grid
+                          const newStatDrivers = statDrivers.filter(function (obj) {
+                            return obj.driverConfigGUID !== rowData.driverConfigGUID;
+                          });
+                          setStatDrivers(newStatDrivers);
                         }
-                      },
-                      onCancel() {
-                        console.log('Changes kept');
                       }
                     })
                   }
@@ -416,20 +405,23 @@ const StatisticDrivers: React.FC = () => {
         visible={runDriversModalVisible}
         onCancel={() => setRunDriversModalVisible(false)}
         onOk={() => setRunDriversModalVisible(false)}
-        okText='Run Driver'
+        okText='Run Drivers'
         removeBodyPadding
       >
         <Spacing padding={16} itemSpacing={12}>
           <Input search />
-          <Toggle
-            defaultValue={'all'}
-            items={[
-              { value: 'all', name: 'All' },
-              { value: 'selected', name: 'Selected' }
-            ]}
-          />
         </Spacing>
-        <Tree treeData={runPatientDriverTree} selectionMode='multiple' height={400} defaultCheckedKeys={[]} defaultExpandedKeys={['AllPatientKey']} onCheck={handleCheck} />
+        <Tree
+          treeData={runPatientDriverTree}
+          selectionMode='multiple'
+          height={400}
+          defaultCheckedKeys={[]}
+          defaultExpandedKeys={['AllPatientKey']}
+          onCheck={(checkedKeys, info) => {
+            const guids: string[] = checkedKeys.toString().split(',');
+            setPatientDriversToRun(guids);
+          }}
+        />
       </Modal>
     </>
   );
