@@ -47,11 +47,13 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
             return Ok(statisticDriverDTO);
         }
 
-        [HttpGet("{driverConfigGUID}")]
+        [HttpGet("ValidateRemoveDriver")]
         [ProducesResponseType(200)]
-        public async Task<ActionResult<bool>> ValidateRemove([FromRoute] Guid driverConfigGUID, CancellationToken cancellationToken)
+        public async Task<ActionResult<bool>> ValidateRemoveDriver([FromRoute]Guid driverConfigGUID, CancellationToken cancellationToken)
         {
-            return  await _statisticDriversRepository.ValidateRemoveAsync(driverConfigGUID, cancellationToken);
+            var usedDriverConfigs =  await _statisticDriversRepository.GetUsedDriverConfigs(cancellationToken);
+
+            return usedDriverConfigs.Any(x=>x==driverConfigGUID);
         }
 
 

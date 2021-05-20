@@ -29,21 +29,17 @@ namespace Strata.DSS.CostAccounting.Biz.StatisticDrivers.Repositories
            
         }
 
-        public async Task<bool> ValidateRemoveAsync(Guid driverConfigGUID, CancellationToken cancellationToken)
+        public async Task<List<Guid>> GetUsedDriverConfigs(CancellationToken cancellationToken)
         {
             await using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
-            var sql = @"select DriverConfigGUID from DSS.AccountReclass
-                        UNION
-                        select DriverConfigGUID from DSS.PayCodeJobCodeReclass
-                        UNION
-                        select DriverConfigGUID from DSS.DepartmentReclass
-                        UNION
-                        select DriverConfigGUID from DSS.AllocationConfig
-                        UNION
-                        select DriverConfigGUID from DSS.AllocationConfigOverride";  
 
+            var driverConfigGUIDs = dbContext.AccountReclasses.Select(x => x.DriverConfigGUID)
+                                           .Union(dbContext.PayCodeJobCodeReclasses.Select(x=>x.DriverConfigGUID))
+                                           .Union(dbContext.DepartmentReclasses.Select(x => x.DriverConfigGUID))
+                                           .Union(dbContext.AllocationConfigs.Select(x => x.DriverConfigGUID))
+                                           .Union(dbContext.AllocationConfigOverrides.Select(x => x.DriverConfigGUID)).ToList();
            
-            return true;
+            return driverConfigGUIDs;
         }
 
         public async Task<Boolean> UpdateStatisticDriversAsync(List<StatisticDriver>statisticDrivers, CancellationToken cancellationToken)

@@ -25,7 +25,11 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.DbContexts
 
         public virtual DbSet<DriverConfig> DriverConfigs { get; set; }
 
-          
+        public virtual DbSet<AccountReclass> AccountReclasses { get; set; }
+        public virtual DbSet<PayCodeJobCodeReclass> PayCodeJobCodeReclasses { get; set; }
+        public virtual DbSet<DepartmentReclass> DepartmentReclasses { get; set; }
+        public virtual DbSet<AllocationConfig> AllocationConfigs { get; set; }
+        public virtual DbSet<AllocationConfigOverride> AllocationConfigOverrides { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -63,6 +67,36 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.DbContexts
             {
                 entity.HasKey(e => e.DriverConfigGUID);
                 entity.ToTable("DriverConfig", "dss");
+            });
+
+            modelBuilder.Entity<AccountReclass>(entity =>
+            {
+                entity.HasKey(e => e.AccountReclassGUID);
+                entity.ToTable("AccountReclass", "dss");
+            });
+
+            modelBuilder.Entity<PayCodeJobCodeReclass>(entity =>
+            {
+                entity.HasKey(e => e.PayCodeJobCodeReclassGUID);
+                entity.ToTable("PayCodeJobCodeReclass", "dss");
+            });
+
+            modelBuilder.Entity<DepartmentReclass>(entity =>
+            {
+                entity.HasKey(e => e.DepartmentReclassGUID);
+                entity.ToTable("DepartmentReclass", "dss");
+            });
+
+            modelBuilder.Entity<AllocationConfig>(entity =>
+            {
+                entity.HasKey(e => e.AllocationConfigGUID);
+                entity.ToTable("AllocationConfig", "dss");
+            });
+
+            modelBuilder.Entity<AllocationConfigOverride>(entity =>
+            {
+                entity.HasKey(e => e.AllocationConfigOverrideGUID);
+                entity.ToTable("AllocationConfigOverride", "dss");
             });
         }
     }

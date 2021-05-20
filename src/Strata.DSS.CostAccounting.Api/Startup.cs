@@ -60,7 +60,7 @@ namespace Strata.DSS.CostAccounting.Api
             .SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
 
             // configure hangfire
-            services.AddStrataHangfire();
+           // services.AddStrataHangfire();
             services.AddCostAccountingServices(_configuration);
 
             services.AddRouting();
@@ -92,10 +92,11 @@ namespace Strata.DSS.CostAccounting.Api
             app.ConfigureSwagger(env, provider);
 
 #if DEBUG
-            app.UseHangfireDashboard("/hangfire", new DashboardOptions
+          /*  app.UseHangfireDashboard("/hangfire", new DashboardOptions
                 {
                     Authorization = new[] {new AllowAnyoneDashboardAuthorizationFilter()}
                 });
+          */
 #endif
             app.UseHealthChecks("/health");
             app.UseEndpoints(endpoints => endpoints.MapControllers().RequireAuthorization());
