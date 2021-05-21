@@ -11,6 +11,7 @@ import Modal from '@strata/tempo/lib/modal';
 import Banner from '@strata/tempo/lib/banner';
 import Input from '@strata/tempo/lib/input';
 import Tree, { Key } from '@strata/tempo/lib/tree';
+import ButtonMenu from '@strata/tempo/lib/buttonmenu';
 import { IStatisticDriverData } from './data/IStatisticDriverData';
 import { IStatisticDriverSaveData } from './data/IStatisticDriverSaveData';
 import { IStatisticDriver } from './data/IStatisticDriver';
@@ -135,7 +136,7 @@ const StatisticDrivers: React.FC = () => {
       } else {
         Toast.show({
           toastType: 'error',
-          message: 'Changed not saved'
+          message: 'Changes not saved'
         });
       }
       //refresh grid
@@ -186,10 +187,18 @@ const StatisticDrivers: React.FC = () => {
       <Header
         title='Statistic Drivers'
         extra={
-          <Spacing itemSpacing={16} wrap={16} vAlign='center'>
-            <DropDown width={200} defaultValue='Reports' items={[{ text: 'Statistic Drivers Report', value: 1 }]} />
+          <>
+            <ButtonMenu
+              buttonText='Reports'
+              onClick={() => {
+                console.log('Get Reports');
+              }}
+            >
+              <ButtonMenu.Item key='1'>Statistic Drivers Report</ButtonMenu.Item>
+            </ButtonMenu>
+
             <Button type='tertiary' icon='InfoCircle' />
-          </Spacing>
+          </>
         }
       />
       <ActionBar
@@ -207,6 +216,8 @@ const StatisticDrivers: React.FC = () => {
       <DataGrid
         key='StatDriverGrid'
         value={statDrivers}
+        scrollable
+        validationMode='all-cells'
         onCellEdit={(e) => {
           //add to updated drivers
           if (updatedDrivers.indexOf(e.rowData.driverConfigGUID) < 0) {
@@ -215,7 +226,7 @@ const StatisticDrivers: React.FC = () => {
           }
         }}
         pager={{
-          pageSize: 10,
+          pageSize: 100,
           extra: (
             <>
               <Button onClick={handleCancel}>Cancel</Button>
@@ -233,7 +244,7 @@ const StatisticDrivers: React.FC = () => {
           filter
           editable
           field='name'
-          width={200}
+          width={240}
           validationRules={[
             {
               required: true
@@ -255,8 +266,9 @@ const StatisticDrivers: React.FC = () => {
           key='dataSource'
           field='dataTableGUID'
           header='Data Source'
+          filter
           editable
-          width={300}
+          width={200}
           itemValueField='dataTableGUID'
           itemTextField='friendlyName'
           items={statDriverData?.dataSources}
@@ -305,6 +317,7 @@ const StatisticDrivers: React.FC = () => {
                   }
                 }}
                 width={300}
+                value={cellEditorArgs.rowData.dataTableGUID}
                 itemValueField='dataTableGUID'
                 itemTextField='friendlyName'
                 items={statDriverData?.dataSources}
@@ -332,8 +345,9 @@ const StatisticDrivers: React.FC = () => {
           key='dataSourceLink'
           field='measureGUID'
           header='Measure'
+          filter
           editable
-          width={300}
+          width={200}
           itemValueField='measureGUID'
           itemTextField='friendlyName'
           items={statDriverData?.dataSourceLinks}
@@ -351,6 +365,7 @@ const StatisticDrivers: React.FC = () => {
                 width={300}
                 itemValueField='measureGUID'
                 itemTextField='friendlyName'
+                value={cellEditorArgs.rowData.measureGUID}
                 items={statDriverData?.dataSourceLinks.filter((x: IDataSourceLink) => {
                   return x.dataTableGUID === cellEditorArgs.rowData.dataTableGUID;
                 })}
@@ -358,52 +373,49 @@ const StatisticDrivers: React.FC = () => {
             </>
           )}
         />
-        <DataGrid.CheckboxColumn key='inverted' header='Inverted' editable field='isInverted' sortable width={150} />
+        <DataGrid.CheckboxColumn key='inverted' header='Inverted' editable field='isInverted' sortable width={80} />
         <DataGrid.EmptyColumn />
         <DataGrid.Column
           align='right'
-          width={150}
+          width={144}
           body={(rowData) => (
             <>
-              <Tooltip
-                title={() => {
-                  return rowData.hasRules ? 'Edit Rules' : 'Add Rules';
-                }}
-              >
+              <Spacing vAlign='center'>
                 <Button type='link' onClick={() => handleEditRules(rowData.driverConfigGUID)} disabled={rowData.isNew}>
                   {rowData.hasRules ? 'Edit Rules' : 'Add Rules'}
                 </Button>
-              </Tooltip>
-              <Tooltip
-                title={() => {
-                  return rowData.isUsed ? 'Driver in use.' : 'Delete';
-                }}
-              >
-                <Button
-                  type='link'
-                  icon='Delete'
-                  disabled={rowData.isUsed}
-                  onClick={() =>
-                    Modal.confirm({
-                      title: 'Delete ' + rowData.name + '?',
-                      okText: 'Delete Driver',
-                      cancelText: 'Keep Driver',
-                      onOk() {
-                        if (statDrivers !== undefined) {
-                          //add to deleted drivers
-                          const driversToDelete = [rowData.driverConfigGUID].concat(deletedDrivers);
-                          setDeletedDrivers(driversToDelete);
-                          //refresh the grid
-                          const newStatDrivers = statDrivers.filter(function (obj) {
-                            return obj.driverConfigGUID !== rowData.driverConfigGUID;
-                          });
-                          setStatDrivers(newStatDrivers);
+
+                <Tooltip
+                  title={() => {
+                    return rowData.isUsed ? 'Driver in use.' : 'Delete';
+                  }}
+                >
+                  <Button
+                    type='link'
+                    icon='Delete'
+                    disabled={rowData.isUsed}
+                    onClick={() =>
+                      Modal.confirm({
+                        title: 'Permanently delete ' + (rowData.name === '' ? 'driver' : rowData.name) + '?',
+                        okText: 'Delete Driver',
+                        cancelText: 'Keep Driver',
+                        onOk() {
+                          if (statDrivers !== undefined) {
+                            //add to deleted drivers
+                            const driversToDelete = [rowData.driverConfigGUID].concat(deletedDrivers);
+                            setDeletedDrivers(driversToDelete);
+                            //refresh the grid
+                            const newStatDrivers = statDrivers.filter(function (obj) {
+                              return obj.driverConfigGUID !== rowData.driverConfigGUID;
+                            });
+                            setStatDrivers(newStatDrivers);
+                          }
                         }
-                      }
-                    })
-                  }
-                />
-              </Tooltip>
+                      })
+                    }
+                  />
+                </Tooltip>
+              </Spacing>
             </>
           )}
         />
