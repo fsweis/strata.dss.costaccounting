@@ -75,8 +75,8 @@ namespace Strata.DSS.CostAccounting.Biz.StatisticDrivers.Repositories
                     DriverConfigGUID = statDriver.DriverConfigGUID,
                     MeasureGUID = statDriver.MeasureGUID,
                     IsInverted = statDriver.IsInverted,
-                    Name = statDriver.Name
-                    //Need costing type!
+                    Name = statDriver.Name,
+                    CostingType = statDriver.CostingType
                 };
 
                 dbContext.DriverConfigs.Add(driverConfig);

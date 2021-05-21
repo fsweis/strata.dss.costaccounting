@@ -59,31 +59,33 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
 
         [HttpPost("SaveStatisticDrivers")]
         [ProducesResponseType(200)]
-        public async Task<ActionResult<bool>>  SaveStatisticDrivers([FromBody] StatisticDriverSaveData statisticDriverSaveData, CancellationToken cancellationToken)
+        public async Task<ActionResult<List<StatisticDriver>>>  SaveStatisticDrivers([FromBody] StatisticDriverSaveData statisticDriverSaveData, CancellationToken cancellationToken)
         {
-            if(statisticDriverSaveData.AddedStatDrivers.Count>0)
+            
+            if (statisticDriverSaveData.AddedStatDrivers.Count>0)
             {
                 if (! await _statisticDriversRepository.AddStatisticDriversAsync(statisticDriverSaveData.AddedStatDrivers, cancellationToken))
                 {
-                    return false;
+                   //LogError
                 };
             }
             if (statisticDriverSaveData.UpdatedStatDrivers.Count > 0)
             {
                 if (!await _statisticDriversRepository.UpdateStatisticDriversAsync(statisticDriverSaveData.UpdatedStatDrivers, cancellationToken))
                 {
-                    return false;
+                    //LogError
                 };
             }
             if (statisticDriverSaveData.DeletedStatDrivers.Count > 0)
             {
                 if (!await _statisticDriversRepository.DeleteStatisticDriversAsync(statisticDriverSaveData.DeletedStatDrivers, cancellationToken))
                 {
-                    return false;
+                    //LogError
                 };
             }
-
-            return true;
+            var costingConfig = await _costaccountingRepository.GetCostingConfigAsync(new Guid("2adafbaa-c365-472a-94f1-79b823d8547a"), cancellationToken);
+            var statDriverDTO = await _statisticDriversService.LoadStatisticDrivers(costingConfig);
+            return Ok(statDriverDTO.StatisticDrivers.ToList());
         }
     }
 }

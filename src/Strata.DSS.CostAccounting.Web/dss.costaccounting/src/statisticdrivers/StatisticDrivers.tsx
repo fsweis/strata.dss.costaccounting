@@ -10,7 +10,7 @@ import DropDown from '@strata/tempo/lib/dropdown';
 import Modal from '@strata/tempo/lib/modal';
 import Banner from '@strata/tempo/lib/banner';
 import Input from '@strata/tempo/lib/input';
-import Tree, { CheckInfo, Key } from '@strata/tempo/lib/tree';
+import Tree, { Key } from '@strata/tempo/lib/tree';
 import { IStatisticDriverData } from './data/IStatisticDriverData';
 import { IStatisticDriverSaveData } from './data/IStatisticDriverSaveData';
 import { IStatisticDriver } from './data/IStatisticDriver';
@@ -116,10 +116,10 @@ const StatisticDrivers: React.FC = () => {
         updatedStatDrivers: statDriversToUpdate,
         deletedStatDrivers: deletedDrivers
       };
-      console.log(statDriverSaveData);
+
       let success = true;
       try {
-        await statisticDriverService.saveStatisticDrivers(statDriverSaveData);
+        setStatDrivers(await statisticDriverService.saveStatisticDrivers(statDriverSaveData));
       } catch (error) {
         success = false;
       }
@@ -264,6 +264,14 @@ const StatisticDrivers: React.FC = () => {
             <>
               <DropDown
                 onChange={(value) => {
+                  if (cellEditorArgs.rowData.hasRules) {
+                    Modal.alert({
+                      title: 'Statistic Drivers',
+                      content: 'You cannot edit a Data Source with existing rule filters'
+                    });
+                    return;
+                  }
+
                   if (value !== cellEditorArgs.rowData.dataTableGUID) {
                     cellEditorArgs.rowData.dataTableGUID = value;
                     const defaultValue = statDriverData?.dataSourceLinks.filter((x) => x.dataTableGUID === value && x.isFirstSelect === true);

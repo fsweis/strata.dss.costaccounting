@@ -1,4 +1,5 @@
 ﻿using Strata.DSS.CostAccounting.Biz.CostAccounting.Models;
+using Strata.DSS.CostAccounting.Biz.Enums;
 using Strata.DSS.CostAccounting.Biz.StatisticDrivers.Models;
 using System;
 using System.Collections.Generic;
@@ -20,7 +21,9 @@ namespace Strata.DSS.CostAccounting.Biz.StatisticDrivers.Models
         public bool IsUsed { get; set; }
        
         public Guid RuleSetGUID { get; set; }
-      
+
+        public CostingType CostingType { get; set; }
+
 
 
         public StatisticDriver()
@@ -43,6 +46,7 @@ namespace Strata.DSS.CostAccounting.Biz.StatisticDrivers.Models
             IsInverted = driverConfigTemp.IsInverted;
             RuleSetGUID = driverConfigTemp.RuleSetGUID;
             HasRules = driverConfigTemp.RuleSetGUID != Guid.Empty;
+            CostingType = driverConfigTemp.CostingType;
         }
 
     }
