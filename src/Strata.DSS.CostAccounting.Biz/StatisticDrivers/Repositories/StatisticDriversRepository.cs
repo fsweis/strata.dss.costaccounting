@@ -9,6 +9,7 @@ using Strata.SqlTools.Configuration.Common.AsyncFactory;
 using System.Linq;
 using Strata.DSS.CostAccounting.Biz.CostAccounting.DbContexts;
 using Strata.DSS.CostAccounting.Biz.Enums;
+using Strata.DSS.CostAccounting.Biz.CostAccounting.Constants;
 
 namespace Strata.DSS.CostAccounting.Biz.StatisticDrivers.Repositories
 {
@@ -23,7 +24,7 @@ namespace Strata.DSS.CostAccounting.Biz.StatisticDrivers.Repositories
         public async Task<IEnumerable<DriverConfig>> GetDriverConfigsAsync(CostingType costingType, CancellationToken cancellationToken)
         {
             await using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
-            var allOnesGuid = new Guid(CostingConstants.ALL_ONES_GUID_STRING);
+            var allOnesGuid = new Guid(GeneralConstants.ALL_ONES_GUID_STRING);
             var drivers = await dbContext.DriverConfigs.Where(dc => dc.DriverConfigGUID != Guid.Empty && dc.DriverConfigGUID != allOnesGuid && dc.CostingConfigGUID == Guid.Empty && dc.CostingType==costingType).OrderBy(dr => dr.Name).ToListAsync(cancellationToken);
             return drivers;
            
