@@ -211,6 +211,37 @@ const StatisticDrivers: React.FC = () => {
     return true;
   };
 
+  const filterDataSource = (cellValue: string, filterValue: string) => {
+    if (typeof filterValue === 'string' && filterValue.trim() !== '' && filterValue.trim() !== '-') {
+      filterValue = filterValue.toLowerCase().trim();
+    } else {
+      return true;
+    }
+    if (cellValue === undefined || cellValue === null) {
+      return false;
+    }
+    const target = statDriverData?.dataSources.find((dataSource) => dataSource.friendlyName.toLowerCase().indexOf(filterValue) > -1);
+    if (target !== undefined) {
+      return target.dataTableGUID === cellValue;
+    }
+    return false;
+  };
+  const filterDataSourceLink = (cellValue: string, filterValue: string) => {
+    if (typeof filterValue === 'string' && filterValue.trim() !== '' && filterValue.trim() !== '-') {
+      filterValue = filterValue.toLowerCase().trim();
+    } else {
+      return true;
+    }
+    if (cellValue === undefined || cellValue === null) {
+      return false;
+    }
+    const target = statDriverData?.dataSourceLinks.find((measure) => measure.friendlyName.toLowerCase().indexOf(filterValue) > -1);
+    if (target !== undefined) {
+      return target.measureGUID === cellValue;
+    }
+    return false;
+  };
+
   return (
     <>
       <Banner>Any changes to as statistic will affect every costing configuration that uses the statistic.</Banner>
@@ -297,6 +328,8 @@ const StatisticDrivers: React.FC = () => {
           field='dataTableGUID'
           header='Data Source'
           filter
+          filterMatchMode='custom'
+          filterFunction={filterDataSource}
           editable
           width={200}
           itemValueField='dataTableGUID'
@@ -376,6 +409,8 @@ const StatisticDrivers: React.FC = () => {
           field='measureGUID'
           header='Measure'
           filter
+          filterMatchMode='custom'
+          filterFunction={filterDataSourceLink}
           editable
           width={200}
           itemValueField='measureGUID'
