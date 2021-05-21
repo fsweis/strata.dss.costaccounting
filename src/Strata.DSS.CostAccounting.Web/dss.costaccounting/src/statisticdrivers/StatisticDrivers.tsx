@@ -114,12 +114,15 @@ const StatisticDrivers: React.FC = () => {
   };
 
   const handleEditRules = function (driverConfigGUID: string) {
+    //TODO with rules engine bli
+    /*
     const url = 'https://dev.sdt.local/StrataJazz202123/DSS/HealthPlan/Statistics/HealthPlanRulesEditWindow.aspx?hpAdminStatisticDriverGuid=' + driverConfigGUID;
     const winid = driverConfigGUID;
     const options = 'scrollbars=0,toolbar=0,location=0,statusbar=0,menubar=0, resizable=1,width=1000,height=700,left=50,top=50';
     const win = window.open(url, winid, options);
     win?.focus();
     return win;
+    */
   };
 
   const handleSave = async () => {

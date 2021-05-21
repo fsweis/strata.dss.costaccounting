@@ -35,6 +35,7 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
         [ProducesResponseType(200)]
         public async Task<ActionResult<IEnumerable<StatisticDriverDTO>>> GetStatisticDrivers(CancellationToken cancellationToken)
         {
+            //TODO pass in costing config with Naviation BLI
             //dev patient
             //var costingConfig = await _costaccountingRepository.GetCostingConfigAsync(new Guid("da9eef04-3c9d-445b-b0c4-3a7812ca76d8"), cancellationToken);
             ///kaiser patient
@@ -83,6 +84,8 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
                     //LogError
                 };
             }
+
+            //TODO pass in costing config with Naviation BLI
             //dev patient
             //var costingConfig = await _costaccountingRepository.GetCostingConfigAsync(new Guid("da9eef04-3c9d-445b-b0c4-3a7812ca76d8"), cancellationToken);
             //kaiser patient
