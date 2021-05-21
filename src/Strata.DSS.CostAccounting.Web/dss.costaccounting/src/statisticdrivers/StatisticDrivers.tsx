@@ -10,15 +10,16 @@ import DropDown from '@strata/tempo/lib/dropdown';
 import Modal from '@strata/tempo/lib/modal';
 import Banner from '@strata/tempo/lib/banner';
 import Input from '@strata/tempo/lib/input';
-import Tree, { Key } from '@strata/tempo/lib/tree';
+import Tree, { ITreeNode, Key } from '@strata/tempo/lib/tree';
 import ButtonMenu from '@strata/tempo/lib/buttonmenu';
 import { IStatisticDriverData } from './data/IStatisticDriverData';
 import { IStatisticDriverSaveData } from './data/IStatisticDriverSaveData';
 import { IStatisticDriver } from './data/IStatisticDriver';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, ChangeEvent } from 'react';
 import { statisticDriverService } from './data/statisticDriverService';
 import { IDataSourceLink } from './data/IDataSourceLink';
 import { getNewGuid, getEmptyGuid } from '../shared/Utils';
+import cloneDeep from 'lodash/cloneDeep';
 
 const StatisticDrivers: React.FC = () => {
   const [statDriverData, setStatDriverData] = useState<IStatisticDriverData>();
@@ -26,17 +27,11 @@ const StatisticDrivers: React.FC = () => {
   const [deletedDrivers, setDeletedDrivers] = useState<string[]>([]);
   const [updatedDrivers, setUpdatedDrivers] = useState<string[]>([]);
   const [runDriversModalVisible, setRunDriversModalVisible] = useState<boolean>(false);
+
   const [patientDriversToRun, setPatientDriversToRun] = useState<Key[]>([]);
-  const runPatientDriverTreeChildren = statDrivers.map((statDriver) => {
-    return { key: statDriver.driverConfigGUID, title: statDriver.name };
-  });
-  const runPatientDriverTree = [
-    {
-      key: 'AllPatientKey',
-      title: 'All Patient Drivers',
-      children: runPatientDriverTreeChildren
-    }
-  ];
+  const [patientDriversSearch, setPatientDriversSearch] = useState('');
+  const [patientDriverTreeData, setPatientDriverTreeData] = useState<ITreeNode[]>([]);
+  const [patientDriverTree, setPatientDriverTree] = useState<ITreeNode[]>([]);
 
   useEffect(() => {
     // runs once when component mounts
@@ -52,6 +47,41 @@ const StatisticDrivers: React.FC = () => {
       setStatDrivers(statDrivers);
     }
   }, [statDriverData]);
+
+  useEffect(() => {
+    const runPatientDriverTreeChildren = statDrivers.map((statDriver) => {
+      return { key: statDriver.driverConfigGUID, title: statDriver.name };
+    });
+
+    const runPatientDriverTree = [
+      {
+        key: 'AllPatientKey',
+        title: 'All Patient Drivers',
+        children: runPatientDriverTreeChildren
+      }
+    ];
+    setPatientDriverTree(runPatientDriverTree);
+  }, [statDrivers]);
+
+  //patient driver tree search
+  useEffect(() => {
+    const searchValue = (value: string | undefined) => {
+      const s = patientDriversSearch.toLowerCase();
+      return value?.toLowerCase().includes(s);
+    };
+    const filterData = (data: ITreeNode[]) => {
+      const filteredData = cloneDeep(data);
+      return filteredData.filter((f) => {
+        f.children = f.children?.filter((c) => searchValue(c.title?.toString()));
+        return searchValue(f.title?.toString()) || f.children?.find((c) => searchValue(c.title?.toString()));
+      });
+    };
+    if (patientDriversSearch !== '') {
+      setPatientDriverTreeData(filterData(patientDriverTree));
+    } else {
+      setPatientDriverTreeData(patientDriverTree);
+    }
+  }, [patientDriversSearch, patientDriverTree]);
 
   const handleCancel = () => {
     if (statDriverData) {
@@ -429,10 +459,10 @@ const StatisticDrivers: React.FC = () => {
         removeBodyPadding
       >
         <Spacing padding={16} itemSpacing={12}>
-          <Input search />
+          <Input search onChange={(event: ChangeEvent<HTMLInputElement>) => setPatientDriversSearch(event.target.value)} />
         </Spacing>
         <Tree
-          treeData={runPatientDriverTree}
+          treeData={patientDriverTreeData}
           selectionMode='multiple'
           height={400}
           defaultCheckedKeys={[]}

@@ -22,6 +22,7 @@
     "eslint-plugin-prettier": "^3.3.1",
     "eslint-plugin-react": "^7.20.0",
     "eslint-plugin-react-hooks": "^4.2.0",
+    "lodash": "^4.17.21",
     "node-sass": "^4.14.1",
     "prettier": "^2.2.1",
     "react": "^17.0.1",
@@ -68,5 +69,8 @@
       "!**/babel.config.js",
       "!**/jest/Setup.js"
     ]
+  },
+  "devDependencies": {
+    "@types/lodash": "^4.14.170"
   }
 }
