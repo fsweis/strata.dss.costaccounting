@@ -16,7 +16,7 @@ namespace Strata.DSS.CostAccounting.Biz.StatisticDrivers.Services
     {
         private readonly ICostAccountingRepository _costaccountingRepository;
         private readonly IStatisticDriversRepository _statisticDriversRepository;
-        //
+
         private DataTable glSampledDataTable;
         private DataTable detailDataTable;
         private DataTable payrollDataTable;
@@ -58,15 +58,15 @@ namespace Strata.DSS.CostAccounting.Biz.StatisticDrivers.Services
             return statisticDriverDto;
         }
 
-        public  IList<string> GetGlobalIDs(bool isClaims)
+        private  IList<string> GetGlobalIDs(bool isClaims)
         {
             var globalIds = new List<string>();
             globalIds.Add(DataTableConstants.DSSGL);
             if (isClaims)
             {
                 globalIds.Add(DataTableConstants.PatientClaimChargeLineItemDetail);
-                //globalIds.Add(DataTableConstants.PatientClaimSummary);
-                //globalIds.Add(DataTableConstants.ClaimCostingStatisticDriver);
+                globalIds.Add(DataTableConstants.PatientClaimSummary);
+                globalIds.Add(DataTableConstants.ClaimCostingStatisticDriver);
                 globalIds.Add(DataTableConstants.ClaimStatisticDriver);
             }
             else
@@ -80,45 +80,66 @@ namespace Strata.DSS.CostAccounting.Biz.StatisticDrivers.Services
             return globalIds;
         }
 
-        public IList<DataTable> SetupDataSources(Boolean isClaims, IList<DataTable> dataTables)
+        private IList<DataTable> SetupDataSources(Boolean isClaims, IList<DataTable> dataTables)
         {
+            var dataSources = new List<DataTable>();
             glSampledDataTable = dataTables.Where(x => x.GlobalID == DataTableConstants.DSSGL).FirstOrDefault();
             if (glSampledDataTable != null) glSampledDataTable.FriendlyName = "GL";
-            
+            dataSources.Add(glSampledDataTable);
+
             if (!isClaims)
             {
                 detailDataTable = dataTables.Where(x => x.GlobalID == DataTableConstants.PatientBillingLineItemDetail).FirstOrDefault();
-                if (detailDataTable != null) detailDataTable.FriendlyName = "Patient Detail";
+                if (detailDataTable != null)
+                {
+                    detailDataTable.FriendlyName = "Patient Detail";
+                    dataSources.Add(detailDataTable);
+                }
             
                 payrollDataTable = dataTables.Where(x => x.GlobalID == DataTableConstants.PayrollSampled).FirstOrDefault();
-                if (payrollDataTable != null) payrollDataTable.FriendlyName = "Payroll";
-            
+                if (payrollDataTable != null)
+                {
+                    payrollDataTable.FriendlyName = "Payroll";
+                    dataSources.Add(payrollDataTable);
+                }
+
                 statDriverDataTable = dataTables.Where(x => x.GlobalID == DataTableConstants.StatisticDriver).FirstOrDefault();
-                if (statDriverDataTable != null) statDriverDataTable.FriendlyName = "Statistics";
+                if (statDriverDataTable != null)
+                {
+                    statDriverDataTable.FriendlyName = "Statistics";
+                    dataSources.Add(statDriverDataTable);
+                }
             
                 summaryDataTableGUID = dataTables.Where(x => x.GlobalID == DataTableConstants.PatientEncounterSummary).Select(x => x.DataTableGUID).FirstOrDefault();
 
                 GL_PAYROLL_DATASOURCE_ID = new Guid("72533379-57ad-44c3-8365-b6187a0c6d48");
                 //Load GL/Payroll combined dummy datasource
                 var glPDataTable = new DataTable() { DataTableGUID = GL_PAYROLL_DATASOURCE_ID, FriendlyName = "GL and Payroll", GlobalID = "GL and Payroll" };
-                dataTables.Add(glPDataTable);
+                dataSources.Add(glPDataTable);
             }
             else
             {
                 //Claims
                 claimDetailDataTable = dataTables.Where(x => x.GlobalID == DataTableConstants.PatientClaimChargeLineItemDetail).FirstOrDefault();
-                if (claimDetailDataTable != null) claimDetailDataTable.FriendlyName = "Claim Detail";
-            
+                if (claimDetailDataTable != null)
+                {
+                    claimDetailDataTable.FriendlyName = "Claim Detail";
+                    dataSources.Add(claimDetailDataTable);
+                }
                 claimCostingStatisticDriverDataTable = dataTables.Where(x => x.GlobalID == DataTableConstants.ClaimCostingStatisticDriver).FirstOrDefault();
                 claimSummaryDataTableGUID = dataTables.Where(x => x.GlobalID == DataTableConstants.PatientClaimSummary).Select(x => x.DataTableGUID).FirstOrDefault();
            
                 claimStatisticDriverDataTable = dataTables.Where(x => x.GlobalID == DataTableConstants.ClaimStatisticDriver).FirstOrDefault();
-                if (claimStatisticDriverDataTable != null) claimStatisticDriverDataTable.FriendlyName = "Claims Statistics";
+                if (claimStatisticDriverDataTable != null)
+                {
+                    claimStatisticDriverDataTable.FriendlyName = "Claims Statistics";
+                    dataSources.Add(claimStatisticDriverDataTable);
+                }
             }
-            return dataTables;
+            return dataSources.OrderBy(x=>x.FriendlyName).ToList();
         }
 
-        public List<DataSourceLink> SetupDataSourceLinks(Boolean isClaims, IList<Measure>measures, IList<RuleEngineIncludedMeasure> ruleEngineIncludedMeasures)
+        private List<DataSourceLink> SetupDataSourceLinks(Boolean isClaims, IList<Measure>measures, IList<RuleEngineIncludedMeasure> ruleEngineIncludedMeasures)
         {
             var dataSourceLinks = new List<DataSourceLink>();
             //Load GL Sampled Measures
@@ -131,7 +152,7 @@ namespace Strata.DSS.CostAccounting.Biz.StatisticDrivers.Services
             {
                 //Load Encounter Summary Measures
                 var summaryMeasure = measures.Single(x => x.DataTableGUID == summaryDataTableGUID && string.Equals(x.SQLColumnName, MeasureConstants.PES_EncounterRecordNumber_ColumnName));
-                dataSourceLinks.Add(new DataSourceLink(summaryMeasure.MeasureGUID, "Encounters", summaryMeasure.DataTableGUID, false));
+                dataSourceLinks.Add(new DataSourceLink(summaryMeasure.MeasureGUID, "Encounters", detailDataTable.DataTableGUID, false));
                 //Load Detail Table Measures
                 var ruleEngineIncludedMeaureGuids = ruleEngineIncludedMeasures.Where(x => x.DataTableGUID == detailDataTable.DataTableGUID && x.IsIncludedInRules).Select(x => x.MeasureGUID).ToList();
                 var detailMeasures = measures.Where(x => x.DataTableGUID == detailDataTable.DataTableGUID && ruleEngineIncludedMeaureGuids.Contains(x.MeasureGUID));
@@ -153,8 +174,8 @@ namespace Strata.DSS.CostAccounting.Biz.StatisticDrivers.Services
             else
             {
                 // Load Claim Summary Measure
-                // var claimsMeasure = measures.Single(x => x.DataTableGUID == claimSummaryDataTableGUID && string.Equals(x.SQLColumnName, MeasureConstants.PCS_ClaimRecordNumber_ColumnName));
-                // dataSourceLinks.Add(new DataSourceLink(claimsMeasure.MeasureGUID, "Claims", claimsMeasure.DataTableGUID, false));
+                 var claimsMeasure = measures.Single(x => x.DataTableGUID == claimSummaryDataTableGUID && string.Equals(x.SQLColumnName, MeasureConstants.PCS_ClaimRecordNumber_ColumnName));
+                 dataSourceLinks.Add(new DataSourceLink(claimsMeasure.MeasureGUID, "Claims", claimDetailDataTable.DataTableGUID, false));
                 //Load Detail Table Measures
                 var claimDetailMeasures = measures.Where(x => x.DataTableGUID == claimDetailDataTable.DataTableGUID && x.IsNumericMeasure()).ToList();
                 foreach (var measure in claimDetailMeasures)
@@ -165,7 +186,7 @@ namespace Strata.DSS.CostAccounting.Biz.StatisticDrivers.Services
                 var unitsMeasure = measures.Single(x => x.DataTableGUID == claimStatisticDriverDataTable.DataTableGUID && string.Equals(x.SQLColumnName, "Amount01"));
                 dataSourceLinks.Add(new DataSourceLink(unitsMeasure.MeasureGUID, "Amount", unitsMeasure.DataTableGUID, true));
             }
-            return dataSourceLinks;
+            return dataSourceLinks.OrderBy(x => x.FriendlyName).ToList() ;
         }
         private async Task<List<StatisticDriver>> GetStatisticDriversAsync(CostingConfig costingConfig)
         {
@@ -185,7 +206,7 @@ namespace Strata.DSS.CostAccounting.Biz.StatisticDrivers.Services
                 statisticDrivers.Add(new StatisticDriver(driverConfigTemp, isUsed, summaryDataTableGUID, detailDataTableGUID));
             }
 
-            return statisticDrivers;
+            return statisticDrivers.OrderBy(x=>x.Name).ToList();
         }
     }
 }

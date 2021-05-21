@@ -38,7 +38,7 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
             //dev patient
             //var costingConfig = await _costaccountingRepository.GetCostingConfigAsync(new Guid("da9eef04-3c9d-445b-b0c4-3a7812ca76d8"), cancellationToken);
             ///kaiser patient
-            //var costingConfig = await _costaccountingRepository.GetCostingConfig(new Guid("0f559827-4df4-4f1d-843e-d49a1e1c649d"), cancellationToken);
+            //var costingConfig = await _costaccountingRepository.GetCostingConfigAsync(new Guid("0f559827-4df4-4f1d-843e-d49a1e1c649d"), cancellationToken);
             //kaiser claims
             var costingConfig = await _costaccountingRepository.GetCostingConfigAsync(new Guid("2adafbaa-c365-472a-94f1-79b823d8547a"), cancellationToken);
 
@@ -83,6 +83,11 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
                     //LogError
                 };
             }
+            //dev patient
+            //var costingConfig = await _costaccountingRepository.GetCostingConfigAsync(new Guid("da9eef04-3c9d-445b-b0c4-3a7812ca76d8"), cancellationToken);
+            //kaiser patient
+            //var costingConfig = await _costaccountingRepository.GetCostingConfigAsync(new Guid("0f559827-4df4-4f1d-843e-d49a1e1c649d"), cancellationToken);
+            //kaiser claims
             var costingConfig = await _costaccountingRepository.GetCostingConfigAsync(new Guid("2adafbaa-c365-472a-94f1-79b823d8547a"), cancellationToken);
             var statDriverDTO = await _statisticDriversService.LoadStatisticDrivers(costingConfig);
             return Ok(statDriverDTO.StatisticDrivers.ToList());
