@@ -12,7 +12,7 @@ export const statisticDriverService = {
   saveStatisticDrivers: (statisticDriverSaveData: IStatisticDriverSaveData): Promise<IStatisticDriver[]> => {
     return httpPost<IStatisticDriver[]>('statistic-drivers/SaveStatisticDrivers/', statisticDriverSaveData);
   },
-  validateRemoveDriver: (driverConfigGUID: string): Promise<boolean> => {
-    return httpGet<boolean>(`statistic-drivers/ValidateRemoveDriver?driverConfigGUID=${driverConfigGUID}`);
+  validateRemoveDriver: (driverConfigGuid: string): Promise<boolean> => {
+    return httpGet<boolean>(`statistic-drivers/ValidateRemoveDriver?driverConfigGuid=${driverConfigGuid}`);
   }
 };

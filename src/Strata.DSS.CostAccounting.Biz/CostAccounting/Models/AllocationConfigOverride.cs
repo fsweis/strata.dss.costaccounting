@@ -6,10 +6,10 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.Models
 {
     public class AllocationConfigOverride
     {
-        public Guid AllocationConfigOverrideGUID { get; set; }
-        public Guid DriverConfigGUID { get; set; }
+        public Guid AllocationConfigOverrideGuid { get; set; }
+        public Guid DriverConfigGuid { get; set; }
 
-        public Guid AllocationConfigGUID { get; set; }
-        public Guid CostingConfigGUID { get; set; }
+        public Guid AllocationConfigGuid { get; set; }
+        public Guid CostingConfigGuid { get; set; }
     }
 }

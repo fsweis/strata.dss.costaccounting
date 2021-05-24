@@ -50,7 +50,7 @@ const StatisticDrivers: React.FC = () => {
 
   useEffect(() => {
     const runPatientDriverTreeChildren = statDrivers.map((statDriver) => {
-      return { key: statDriver.driverConfigGUID, title: statDriver.name };
+      return { key: statDriver.driverConfigGuid, title: statDriver.name };
     });
 
     const runPatientDriverTree = [
@@ -97,9 +97,9 @@ const StatisticDrivers: React.FC = () => {
     const newGuid = getNewGuid();
 
     const newDriver: IStatisticDriver = {
-      driverConfigGUID: newGuid,
-      dataTableGUID: getEmptyGuid(),
-      measureGUID: getEmptyGuid(),
+      driverConfigGuid: newGuid,
+      dataTableGuid: getEmptyGuid(),
+      measureGuid: getEmptyGuid(),
       hasRules: false,
       isInverted: false,
       isNew: true,
@@ -113,11 +113,11 @@ const StatisticDrivers: React.FC = () => {
     }
   };
 
-  const handleEditRules = function (driverConfigGUID: string) {
+  const handleEditRules = function (driverConfigGuid: string) {
     //TODO with rules engine bli
     /*
-    const url = 'https://dev.sdt.local/StrataJazz202123/DSS/HealthPlan/Statistics/HealthPlanRulesEditWindow.aspx?hpAdminStatisticDriverGuid=' + driverConfigGUID;
-    const winid = driverConfigGUID;
+    const url = 'https://dev.sdt.local/StrataJazz202123/DSS/HealthPlan/Statistics/HealthPlanRulesEditWindow.aspx?hpAdminStatisticDriverGuid=' + driverConfigGuid;
+    const winid = driverConfigGuid;
     const options = 'scrollbars=0,toolbar=0,location=0,statusbar=0,menubar=0, resizable=1,width=1000,height=700,left=50,top=50';
     const win = window.open(url, winid, options);
     win?.focus();
@@ -138,11 +138,11 @@ const StatisticDrivers: React.FC = () => {
       });
       //get stats to update
       const statDriversToUpdate = statDrivers.filter(function (stat) {
-        return driversToUpdate.indexOf(stat.driverConfigGUID) >= 0 && stat.isNew === false;
+        return driversToUpdate.indexOf(stat.driverConfigGuid) >= 0 && stat.isNew === false;
       });
       //get stats to add
       const statDriversToAdd = statDrivers.filter(function (stat) {
-        return driversToUpdate.indexOf(stat.driverConfigGUID) >= 0 && stat.isNew === true;
+        return driversToUpdate.indexOf(stat.driverConfigGuid) >= 0 && stat.isNew === true;
       });
 
       const statDriverSaveData: IStatisticDriverSaveData = {
@@ -187,11 +187,11 @@ const StatisticDrivers: React.FC = () => {
         message = 'Statistic driver name cannot be blank. Column: 0 , Row: ' + i + '.';
         break;
       }
-      if (data[i].dataTableGUID === getEmptyGuid()) {
+      if (data[i].dataTableGuid === getEmptyGuid()) {
         message = 'Data Source cannot be empty. Column: 1 , Row: ' + i + '.';
         break;
       }
-      if (data[i].measureGUID === getEmptyGuid()) {
+      if (data[i].measureGuid === getEmptyGuid()) {
         message = 'Measure cannot be empty. Column: 2 , Row: ' + i + '.';
         break;
       }
@@ -225,7 +225,7 @@ const StatisticDrivers: React.FC = () => {
     }
     const target = statDriverData?.dataSources.find((dataSource) => dataSource.friendlyName.toLowerCase().indexOf(filterValue) > -1);
     if (target !== undefined) {
-      return target.dataTableGUID === cellValue;
+      return target.dataTableGuid === cellValue;
     }
     return false;
   };
@@ -240,7 +240,7 @@ const StatisticDrivers: React.FC = () => {
     }
     const target = statDriverData?.dataSourceLinks.find((measure) => measure.friendlyName.toLowerCase().indexOf(filterValue) > -1);
     if (target !== undefined) {
-      return target.measureGUID === cellValue;
+      return target.measureGuid === cellValue;
     }
     return false;
   };
@@ -284,8 +284,8 @@ const StatisticDrivers: React.FC = () => {
         validationMode='all-cells'
         onCellEdit={(e) => {
           //add to updated drivers
-          if (updatedDrivers.indexOf(e.rowData.driverConfigGUID) < 0) {
-            const driversToUpdate = [e.rowData.driverConfigGUID].concat(updatedDrivers);
+          if (updatedDrivers.indexOf(e.rowData.driverConfigGuid) < 0) {
+            const driversToUpdate = [e.rowData.driverConfigGuid].concat(updatedDrivers);
             setUpdatedDrivers(driversToUpdate);
           }
         }}
@@ -328,14 +328,14 @@ const StatisticDrivers: React.FC = () => {
         />
         <DataGrid.DropDownColumn
           key='dataSource'
-          field='dataTableGUID'
+          field='dataTableGuid'
           header='Data Source'
           filter
           filterMatchMode='custom'
           filterFunction={filterDataSource}
           editable
           width={200}
-          itemValueField='dataTableGUID'
+          itemValueField='dataTableGuid'
           itemTextField='friendlyName'
           items={statDriverData?.dataSources}
           editor={(cellEditorArgs) => (
@@ -350,24 +350,24 @@ const StatisticDrivers: React.FC = () => {
                     return;
                   }
 
-                  if (value !== cellEditorArgs.rowData.dataTableGUID) {
-                    cellEditorArgs.rowData.dataTableGUID = value;
-                    const defaultValue = statDriverData?.dataSourceLinks.filter((x) => x.dataTableGUID === value && x.isFirstSelect === true);
+                  if (value !== cellEditorArgs.rowData.dataTableGuid) {
+                    cellEditorArgs.rowData.dataTableGuid = value;
+                    const defaultValue = statDriverData?.dataSourceLinks.filter((x) => x.dataTableGuid === value && x.isFirstSelect === true);
                     if (defaultValue !== undefined && defaultValue.length > 0) {
                       const updatedDrivers = statDrivers.map((driver) => {
-                        if (driver.driverConfigGUID === cellEditorArgs.rowData.driverConfigGUID) {
-                          return { ...driver, measureGUID: defaultValue[0].measureGUID };
+                        if (driver.driverConfigGuid === cellEditorArgs.rowData.driverConfigGuid) {
+                          return { ...driver, measureGuid: defaultValue[0].measureGuid };
                         }
                         return driver;
                       });
                       //need to refresh grid data
                       setStatDrivers(updatedDrivers);
                     } else {
-                      const nonDefaultValue = statDriverData?.dataSourceLinks.filter((x) => x.dataTableGUID === value);
+                      const nonDefaultValue = statDriverData?.dataSourceLinks.filter((x) => x.dataTableGuid === value);
                       if (nonDefaultValue !== undefined && nonDefaultValue.length > 0) {
                         const updatedDrivers = statDrivers.map((driver) => {
-                          if (driver.driverConfigGUID === cellEditorArgs.rowData.driverConfigGUID) {
-                            return { ...driver, measureGUID: nonDefaultValue[0].measureGUID };
+                          if (driver.driverConfigGuid === cellEditorArgs.rowData.driverConfigGuid) {
+                            return { ...driver, measureGuid: nonDefaultValue[0].measureGuid };
                           }
                           return driver;
                         });
@@ -377,14 +377,14 @@ const StatisticDrivers: React.FC = () => {
                     }
                   }
                   //add to updated drivers
-                  if (updatedDrivers.indexOf(cellEditorArgs.rowData.driverConfigGUID) < 0) {
-                    const driversToUpdate = [cellEditorArgs.rowData.driverConfigGUID].concat(updatedDrivers);
+                  if (updatedDrivers.indexOf(cellEditorArgs.rowData.driverConfigGuid) < 0) {
+                    const driversToUpdate = [cellEditorArgs.rowData.driverConfigGuid].concat(updatedDrivers);
                     setUpdatedDrivers(driversToUpdate);
                   }
                 }}
                 width={300}
-                value={cellEditorArgs.rowData.dataTableGUID}
-                itemValueField='dataTableGUID'
+                value={cellEditorArgs.rowData.dataTableGuid}
+                itemValueField='dataTableGuid'
                 itemTextField='friendlyName'
                 items={statDriverData?.dataSources}
               />
@@ -409,33 +409,33 @@ const StatisticDrivers: React.FC = () => {
         />
         <DataGrid.DropDownColumn
           key='dataSourceLink'
-          field='measureGUID'
+          field='measureGuid'
           header='Measure'
           filter
           filterMatchMode='custom'
           filterFunction={filterDataSourceLink}
           editable
           width={200}
-          itemValueField='measureGUID'
+          itemValueField='measureGuid'
           itemTextField='friendlyName'
           items={statDriverData?.dataSourceLinks}
           editor={(cellEditorArgs) => (
             <>
               <DropDown
                 onChange={(value) => {
-                  cellEditorArgs.rowData.measureGUID = value;
+                  cellEditorArgs.rowData.measureGuid = value;
                   //add to updated drivers
-                  if (updatedDrivers.indexOf(cellEditorArgs.rowData.driverConfigGUID) < 0) {
-                    const driversToUpdate = [cellEditorArgs.rowData.driverConfigGUID].concat(updatedDrivers);
+                  if (updatedDrivers.indexOf(cellEditorArgs.rowData.driverConfigGuid) < 0) {
+                    const driversToUpdate = [cellEditorArgs.rowData.driverConfigGuid].concat(updatedDrivers);
                     setUpdatedDrivers(driversToUpdate);
                   }
                 }}
                 width={300}
-                itemValueField='measureGUID'
+                itemValueField='measureGuid'
                 itemTextField='friendlyName'
-                value={cellEditorArgs.rowData.measureGUID}
+                value={cellEditorArgs.rowData.measureGuid}
                 items={statDriverData?.dataSourceLinks.filter((x: IDataSourceLink) => {
-                  return x.dataTableGUID === cellEditorArgs.rowData.dataTableGUID;
+                  return x.dataTableGuid === cellEditorArgs.rowData.dataTableGuid;
                 })}
               />
             </>
@@ -449,7 +449,7 @@ const StatisticDrivers: React.FC = () => {
           body={(rowData) => (
             <>
               <Spacing vAlign='center'>
-                <Button type='link' onClick={() => handleEditRules(rowData.driverConfigGUID)} disabled={rowData.isNew}>
+                <Button type='link' onClick={() => handleEditRules(rowData.driverConfigGuid)} disabled={rowData.isNew}>
                   {rowData.hasRules ? 'Edit Rules' : 'Add Rules'}
                 </Button>
 
@@ -470,11 +470,11 @@ const StatisticDrivers: React.FC = () => {
                         onOk() {
                           if (statDrivers !== undefined) {
                             //add to deleted drivers
-                            const driversToDelete = [rowData.driverConfigGUID].concat(deletedDrivers);
+                            const driversToDelete = [rowData.driverConfigGuid].concat(deletedDrivers);
                             setDeletedDrivers(driversToDelete);
                             //refresh the grid
                             const newStatDrivers = statDrivers.filter(function (obj) {
-                              return obj.driverConfigGUID !== rowData.driverConfigGUID;
+                              return obj.driverConfigGuid !== rowData.driverConfigGuid;
                             });
                             setStatDrivers(newStatDrivers);
                           }

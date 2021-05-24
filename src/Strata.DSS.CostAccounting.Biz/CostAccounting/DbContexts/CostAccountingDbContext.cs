@@ -35,67 +35,67 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.DbContexts
         {
             modelBuilder.Entity<Measure>(entity =>
             {
-                entity.HasKey(e => e.MeasureGUID);
+                entity.HasKey(e => e.MeasureGuid);
                 entity.ToTable("ScoreMeasure", "dbo");
             });
 
             modelBuilder.Entity<DataTable>(entity =>
             {
-                entity.HasKey(e => e.DataTableGUID);
+                entity.HasKey(e => e.DataTableGuid);
                 entity.ToTable("ScoreDataTable", "dbo");
             });
 
             modelBuilder.Entity<RuleSet>(entity =>
             {
-                entity.HasKey(e => e.RuleSetGUID);
+                entity.HasKey(e => e.RuleSetGuid);
                 entity.ToTable("RuleSet", "dbo");
             });
 
             modelBuilder.Entity<CostingConfig>(entity =>
             {
-                entity.HasKey(e => e.CostingConfigGUID);
+                entity.HasKey(e => e.CostingConfigGuid);
                 entity.ToTable("CostingConfig", "dss");
             });
 
             modelBuilder.Entity<RuleEngineIncludedMeasure>(entity =>
             {
-                entity.HasKey(e => e.RuleEngineIncludedMeasureGUID);
+                entity.HasKey(e => e.RuleEngineIncludedMeasureGuid);
                 entity.ToTable("viewRuleEngineIncludedMeasure", "dss");
             });
 
             modelBuilder.Entity<DriverConfig>(entity =>
             {
-                entity.HasKey(e => e.DriverConfigGUID);
+                entity.HasKey(e => e.DriverConfigGuid);
                 entity.ToTable("viewDriverConfigInfo", "dss");
             });
 
             modelBuilder.Entity<AccountReclass>(entity =>
             {
-                entity.HasKey(e => e.AccountReclassGUID);
+                entity.HasKey(e => e.AccountReclassGuid);
                 entity.ToTable("AccountReclass", "dss");
             });
 
             modelBuilder.Entity<PayCodeJobCodeReclass>(entity =>
             {
-                entity.HasKey(e => e.PayCodeJobCodeReclassGUID);
+                entity.HasKey(e => e.PayCodeJobCodeReclassGuid);
                 entity.ToTable("PayCodeJobCodeReclass", "dss");
             });
 
             modelBuilder.Entity<DepartmentReclass>(entity =>
             {
-                entity.HasKey(e => e.DepartmentReclassGUID);
+                entity.HasKey(e => e.DepartmentReclassGuid);
                 entity.ToTable("DepartmentReclass", "dss");
             });
 
             modelBuilder.Entity<AllocationConfig>(entity =>
             {
-                entity.HasKey(e => e.AllocationConfigGUID);
+                entity.HasKey(e => e.AllocationConfigGuid);
                 entity.ToTable("AllocationConfig", "dss");
             });
 
             modelBuilder.Entity<AllocationConfigOverride>(entity =>
             {
-                entity.HasKey(e => e.AllocationConfigOverrideGUID);
+                entity.HasKey(e => e.AllocationConfigOverrideGuid);
                 entity.ToTable("AllocationConfigOverride", "dss");
             });
 

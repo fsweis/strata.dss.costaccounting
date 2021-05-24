@@ -1,10 +1,10 @@
 export interface IStatisticDriver {
-  driverConfigGUID: string;
-  dataTableGUID: string;
+  driverConfigGuid: string;
+  dataTableGuid: string;
   hasRules: boolean;
   isInverted: boolean;
   isNew: boolean;
   isUsed: boolean;
-  measureGUID: string;
+  measureGuid: string;
   name: string;
 }

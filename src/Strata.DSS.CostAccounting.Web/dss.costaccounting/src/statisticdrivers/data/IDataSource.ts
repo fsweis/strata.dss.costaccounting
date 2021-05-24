@@ -1,5 +1,5 @@
 export interface IDataSource {
-  dataTableGUID: string;
+  dataTableGuid: string;
   friendlyName: string;
   globalID: string;
 }

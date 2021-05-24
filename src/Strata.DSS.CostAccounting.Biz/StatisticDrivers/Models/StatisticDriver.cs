@@ -10,9 +10,9 @@ namespace Strata.DSS.CostAccounting.Biz.StatisticDrivers.Models
 {
     public class StatisticDriver
     {
-        public Guid DriverConfigGUID { get; set; }
-        public Guid MeasureGUID { get; set; }
-        public Guid DataTableGUID { get; set; }
+        public Guid DriverConfigGuid { get; set; }
+        public Guid MeasureGuid { get; set; }
+        public Guid DataTableGuid { get; set; }
         public string Name { get; set; }
         public bool HasRules { get; set; }
         public bool IsInverted { get; set; }
@@ -20,7 +20,7 @@ namespace Strata.DSS.CostAccounting.Biz.StatisticDrivers.Models
       
         public bool IsUsed { get; set; }
        
-        public Guid RuleSetGUID { get; set; }
+        public Guid RuleSetGuid { get; set; }
 
         public CostingType CostingType { get; set; }
 
@@ -30,22 +30,22 @@ namespace Strata.DSS.CostAccounting.Biz.StatisticDrivers.Models
         {
         }
 
-        public StatisticDriver(DriverConfig driverConfigTemp, bool isUsed, Guid summaryDataTableGUID, Guid detailDataTableGUID)
+        public StatisticDriver(DriverConfig driverConfigTemp, bool isUsed, Guid summaryDataTableGuid, Guid detailDataTableGuid)
         {
-            var dtGUID = driverConfigTemp.DataTableGUID;
-            if(dtGUID==summaryDataTableGUID)
+            var dtGuid = driverConfigTemp.DataTableGuid;
+            if(dtGuid==summaryDataTableGuid)
             {
-                dtGUID = detailDataTableGUID;
+                dtGuid = detailDataTableGuid;
             }
-            DriverConfigGUID = driverConfigTemp.DriverConfigGUID;
-            MeasureGUID = driverConfigTemp.MeasureGUID;
-            DataTableGUID = dtGUID;
+            DriverConfigGuid = driverConfigTemp.DriverConfigGuid;
+            MeasureGuid = driverConfigTemp.MeasureGuid;
+            DataTableGuid = dtGuid;
             Name = driverConfigTemp.Name;
             IsNew = false;
             IsUsed = isUsed;
             IsInverted = driverConfigTemp.IsInverted;
-            RuleSetGUID = driverConfigTemp.RuleSetGUID;
-            HasRules = driverConfigTemp.RuleSetGUID != Guid.Empty;
+            RuleSetGuid = driverConfigTemp.RuleSetGuid;
+            HasRules = driverConfigTemp.RuleSetGuid != Guid.Empty;
             CostingType = driverConfigTemp.CostingType;
         }
 

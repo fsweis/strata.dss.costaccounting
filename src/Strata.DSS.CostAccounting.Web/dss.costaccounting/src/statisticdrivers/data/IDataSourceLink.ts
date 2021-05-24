@@ -1,6 +1,6 @@
 export interface IDataSourceLink {
-  dataTableGUID: string;
+  dataTableGuid: string;
   friendlyName: string;
-  measureGUID: string;
+  measureGuid: string;
   isFirstSelect: boolean;
 }

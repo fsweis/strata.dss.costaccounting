@@ -6,8 +6,8 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.Models
 {
     public class PayCodeJobCodeReclass
     {
-        public Guid PayCodeJobCodeReclassGUID { get; set; }
-        public Guid DriverConfigGUID { get; set; }
-        public Guid CostingConfigGUID { get; set; }
+        public Guid PayCodeJobCodeReclassGuid { get; set; }
+        public Guid DriverConfigGuid { get; set; }
+        public Guid CostingConfigGuid { get; set; }
     }
 }

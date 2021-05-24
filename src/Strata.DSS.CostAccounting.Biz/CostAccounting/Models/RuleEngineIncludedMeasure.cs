@@ -6,9 +6,9 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.Models
 {
     public class RuleEngineIncludedMeasure
     {
-        public Guid RuleEngineIncludedMeasureGUID { get; set; }
-        public Guid DataTableGUID { get; set; }
-        public Guid MeasureGUID { get; set; }
+        public Guid RuleEngineIncludedMeasureGuid { get; set; }
+        public Guid DataTableGuid { get; set; }
+        public Guid MeasureGuid { get; set; }
         public string DataTableName { get; set; }
         public string MeasureName { get; set; }
         public bool IsIncludedInRules { get; set; }

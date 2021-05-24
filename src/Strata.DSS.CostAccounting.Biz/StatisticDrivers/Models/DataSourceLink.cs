@@ -5,24 +5,24 @@ namespace Strata.DSS.CostAccounting.Biz.StatisticDrivers.Models
 {
     public class DataSourceLink
     {
-        public Guid MeasureGUID { get; set; }
-        public Guid DataTableGUID { get; set; }
+        public Guid MeasureGuid { get; set; }
+        public Guid DataTableGuid { get; set; }
         public string FriendlyName { get; set; }
         public bool IsFirstSelect { get; set; }
 
         public DataSourceLink(Measure measure)
         {
-            MeasureGUID = measure.MeasureGUID;
+            MeasureGuid = measure.MeasureGuid;
             FriendlyName = measure.FriendlyName;
-            DataTableGUID = measure.DataTableGUID;
+            DataTableGuid = measure.DataTableGuid;
             IsFirstSelect = false;
         }
 
-        public DataSourceLink(Guid measureGUID, string measureFriendlyName, Guid dataTableGUID, bool isFirstSelect)
+        public DataSourceLink(Guid measureGuid, string measureFriendlyName, Guid dataTableGuid, bool isFirstSelect)
         {
-            MeasureGUID = measureGUID;
+            MeasureGuid = measureGuid;
             FriendlyName = measureFriendlyName;
-            DataTableGUID = dataTableGUID;
+            DataTableGuid = dataTableGuid;
             IsFirstSelect = isFirstSelect;
         }
     }

@@ -6,9 +6,9 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.Models
 {
     public class DepartmentReclass
     {
-        public Guid DepartmentReclassGUID { get; set; }
-        public Guid DriverConfigGUID { get; set; }
-        public Guid CostingConfigGUID { get; set; }
+        public Guid DepartmentReclassGuid { get; set; }
+        public Guid DriverConfigGuid { get; set; }
+        public Guid CostingConfigGuid { get; set; }
     }
 }
 

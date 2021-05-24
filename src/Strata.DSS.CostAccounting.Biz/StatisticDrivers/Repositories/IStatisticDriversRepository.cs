@@ -13,6 +13,6 @@ namespace Strata.DSS.CostAccounting.Biz.StatisticDrivers.Repositories
         public Task<List<Guid>> GetUsedDriverConfigs(CancellationToken cancellationToken);
         public Task<Boolean> AddStatisticDriversAsync(List<StatisticDriver> statisticDrivers, CancellationToken cancellationToken);
         public Task<Boolean> UpdateStatisticDriversAsync(List<StatisticDriver> statisticDrivers, CancellationToken cancellationToken);
-        public Task<Boolean> DeleteStatisticDriversAsync(List<Guid> statisticDriverGUIDs, CancellationToken cancellationToken);
+        public Task<Boolean> DeleteStatisticDriversAsync(List<Guid> statisticDriverGuids, CancellationToken cancellationToken);
     }
 }

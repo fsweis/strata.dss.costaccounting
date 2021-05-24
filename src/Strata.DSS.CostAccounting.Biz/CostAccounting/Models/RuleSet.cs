@@ -8,8 +8,8 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.Models
     {
         public string Category { get; set; }
         public int ExecutionOrder { get; set; }
-        public Guid RootRuleGroupGUID { get; set; }
-        public Guid RuleSetGUID { get; set; }
+        public Guid RootRuleGroupGuid { get; set; }
+        public Guid RuleSetGuid { get; set; }
         public int RuleSetID { get; set; }
 
     }

@@ -8,11 +8,11 @@ namespace Strata.DSS.CostAccounting.Biz.StatisticDrivers.Models
     public class DriverConfig
     {
         public string Name { get; set; }
-        public Guid DriverConfigGUID{ get; set; }
-        public Guid CostingConfigGUID { get; set; }
-        public Guid DataTableGUID { get; set; }
-        public Guid MeasureGUID { get; set; }
-        public Guid RuleSetGUID { get; set; }
+        public Guid DriverConfigGuid{ get; set; }
+        public Guid CostingConfigGuid { get; set; }
+        public Guid DataTableGuid { get; set; }
+        public Guid MeasureGuid { get; set; }
+        public Guid RuleSetGuid { get; set; }
         public CostingType CostingType { get; set; }
         public bool IsInverted { get; set; }
     }
