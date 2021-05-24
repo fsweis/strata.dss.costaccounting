@@ -1,9 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using System.Net.Mime;
-using System.Text.Json;
-using System.Text.Json.Serialization;
-using Hangfire;
-using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
@@ -15,9 +10,11 @@ using Strata.ApiLib.Core.Cors.Extensions;
 using Strata.ApiLib.Core.ExceptionHandling.DependencyInjection.Bootstrappers;
 using Strata.ApiLib.Core.Logging.Bootstrappers;
 using Strata.ApiLib.Core.StrataAuthentication.Bootstrappers;
-using Strata.Hangfire.AspNetCore;
-using Strata.Hangfire.AspNetCore.Filters.Dashboard;
 using Strata.SwaggerExtensions;
+using System.Diagnostics.CodeAnalysis;
+using System.Net.Mime;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace Strata.DSS.CostAccounting.Api
 {
@@ -59,10 +56,7 @@ namespace Strata.DSS.CostAccounting.Api
             })
             .SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
 
-            // configure hangfire
-           // services.AddStrataHangfire();
             services.AddCostAccountingServices(_configuration);
-
             services.AddRouting();
             services.AddSwagger(_configuration);
             services.AddStrataAuthentication(_configuration);
@@ -75,10 +69,9 @@ namespace Strata.DSS.CostAccounting.Api
         {
             app.UseGlobalExceptionMiddleware();
             app.UseRouting();
-
             app.UseStrataCorsPolicy(env);
 
-            if (!env.IsDevelopment()) 
+            if (!env.IsDevelopment())
             {
                 app.UseHsts();
                 app.UseHttpsRedirection();
@@ -86,18 +79,9 @@ namespace Strata.DSS.CostAccounting.Api
 
             app.UseMetricServer();
             app.UseHttpMetrics();
-
             app.UseStrataAuthentication();
             app.UseClaimsLogging();
             app.ConfigureSwagger(env, provider);
-
-#if DEBUG
-          /*  app.UseHangfireDashboard("/hangfire", new DashboardOptions
-                {
-                    Authorization = new[] {new AllowAnyoneDashboardAuthorizationFilter()}
-                });
-          */
-#endif
             app.UseHealthChecks("/health");
             app.UseEndpoints(endpoints => endpoints.MapControllers().RequireAuthorization());
         }
