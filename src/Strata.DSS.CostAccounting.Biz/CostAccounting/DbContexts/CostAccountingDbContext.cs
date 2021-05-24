@@ -1,5 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Strata.DSS.CostAccounting.Biz.CostAccounting.Entities;
+using Strata.DSS.CostAccounting.Biz.CostAccounting.Models;
+using Strata.DSS.CostAccounting.Biz.StatisticDrivers.Models;
 
 namespace Strata.DSS.CostAccounting.Biz.CostAccounting.DbContexts
 {
@@ -14,5 +16,102 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.DbContexts
         {
 
         }
+
+        public virtual DbSet<Measure> Measures { get; set; }
+        public virtual DbSet<DataTable> DataTables { get; set; }
+        public virtual DbSet<RuleSet> RuleSets { get; set; }
+        public virtual DbSet<CostingConfig> CostingConfigs { get; set; }
+        public virtual DbSet<RuleEngineIncludedMeasure> RuleEngineIncludedMeasures { get; set; }
+
+        public virtual DbSet<DriverConfig> DriverConfigs { get; set; }
+        public virtual DbSet<DriverConfigView> DriverConfigViews { get; set; }
+
+        public virtual DbSet<AccountReclass> AccountReclasses { get; set; }
+        public virtual DbSet<PayCodeJobCodeReclass> PayCodeJobCodeReclasses { get; set; }
+        public virtual DbSet<DepartmentReclass> DepartmentReclasses { get; set; }
+        public virtual DbSet<AllocationConfig> AllocationConfigs { get; set; }
+        public virtual DbSet<AllocationConfigOverride> AllocationConfigOverrides { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Measure>(entity =>
+            {
+                entity.HasKey(e => e.MeasureGuid);
+                entity.ToTable("ScoreMeasure", "dbo");
+            });
+
+            modelBuilder.Entity<DataTable>(entity =>
+            {
+                entity.HasKey(e => e.DataTableGuid);
+                entity.ToTable("ScoreDataTable", "dbo");
+            });
+
+            modelBuilder.Entity<RuleSet>(entity =>
+            {
+                entity.HasKey(e => e.RuleSetGuid);
+                entity.ToTable("RuleSet", "dbo");
+            });
+
+            modelBuilder.Entity<CostingConfig>(entity =>
+            {
+                entity.HasKey(e => e.CostingConfigGuid);
+                entity.ToTable("CostingConfig", "dss");
+            });
+
+            modelBuilder.Entity<RuleEngineIncludedMeasure>(entity =>
+            {
+                entity.HasKey(e => e.RuleEngineIncludedMeasureGuid);
+                entity.ToTable("viewRuleEngineIncludedMeasure", "dss");
+            });
+
+            modelBuilder.Entity<DriverConfig>(entity =>
+            {
+                entity.HasKey(e => e.DriverConfigGuid);
+                entity.ToTable("DriverConfig", "dss");
+            });
+
+            modelBuilder.Entity<DriverConfigView>(entity =>
+            {
+                entity.HasKey(e => e.DriverConfigGuid);
+                entity.ToTable("viewDriverConfigInfo", "dss");
+            });
+
+            modelBuilder.Entity<AccountReclass>(entity =>
+            {
+                entity.HasKey(e => e.AccountReclassGuid);
+                entity.ToTable("AccountReclass", "dss");
+            });
+
+            modelBuilder.Entity<PayCodeJobCodeReclass>(entity =>
+            {
+                entity.HasKey(e => e.PayCodeJobCodeReclassGuid);
+                entity.ToTable("PayCodeJobCodeReclass", "dss");
+            });
+
+            modelBuilder.Entity<DepartmentReclass>(entity =>
+            {
+                entity.HasKey(e => e.DepartmentReclassGuid);
+                entity.ToTable("DepartmentReclass", "dss");
+            });
+
+            modelBuilder.Entity<AllocationConfig>(entity =>
+            {
+                entity.HasKey(e => e.AllocationConfigGuid);
+                entity.ToTable("AllocationConfig", "dss");
+            });
+
+            modelBuilder.Entity<AllocationConfigOverride>(entity =>
+            {
+                entity.HasKey(e => e.AllocationConfigOverrideGuid);
+                entity.ToTable("AllocationConfigOverride", "dss");
+            });
+
+            modelBuilder.Entity<RuleSet>(entity =>
+            {
+                entity.HasKey(e => e.RuleSetID);
+                entity.ToTable("RuleSet", "dbo");
+            });
+        }
     }
 }
+
