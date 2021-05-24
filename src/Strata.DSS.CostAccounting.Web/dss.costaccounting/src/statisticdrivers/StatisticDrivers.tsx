@@ -104,7 +104,8 @@ const StatisticDrivers: React.FC = () => {
       isInverted: false,
       isNew: true,
       isUsed: false,
-      name: ''
+      name: '',
+      costingType: 1 //this should be costing type from context
     };
 
     if (statDrivers !== undefined) {

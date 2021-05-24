@@ -7,4 +7,5 @@ export interface IStatisticDriver {
   isUsed: boolean;
   measureGuid: string;
   name: string;
+  costingType: number;
 }

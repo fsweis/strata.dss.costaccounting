@@ -21,11 +21,11 @@ namespace Strata.DSS.CostAccounting.Biz.StatisticDrivers.Repositories
         {
             _dbContextFactory = dbContextFactory;
         }
-        public async Task<IEnumerable<DriverConfig>> GetDriverConfigsAsync(CostingType costingType, CancellationToken cancellationToken)
+        public async Task<IEnumerable<DriverConfigView>> GetDriverConfigsAsync(CostingType costingType, CancellationToken cancellationToken)
         {
             await using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
             var allOnesGuid = new Guid(GeneralConstants.ALL_ONES_GUID_STRING);
-            var drivers = await dbContext.DriverConfigs.Where(dc => dc.DriverConfigGuid != Guid.Empty && dc.DriverConfigGuid != allOnesGuid && dc.CostingConfigGuid == Guid.Empty && dc.CostingType==costingType).OrderBy(dr => dr.Name).ToListAsync(cancellationToken);
+            var drivers = await dbContext.DriverConfigViews.Where(dc => dc.DriverConfigGuid != Guid.Empty && dc.DriverConfigGuid != allOnesGuid && dc.CostingConfigGuid == Guid.Empty && dc.CostingType==costingType).OrderBy(dr => dr.Name).ToListAsync(cancellationToken);
             return drivers;
            
         }

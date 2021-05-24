@@ -30,7 +30,7 @@ namespace Strata.DSS.CostAccounting.Biz.StatisticDrivers.Models
         {
         }
 
-        public StatisticDriver(DriverConfig driverConfigTemp, bool isUsed, Guid summaryDataTableGuid, Guid detailDataTableGuid)
+        public StatisticDriver(DriverConfigView driverConfigTemp, bool isUsed, Guid summaryDataTableGuid, Guid detailDataTableGuid)
         {
             var dtGuid = driverConfigTemp.DataTableGuid;
             if(dtGuid==summaryDataTableGuid)

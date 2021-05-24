@@ -24,6 +24,7 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.DbContexts
         public virtual DbSet<RuleEngineIncludedMeasure> RuleEngineIncludedMeasures { get; set; }
 
         public virtual DbSet<DriverConfig> DriverConfigs { get; set; }
+        public virtual DbSet<DriverConfigView> DriverConfigViews { get; set; }
 
         public virtual DbSet<AccountReclass> AccountReclasses { get; set; }
         public virtual DbSet<PayCodeJobCodeReclass> PayCodeJobCodeReclasses { get; set; }
@@ -64,6 +65,12 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.DbContexts
             });
 
             modelBuilder.Entity<DriverConfig>(entity =>
+            {
+                entity.HasKey(e => e.DriverConfigGuid);
+                entity.ToTable("DriverConfig", "dss");
+            });
+
+            modelBuilder.Entity<DriverConfigView>(entity =>
             {
                 entity.HasKey(e => e.DriverConfigGuid);
                 entity.ToTable("viewDriverConfigInfo", "dss");

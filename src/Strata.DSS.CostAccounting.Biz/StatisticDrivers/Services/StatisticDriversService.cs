@@ -204,8 +204,11 @@ namespace Strata.DSS.CostAccounting.Biz.StatisticDrivers.Services
                 {
                     isUsed = true;
                 }
-                
-                statisticDrivers.Add(new StatisticDriver(driverConfigTemp, isUsed, summaryDataTableGuid, detailDataTableGuid));
+                if(driverConfigTemp.Name=="fstest")
+                {
+                    Console.WriteLine("stop");
+                }
+                statisticDrivers.Add(new StatisticDriver(driverConfigTemp, isUsed, summaryGuid, detailDataTableGuid));
             }
 
             return statisticDrivers.OrderBy(x=>x.Name).ToList();
