@@ -38,6 +38,7 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
             _costaccountingRepository = costaccountingRepository;
             _statisticDriversRepository = statisticDriversRepository;
             _statisticDriversService = statisticDriversService;
+            _costingConfigRepository = costingConfigRepository;
             _dataSourceService = dataSourceService;
             _dataSourceLinkService = dataSourceLinkService;
         }
