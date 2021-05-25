@@ -50,7 +50,7 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
             return Ok(statisticDrivers);
         }
 
-        [HttpGet("GetDataSources")]
+        [HttpGet("DataSources")]
         [ProducesResponseType(200)]
         public async Task<ActionResult<IEnumerable<DataTable>>> GetDataSources(CancellationToken cancellationToken)
         {
@@ -67,7 +67,7 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
             
         }
 
-        [HttpGet("GetDataSourceLinks")]
+        [HttpGet("DataSourceLinks")]
         [ProducesResponseType(200)]
         public async Task<ActionResult<IEnumerable<DataSourceLink>>> GetDataSourceLinks(CancellationToken cancellationToken)
         {
@@ -84,7 +84,7 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
         }
 
 
-        [HttpPost("SaveStatisticDrivers")]
+        [HttpPost("")]
         [ProducesResponseType(200)]
         public async Task<ActionResult<List<StatisticDriver>>>  SaveStatisticDrivers([FromBody] StatisticDriverSaveData statisticDriverSaveData, CancellationToken cancellationToken)
         {

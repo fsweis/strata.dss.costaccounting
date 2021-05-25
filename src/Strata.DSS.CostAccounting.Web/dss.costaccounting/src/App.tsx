@@ -4,6 +4,7 @@ import { AuthProvider } from '@strata/core/lib';
 import { BrowserRouter } from 'react-router-dom';
 import Navigation from './shared/Navigation';
 import ErrorBoundary from '@strata/tempo/lib/errorboundary';
+import PageLoader from '@strata/tempo/lib/pageloader';
 
 const App: React.FC = () => {
   return (
@@ -11,7 +12,9 @@ const App: React.FC = () => {
       <Unload>
         <AuthProvider>
           <BrowserRouter>
-            <Navigation />
+            <PageLoader>
+              <Navigation />
+            </PageLoader>
           </BrowserRouter>
         </AuthProvider>
       </Unload>
