@@ -25,6 +25,8 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
         private readonly ICostingConfigRepository _costingConfigRepository;
         private readonly IStatisticDriversRepository _statisticDriversRepository;
         private readonly IStatisticDriversService _statisticDriversService;
+        private readonly IDataSourceService _dataSourceService;
+        private readonly IDataSourceLinkService _dataSourceLinkService;
 
         public StatisticDriversController(ICostAccountingRepository costaccountingRepository
                                             , IStatisticDriversRepository statisticDriversRepository
@@ -34,37 +36,57 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
             _costaccountingRepository = costaccountingRepository;
             _statisticDriversRepository = statisticDriversRepository;
             _statisticDriversService = statisticDriversService;
-            _costingConfigRepository = costingConfigRepository;
+            _dataSourceService = dataSourceService;
+            _dataSourceLinkService = dataSourceLinkService;
         }
 
         [HttpGet("")]
         [ProducesResponseType(200)]
-        public async Task<ActionResult<IEnumerable<StatisticDriverDTO>>> GetStatisticDrivers(CancellationToken cancellationToken)
+        public async Task<ActionResult<IEnumerable<StatisticDriver>>> GetStatisticDrivers(CancellationToken cancellationToken)
         {
             //TODO pass in costing config with Naviation BLI
             //dev patient
             //var costingConfig = await _costaccountingRepository.GetCostingConfigAsync(new Guid("da9eef04-3c9d-445b-b0c4-3a7812ca76d8"), cancellationToken);
-            ///kaiser patient
+            //kaiser patient
             //var costingConfig = await _costaccountingRepository.GetCostingConfigAsync(new Guid("0f559827-4df4-4f1d-843e-d49a1e1c649d"), cancellationToken);
             //kaiser claims
             var costingConfig = await _costingConfigRepository.GetCostingConfigAsync(new Guid("2adafbaa-c365-472a-94f1-79b823d8547a"), cancellationToken);
 
-
-            var statisticDriverDTO = await _statisticDriversService.LoadStatisticDrivers(costingConfig);
-            return Ok(statisticDriverDTO);
-        }
-
-        [HttpGet("ValidateRemoveDriver")]
+        [HttpGet("DataSources")]
         [ProducesResponseType(200)]
-        public async Task<ActionResult<bool>> ValidateRemoveDriver([FromRoute]Guid driverConfigGuid, CancellationToken cancellationToken)
+        public async Task<ActionResult<IEnumerable<DataTable>>> GetDataSources(CancellationToken cancellationToken)
         {
-            var usedDriverConfigs =  await _statisticDriversRepository.GetUsedDriverConfigs(cancellationToken);
+            //TODO pass in costing config with Naviation BLI
+            //dev patient
+            //var costingConfig = await _costaccountingRepository.GetCostingConfigAsync(new Guid("da9eef04-3c9d-445b-b0c4-3a7812ca76d8"), cancellationToken);
+            //kaiser patient
+            //var costingConfig = await _costaccountingRepository.GetCostingConfigAsync(new Guid("0f559827-4df4-4f1d-843e-d49a1e1c649d"), cancellationToken);
+            //kaiser claims
+            var costingConfig = await _costaccountingRepository.GetCostingConfigAsync(new Guid("2adafbaa-c365-472a-94f1-79b823d8547a"), cancellationToken);
+            var isClaims = costingConfig.Type == CostingType.Claims ? true : false;
+            var dataSources = _dataSourceService.GetDataSources(isClaims);
+            return Ok(dataSources);
+            
+        }
 
-            return usedDriverConfigs.Any(x=>x==driverConfigGuid);
+        [HttpGet("DataSourceLinks")]
+        [ProducesResponseType(200)]
+        public async Task<ActionResult<IEnumerable<DataSourceLink>>> GetDataSourceLinks(CancellationToken cancellationToken)
+        {
+            //TODO pass in costing config with Naviation BLI
+            //dev patient
+            //var costingConfig = await _costaccountingRepository.GetCostingConfigAsync(new Guid("da9eef04-3c9d-445b-b0c4-3a7812ca76d8"), cancellationToken);
+            //kaiser patient
+            //var costingConfig = await _costaccountingRepository.GetCostingConfigAsync(new Guid("0f559827-4df4-4f1d-843e-d49a1e1c649d"), cancellationToken);
+            //kaiser claims
+            var costingConfig = await _costaccountingRepository.GetCostingConfigAsync(new Guid("2adafbaa-c365-472a-94f1-79b823d8547a"), cancellationToken);
+            var isClaims = costingConfig.Type == CostingType.Claims ? true : false;
+            var dataSourceLinks = await _dataSourceLinkService.GetDataSourceLinks(isClaims);
+            return Ok(dataSourceLinks);
         }
 
 
-        [HttpPost("SaveStatisticDrivers")]
+        [HttpPost("")]
         [ProducesResponseType(200)]
         public async Task<ActionResult<List<StatisticDriver>>>  SaveStatisticDrivers([FromBody] StatisticDriverSaveData statisticDriverSaveData, CancellationToken cancellationToken)
         {

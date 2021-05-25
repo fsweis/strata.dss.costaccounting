@@ -1,5 +1,4 @@
 ﻿using Strata.DSS.CostAccounting.Biz.CostAccounting.Models;
-using Strata.DSS.CostAccounting.Biz.StatisticDrivers.Models;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -7,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace Strata.DSS.CostAccounting.Biz.StatisticDrivers.Services
 {
-    public interface IStatisticDriversService
+    public interface IDataSourceService
     {
-        public Task<StatisticDriverDTO> LoadStatisticDrivers(CostingConfigModel costingConfig);
+        public IList<DataTable> GetDataSources(Boolean isClaims);
     }
 }
 
