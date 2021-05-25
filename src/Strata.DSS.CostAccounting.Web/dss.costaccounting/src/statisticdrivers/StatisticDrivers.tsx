@@ -20,10 +20,12 @@ import { statisticDriverService } from './data/statisticDriverService';
 import { IDataSourceLink } from './data/IDataSourceLink';
 import { getNewGuid, getEmptyGuid } from '../shared/Utils';
 import cloneDeep from 'lodash/cloneDeep';
+import { IDataSource } from './data/IDataSource';
 
 const StatisticDrivers: React.FC = () => {
-  const [statDriverData, setStatDriverData] = useState<IStatisticDriverData>();
   const [statDrivers, setStatDrivers] = useState<IStatisticDriver[]>([]);
+  const [dataSources, setDataSources] = useState<IDataSource[]>([]);
+  const [dataSourceLinks, setDataSourceLinks] = useState<IDataSourceLink[]>([]);
   const [deletedDrivers, setDeletedDrivers] = useState<string[]>([]);
   const [updatedDrivers, setUpdatedDrivers] = useState<string[]>([]);
   const [runDriversModalVisible, setRunDriversModalVisible] = useState<boolean>(false);
@@ -35,18 +37,14 @@ const StatisticDrivers: React.FC = () => {
 
   useEffect(() => {
     // runs once when component mounts
+
     const fetchData = async () => {
-      setStatDriverData(await statisticDriverService.getStatisticDrivers());
+      setDataSources(await statisticDriverService.getDataSources());
+      setDataSourceLinks(await statisticDriverService.getDataSourceLinks());
+      setStatDrivers(await statisticDriverService.getStatisticDrivers());
     };
     fetchData();
   }, []);
-
-  useEffect(() => {
-    if (statDriverData?.statisticDrivers) {
-      const statDrivers = statDriverData.statisticDrivers;
-      setStatDrivers(statDrivers);
-    }
-  }, [statDriverData]);
 
   useEffect(() => {
     const runPatientDriverTreeChildren = statDrivers.map((statDriver) => {
@@ -84,8 +82,8 @@ const StatisticDrivers: React.FC = () => {
   }, [patientDriversSearch, patientDriverTree]);
 
   const handleCancel = () => {
-    if (statDriverData) {
-      setStatDrivers(statDriverData?.statisticDrivers);
+    if (statDrivers) {
+      setStatDrivers(statDrivers);
     }
 
     Toast.show({
@@ -224,7 +222,7 @@ const StatisticDrivers: React.FC = () => {
     if (cellValue === undefined || cellValue === null) {
       return false;
     }
-    const target = statDriverData?.dataSources.find((dataSource) => dataSource.friendlyName.toLowerCase().indexOf(filterValue) > -1);
+    const target = dataSources.find((dataSource) => dataSource.friendlyName.toLowerCase().indexOf(filterValue) > -1);
     if (target !== undefined) {
       return target.dataTableGuid === cellValue;
     }
@@ -239,13 +237,22 @@ const StatisticDrivers: React.FC = () => {
     if (cellValue === undefined || cellValue === null) {
       return false;
     }
-    const target = statDriverData?.dataSourceLinks.find((measure) => measure.friendlyName.toLowerCase().indexOf(filterValue) > -1);
+    const target = dataSourceLinks.find((measure) => measure.friendlyName.toLowerCase().indexOf(filterValue) > -1);
     if (target !== undefined) {
       return target.measureGuid === cellValue;
     }
     return false;
   };
 
+  const updateDropDownDrivers = (driverConfigGuid: string, measureGuid: string) => {
+    const updatedDrivers = statDrivers.map((driver) => {
+      if (driver.driverConfigGuid === driverConfigGuid) {
+        return { ...driver, measureGuid: measureGuid };
+      }
+      return driver;
+    });
+    return updatedDrivers;
+  };
   return (
     <>
       <Banner>Any changes to as statistic will affect every costing configuration that uses the statistic.</Banner>
@@ -338,7 +345,7 @@ const StatisticDrivers: React.FC = () => {
           width={200}
           itemValueField='dataTableGuid'
           itemTextField='friendlyName'
-          items={statDriverData?.dataSources}
+          items={dataSources}
           editor={(cellEditorArgs) => (
             <>
               <DropDown
@@ -353,25 +360,32 @@ const StatisticDrivers: React.FC = () => {
 
                   if (value !== cellEditorArgs.rowData.dataTableGuid) {
                     cellEditorArgs.rowData.dataTableGuid = value;
-                    const defaultValue = statDriverData?.dataSourceLinks.filter((x) => x.dataTableGuid === value && x.isFirstSelect === true);
+                    const defaultValue = dataSourceLinks.filter((x) => x.dataTableGuid === value && x.isFirstSelect === true);
                     if (defaultValue !== undefined && defaultValue.length > 0) {
+                      const updatedDrivers = updateDropDownDrivers(cellEditorArgs.rowData.driverConfigGuid, defaultValue[0].measureGuid);
+                      /*
                       const updatedDrivers = statDrivers.map((driver) => {
                         if (driver.driverConfigGuid === cellEditorArgs.rowData.driverConfigGuid) {
                           return { ...driver, measureGuid: defaultValue[0].measureGuid };
                         }
                         return driver;
                       });
+                      */
                       //need to refresh grid data
                       setStatDrivers(updatedDrivers);
                     } else {
-                      const nonDefaultValue = statDriverData?.dataSourceLinks.filter((x) => x.dataTableGuid === value);
+                      const nonDefaultValue = dataSourceLinks.filter((x) => x.dataTableGuid === value);
                       if (nonDefaultValue !== undefined && nonDefaultValue.length > 0) {
+                        const updatedDrivers = updateDropDownDrivers(cellEditorArgs.rowData.driverConfigGuid, nonDefaultValue[0].measureGuid);
+
+                        /*
                         const updatedDrivers = statDrivers.map((driver) => {
                           if (driver.driverConfigGuid === cellEditorArgs.rowData.driverConfigGuid) {
                             return { ...driver, measureGuid: nonDefaultValue[0].measureGuid };
                           }
                           return driver;
                         });
+                         */
                         //need to refresh grid data
                         setStatDrivers(updatedDrivers);
                       }
@@ -387,7 +401,7 @@ const StatisticDrivers: React.FC = () => {
                 value={cellEditorArgs.rowData.dataTableGuid}
                 itemValueField='dataTableGuid'
                 itemTextField='friendlyName'
-                items={statDriverData?.dataSources}
+                items={dataSources}
               />
             </>
           )}
@@ -419,7 +433,7 @@ const StatisticDrivers: React.FC = () => {
           width={200}
           itemValueField='measureGuid'
           itemTextField='friendlyName'
-          items={statDriverData?.dataSourceLinks}
+          items={dataSourceLinks}
           editor={(cellEditorArgs) => (
             <>
               <DropDown
@@ -435,7 +449,7 @@ const StatisticDrivers: React.FC = () => {
                 itemValueField='measureGuid'
                 itemTextField='friendlyName'
                 value={cellEditorArgs.rowData.measureGuid}
-                items={statDriverData?.dataSourceLinks.filter((x: IDataSourceLink) => {
+                items={dataSourceLinks.filter((x: IDataSourceLink) => {
                   return x.dataTableGuid === cellEditorArgs.rowData.dataTableGuid;
                 })}
               />

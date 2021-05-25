@@ -25,6 +25,8 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddScoped<ICostAccountingRepository, CostAccountingRepository>();
             services.AddScoped<IStatisticDriversRepository, StatisticDriversRepository>();
             services.AddScoped<IStatisticDriversService, StatisticDriversService>();
+            services.AddScoped<IDataSourceService, DataSourceService>();
+            services.AddScoped<IDataSourceLinkService, DataSourceLinkService>();
             services.AddCachedSmcServiceClient();
             services.AddHttpContextAccessor();
             services.TryAddScoped<IClaimsPrincipalAccessor, ClaimsPrincipalAccessor>();

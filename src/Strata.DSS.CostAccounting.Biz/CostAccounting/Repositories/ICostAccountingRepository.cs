@@ -12,7 +12,7 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.Repositories
         public Task<CostAccountingModel> GetCostAccountingAsync(Guid id, CancellationToken cancellationToken);
         public Task<CostingConfig> GetCostingConfigAsync(Guid costingConfigGuid, CancellationToken cancellationToken);
         public Task<IList<DataTable>> GetDataTablesAsync(IList<string> globalIds, CancellationToken cancellationToken);
-        public Task<IList<Measure>> GetMeasuresAsync(IList<DataTable> dataTables, CancellationToken cancellationToken);
+        public Task<IList<Measure>> GetMeasuresAsync(IList<Guid> dataTableGuids, CancellationToken cancellationToken);
         public Task<IList<RuleEngineIncludedMeasure>> GetRuleEngineIncludedMeasuresAsync(CancellationToken cancellationToken); 
     }
 }

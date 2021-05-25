@@ -1,4 +1,6 @@
 import { appConfig, getSecureService } from '@strata/core/lib';
+import { IDataSource } from './IDataSource';
+import { IDataSourceLink } from './IDataSourceLink';
 import { IStatisticDriver } from './IStatisticDriver';
 import { IStatisticDriverData } from './IStatisticDriverData';
 import { IStatisticDriverSaveData } from './IStatisticDriverSaveData';
@@ -6,13 +8,16 @@ import { IStatisticDriverSaveData } from './IStatisticDriverSaveData';
 const { httpGet, httpPost } = getSecureService(appConfig.apiUrl);
 
 export const statisticDriverService = {
-  getStatisticDrivers: (): Promise<IStatisticDriverData> => {
-    return httpGet<IStatisticDriverData>(`statistic-drivers`);
+  getStatisticDrivers: (): Promise<IStatisticDriver[]> => {
+    return httpGet<IStatisticDriver[]>(`statistic-drivers`);
+  },
+  getDataSources: (): Promise<IDataSource[]> => {
+    return httpGet<IDataSource[]>(`statistic-drivers/GetDataSources`);
+  },
+  getDataSourceLinks: (): Promise<IDataSourceLink[]> => {
+    return httpGet<IDataSourceLink[]>(`statistic-drivers/GetDataSourceLinks`);
   },
   saveStatisticDrivers: (statisticDriverSaveData: IStatisticDriverSaveData): Promise<IStatisticDriver[]> => {
     return httpPost<IStatisticDriver[]>('statistic-drivers/SaveStatisticDrivers/', statisticDriverSaveData);
-  },
-  validateRemoveDriver: (driverConfigGuid: string): Promise<boolean> => {
-    return httpGet<boolean>(`statistic-drivers/ValidateRemoveDriver?driverConfigGuid=${driverConfigGuid}`);
   }
 };
