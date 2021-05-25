@@ -36,7 +36,7 @@ namespace Strata.DSS.CostAccounting.Biz.StatisticDrivers.Services
             _costaccountingRepository = costaccountingRepository;
             _statisticDriversRepository = statisticDriversRepository;
         }
-        public async Task<StatisticDriverDTO> LoadStatisticDrivers(CostingConfig costingConfig)
+        public async Task<StatisticDriverDTO> LoadStatisticDrivers(CostingConfigModel costingConfig)
         {
             var isClaims = false;
             if ((CostingType)costingConfig.Type == CostingType.Claims)
@@ -190,7 +190,7 @@ namespace Strata.DSS.CostAccounting.Biz.StatisticDrivers.Services
             }
             return dataSourceLinks.OrderBy(x => x.FriendlyName).ToList() ;
         }
-        private async Task<List<StatisticDriver>> GetStatisticDriversAsync(CostingConfig costingConfig)
+        private async Task<List<StatisticDriver>> GetStatisticDriversAsync(CostingConfigModel costingConfig)
         {
             var driverConfigs = await _statisticDriversRepository.GetDriverConfigsAsync(costingConfig.Type, default);
             var usedDriverConfigGuids = await _statisticDriversRepository.GetUsedDriverConfigs(default);

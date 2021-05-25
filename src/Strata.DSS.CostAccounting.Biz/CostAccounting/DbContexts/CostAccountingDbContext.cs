@@ -20,7 +20,7 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.DbContexts
         public virtual DbSet<Measure> Measures { get; set; }
         public virtual DbSet<DataTable> DataTables { get; set; }
         public virtual DbSet<RuleSet> RuleSets { get; set; }
-        public virtual DbSet<CostingConfig> CostingConfigs { get; set; }
+        public virtual DbSet<CostingConfigEntity> CostingConfigs { get; set; }
         public virtual DbSet<RuleEngineIncludedMeasure> RuleEngineIncludedMeasures { get; set; }
 
         public virtual DbSet<DriverConfig> DriverConfigs { get; set; }
@@ -52,7 +52,7 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.DbContexts
                 entity.ToTable("RuleSet", "dbo");
             });
 
-            modelBuilder.Entity<CostingConfig>(entity =>
+            modelBuilder.Entity<CostingConfigEntity>(entity =>
             {
                 entity.HasKey(e => e.CostingConfigGuid);
                 entity.ToTable("CostingConfig", "dss");

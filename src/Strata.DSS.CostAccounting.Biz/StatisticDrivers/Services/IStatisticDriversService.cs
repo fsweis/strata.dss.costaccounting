@@ -8,7 +8,7 @@ namespace Strata.DSS.CostAccounting.Biz.StatisticDrivers.Services
 {
     public interface IStatisticDriversService
     {
-        public Task<StatisticDriverDTO> LoadStatisticDrivers(CostingConfig costingConfig);
+        public Task<StatisticDriverDTO> LoadStatisticDrivers(CostingConfigModel costingConfig);
     }
 }
 

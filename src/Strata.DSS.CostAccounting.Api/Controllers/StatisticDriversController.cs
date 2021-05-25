@@ -12,6 +12,7 @@ using Strata.DSS.CostAccounting.Biz.StatisticDrivers;
 using Strata.DSS.CostAccounting.Biz.StatisticDrivers.Repositories;
 using Strata.DSS.CostAccounting.Biz.StatisticDrivers.Models;
 using Strata.DSS.CostAccounting.Biz.StatisticDrivers.Services;
+using Strata.DSS.CostAccounting.Biz.CostAccounting.Repositories.Interfaces;
 
 namespace Strata.DSS.CostAccounting.Api.Controllers
 {
@@ -21,14 +22,19 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
     public class StatisticDriversController:ControllerBase
     {
         private readonly ICostAccountingRepository _costaccountingRepository;
+        private readonly ICostingConfigRepository _costingConfigRepository;
         private readonly IStatisticDriversRepository _statisticDriversRepository;
         private readonly IStatisticDriversService _statisticDriversService;
 
-        public StatisticDriversController(ICostAccountingRepository costaccountingRepository, IStatisticDriversRepository statisticDriversRepository, IStatisticDriversService statisticDriversService)
+        public StatisticDriversController(ICostAccountingRepository costaccountingRepository
+                                            , IStatisticDriversRepository statisticDriversRepository
+                                            , IStatisticDriversService statisticDriversService
+                                            , ICostingConfigRepository costingConfigRepository)
         {
             _costaccountingRepository = costaccountingRepository;
             _statisticDriversRepository = statisticDriversRepository;
             _statisticDriversService = statisticDriversService;
+            _costingConfigRepository = costingConfigRepository;
         }
 
         [HttpGet("")]
@@ -41,7 +47,7 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
             ///kaiser patient
             //var costingConfig = await _costaccountingRepository.GetCostingConfigAsync(new Guid("0f559827-4df4-4f1d-843e-d49a1e1c649d"), cancellationToken);
             //kaiser claims
-            var costingConfig = await _costaccountingRepository.GetCostingConfigAsync(new Guid("2adafbaa-c365-472a-94f1-79b823d8547a"), cancellationToken);
+            var costingConfig = await _costingConfigRepository.GetCostingConfigAsync(new Guid("2adafbaa-c365-472a-94f1-79b823d8547a"), cancellationToken);
 
 
             var statisticDriverDTO = await _statisticDriversService.LoadStatisticDrivers(costingConfig);
@@ -91,7 +97,7 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
             //kaiser patient
             //var costingConfig = await _costaccountingRepository.GetCostingConfigAsync(new Guid("0f559827-4df4-4f1d-843e-d49a1e1c649d"), cancellationToken);
             //kaiser claims
-            var costingConfig = await _costaccountingRepository.GetCostingConfigAsync(new Guid("2adafbaa-c365-472a-94f1-79b823d8547a"), cancellationToken);
+            var costingConfig = await _costingConfigRepository.GetCostingConfigAsync(new Guid("2adafbaa-c365-472a-94f1-79b823d8547a"), cancellationToken);
             var statDriverDTO = await _statisticDriversService.LoadStatisticDrivers(costingConfig);
             return Ok(statDriverDTO.StatisticDrivers.ToList());
         }
