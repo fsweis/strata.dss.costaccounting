@@ -30,15 +30,40 @@ const Navigation: React.FC = () => {
           <Layout.Sider collapsible>
             <Header title='Cost Accounting' />
             <Menu selectedKeys={getActiveUrlKey()}>
-              <Menu.ItemGroup title='Menu Group 1'>
+              <Menu.ItemGroup title=''>
                 <Menu.Item key='/users' href='/users'>
-                  Users
+                  Overview
                 </Menu.Item>
                 <Menu.Item key='/databases' href='/databases'>
-                  Databases
+                  Cost Audit
                 </Menu.Item>
-                <Menu.Item key='/statistic-drivers' href='/statistic-drivers'>
-                  Statistic Drivers
+              </Menu.ItemGroup>
+              <Menu.ItemGroup title='CATEGORIZE'>
+                <Menu.Item key='/users' href='/users'>
+                  Department Categorization
+                </Menu.Item>
+                <Menu.Item key='/databases' href='/databases'>
+                  Cost Components
+                </Menu.Item>
+                <Menu.Item key='/databases' href='/databases'>
+                  Variability
+                </Menu.Item>
+                <Menu.Item key='/databases' href='/databases'>
+                  Statistics Drivers
+                </Menu.Item>
+              </Menu.ItemGroup>
+              <Menu.ItemGroup title='ALIGN'>
+                <Menu.Item key='/users' href='/users'>
+                  Reclassification
+                </Menu.Item>
+                <Menu.Item key='/databases' href='/databases'>
+                  Cost Components
+                </Menu.Item>
+                <Menu.Item key='/databases' href='/databases'>
+                  Variability
+                </Menu.Item>
+                <Menu.Item key='/databases' href='/databases'>
+                  Statistics Drivers
                 </Menu.Item>
               </Menu.ItemGroup>
             </Menu>
