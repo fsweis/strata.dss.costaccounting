@@ -57,7 +57,7 @@ const Navigation: React.FC = () => {
                   Reclassification
                 </Menu.Item>
                 <Menu.Item key='/databases' href='/databases'>
-                  Cost Components
+                  Overhead Allocation
                 </Menu.Item>
                 <Menu.Item key='/databases' href='/databases'>
                   Variability
