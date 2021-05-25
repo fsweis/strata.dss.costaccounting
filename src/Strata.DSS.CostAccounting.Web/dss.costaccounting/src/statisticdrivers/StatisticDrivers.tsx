@@ -20,7 +20,7 @@ import { statisticDriverService } from './data/statisticDriverService';
 import { IDataSourceLink } from './data/IDataSourceLink';
 import { getNewGuid, getEmptyGuid } from '../shared/Utils';
 import cloneDeep from 'lodash/cloneDeep';
-import { IDataSource } from './data/IDataSource';
+import { IDataSource } from '../shared/data/IDataSource';
 
 const StatisticDrivers: React.FC = () => {
   const [statDrivers, setStatDrivers] = useState<IStatisticDriver[]>([]);
@@ -166,8 +166,11 @@ const StatisticDrivers: React.FC = () => {
       try {
         //refresh stat drivers from return
         setStatDrivers(await statisticDriverService.saveStatisticDrivers(statDriverSaveData));
+        setLoading(true);
       } catch (error) {
         success = false;
+      } finally {
+        setLoading(false);
       }
 
       if (success) {
@@ -505,7 +508,6 @@ const StatisticDrivers: React.FC = () => {
           treeData={patientDriverTreeData}
           selectionMode='multiple'
           height={400}
-          defaultCheckedKeys={[]}
           defaultExpandedKeys={['AllPatientKey']}
           onCheck={(checkedKeys, info) => {
             const guids: string[] = checkedKeys.toString().split(',');

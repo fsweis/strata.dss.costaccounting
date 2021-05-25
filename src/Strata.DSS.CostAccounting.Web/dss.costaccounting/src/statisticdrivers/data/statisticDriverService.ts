@@ -1,5 +1,5 @@
 import { appConfig, getSecureService } from '@strata/core/lib';
-import { IDataSource } from './IDataSource';
+import { IDataSource } from '../../shared/data/IDataSource';
 import { IDataSourceLink } from './IDataSourceLink';
 import { IStatisticDriver } from './IStatisticDriver';
 import { IStatisticDriverSaveData } from './IStatisticDriverSaveData';
