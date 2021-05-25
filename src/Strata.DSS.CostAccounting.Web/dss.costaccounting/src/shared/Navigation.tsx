@@ -48,7 +48,7 @@ const Navigation: React.FC = () => {
                 <Menu.Item key='/databases' href='/databases'>
                   Variability
                 </Menu.Item>
-                <Menu.Item key='/databases' href='/databases'>
+                <Menu.Item key='/statisticdrivers' href='/statisticdrivers'>
                   Statistics Drivers
                 </Menu.Item>
               </Menu.ItemGroup>
@@ -60,10 +60,23 @@ const Navigation: React.FC = () => {
                   Overhead Allocation
                 </Menu.Item>
                 <Menu.Item key='/databases' href='/databases'>
-                  Variability
+                  Cost Component Reclassification
+                </Menu.Item>
+              </Menu.ItemGroup>
+              <Menu.ItemGroup title='ALLOCATE'>
+                <Menu.Item key='/users' href='/users'>
+                  Activity Code Designer
                 </Menu.Item>
                 <Menu.Item key='/databases' href='/databases'>
-                  Statistics Drivers
+                  Charge Allocation
+                </Menu.Item>
+              </Menu.ItemGroup>
+              <Menu.ItemGroup title='CONFIGURE'>
+                <Menu.Item key='/users' href='/users'>
+                  Drop-down Configuration
+                </Menu.Item>
+                <Menu.Item key='/databases' href='/databases'>
+                  Manual Statistics
                 </Menu.Item>
               </Menu.ItemGroup>
             </Menu>
