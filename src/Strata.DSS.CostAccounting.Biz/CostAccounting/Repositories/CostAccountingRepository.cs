@@ -44,7 +44,7 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.Repositories
             };
         }
        
-        public async Task<IList<Measure>> GetMeasuresAsync(IList<DataTable> dataTables, CancellationToken cancellationToken)
+        public async Task<IList<Measure>> GetMeasuresAsync(IList<Guid> dataTableGuids, CancellationToken cancellationToken)
         {
             await using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
             var measures = await dbContext.Measures.Where(m => dataTableGuids.Contains(m.DataTableGuid) && m.MeasureGuid != Guid.Empty).ToListAsync(cancellationToken);
