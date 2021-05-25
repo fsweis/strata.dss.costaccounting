@@ -50,7 +50,7 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
             return Ok(statisticDrivers);
         }
 
-        [HttpGet("DataSources")]
+        [HttpGet("data-sources")]
         [ProducesResponseType(200)]
         public async Task<ActionResult<IEnumerable<DataTable>>> GetDataSources(CancellationToken cancellationToken)
         {
@@ -61,13 +61,13 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
             //var costingConfig = await _costaccountingRepository.GetCostingConfigAsync(new Guid("0f559827-4df4-4f1d-843e-d49a1e1c649d"), cancellationToken);
             //kaiser claims
             var costingConfig = await _costaccountingRepository.GetCostingConfigAsync(new Guid("2adafbaa-c365-472a-94f1-79b823d8547a"), cancellationToken);
-            var isClaims = costingConfig.Type == CostingType.Claims ? true : false;
+            var isClaims = costingConfig.Type == CostingType.Claims;
             var dataSources = _dataSourceService.GetDataSources(isClaims);
             return Ok(dataSources);
             
         }
 
-        [HttpGet("DataSourceLinks")]
+        [HttpGet("data-source-links")]
         [ProducesResponseType(200)]
         public async Task<ActionResult<IEnumerable<DataSourceLink>>> GetDataSourceLinks(CancellationToken cancellationToken)
         {
@@ -78,7 +78,7 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
             //var costingConfig = await _costaccountingRepository.GetCostingConfigAsync(new Guid("0f559827-4df4-4f1d-843e-d49a1e1c649d"), cancellationToken);
             //kaiser claims
             var costingConfig = await _costaccountingRepository.GetCostingConfigAsync(new Guid("2adafbaa-c365-472a-94f1-79b823d8547a"), cancellationToken);
-            var isClaims = costingConfig.Type == CostingType.Claims ? true : false;
+            var isClaims = costingConfig.Type == CostingType.Claims;
             var dataSourceLinks = await _dataSourceLinkService.GetDataSourceLinks(isClaims);
             return Ok(dataSourceLinks);
         }

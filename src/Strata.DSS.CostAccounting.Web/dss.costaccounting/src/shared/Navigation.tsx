@@ -12,7 +12,7 @@ const Navigation: React.FC = () => {
 
   const getActiveUrlKey = () => {
     if (location.pathname === '/') {
-      return ['/users'];
+      return ['/statistic-drivers'];
     }
 
     return [location.pathname];
