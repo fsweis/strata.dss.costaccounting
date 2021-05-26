@@ -1,15 +1,14 @@
 import { appConfig, getSecureService } from '@strata/core/lib';
-import { IDataSource } from '../../shared/data/IDataSource';
 import { ICostConfig } from './ICostConfig';
 import { ICostConfigSaveData } from './ICostConfigSaveData';
 
 const { httpGet, httpPost } = getSecureService(appConfig.apiUrl);
 
-export const statisticDriverService = {
+export const costConfigService = {
   getCostConfig: (): Promise<ICostConfig[]> => {
     return httpGet<ICostConfig[]>(`costing-configs`);
   },
-  saveCostCofig: (costConfigSaveData: ICostConfig): Promise<ICostConfig[]> => {
+  saveCostCofig: (costConfigSaveData: ICostConfigSaveData): Promise<ICostConfig[]> => {
     return httpPost<ICostConfig[]>('costing-configs/', costConfigSaveData);
   }
 };

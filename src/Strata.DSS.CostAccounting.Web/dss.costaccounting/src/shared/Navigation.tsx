@@ -4,8 +4,6 @@ import Header from '@strata/tempo/lib/header';
 import Layout from '@strata/tempo/lib/layout';
 import Menu from '@strata/tempo/lib/menu';
 import { Switch, Route } from 'react-router-dom';
-import ExampleUser from '../user-example/ExampleUser';
-import ExampleDatabase from '../database-example/ExampleDatabase';
 import StatisticDrivers from '../statisticdrivers/StatisticDrivers';
 import Overview from '../overview/Overview';
 import CostAudit from '../cost-audit/CostAudit';
