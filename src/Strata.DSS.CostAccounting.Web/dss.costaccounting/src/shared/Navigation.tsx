@@ -95,8 +95,7 @@ const Navigation: React.FC = () => {
           </Layout.Sider>
           <Layout.Content>
             <Switch>
-              <Route path={['/', '/overview']} exact component={ExampleUser} key='overview'></Route>
-              <Route path='/databases' exact component={ExampleDatabase} key='databases'></Route>
+              <Route path={['/', '/overview']} exact component={Overview} key='overview'></Route>
               <Route path='/statistic-drivers' exact component={StatisticDrivers} key='statistic-drivers'></Route>
               <Route path='/overview' exact component={Overview} key='overview'></Route>
               <Route path='/cost-audit' exact component={CostAudit} key='cost-audit'></Route>
