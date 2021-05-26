@@ -7,9 +7,9 @@ const { httpGet, httpPost } = getSecureService(appConfig.apiUrl);
 
 export const statisticDriverService = {
   getCostConfig: (): Promise<ICostConfig[]> => {
-    return httpGet<ICostConfig[]>(`overview`);
+    return httpGet<ICostConfig[]>(`costing-configs`);
   },
   saveCostCofig: (costConfigSaveData: ICostConfig): Promise<ICostConfig[]> => {
-    return httpPost<ICostConfig[]>('overview/', costConfigSaveData);
+    return httpPost<ICostConfig[]>('costing-configs/', costConfigSaveData);
   }
 };
