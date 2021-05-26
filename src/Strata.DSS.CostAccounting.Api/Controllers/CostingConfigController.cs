@@ -13,7 +13,7 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
     
     [ApiController]
     [ApiVersion("1.0")]
-    [Route("api/v{api-version:apiVersion}/[controller]")]
+    [Route("api/v{api-version:apiVersion}/costing-configs")]
     public class CostingConfigController : ControllerBase
     {
         private readonly ICostingConfigRepository _costingConfigRepository;
