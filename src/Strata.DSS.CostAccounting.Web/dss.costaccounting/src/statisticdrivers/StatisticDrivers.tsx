@@ -10,6 +10,7 @@ import DropDown from '@strata/tempo/lib/dropdown';
 import Modal from '@strata/tempo/lib/modal';
 import Banner from '@strata/tempo/lib/banner';
 import ButtonMenu from '@strata/tempo/lib/buttonmenu';
+import Text from '@strata/tempo/lib/text';
 import { usePageLoader } from '@strata/tempo/lib/pageloader';
 import { IStatisticDriverSaveData } from './data/IStatisticDriverSaveData';
 import { IStatisticDriver } from './data/IStatisticDriver';
@@ -154,16 +155,16 @@ const StatisticDrivers: React.FC = () => {
     let message = '';
     for (let i = 0; i < data.length; i++) {
       if (data[i].name === '') {
-        message += 'Statistic driver name cannot be blank. Column: 0 , Row: ' + i + '. ';
+        message += 'Statistic driver name cannot be blank. Row: ' + i + '. ';
       }
       if (data[i].dataTableGuid === '') {
-        message += 'Data Source cannot be empty. Column: 1 , Row: ' + i + '. ';
+        message += 'Data Source cannot be empty. Row: ' + i + '. ';
       }
       if (data[i].measureGuid === '') {
-        message += 'Measure cannot be empty. Column: 2 , Row: ' + i + '. ';
+        message += 'Measure cannot be empty. Row: ' + i + '. ';
       }
       if (dupeNames.includes(data[i].name)) {
-        message += 'Statistic driver name must be unique. Column: 0 , Row: ' + i + '. ';
+        message += 'Statistic driver name must be unique. Row: ' + i + '. ';
       } else {
         dupeNames.push(data[i].name);
       }
@@ -194,6 +195,7 @@ const StatisticDrivers: React.FC = () => {
     }
     return false;
   };
+
   const filterDataSourceLink = (cellValue: string, filterValue: string) => {
     if (typeof filterValue === 'string' && filterValue.trim() !== '' && filterValue.trim() !== '-') {
       filterValue = filterValue.toLowerCase().trim();
@@ -203,11 +205,8 @@ const StatisticDrivers: React.FC = () => {
     if (cellValue === undefined || cellValue === null) {
       return false;
     }
-    const target = dataSourceLinks.find((measure) => measure.friendlyName.toLowerCase().indexOf(filterValue) > -1);
-    if (target !== undefined) {
-      return target.measureGuid === cellValue;
-    }
-    return false;
+    const measureGuids = dataSourceLinks.filter((l) => l.friendlyName.toLowerCase().includes(filterValue)).map((l) => l.measureGuid);
+    return measureGuids.includes(cellValue);
   };
 
   const updateDropDownDrivers = (driverConfigGuid: string, measureGuid: string) => {
@@ -282,13 +281,14 @@ const StatisticDrivers: React.FC = () => {
 
   return (
     <>
-      <Banner>Any changes to as statistic will affect every costing configuration that uses the statistic.</Banner>
+      <Banner>Any changes to a statistic will affect every costing configuration that uses the statistic.</Banner>
       <Header
         title='Statistic Drivers'
         extra={
           <>
             <ButtonMenu
               buttonText='Reports'
+              type='tertiary'
               onClick={() => {
                 return;
               }}
@@ -340,21 +340,32 @@ const StatisticDrivers: React.FC = () => {
           filter
           filterMatchMode='custom'
           filterFunction={filterDataSource}
-          editable
+          isCellEditable={(cellEditorArgs) => !cellEditorArgs.rowData.isUsed}
           width={200}
           itemValueField='dataTableGuid'
           itemTextField='friendlyName'
           items={dataSources}
           editor={(cellEditorArgs) => (
             <>
-              <DropDown
-                onChange={(value) => handleDataSourceChange(cellEditorArgs, value.toString())}
-                width={300}
-                value={cellEditorArgs.rowData.dataTableGuid}
-                itemValueField='dataTableGuid'
-                itemTextField='friendlyName'
-                items={dataSources}
-              />
+              {cellEditorArgs.rowData.isUsed && (
+                <Text>
+                  {
+                    dataSources.filter((x) => {
+                      return x.dataTableGuid === cellEditorArgs.rowData.dataTableGuid;
+                    })[0].friendlyName
+                  }
+                </Text>
+              )}
+              {!cellEditorArgs.rowData.isUsed && (
+                <DropDown
+                  onChange={(value) => handleDataSourceChange(cellEditorArgs, value.toString())}
+                  width={300}
+                  value={cellEditorArgs.rowData.dataTableGuid}
+                  itemValueField='dataTableGuid'
+                  itemTextField='friendlyName'
+                  items={dataSources}
+                />
+              )}
             </>
           )}
         />
@@ -393,13 +404,19 @@ const StatisticDrivers: React.FC = () => {
           body={(rowData) => (
             <>
               <Spacing vAlign='center'>
-                <Button type='link' onClick={() => handleEditRules(rowData.driverConfigGuid)} disabled={rowData.isNew}>
-                  {rowData.hasRules ? 'Edit Rules' : 'Add Rules'}
-                </Button>
+                <Tooltip
+                  title={() => {
+                    return rowData.isNew ? 'Driver must be saved.' : 'Add Rules';
+                  }}
+                >
+                  <Button type='link' onClick={() => handleEditRules(rowData.driverConfigGuid)} disabled={rowData.isNew}>
+                    {rowData.hasRules ? 'Edit Rules' : 'Add Rules'}
+                  </Button>
+                </Tooltip>
 
                 <Tooltip
                   title={() => {
-                    return rowData.isUsed ? 'Driver in use.' : 'Delete';
+                    return rowData.isUsed ? 'Driver used in configurations' : 'Delete';
                   }}
                 >
                   <Button type='link' icon='Delete' disabled={rowData.isUsed} onClick={() => handleDelete(rowData.driverConfigGuid)} />

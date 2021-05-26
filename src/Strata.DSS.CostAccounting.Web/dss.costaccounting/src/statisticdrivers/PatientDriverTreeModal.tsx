@@ -1,5 +1,6 @@
 import React from 'react';
 import Spacing from '@strata/tempo/lib/spacing';
+import Button from '@strata/tempo/lib/button';
 import Modal from '@strata/tempo/lib/modal';
 import Input from '@strata/tempo/lib/input';
 import Tree, { ITreeNode, Key } from '@strata/tempo/lib/tree';
@@ -20,6 +21,7 @@ const PatientDriverTreeModal: React.FC<IPatientDriverTreeModalProps> = (props: I
   const [patientDriversSearch, setPatientDriversSearch] = useState('');
   const [patientDriverTreeData, setPatientDriverTreeData] = useState<ITreeNode[]>([]);
   const [patientDriverTree, setPatientDriverTree] = useState<ITreeNode[]>([]);
+  const [patientDriverTreeOkText, setPatientDriverTreeOkText] = useState<string>('');
 
   useEffect(() => {
     const runPatientDriverTreeChildren = props.statDrivers.map((statDriver) => {
@@ -56,6 +58,19 @@ const PatientDriverTreeModal: React.FC<IPatientDriverTreeModalProps> = (props: I
     }
   }, [patientDriversSearch, patientDriverTree]);
 
+  useEffect(() => {
+    switch (patientDriversToRun.length) {
+      case 0:
+        setPatientDriverTreeOkText('Run Drivers');
+        break;
+      case 1:
+        setPatientDriverTreeOkText('Run 1 Driver');
+        break;
+      default:
+        setPatientDriverTreeOkText('Run ' + patientDriversToRun.length + ' Drivers');
+    }
+  }, [patientDriversToRun]);
+
   const handleCancel = () => {
     setPatientDriversSearch('');
     props.onCancel();
@@ -68,7 +83,24 @@ const PatientDriverTreeModal: React.FC<IPatientDriverTreeModalProps> = (props: I
 
   return (
     <>
-      <Modal title='Run Patient Drivers' visible={props.visible} onCancel={handleCancel} onOk={handleOk} okText='Run Drivers' removeBodyPadding>
+      <Modal
+        title='Run Patient Drivers'
+        visible={props.visible}
+        onCancel={handleCancel}
+        onOk={handleOk}
+        okText='Run Drivers'
+        removeBodyPadding
+        footer={
+          <Spacing hAlign='right'>
+            <Button type='secondary' onClick={handleCancel}>
+              Cancel
+            </Button>
+            <Button type='primary' onClick={handleOk} disabled={patientDriversToRun.length === 0}>
+              {patientDriverTreeOkText}
+            </Button>
+          </Spacing>
+        }
+      >
         <Spacing padding={16} itemSpacing={12}>
           <Input search onChange={(event: ChangeEvent<HTMLInputElement>) => setPatientDriversSearch(event.target.value)} />
         </Spacing>
