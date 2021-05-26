@@ -73,11 +73,13 @@ const PatientDriverTreeModal: React.FC<IPatientDriverTreeModalProps> = (props: I
 
   const handleCancel = () => {
     setPatientDriversSearch('');
+    setPatientDriversToRun([]);
     props.onCancel();
   };
 
   const handleOk = () => {
     setPatientDriversSearch('');
+    setPatientDriversToRun([]);
     props.onOk();
   };
 

@@ -91,24 +91,15 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
             
             if (statisticDriverSaveData.AddedStatDrivers.Count>0)
             {
-                if (! await _statisticDriversRepository.AddStatisticDriversAsync(statisticDriverSaveData.AddedStatDrivers, cancellationToken))
-                {
-                   //LogError
-                };
+                await _statisticDriversRepository.AddStatisticDriversAsync(statisticDriverSaveData.AddedStatDrivers, cancellationToken);
             }
             if (statisticDriverSaveData.UpdatedStatDrivers.Count > 0)
             {
-                if (!await _statisticDriversRepository.UpdateStatisticDriversAsync(statisticDriverSaveData.UpdatedStatDrivers, cancellationToken))
-                {
-                    //LogError
-                };
+                await _statisticDriversRepository.UpdateStatisticDriversAsync(statisticDriverSaveData.UpdatedStatDrivers, cancellationToken);
             }
             if (statisticDriverSaveData.DeletedStatDrivers.Count > 0)
             {
-                if (!await _statisticDriversRepository.DeleteStatisticDriversAsync(statisticDriverSaveData.DeletedStatDrivers, cancellationToken))
-                {
-                    //LogError
-                };
+                await _statisticDriversRepository.DeleteStatisticDriversAsync(statisticDriverSaveData.DeletedStatDrivers, cancellationToken);
             }
 
             //TODO pass in costing config with Naviation BLI

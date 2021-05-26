@@ -13,7 +13,6 @@ namespace Strata.DSS.CostAccounting.Biz.StatisticDrivers.Models
         public Guid CostingConfigGuid { get; set; }
         public Guid DataTableGuid { get; set; }
         public Guid MeasureGuid { get; set; }
-        public Guid RuleSetGuid { get; set; }
         public CostingType CostingType { get; set; }
         public bool IsInverted { get; set; }
     }

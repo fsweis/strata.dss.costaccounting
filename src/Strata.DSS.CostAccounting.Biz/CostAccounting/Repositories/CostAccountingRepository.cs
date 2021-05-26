@@ -69,5 +69,12 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.Repositories
             return measures;
         }
 
+        public async Task<IList<RuleSet>> GetRuleSetssAsync(CancellationToken cancellationToken)
+        {
+            await using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
+            var ruleSets = await dbContext.RuleSets.ToListAsync(cancellationToken);
+            return ruleSets;
+        }
+
     }
 }

@@ -58,14 +58,22 @@ const StatisticDrivers: React.FC = () => {
   }, [setLoading]);
 
   const handleCancel = () => {
-    if (tempStatDrivers) {
-      setUpdatedDriverGuids([]);
-      setDeletedDriverGuids([]);
-      const tempStats = cloneDeep(statDrivers);
-      setTempStatDrivers(tempStats);
-    }
-    Toast.show({
-      message: 'Changes discarded'
+    Modal.confirm({
+      title: 'Discard Unsaved Changes?',
+      content: 'Changes will be dicarded.',
+      okText: 'Discard',
+      cancelText: 'Keep Changes',
+      onOk() {
+        if (tempStatDrivers) {
+          setUpdatedDriverGuids([]);
+          setDeletedDriverGuids([]);
+          const tempStats = cloneDeep(statDrivers);
+          setTempStatDrivers(tempStats);
+        }
+        Toast.show({
+          message: 'Changes discarded'
+        });
+      }
     });
   };
 
@@ -150,6 +158,7 @@ const StatisticDrivers: React.FC = () => {
   };
 
   const validateStatisticDrivers = () => {
+    gridRef.current?.validateGrid();
     const data = tempStatDrivers;
     const dupeNames: string[] = [];
     let message = '';
@@ -317,7 +326,7 @@ const StatisticDrivers: React.FC = () => {
         ref={gridRef}
         value={tempStatDrivers}
         scrollable
-        validationMode='all-cells'
+        dataKey='driverConfigGuid'
         onCellEdit={(e) => handleCellEdit(e.rowData.driverConfigGuid)}
         pager={{
           pageSize: 100,
@@ -332,7 +341,28 @@ const StatisticDrivers: React.FC = () => {
         }}
       >
         <DataGrid.RowNumber key='numberRow'></DataGrid.RowNumber>
-        <DataGrid.Column key='name' header='Name' filter editable field='name' width={240} />
+        <DataGrid.Column
+          key='name'
+          header='Name'
+          filter
+          editable
+          field='name'
+          width={240}
+          validationRules={[
+            {
+              required: true
+            },
+            {
+              type: 'string'
+            },
+            {
+              validator: (rule, value, callback, source, options) => {
+                return value !== '';
+              },
+              message: 'Name cannot be blank'
+            }
+          ]}
+        />
         <DataGrid.DropDownColumn
           key='dataSource'
           field='dataTableGuid'
@@ -368,6 +398,20 @@ const StatisticDrivers: React.FC = () => {
               )}
             </>
           )}
+          validationRules={[
+            {
+              required: true
+            },
+            {
+              type: 'string'
+            },
+            {
+              validator: (rule, value, callback, source, options) => {
+                return value !== '';
+              },
+              message: 'Data Source cannot be blank'
+            }
+          ]}
         />
         <DataGrid.DropDownColumn
           key='dataSourceLink'
@@ -395,6 +439,20 @@ const StatisticDrivers: React.FC = () => {
               />
             </>
           )}
+          validationRules={[
+            {
+              required: true
+            },
+            {
+              type: 'string'
+            },
+            {
+              validator: (rule, value, callback, source, options) => {
+                return value !== '';
+              },
+              message: 'Data Source Link cannot be blank'
+            }
+          ]}
         />
         <DataGrid.CheckboxColumn key='inverted' header='Inverted' editable field='isInverted' sortable width={80} />
         <DataGrid.EmptyColumn />
