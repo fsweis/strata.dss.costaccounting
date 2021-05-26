@@ -11,10 +11,10 @@ export const statisticDriverService = {
     return httpGet<IStatisticDriver[]>(`statistic-drivers`);
   },
   getDataSources: (): Promise<IDataSource[]> => {
-    return httpGet<IDataSource[]>(`statistic-drivers/DataSources`);
+    return httpGet<IDataSource[]>(`statistic-drivers/data-sources`);
   },
   getDataSourceLinks: (): Promise<IDataSourceLink[]> => {
-    return httpGet<IDataSourceLink[]>(`statistic-drivers/DataSourceLinks`);
+    return httpGet<IDataSourceLink[]>(`statistic-drivers/data-source-links`);
   },
   saveStatisticDrivers: (statisticDriverSaveData: IStatisticDriverSaveData): Promise<IStatisticDriver[]> => {
     return httpPost<IStatisticDriver[]>('statistic-drivers/', statisticDriverSaveData);

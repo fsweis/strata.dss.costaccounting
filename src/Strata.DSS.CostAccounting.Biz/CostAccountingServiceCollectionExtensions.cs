@@ -33,8 +33,11 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddAsyncDbContextFactory<CostAccountingDbContext>(options =>
             {
                 options
-                    //.WithConnectionString((provider, token) => provider.GetConnectionStringFromSmc(token))
-                    .WithConnectionString((provider, token) => provider.GetConnectionStringUsingIntegratedSecurity(token))
+                    #if DEBUG
+                    .WithConnectionString(GetConnectionStringUsingIntegratedSecurity)
+                    #else
+                    .WithConnectionString(GetConnectionStringUserPass)
+                    #endif
                     .WithDbContextOptions((connectionString, builder) => builder.UseSqlServer(connectionString));
             });
 
@@ -46,11 +49,47 @@ namespace Microsoft.Extensions.DependencyInjection
             return services;
         }
 
-        private static async Task<string> GetConnectionStringUsingIntegratedSecurity(
-            this IServiceProvider provider,
+        private static async Task<string> GetConnectionStringUserPass(
+            IServiceProvider provider,
             CancellationToken cancellationToken)
         {
+            var claimsAccessor = provider.GetRequiredService<IClaimsPrincipalAccessor>();
+            var databaseGuid = claimsAccessor.GetCurrentClaimsPrincipal()?.GetStrataDatabaseGuid();
+         
+            if (!databaseGuid.HasValue)
+            {
+                throw new InvalidOperationException(
+                    $"User must be authenticated an have claim with key: '{Strata.CoreLib.Claims.StrataClaims.DatabaseGuid}'.");
+            }
+            var smc = provider.GetRequiredService<ISMCServiceClient>();
+            var database = await smc.GetDatabaseAsync(databaseGuid.Value, cancellationToken);
+
+            var configuration = provider.GetRequiredService<IConfiguration>();
+            var username = configuration.GetValue<string>("jazzDb:username");
+            var password = configuration.GetValue<string>("jazzDb:password");
+            if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password))
+            {
+                throw new ArgumentNullException(nameof(username),
+                    "Sql username for jazz database not found in configuration");
+            }
             
+            var connectionStringBuilder = new SqlConnectionStringBuilder
+            {
+                DataSource = database.ServerName,
+                InitialCatalog = database.PhysicalName,
+                UserID = username,
+                Password = password,
+                Encrypt = true,
+                TrustServerCertificate = true,
+                MultiSubnetFailover = false
+            };
+            return connectionStringBuilder.ToString();
+        }
+
+        private static async Task<string> GetConnectionStringUsingIntegratedSecurity(
+            IServiceProvider provider,
+            CancellationToken cancellationToken)
+        {
             var claimsAccessor = provider.GetRequiredService<IClaimsPrincipalAccessor>();
             var databaseGuid = claimsAccessor.GetCurrentClaimsPrincipal()?.GetStrataDatabaseGuid();
          
