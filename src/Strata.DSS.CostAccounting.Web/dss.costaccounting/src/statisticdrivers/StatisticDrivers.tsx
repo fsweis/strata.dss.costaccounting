@@ -113,6 +113,16 @@ const StatisticDrivers: React.FC = () => {
         deletedStatDrivers: deletedDriverGuids
       };
 
+      // Don't actually save if there are no changes
+      if (!statDriverSaveData.addedStatDrivers.length && !statDriverSaveData.updatedStatDrivers.length && !statDriverSaveData.deletedStatDrivers.length) {
+        // TODO: Stelios give us a toast message
+        Toast.show({
+          toastType: 'info',
+          message: 'No changes to save'
+        });
+        return;
+      }
+
       try {
         setLoading(true);
         //refresh stat drivers from return
