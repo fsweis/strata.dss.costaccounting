@@ -38,5 +38,13 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
             var costingConfig = await _costingConfigRepository.GetCostingConfigAsync(id, cancellationToken);
             return costingConfig;
         }
+
+        [HttpPost]
+        [ProducesResponseType(200)]
+        public async Task<ActionResult<List<CostingConfigModel>>> SaveStatisticDrivers([FromBody] CostingConfigModel costingConfgData
+                                                                                                , CancellationToken cancellationToken)
+        {            
+            return Ok();
+        }
     }
 }
