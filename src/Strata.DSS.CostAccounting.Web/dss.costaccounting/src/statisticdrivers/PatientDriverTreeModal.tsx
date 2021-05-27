@@ -39,7 +39,6 @@ const PatientDriverTreeModal: React.FC<IPatientDriverTreeModalProps> = (props: I
 
   //patient driver tree search
   useEffect(() => {
-    console.log('here', patientDriversSearch);
     const searchValue = (value: string | undefined) => {
       const s = patientDriversSearch.toLowerCase();
       return value?.toLowerCase().includes(s);
