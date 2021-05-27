@@ -59,7 +59,7 @@ const StatisticDrivers: React.FC = () => {
 
   const handleCancel = () => {
     Modal.confirm({
-      title: 'Discard Unsaved Changes?',
+      title: 'Discard unsaved changes?',
       content: 'Changes will be dicarded.',
       okText: 'Discard',
       cancelText: 'Keep Changes',
