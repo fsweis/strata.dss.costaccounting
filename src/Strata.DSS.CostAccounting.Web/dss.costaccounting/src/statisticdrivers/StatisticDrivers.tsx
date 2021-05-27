@@ -111,7 +111,7 @@ const StatisticDrivers: React.FC = () => {
   };
 
   const handleSave = async () => {
-    if (validateStatisticDrivers()) {
+    if (await validateStatisticDrivers()) {
       const guids = updatedDriverGuids.filter((guid) => !deletedDriverGuids.includes(guid));
       const updatedStatDrivers = tempStatDrivers.filter((d) => guids.includes(d.driverConfigGuid) && !d.isNew);
       const addedStatDrivers = tempStatDrivers.filter((d) => guids.includes(d.driverConfigGuid) && d.isNew);
@@ -124,7 +124,7 @@ const StatisticDrivers: React.FC = () => {
 
       // Don't actually save if there are no changes
       if (!statDriverSaveData.addedStatDrivers.length && !statDriverSaveData.updatedStatDrivers.length && !statDriverSaveData.deletedStatDrivers.length) {
-        // TODO: Stelios give us a toast message
+        // TODO: Get exact language here
         Toast.show({
           toastType: 'info',
           message: 'No changes to save'
@@ -157,31 +157,23 @@ const StatisticDrivers: React.FC = () => {
     }
   };
 
-  const validateStatisticDrivers = () => {
-    gridRef.current?.validateGrid();
-    const data = tempStatDrivers;
-    const dupeNames: string[] = [];
-    let message = '';
-    for (let i = 0; i < data.length; i++) {
-      if (data[i].name === '') {
-        message += 'Statistic driver name cannot be blank. Row: ' + i + '. ';
-      }
-      if (data[i].dataTableGuid === '') {
-        message += 'Data Source cannot be empty. Row: ' + i + '. ';
-      }
-      if (data[i].measureGuid === '') {
-        message += 'Measure cannot be empty. Row: ' + i + '. ';
-      }
-      if (dupeNames.includes(data[i].name)) {
-        message += 'Statistic driver name must be unique. Row: ' + i + '. ';
-      } else {
-        dupeNames.push(data[i].name);
-      }
+  const validateStatisticDrivers = async () => {
+    if (!gridRef.current) {
+      return false;
     }
-    if (message !== '') {
+    const invalidCells = await gridRef.current.validateGrid();
+    if (invalidCells.length > 0) {
+      const invalidKeys = invalidCells.map((cell) => cell.rowKey);
+      const invalidRows: { rowNumber: number; guid: string }[] = tempStatDrivers
+        .map((driver, index) => {
+          return { guid: driver.driverConfigGuid, rowNumber: index };
+        })
+        .filter((r) => invalidKeys.includes(r.guid));
+
+      const rowNumbers = invalidRows.map((r) => r.rowNumber + 1);
       Modal.alert({
         title: 'Changes not saved',
-        content: message,
+        content: `Fix errors in rows: ${rowNumbers.join(', ')}`,
         alertType: 'error'
       });
       return false;
@@ -350,16 +342,17 @@ const StatisticDrivers: React.FC = () => {
           width={240}
           validationRules={[
             {
-              required: true
-            },
-            {
-              type: 'string'
-            },
-            {
+              required: true,
+              type: 'string',
               validator: (rule, value, callback, source, options) => {
-                return value !== '';
+                const stringVal: string = value.toString().trim().toLowerCase();
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                const driver: IStatisticDriver = (options as any).cellArgs.rowData;
+                const dupe = tempStatDrivers.findIndex((d) => d.name.toLowerCase() === stringVal && d.driverConfigGuid !== driver.driverConfigGuid) !== -1;
+                const blank = stringVal === '';
+                return !blank && !dupe;
               },
-              message: 'Name cannot be blank'
+              message: 'Name is required and must be unique'
             }
           ]}
         />
@@ -377,15 +370,7 @@ const StatisticDrivers: React.FC = () => {
           items={dataSources}
           editor={(cellEditorArgs) => (
             <>
-              {cellEditorArgs.rowData.isUsed && (
-                <Text>
-                  {
-                    dataSources.filter((x) => {
-                      return x.dataTableGuid === cellEditorArgs.rowData.dataTableGuid;
-                    })[0].friendlyName
-                  }
-                </Text>
-              )}
+              {cellEditorArgs.rowData.isUsed && <Text>{dataSources.find((x) => x.dataTableGuid === cellEditorArgs.rowData.dataTableGuid)?.friendlyName}</Text>}
               {!cellEditorArgs.rowData.isUsed && (
                 <DropDown
                   onChange={(value) => handleDataSourceChange(cellEditorArgs, value.toString())}
@@ -400,16 +385,12 @@ const StatisticDrivers: React.FC = () => {
           )}
           validationRules={[
             {
-              required: true
-            },
-            {
-              type: 'string'
-            },
-            {
+              required: true,
+              type: 'string',
               validator: (rule, value, callback, source, options) => {
                 return value !== '';
               },
-              message: 'Data Source cannot be blank'
+              message: 'Data Source must be selected'
             }
           ]}
         />
@@ -441,16 +422,12 @@ const StatisticDrivers: React.FC = () => {
           )}
           validationRules={[
             {
-              required: true
-            },
-            {
-              type: 'string'
-            },
-            {
+              required: true,
+              type: 'string',
               validator: (rule, value, callback, source, options) => {
                 return value !== '';
               },
-              message: 'Data Source Link cannot be blank'
+              message: 'Measure must be selected'
             }
           ]}
         />
