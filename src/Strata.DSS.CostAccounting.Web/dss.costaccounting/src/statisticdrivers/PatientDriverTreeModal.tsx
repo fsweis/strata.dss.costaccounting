@@ -69,13 +69,10 @@ const PatientDriverTreeModal: React.FC<IPatientDriverTreeModalProps> = (props: I
   };
 
   const handleCheck = (checkedKeys: Key[] | { checked: Key[]; halfChecked: Key[] }, info: CheckInfo) => {
-    if (!checkedKeys) return;
-
-    const keys = checkedKeys.toString().split(',');
-    const selected = keys.filter((g) => {
+    const selectedKeys = (checkedKeys as Key[]).filter((g) => {
       return g !== '' && g !== 'AllPatientKey';
     });
-    setPatientDriversToRun(selected);
+    setPatientDriversToRun(selectedKeys);
   };
 
   return (
