@@ -5,7 +5,7 @@ import Modal from '@strata/tempo/lib/modal';
 import Input from '@strata/tempo/lib/input';
 import Tree, { CheckInfo, ITreeNode, Key } from '@strata/tempo/lib/tree';
 import { IStatisticDriver } from './data/IStatisticDriver';
-import { useEffect, useState, ChangeEvent, ReactText } from 'react';
+import { useEffect, useState, ChangeEvent } from 'react';
 import cloneDeep from 'lodash/cloneDeep';
 
 export interface IPatientDriverTreeModalProps {
@@ -16,7 +16,6 @@ export interface IPatientDriverTreeModalProps {
 }
 
 const PatientDriverTreeModal: React.FC<IPatientDriverTreeModalProps> = (props: IPatientDriverTreeModalProps) => {
-  // Mmove all this logic into its own component for the run patient drivers modal
   const [patientDriversToRun, setPatientDriversToRun] = useState<Key[]>([]);
   const [patientDriversSearch, setPatientDriversSearch] = useState('');
   const [patientDriverTreeData, setPatientDriverTreeData] = useState<ITreeNode[]>([]);
@@ -72,8 +71,8 @@ const PatientDriverTreeModal: React.FC<IPatientDriverTreeModalProps> = (props: I
   const handleCheck = (checkedKeys: Key[] | { checked: Key[]; halfChecked: Key[] }, info: CheckInfo) => {
     if (!checkedKeys) return;
 
-    const guids: string[] = checkedKeys.toString().split(',');
-    const selected = guids.filter((g) => {
+    const keys = checkedKeys.toString().split(',');
+    const selected = keys.filter((g) => {
       return g !== '' && g !== 'AllPatientKey';
     });
     setPatientDriversToRun(selected);
@@ -94,7 +93,7 @@ const PatientDriverTreeModal: React.FC<IPatientDriverTreeModalProps> = (props: I
               Cancel
             </Button>
             <Button type='primary' onClick={handleOk} disabled={patientDriversToRun.length === 0}>
-              {'Run ' + patientDriversToRun.length + ' Drivers'}
+              Run {patientDriversToRun.length === 0 ? '' : patientDriversToRun.length} Driver{patientDriversToRun.length === 1 ? '' : 's'}
             </Button>
           </Spacing>
         }
