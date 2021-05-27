@@ -433,21 +433,12 @@ const StatisticDrivers: React.FC = () => {
           body={(rowData) => (
             <>
               <Spacing vAlign='center'>
-                <Tooltip
-                  title={() => {
-                    return rowData.isNew ? 'Driver must be saved.' : 'Add Rules';
-                  }}
-                >
+                <Tooltip title={rowData.isNew ? 'Save driver to add rules' : ''}>
                   <Button type='link' onClick={() => handleEditRules(rowData.driverConfigGuid)} disabled={rowData.isNew}>
                     {rowData.hasRules ? 'Edit Rules' : 'Add Rules'}
                   </Button>
                 </Tooltip>
-
-                <Tooltip
-                  title={() => {
-                    return rowData.isUsed ? 'Driver used in configurations' : 'Delete';
-                  }}
-                >
+                <Tooltip placement='left' title={rowData.isUsed ? "Can't delete drivers in use" : 'Delete'}>
                   <Button type='link' icon='Delete' disabled={rowData.isUsed} onClick={() => handleDelete(rowData.driverConfigGuid)} />
                 </Tooltip>
               </Spacing>
