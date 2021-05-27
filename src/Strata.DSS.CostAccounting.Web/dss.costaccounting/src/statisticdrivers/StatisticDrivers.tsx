@@ -344,15 +344,17 @@ const StatisticDrivers: React.FC = () => {
             {
               required: true,
               type: 'string',
+              whitespace: true
+            },
+            {
               validator: (rule, value, callback, source, options) => {
                 const stringVal: string = value.toString().trim().toLowerCase();
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 const driver: IStatisticDriver = (options as any).cellArgs.rowData;
                 const dupe = tempStatDrivers.findIndex((d) => d.name.toLowerCase() === stringVal && d.driverConfigGuid !== driver.driverConfigGuid) !== -1;
-                const blank = stringVal === '';
-                return !blank && !dupe;
+                return !dupe;
               },
-              message: 'Name is required and must be unique'
+              message: 'Enter a unique name'
             }
           ]}
         />
@@ -386,11 +388,7 @@ const StatisticDrivers: React.FC = () => {
           validationRules={[
             {
               required: true,
-              type: 'string',
-              validator: (rule, value, callback, source, options) => {
-                return value !== '';
-              },
-              message: 'Data Source must be selected'
+              type: 'string'
             }
           ]}
         />
@@ -423,11 +421,7 @@ const StatisticDrivers: React.FC = () => {
           validationRules={[
             {
               required: true,
-              type: 'string',
-              validator: (rule, value, callback, source, options) => {
-                return value !== '';
-              },
-              message: 'Measure must be selected'
+              type: 'string'
             }
           ]}
         />
