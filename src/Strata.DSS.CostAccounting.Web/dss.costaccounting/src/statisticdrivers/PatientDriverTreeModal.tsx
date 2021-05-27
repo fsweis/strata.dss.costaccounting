@@ -3,9 +3,9 @@ import Spacing from '@strata/tempo/lib/spacing';
 import Button from '@strata/tempo/lib/button';
 import Modal from '@strata/tempo/lib/modal';
 import Input from '@strata/tempo/lib/input';
-import Tree, { ITreeNode, Key } from '@strata/tempo/lib/tree';
+import Tree, { CheckInfo, ITreeNode, Key } from '@strata/tempo/lib/tree';
 import { IStatisticDriver } from './data/IStatisticDriver';
-import { useEffect, useState, ChangeEvent } from 'react';
+import { useEffect, useState, ChangeEvent, ReactText } from 'react';
 import cloneDeep from 'lodash/cloneDeep';
 
 export interface IPatientDriverTreeModalProps {
@@ -21,7 +21,6 @@ const PatientDriverTreeModal: React.FC<IPatientDriverTreeModalProps> = (props: I
   const [patientDriversSearch, setPatientDriversSearch] = useState('');
   const [patientDriverTreeData, setPatientDriverTreeData] = useState<ITreeNode[]>([]);
   const [patientDriverTree, setPatientDriverTree] = useState<ITreeNode[]>([]);
-  const [patientDriverTreeOkText, setPatientDriverTreeOkText] = useState<string>('');
 
   useEffect(() => {
     const runPatientDriverTreeChildren = props.statDrivers.map((statDriver) => {
@@ -40,6 +39,7 @@ const PatientDriverTreeModal: React.FC<IPatientDriverTreeModalProps> = (props: I
 
   //patient driver tree search
   useEffect(() => {
+    console.log('here', patientDriversSearch);
     const searchValue = (value: string | undefined) => {
       const s = patientDriversSearch.toLowerCase();
       return value?.toLowerCase().includes(s);
@@ -58,19 +58,6 @@ const PatientDriverTreeModal: React.FC<IPatientDriverTreeModalProps> = (props: I
     }
   }, [patientDriversSearch, patientDriverTree]);
 
-  useEffect(() => {
-    switch (patientDriversToRun.length) {
-      case 0:
-        setPatientDriverTreeOkText('Run Drivers');
-        break;
-      case 1:
-        setPatientDriverTreeOkText('Run 1 Driver');
-        break;
-      default:
-        setPatientDriverTreeOkText('Run ' + patientDriversToRun.length + ' Drivers');
-    }
-  }, [patientDriversToRun]);
-
   const handleCancel = () => {
     setPatientDriversSearch('');
     setPatientDriversToRun([]);
@@ -81,6 +68,16 @@ const PatientDriverTreeModal: React.FC<IPatientDriverTreeModalProps> = (props: I
     setPatientDriversSearch('');
     setPatientDriversToRun([]);
     props.onOk();
+  };
+
+  const handleCheck = (checkedKeys: Key[] | { checked: Key[]; halfChecked: Key[] }, info: CheckInfo) => {
+    if (!checkedKeys) return;
+
+    const guids: string[] = checkedKeys.toString().split(',');
+    const selected = guids.filter((g) => {
+      return g !== '' && g !== 'AllPatientKey';
+    });
+    setPatientDriversToRun(selected);
   };
 
   return (
@@ -98,7 +95,7 @@ const PatientDriverTreeModal: React.FC<IPatientDriverTreeModalProps> = (props: I
               Cancel
             </Button>
             <Button type='primary' onClick={handleOk} disabled={patientDriversToRun.length === 0}>
-              {patientDriverTreeOkText}
+              {'Run ' + patientDriversToRun.length + ' Drivers'}
             </Button>
           </Spacing>
         }
@@ -106,16 +103,7 @@ const PatientDriverTreeModal: React.FC<IPatientDriverTreeModalProps> = (props: I
         <Spacing padding={16} itemSpacing={12}>
           <Input search onChange={(event: ChangeEvent<HTMLInputElement>) => setPatientDriversSearch(event.target.value)} />
         </Spacing>
-        <Tree
-          treeData={patientDriverTreeData}
-          selectionMode='multiple'
-          height={400}
-          defaultExpandedKeys={['AllPatientKey']}
-          onCheck={(checkedKeys, info) => {
-            const guids: string[] = checkedKeys.toString().split(',');
-            setPatientDriversToRun(guids);
-          }}
-        />
+        <Tree treeData={patientDriverTreeData} selectionMode='multiple' height={400} defaultExpandedKeys={['AllPatientKey']} onCheck={handleCheck} />
       </Modal>
     </>
   );
