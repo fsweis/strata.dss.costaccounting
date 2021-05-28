@@ -1,6 +1,5 @@
 import React from 'react';
 import Spacing from '@strata/tempo/lib/spacing';
-import Button from '@strata/tempo/lib/button';
 import Modal from '@strata/tempo/lib/modal';
 import Input from '@strata/tempo/lib/input';
 import Tree, { CheckInfo, ITreeNode, Key } from '@strata/tempo/lib/tree';
@@ -82,18 +81,9 @@ const PatientDriverTreeModal: React.FC<IPatientDriverTreeModalProps> = (props: I
         visible={props.visible}
         onCancel={handleCancel}
         onOk={handleOk}
-        okText='Run Drivers'
+        okText={'Run ' + (patientDriversToRun.length === 0 ? '' : patientDriversToRun.length) + ' Driver' + (patientDriversToRun.length === 1 ? '' : 's')}
         removeBodyPadding
-        footer={
-          <Spacing hAlign='right'>
-            <Button type='secondary' onClick={handleCancel}>
-              Cancel
-            </Button>
-            <Button type='primary' onClick={handleOk} disabled={patientDriversToRun.length === 0}>
-              Run {patientDriversToRun.length === 0 ? '' : patientDriversToRun.length} Driver{patientDriversToRun.length === 1 ? '' : 's'}
-            </Button>
-          </Spacing>
-        }
+        okButtonProps={patientDriversToRun.length === 0 ? { disabled: true } : { disabled: false }}
       >
         <Spacing padding={16} itemSpacing={12}>
           <Input search onChange={(event: ChangeEvent<HTMLInputElement>) => setPatientDriversSearch(event.target.value)} />
