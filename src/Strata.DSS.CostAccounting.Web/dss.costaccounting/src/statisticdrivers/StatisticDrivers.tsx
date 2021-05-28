@@ -258,11 +258,16 @@ const StatisticDrivers: React.FC = () => {
     }
   };
 
-  const handleDelete = (driverConfigGuid: string) => {
+  const handleDelete = (driverConfigGuid: string, isNew: boolean) => {
     if (tempStatDrivers !== undefined) {
-      //add to deleted drivers
-      const driversToDelete = [driverConfigGuid].concat(deletedDriverGuids);
-      setDeletedDriverGuids(driversToDelete);
+      if (isNew) {
+        const newUpdatedDriverGuids = updatedDriverGuids.filter((guid) => guid !== driverConfigGuid);
+        setUpdatedDriverGuids(newUpdatedDriverGuids);
+      } else {
+        //add to deleted drivers
+        const driversToDelete = [driverConfigGuid].concat(deletedDriverGuids);
+        setDeletedDriverGuids(driversToDelete);
+      }
       //refresh the grid
       const newStatDrivers = tempStatDrivers.filter((obj) => obj.driverConfigGuid !== driverConfigGuid);
       setTempStatDrivers(newStatDrivers);
@@ -437,7 +442,7 @@ const StatisticDrivers: React.FC = () => {
                   </Button>
                 </Tooltip>
                 <Tooltip placement='left' title={rowData.isUsed ? "Can't delete drivers in use" : 'Delete'}>
-                  <Button type='link' icon='Delete' disabled={rowData.isUsed} onClick={() => handleDelete(rowData.driverConfigGuid)} />
+                  <Button type='link' icon='Delete' disabled={rowData.isUsed} onClick={() => handleDelete(rowData.driverConfigGuid, rowData.isNew)} />
                 </Tooltip>
               </Spacing>
             </>
