@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import DataGrid from '@strata/tempo/lib/datagrid';
 import Header from '@strata/tempo/lib/header';
 import Tooltip from '@strata/tempo/lib/tooltip';
@@ -12,30 +12,27 @@ import Banner from '@strata/tempo/lib/banner';
 import ButtonMenu from '@strata/tempo/lib/buttonmenu';
 import Text from '@strata/tempo/lib/text';
 import { usePageLoader } from '@strata/tempo/lib/pageloader';
+import { ICellEditorArgs } from '@strata/tempo/lib/datacolumn';
 import { IStatisticDriverSaveData } from './data/IStatisticDriverSaveData';
 import { IStatisticDriver } from './data/IStatisticDriver';
-import { useEffect, useState } from 'react';
 import { statisticDriverService } from './data/statisticDriverService';
 import { IDataSourceLink } from './data/IDataSourceLink';
 import { getNewGuid } from '../shared/Utils';
 import cloneDeep from 'lodash/cloneDeep';
 import { IDataSource } from '../shared/data/IDataSource';
 import PatientDriverTreeModal from './PatientDriverTreeModal';
-import { ICellEditorArgs } from '@strata/tempo/lib/datacolumn';
 
 const StatisticDrivers: React.FC = () => {
   const [statDrivers, setStatDrivers] = useState<IStatisticDriver[]>([]);
   const [tempStatDrivers, setTempStatDrivers] = useState<IStatisticDriver[]>([]);
   const [dataSources, setDataSources] = useState<IDataSource[]>([]);
   const [dataSourceLinks, setDataSourceLinks] = useState<IDataSourceLink[]>([]);
-
   const [patientDriverTreeModalVisible, setPatientDriverTreeModalVisible] = useState<boolean>(false);
   const [deletedDriverGuids, setDeletedDriverGuids] = useState<string[]>([]);
   const [updatedDriverGuids, setUpdatedDriverGuids] = useState<string[]>([]);
-
   const gridRef = React.useRef<DataGrid>(null);
-
   const { setLoading } = usePageLoader();
+  const [gridLoading, setGridLoading] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -50,12 +47,12 @@ const StatisticDrivers: React.FC = () => {
         setStatDrivers(statisticDrivers);
         setTempStatDrivers(cloneDeep(statisticDrivers));
       } finally {
-        setLoading(false);
+        setGridLoading(false);
       }
     };
-    setLoading(true);
+    setGridLoading(true);
     fetchData();
-  }, [setLoading]);
+  }, []);
 
   const handleCancel = () => {
     Modal.confirm({
@@ -331,6 +328,7 @@ const StatisticDrivers: React.FC = () => {
             </>
           )
         }}
+        loading={gridLoading}
       >
         <DataGrid.RowNumber key='numberRow'></DataGrid.RowNumber>
         <DataGrid.Column
