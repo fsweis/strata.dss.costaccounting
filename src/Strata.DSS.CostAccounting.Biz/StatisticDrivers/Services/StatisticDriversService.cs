@@ -40,7 +40,7 @@ namespace Strata.DSS.CostAccounting.Biz.StatisticDrivers.Services
                     isUsed = true;
                 }
                 var hasRules = false;
-                if(ruleSets.Any(x=>x.Category==driverConfigTemp.DriverConfigGuid.ToString()))
+                if(ruleSets.Any(x=> x.Category.ToLower() == driverConfigTemp.DriverConfigGuid.ToString().ToLower()))
                 {
                     hasRules = true;
                 }
