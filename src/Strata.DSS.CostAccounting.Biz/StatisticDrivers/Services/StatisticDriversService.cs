@@ -27,6 +27,7 @@ namespace Strata.DSS.CostAccounting.Biz.StatisticDrivers.Services
         public async Task<IList<StatisticDriver>> LoadStatisticDrivers(CostingConfigModel costingConfig)
         {
             var driverConfigs = await _statisticDriversRepository.GetDriverConfigsAsync(costingConfig.Type, default);
+            var ruleSets = await _costaccountingRepository.GetRuleSetssAsync(default);
             var usedDriverConfigGuids = await _statisticDriversRepository.GetUsedDriverConfigs(default);
             var statisticDrivers = new List<StatisticDriver>();
             var summaryGuid = costingConfig.Type == CostingType.PatientCare ? DataTableConstants.PatientEncounterSummaryGuid : DataTableConstants.PatientClaimSummaryGuid;
@@ -38,7 +39,12 @@ namespace Strata.DSS.CostAccounting.Biz.StatisticDrivers.Services
                 {
                     isUsed = true;
                 }
-                statisticDrivers.Add(new StatisticDriver(driverConfigTemp, isUsed, summaryGuid, detailDataTableGuid));
+                var hasRules = false;
+                if(ruleSets.Any(x=> x.Category.ToLower() == driverConfigTemp.DriverConfigGuid.ToString().ToLower()))
+                {
+                    hasRules = true;
+                }
+                statisticDrivers.Add(new StatisticDriver(driverConfigTemp, isUsed, hasRules, summaryGuid, detailDataTableGuid));
             }
             return statisticDrivers.OrderBy(x => x.Name).ToList();
         }

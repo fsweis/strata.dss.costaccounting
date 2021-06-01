@@ -43,7 +43,7 @@ namespace Strata.DSS.CostAccounting.Biz.StatisticDrivers.Repositories
             return driverConfigGuids;
         }
 
-        public async Task<Boolean> UpdateStatisticDriversAsync(List<StatisticDriver>statisticDrivers, CancellationToken cancellationToken)
+        public async Task UpdateStatisticDriversAsync(List<StatisticDriver>statisticDrivers, CancellationToken cancellationToken)
         {
             await using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
             foreach (var statDriver in statisticDrivers)
@@ -54,18 +54,10 @@ namespace Strata.DSS.CostAccounting.Biz.StatisticDrivers.Repositories
                 driver.Name = statDriver.Name;
            }
 
-            try
-            {
-                await dbContext.SaveChangesAsync(cancellationToken);
-            }
-            catch (Exception e)
-            {
-                return false;
-            }
-            return true;
+           await dbContext.SaveChangesAsync(cancellationToken);
         }
 
-        public async Task<Boolean> AddStatisticDriversAsync(List<StatisticDriver> statisticDrivers, CancellationToken cancellationToken)
+        public async Task AddStatisticDriversAsync(List<StatisticDriver> statisticDrivers, CancellationToken cancellationToken)
         {
             await using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
 
@@ -83,17 +75,11 @@ namespace Strata.DSS.CostAccounting.Biz.StatisticDrivers.Repositories
                 dbContext.DriverConfigs.Add(driverConfig);
             }
 
-            try { 
-             await dbContext.SaveChangesAsync(cancellationToken);
-            }catch(Exception e)
-            {
-                return false;
-            }
+            await dbContext.SaveChangesAsync(cancellationToken);
 
-            return true;
         }
 
-        public async Task<Boolean> DeleteStatisticDriversAsync(List<Guid> statisticDriverGuids, CancellationToken cancellationToken)
+        public async Task DeleteStatisticDriversAsync(List<Guid> statisticDriverGuids, CancellationToken cancellationToken)
         {
             await using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
             foreach (var statDriverGuid in statisticDriverGuids)
@@ -101,16 +87,9 @@ namespace Strata.DSS.CostAccounting.Biz.StatisticDrivers.Repositories
                 var driver = await dbContext.DriverConfigs.Where(dc => dc.DriverConfigGuid == statDriverGuid).FirstOrDefaultAsync();
                 dbContext.Remove(driver);
             }
-
-            try
-            {
-                await dbContext.SaveChangesAsync(cancellationToken);
-            }
-            catch (Exception e)
-            {
-                return false;
-            }
-            return true;
+          
+            await dbContext.SaveChangesAsync(cancellationToken);
+            
         }
     }
 }

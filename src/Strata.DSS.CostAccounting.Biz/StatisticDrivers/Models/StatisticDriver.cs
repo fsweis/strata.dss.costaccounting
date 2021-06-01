@@ -19,8 +19,6 @@ namespace Strata.DSS.CostAccounting.Biz.StatisticDrivers.Models
         public bool IsNew { get; set; }
       
         public bool IsUsed { get; set; }
-       
-        public Guid RuleSetGuid { get; set; }
 
         public CostingType CostingType { get; set; }
 
@@ -30,7 +28,7 @@ namespace Strata.DSS.CostAccounting.Biz.StatisticDrivers.Models
         {
         }
 
-        public StatisticDriver(DriverConfigView driverConfigTemp, bool isUsed, Guid summaryDataTableGuid, Guid detailDataTableGuid)
+        public StatisticDriver(DriverConfigView driverConfigTemp, bool isUsed, bool hasRules, Guid summaryDataTableGuid, Guid detailDataTableGuid)
         {
             var dtGuid = driverConfigTemp.DataTableGuid;
             if(dtGuid==summaryDataTableGuid)
@@ -44,8 +42,7 @@ namespace Strata.DSS.CostAccounting.Biz.StatisticDrivers.Models
             IsNew = false;
             IsUsed = isUsed;
             IsInverted = driverConfigTemp.IsInverted;
-            RuleSetGuid = driverConfigTemp.RuleSetGuid;
-            HasRules = driverConfigTemp.RuleSetGuid != Guid.Empty;
+            HasRules = hasRules;
             CostingType = driverConfigTemp.CostingType;
         }
 
