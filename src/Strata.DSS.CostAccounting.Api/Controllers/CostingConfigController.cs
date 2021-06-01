@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Strata.DSS.CostAccounting.Biz.CostAccounting.Models;
-using Strata.DSS.CostAccounting.Biz.CostAccounting.Repositories.Interfaces;
+using Strata.DSS.CostAccounting.Biz.CostAccounting.Repositories;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Strata.DSS.CostAccounting.Api.Controllers
 {
-    
+
     [ApiController]
     [ApiVersion("1.0")]
     [Route("api/v{api-version:apiVersion}/costing-configs")]

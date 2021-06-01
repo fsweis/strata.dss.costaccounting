@@ -1,14 +1,11 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Strata.DSS.CostAccounting.Biz.CostAccounting.DbContexts;
-using Strata.DSS.CostAccounting.Biz.CostAccounting.Entities;
 using Strata.DSS.CostAccounting.Biz.CostAccounting.Models;
-using Strata.DSS.CostAccounting.Biz.CostAccounting.Repositories.Interfaces;
 using Strata.SqlTools.Configuration.Common.AsyncFactory;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -27,7 +24,7 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.Repositories
         public async Task<IEnumerable<CostingConfigModel>> GetAllCostingConfigsAsync(CancellationToken cancellationToken)
         {
             await using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
-            var costingConfigs = dbContext.CostingConfigs.AsEnumerable();
+            var costingConfigs = await dbContext.CostingConfigs.ToListAsync(cancellationToken);
 
             if(!costingConfigs.Any())
             {

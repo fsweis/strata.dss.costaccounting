@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Strata.DSS.CostAccounting.Biz.CostAccounting.Repositories.Interfaces
+namespace Strata.DSS.CostAccounting.Biz.CostAccounting.Repositories
 {
     public interface ICostingConfigRepository
     {

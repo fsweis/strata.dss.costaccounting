@@ -14,7 +14,6 @@ using System.Threading;
 using Strata.CoreLib.Claims.Extensions;
 using Strata.SMC.Client;
 using Microsoft.Data.SqlClient;
-using Strata.DSS.CostAccounting.Biz.CostAccounting.Repositories.Interfaces;
 
 // ReSharper disable once CheckNamespace
 namespace Microsoft.Extensions.DependencyInjection
