@@ -335,9 +335,8 @@ const StatisticDrivers: React.FC = () => {
         }}
         loading={gridLoading}
       >
-        <DataGrid.RowNumber key='numberRow'></DataGrid.RowNumber>
+        <DataGrid.RowNumber></DataGrid.RowNumber>
         <DataGrid.Column
-          key='name'
           header='Name'
           filter
           editable
@@ -362,7 +361,6 @@ const StatisticDrivers: React.FC = () => {
           ]}
         />
         <DataGrid.DropDownColumn
-          key='dataSource'
           field='dataTableGuid'
           header='Data Source'
           filter
@@ -396,7 +394,6 @@ const StatisticDrivers: React.FC = () => {
           ]}
         />
         <DataGrid.DropDownColumn
-          key='dataSourceLink'
           field='measureGuid'
           header='Measure'
           filter
@@ -428,7 +425,7 @@ const StatisticDrivers: React.FC = () => {
             }
           ]}
         />
-        <DataGrid.CheckboxColumn key='inverted' header='Inverted' editable field='isInverted' sortable width={80} />
+        <DataGrid.CheckboxColumn header='Inverted' editable field='isInverted' sortable width={80} />
         <DataGrid.EmptyColumn />
         <DataGrid.Column
           align='right'
