@@ -43,5 +43,38 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.Repositories
                 Name = entity.Name
             };
         }
+
+        public async Task<CostingConfig> GetCostingConfigAsync(Guid costingConfigGuid, CancellationToken cancellationToken)
+        {
+            await using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
+            return await dbContext.CostingConfigs.Where(cc => cc.CostingConfigGuid == costingConfigGuid).FirstOrDefaultAsync(cancellationToken); 
+        }
+
+        public async Task<IList<Measure>> GetMeasuresAsync(IList<Guid> dataTableGuids, CancellationToken cancellationToken)
+        {
+            await using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
+            var measures = await dbContext.Measures.Where(m => dataTableGuids.Contains(m.DataTableGuid) && m.MeasureGuid != Guid.Empty).ToListAsync(cancellationToken);
+            return measures;
+        }
+        public async Task<IList<DataTable>> GetDataTablesAsync(IList<string> globalIDs, CancellationToken cancellationToken)
+        {
+            await using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
+            var dataTables = await dbContext.DataTables.Where(dt => globalIDs.Contains(dt.GlobalID) && dt.GlobalID != "").ToListAsync(cancellationToken);
+            return dataTables;
+        }
+        public async Task<IList<RuleEngineIncludedMeasure>> GetRuleEngineIncludedMeasuresAsync(CancellationToken cancellationToken)
+        {
+            await using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
+            var measures = await dbContext.RuleEngineIncludedMeasures.ToListAsync(cancellationToken);
+            return measures;
+        }
+
+        public async Task<IList<RuleSet>> GetRuleSetssAsync(CancellationToken cancellationToken)
+        {
+            await using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
+            var ruleSets = await dbContext.RuleSets.ToListAsync(cancellationToken);
+            return ruleSets;
+        }
+
     }
 }
