@@ -10,6 +10,7 @@ import DropDown from '@strata/tempo/lib/dropdown';
 import Modal from '@strata/tempo/lib/modal';
 import Banner from '@strata/tempo/lib/banner';
 import ButtonMenu from '@strata/tempo/lib/buttonmenu';
+import RouteConfirm from '@strata/tempo/lib/routeconfirm';
 import Text from '@strata/tempo/lib/text';
 import { usePageLoader } from '@strata/tempo/lib/pageloader';
 import { ICellEditorArgs } from '@strata/tempo/lib/datacolumn';
@@ -55,23 +56,25 @@ const StatisticDrivers: React.FC = () => {
   }, []);
 
   const handleCancel = () => {
-    Modal.confirm({
-      title: 'Discard unsaved changes?',
-      content: 'Changes will be discarded.',
-      okText: 'Discard',
-      cancelText: 'Keep Changes',
-      onOk() {
-        if (tempStatDrivers) {
-          setUpdatedDriverGuids([]);
-          setDeletedDriverGuids([]);
-          const tempStats = cloneDeep(statDrivers);
-          setTempStatDrivers(tempStats);
+    if (updatedDriverGuids.length > 0 || deletedDriverGuids.length > 0) {
+      Modal.confirm({
+        title: 'Discard unsaved changes?',
+        content: 'Changes will be discarded.',
+        okText: 'Discard Changes',
+        cancelText: 'Keep Changes',
+        onOk() {
+          if (tempStatDrivers) {
+            setUpdatedDriverGuids([]);
+            setDeletedDriverGuids([]);
+            const tempStats = cloneDeep(statDrivers);
+            setTempStatDrivers(tempStats);
+          }
+          Toast.show({
+            message: 'Changes discarded'
+          });
         }
-        Toast.show({
-          message: 'Changes discarded'
-        });
-      }
-    });
+      });
+    }
   };
 
   const handleAdd = () => {
@@ -452,6 +455,7 @@ const StatisticDrivers: React.FC = () => {
         statDrivers={statDrivers}
         visible={patientDriverTreeModalVisible}
       ></PatientDriverTreeModal>
+      <RouteConfirm showPrompt={updatedDriverGuids.length > 0 || deletedDriverGuids.length > 0} title={'Discard unsaved changes?'} okText={'Discard Changes'} cancelText={'Keep Changes'} />
     </>
   );
 };
