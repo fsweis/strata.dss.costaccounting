@@ -21,6 +21,7 @@ import { getNewGuid } from '../shared/Utils';
 import cloneDeep from 'lodash/cloneDeep';
 import { IDataSource } from '../shared/data/IDataSource';
 import PatientDriverTreeModal from './PatientDriverTreeModal';
+import useStatDriverRulesEditWindow from './data/useStatDriverRulesEditWindow';
 
 const StatisticDrivers: React.FC = () => {
   const [statDrivers, setStatDrivers] = useState<IStatisticDriver[]>([]);
@@ -95,16 +96,10 @@ const StatisticDrivers: React.FC = () => {
     }
   };
 
-  const handleEditRules = function (driverConfigGuid: string) {
-    //TODO with rules engine bli
-    /*
-    const url = 'https://dev.sdt.local/StrataJazz202123/DSS/HealthPlan/Statistics/HealthPlanRulesEditWindow.aspx?hpAdminStatisticDriverGuid=' + driverConfigGuid;
-    const winid = driverConfigGuid;
-    const options = 'scrollbars=0,toolbar=0,location=0,statusbar=0,menubar=0, resizable=1,width=1000,height=700,left=50,top=50';
-    const win = window.open(url, winid, options);
-    win?.focus();
-    return win;
-    */
+  const openStatDriverRulesEditWindow = useStatDriverRulesEditWindow();
+
+  const handleRulesClick = function (costingConfigGuid: string, driverConfigGuid: string) {
+    openStatDriverRulesEditWindow(costingConfigGuid, driverConfigGuid);
   };
 
   const handleSave = async () => {
@@ -434,7 +429,12 @@ const StatisticDrivers: React.FC = () => {
             <>
               <Spacing vAlign='center'>
                 <Tooltip title={rowData.isNew ? 'Save driver to add rules' : ''}>
-                  <Button type='link' onClick={() => handleEditRules(rowData.driverConfigGuid)} disabled={rowData.isNew}>
+                  <Button
+                    type='link'
+                    /*hard coding configGuid until we can pull from route/Url*/
+                    onClick={() => handleRulesClick('2adafbaa-c365-472a-94f1-79b823d8547a', rowData.driverConfigGuid)}
+                    disabled={rowData.isNew}
+                  >
                     {rowData.hasRules ? 'Edit Rules' : 'Add Rules'}
                   </Button>
                 </Tooltip>
