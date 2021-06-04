@@ -23,6 +23,7 @@ namespace Microsoft.Extensions.DependencyInjection
         public static IServiceCollection AddCostAccountingServices(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddScoped<ICostAccountingRepository, CostAccountingRepository>();
+            services.AddScoped<ICostingConfigRepository, CostingConfigRepository>();
             services.AddScoped<IStatisticDriversRepository, StatisticDriversRepository>();
             services.AddScoped<IStatisticDriversService, StatisticDriversService>();
             services.AddScoped<IDataSourceService, DataSourceService>();

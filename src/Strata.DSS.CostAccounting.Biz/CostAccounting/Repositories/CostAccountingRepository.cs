@@ -43,13 +43,7 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.Repositories
                 Name = entity.Name
             };
         }
-
-        public async Task<CostingConfig> GetCostingConfigAsync(Guid costingConfigGuid, CancellationToken cancellationToken)
-        {
-            await using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
-            return await dbContext.CostingConfigs.Where(cc => cc.CostingConfigGuid == costingConfigGuid).FirstOrDefaultAsync(cancellationToken); 
-        }
-
+       
         public async Task<IList<Measure>> GetMeasuresAsync(IList<Guid> dataTableGuids, CancellationToken cancellationToken)
         {
             await using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);

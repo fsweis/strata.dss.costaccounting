@@ -24,7 +24,7 @@ namespace Strata.DSS.CostAccounting.Biz.StatisticDrivers.Services
             _costaccountingRepository = costaccountingRepository;
             _statisticDriversRepository = statisticDriversRepository;
         }
-        public async Task<IList<StatisticDriver>> LoadStatisticDrivers(CostingConfig costingConfig)
+        public async Task<IList<StatisticDriver>> LoadStatisticDrivers(CostingConfigModel costingConfig)
         {
             var driverConfigs = await _statisticDriversRepository.GetDriverConfigsAsync(costingConfig.Type, default);
             var ruleSets = await _costaccountingRepository.GetRuleSetssAsync(default);

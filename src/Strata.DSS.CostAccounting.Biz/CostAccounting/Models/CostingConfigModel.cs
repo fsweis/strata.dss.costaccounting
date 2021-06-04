@@ -1,11 +1,9 @@
 ﻿using Strata.DSS.CostAccounting.Biz.Enums;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Strata.DSS.CostAccounting.Biz.CostAccounting.Models
 {
-    public class CostingConfig
+    public class CostingConfigModel
     {
         public Guid CostingConfigGuid { get; set; }
         public string Name { get; set; }
