@@ -3,13 +3,24 @@
     "Strata.DSS.CostAccounting.Api": {
       "commandName": "Project",
       "launchBrowser": true,
-      "launchUrl": "",
-      "applicationUrl": "https://localhost:8443",
       "environmentVariables": {
         "Hangfire__RunLocally": "true",
-        "ASPNETCORE_ENVIRONMENT": "Development",
-        "AWS_Profile": "809820578507_SDT-Dev-Developers"
-      }
+        "AWS_Profile": "809820578507_SDT-Dev-Developers",
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://localhost:8443"
+    },
+    "WSL 2": {
+      "commandName": "WSL2",
+      "launchBrowser": true,
+      "launchUrl": "https://localhost:8443/",
+      "environmentVariables": {
+        "Hangfire__RunLocally": "true",
+        "ASPNETCORE_URLS": "https://localhost:8443",
+        "AWS_Profile": "809820578507_SDT-Dev-Developers",
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "distributionName": ""
     }
   }
 }
