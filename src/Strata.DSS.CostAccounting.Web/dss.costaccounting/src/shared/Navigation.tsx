@@ -59,7 +59,7 @@ const Navigation: React.FC = () => {
                   Variability
                 </Menu.Item>
                 <Menu.Item key='/statistic-drivers' href='/statistic-drivers'>
-                  Statistics Drivers
+                  Statistic Drivers
                 </Menu.Item>
               </Menu.ItemGroup>
               <Menu.ItemGroup title='ALIGN'>
