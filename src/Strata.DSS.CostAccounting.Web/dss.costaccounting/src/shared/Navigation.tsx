@@ -4,7 +4,7 @@ import Header from '@strata/tempo/lib/header';
 import Layout from '@strata/tempo/lib/layout';
 import Menu from '@strata/tempo/lib/menu';
 import { Switch, Route } from 'react-router-dom';
-import StatisticDrivers from '../statisticdrivers/StatisticDrivers';
+import StatisticDrivers from '../statistic-driver/StatisticDrivers';
 import { Navbar } from '@strata/navbar/lib';
 
 const Navigation: React.FC = () => {
