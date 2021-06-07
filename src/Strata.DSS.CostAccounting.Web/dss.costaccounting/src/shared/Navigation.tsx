@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import Header from '@strata/tempo/lib/header';
 import Layout from '@strata/tempo/lib/layout';
@@ -17,7 +17,9 @@ import ActivityCodeDesigner from '../activity-code-designer/ActivityCodeDesigner
 import ChargeAllocation from '../charge-allocation/ChargeAllocation';
 import DropdownConfiguration from '../drop-down-configuration/DropdownConfiguration';
 import ManualStatistics from '../manual-statistics/ManualStatistics';
+import ModelModal from './ModelModal';
 import { Navbar } from '@strata/navbar/lib';
+import Button from '@strata/tempo/lib/button';
 
 const Navigation: React.FC = () => {
   const location = useLocation();
@@ -30,6 +32,8 @@ const Navigation: React.FC = () => {
     return [location.pathname];
   };
 
+  const [modelModalVisible, setModelModalVisibleVisible] = useState<boolean>(false);
+
   return (
     <>
       <Layout>
@@ -39,6 +43,14 @@ const Navigation: React.FC = () => {
         <Layout>
           <Layout.Sider collapsible>
             <Header title='Cost Accounting' />
+            <Button
+              icon='Plus'
+              onClick={() => {
+                setModelModalVisibleVisible(true);
+              }}
+            >
+              Add Model
+            </Button>
             <Menu selectedKeys={getActiveUrlKey()}>
               <Menu.ItemGroup title=''>
                 <Menu.Item key='/overview' href='/overview'>
@@ -110,6 +122,15 @@ const Navigation: React.FC = () => {
           </Layout.Content>
         </Layout>
       </Layout>
+      <ModelModal
+        visible={modelModalVisible}
+        onCancel={() => {
+          setModelModalVisibleVisible(false);
+        }}
+        onSave={() => {
+          setModelModalVisibleVisible(false);
+        }}
+      ></ModelModal>
     </>
   );
 };

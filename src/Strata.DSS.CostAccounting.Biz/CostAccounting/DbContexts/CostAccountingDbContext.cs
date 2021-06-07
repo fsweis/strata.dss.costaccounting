@@ -20,6 +20,8 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.DbContexts
         public virtual DbSet<Measure> Measures { get; set; }
         public virtual DbSet<DataTable> DataTables { get; set; }
         public virtual DbSet<RuleSet> RuleSets { get; set; }
+        public virtual DbSet<FiscalMonth> FiscalMonths { get; set; }
+        public virtual DbSet<FiscalYear> FiscalYears { get; set; }
         public virtual DbSet<CostingConfigEntity> CostingConfigs { get; set; }
         public virtual DbSet<RuleEngineIncludedMeasure> RuleEngineIncludedMeasures { get; set; }
 
@@ -50,6 +52,16 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.DbContexts
             {
                 entity.HasKey(e => e.RuleSetGuid);
                 entity.ToTable("RuleSet", "dbo");
+            });
+            modelBuilder.Entity<FiscalMonth>(entity =>
+            {
+                entity.HasKey(e => e.FiscalMonthID);
+                entity.ToTable("DimFiscalMonth", "fw");
+            });
+            modelBuilder.Entity<FiscalYear>(entity =>
+            {
+                entity.HasKey(e => e.FiscalYearID);
+                entity.ToTable("DimFiscalYear", "fw");
             });
 
             modelBuilder.Entity<CostingConfigEntity>(entity =>

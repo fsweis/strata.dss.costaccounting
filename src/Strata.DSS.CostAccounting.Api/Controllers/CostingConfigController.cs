@@ -46,5 +46,25 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
         {            
             return Ok();
         }
+
+        [HttpGet("fiscal-month")]
+        [ProducesResponseType(200)]
+        public async Task<ActionResult<IEnumerable<FiscalMonth>>> GetFiscalMonths(CancellationToken cancellationToken)
+        {
+            var fiscalMonths = _costingConfigRepository.GetFiscalMonthsAsync(cancellationToken);
+            return Ok(fiscalMonths);
+
+        }
+
+
+        [HttpGet("fiscal-year")]
+        [ProducesResponseType(200)]
+        public async Task<ActionResult<IEnumerable<FiscalYear>>> GetFiscalYears(CancellationToken cancellationToken)
+        {
+            var fiscalYears = _costingConfigRepository.GetFiscalYearsAsync(cancellationToken);
+            return Ok(fiscalYears);
+
+        }
+
     }
 }
