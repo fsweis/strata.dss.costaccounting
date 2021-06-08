@@ -21,6 +21,7 @@ import ManualStatistics from '../manual-statistics/ManualStatistics';
 import { costConfigService } from './data/costConfigService';
 import { ICostConfig } from './data/ICostConfig';
 import { Navbar } from '@strata/navbar/lib';
+import Icon from '@strata/tempo/lib/icon/Icon';
 
 const Navigation: React.FC = () => {
   const [costConfigs, setCostConfigs] = useState<ICostConfig[]>([]);
@@ -53,10 +54,13 @@ const Navigation: React.FC = () => {
     fetchData();
   }, []);
 
-  const handleClick = (e: { key: React.Key; keyPath: React.Key[]; item: React.ReactInstance; domEvent: React.MouseEvent<HTMLElement> }) => {
-    const selectedConfigGuid = e.key;
-    const costConfigItem = costConfigs.find((config) => config.costingConfigGuid === selectedConfigGuid);
-    if (costConfigItem) setSelectedCostConfigItem(costConfigItem);
+  const handleClick = (key: React.Key) => {
+    if (key === '1') alert('All Models Page');
+    else if (key === '2') alert('New Model Modal');
+    else {
+      const costConfigItem = costConfigs.find((config) => config.costingConfigGuid === key);
+      if (costConfigItem) setSelectedCostConfigItem(costConfigItem);
+    }
   };
 
   return (
@@ -70,10 +74,17 @@ const Navigation: React.FC = () => {
             <Menu selectedKeys={getActiveUrlKey()}>
               <Menu.ItemGroup title=''>
                 <Menu.Item key=''>
-                  <ButtonMenu buttonText={selectedConfgItem?.name} type='title' selectedKeys={[selectedConfgItem?.costingConfigGuid]} onClick={handleClick}>
+                  <ButtonMenu buttonText={selectedConfgItem?.name} type='title' selectedKeys={[selectedConfgItem?.costingConfigGuid]} onClick={(e) => handleClick(e.key)}>
                     {costConfigs.map((item) => (
                       <ButtonMenu.Item key={item.costingConfigGuid}>{item.name}</ButtonMenu.Item>
                     ))}
+                    <ButtonMenu.Divider />
+                    <ButtonMenu.Item key='1'>All Models</ButtonMenu.Item>
+                    <ButtonMenu.Divider />
+                    <ButtonMenu.Item key='2'>
+                      <Icon name='Plus' />
+                      New Model
+                    </ButtonMenu.Item>
                   </ButtonMenu>
                 </Menu.Item>
               </Menu.ItemGroup>
