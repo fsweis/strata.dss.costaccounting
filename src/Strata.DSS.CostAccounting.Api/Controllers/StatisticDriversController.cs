@@ -91,7 +91,7 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
 
         [HttpPost("")]
         [ProducesResponseType(200)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<List<StatisticDriver>>> SaveStatisticDrivers([FromBody] StatisticDriverSaveData statisticDriverSaveData, CancellationToken cancellationToken)
         {
             if (_statisticDriversService.ValidateStatisticDrivers(statisticDriverSaveData.UpdatedStatDrivers))
@@ -103,7 +103,7 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
             }
             else
             {
-                return StatusCode(StatusCodes.Status500InternalServerError);
+                return StatusCode(StatusCodes.Status400BadRequest);
             }
 
             if (statisticDriverSaveData.DeletedStatDrivers.Count > 0)
