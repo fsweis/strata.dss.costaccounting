@@ -109,9 +109,11 @@ const StatisticDrivers: React.FC = () => {
       const guids = updatedDriverGuids.filter((guid) => !deletedDriverGuids.includes(guid));
       const updatedStatDrivers = tempStatDrivers.filter((d) => guids.includes(d.driverConfigGuid) || d.driverConfigGuid === getEmptyGuid());
 
+      //hook up configGUid from route once we have it
       const statDriverSaveData: IStatisticDriverSaveData = {
         updatedStatDrivers: updatedStatDrivers,
-        deletedStatDrivers: deletedDriverGuids
+        deletedStatDrivers: deletedDriverGuids,
+        costingConfigGuid: '2adafbaa-c365-472a-94f1-79b823d8547a'
       };
 
       // Don't actually save if there are no changes
