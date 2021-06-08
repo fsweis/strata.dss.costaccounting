@@ -140,7 +140,7 @@ const StatisticDrivers: React.FC = () => {
         // TODO: Get exact language here
         Modal.alert({
           title: 'Changes not saved',
-          content: 'Something went wrong when attempting to save changes',
+          content: 'Try again later. If the problem persists, contact your system administrator.',
           alertType: 'error'
         });
       } finally {
