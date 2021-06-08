@@ -2,19 +2,15 @@
 using Strata.DSS.CostAccounting.Biz.CostAccounting.Models;
 using Strata.DSS.CostAccounting.Biz.CostAccounting.Repositories;
 using Strata.DSS.CostAccounting.Biz.Enums;
-using Strata.DSS.CostAccounting.Biz.StatisticDrivers.Constants;
 using Strata.DSS.CostAccounting.Biz.StatisticDrivers.Models;
 using Strata.DSS.CostAccounting.Biz.StatisticDrivers.Repositories;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace Strata.DSS.CostAccounting.Biz.StatisticDrivers.Services
 {
-    public class StatisticDriversService: IStatisticDriversService
+    public class StatisticDriversService : IStatisticDriversService
     {
         private readonly ICostAccountingRepository _costaccountingRepository;
         private readonly IStatisticDriversRepository _statisticDriversRepository;
@@ -40,7 +36,7 @@ namespace Strata.DSS.CostAccounting.Biz.StatisticDrivers.Services
                     isUsed = true;
                 }
                 var hasRules = false;
-                if(ruleSets.Any(x=> x.Category.ToLower() == driverConfigTemp.DriverConfigGuid.ToString().ToLower()))
+                if (ruleSets.Any(x => x.Category.ToLower() == driverConfigTemp.DriverConfigGuid.ToString().ToLower()))
                 {
                     hasRules = true;
                 }
