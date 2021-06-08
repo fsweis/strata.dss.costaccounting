@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import Header from '@strata/tempo/lib/header';
 import Layout from '@strata/tempo/lib/layout';
 import Menu from '@strata/tempo/lib/menu';
+import ButtonMenu from '@strata/tempo/lib/buttonmenu';
+import {} from '@strata/tempo/lib/buttonmenu';
 import { Switch, Route } from 'react-router-dom';
 import StatisticDrivers from '../statisticdrivers/StatisticDrivers';
 import Overview from '../overview/Overview';
@@ -17,9 +18,23 @@ import ActivityCodeDesigner from '../activity-code-designer/ActivityCodeDesigner
 import ChargeAllocation from '../charge-allocation/ChargeAllocation';
 import DropdownConfiguration from '../drop-down-configuration/DropdownConfiguration';
 import ManualStatistics from '../manual-statistics/ManualStatistics';
+import { costConfigService } from './data/costConfigService';
+import { ICostConfig } from './data/ICostConfig';
 import { Navbar } from '@strata/navbar/lib';
 
 const Navigation: React.FC = () => {
+  const [costConfigs, setCostConfigs] = useState<ICostConfig[]>([]);
+  const [selectedConfgItem, setSelectedCostConfigItem] = useState<ICostConfig>({
+    name: 'PlaceHolder',
+    costingConfigGuid: '000',
+    isGLCosting: false,
+    defaultChargeAllocationMethod: 0,
+    fiscalYearID: 2021,
+    type: 0,
+    createdAt: new Date(),
+    modifiedAtUtc: new Date()
+  });
+
   const location = useLocation();
 
   const getActiveUrlKey = () => {
@@ -30,6 +45,20 @@ const Navigation: React.FC = () => {
     return [location.pathname];
   };
 
+  useEffect(() => {
+    const fetchData = async () => {
+      const [costingConfigurations] = await Promise.all([costConfigService.getCostConfig()]);
+      setCostConfigs(costingConfigurations);
+    };
+    fetchData();
+  }, []);
+
+  const handleClick = (e: { key: React.Key; keyPath: React.Key[]; item: React.ReactInstance; domEvent: React.MouseEvent<HTMLElement> }) => {
+    const selectedConfigGuid = e.key;
+    const costConfigItem = costConfigs.find((config) => config.costingConfigGuid === selectedConfigGuid);
+    if (costConfigItem) setSelectedCostConfigItem(costConfigItem);
+  };
+
   return (
     <>
       <Layout>
@@ -38,8 +67,16 @@ const Navigation: React.FC = () => {
         </Layout.Nav>
         <Layout>
           <Layout.Sider collapsible>
-            <Header title='Cost Accounting' />
             <Menu selectedKeys={getActiveUrlKey()}>
+              <Menu.ItemGroup title=''>
+                <Menu.Item key=''>
+                  <ButtonMenu buttonText={selectedConfgItem?.name} type='title' selectedKeys={[selectedConfgItem?.costingConfigGuid]} onClick={handleClick}>
+                    {costConfigs.map((item) => (
+                      <ButtonMenu.Item key={item.costingConfigGuid}>{item.name}</ButtonMenu.Item>
+                    ))}
+                  </ButtonMenu>
+                </Menu.Item>
+              </Menu.ItemGroup>
               <Menu.ItemGroup title=''>
                 <Menu.Item key='/overview' href='/overview'>
                   Overview
