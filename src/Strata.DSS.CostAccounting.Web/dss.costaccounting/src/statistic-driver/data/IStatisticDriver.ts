@@ -3,7 +3,6 @@ export interface IStatisticDriver {
   dataTableGuid: string;
   hasRules: boolean;
   isInverted: boolean;
-  isNew: boolean;
   isUsed: boolean;
   measureGuid: string;
   name: string;
