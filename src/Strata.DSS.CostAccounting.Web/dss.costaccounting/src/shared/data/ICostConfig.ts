@@ -8,6 +8,6 @@ export interface ICostConfig {
   type: number;
   createdAt: Date;
   modifiedAtUtc: Date;
-  lastPublishedRun: Date;
+  lastPublishedUtc: Date;
   isEditable: boolean;
 }

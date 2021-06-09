@@ -10,7 +10,6 @@ import ActionBar from '@strata/tempo/lib/actionbar';
 import DataGrid, { IGlobalFilterValue } from '@strata/tempo/lib/datagrid/DataGrid';
 
 export interface ICostModelsModalProps {
-  costModels: ICostConfig[];
   visible: boolean;
   onCancel: () => void;
 }
@@ -33,17 +32,18 @@ const CostModelsModal: React.FC<ICostModelsModalProps> = (props: ICostModelsModa
     props.onCancel();
   };
 
-  const handleChangeConfigs = (driverConfigGuid: string) => {
+  const handleChangeConfigs = (costingConfigGuid: string) => {
+    //TODO
     //Switch Configs
   };
 
-  const handleCopy = (driverConfigGuidToCopy: string) => {
-    console.log('handle copy');
-    //use Feras's modal
+  const handleCopy = (costingConfigGuid: string) => {
+    //TODO
+    //Open new modal
   };
 
-  const handleDelete = (driverConfigGuidToDelete: string) => {
-    console.log('handle delete');
+  const handleDelete = (costingConfigGuid: string) => {
+    costConfigService.deleteCostConfig(costingConfigGuid);
   };
 
   const getConfigType = (type: number) => {
