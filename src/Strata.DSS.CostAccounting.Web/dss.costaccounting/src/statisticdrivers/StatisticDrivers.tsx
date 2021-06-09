@@ -47,6 +47,7 @@ const StatisticDrivers: React.FC = () => {
         setDataSourceLinks(dataSourceLinks);
         setStatDrivers(statisticDrivers);
         setTempStatDrivers(cloneDeep(statisticDrivers));
+        console.log(statisticDrivers);
       } finally {
         setGridLoading(false);
       }

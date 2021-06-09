@@ -17,6 +17,8 @@ import { IFiscalMonth } from './data/IFiscalMonth';
 import { IEntity } from './data/IEntity';
 import { costConfigService } from './data/CostConfigService';
 import { RadioChangeEvent } from 'antd/lib/radio/interface';
+import { ICostingType } from './data/ICostingType';
+import { ICostingMethod } from './data/ICostingMethod';
 
 export interface IModelModalProps {
   visible: boolean;
@@ -34,20 +36,26 @@ const ModelModal: React.FC<IModelModalProps> = (props: IModelModalProps) => {
   const [modalLoading, setModalLoading] = useState<boolean>(false);
   const [costingType, setCostingType] = useState<number>(0);
   const [entityUtilType, setEntityUtilType] = useState<number>(0);
+  const [costingTypes, setCostingTypes] = useState<ICostingType[]>([]);
+  const [costingMethods, setCostingMethods] = useState<ICostingMethod[]>([]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [fiscalMonths, fiscalYears, entities, filteredEntities] = await Promise.all([
+        const [fiscalMonths, fiscalYears, entities, filteredEntities, costingTypes, costingMethods] = await Promise.all([
           costConfigService.getFiscalMonths(),
           costConfigService.getFiscalYears(),
           costConfigService.getEntities(),
-          costConfigService.getFilteredEntities()
+          costConfigService.getFilteredEntities(),
+          costConfigService.getCostingTypes(),
+          costConfigService.getCostingMethods()
         ]);
         setFiscalMonths(fiscalMonths);
         setFiscalYears(fiscalYears);
         setEntities(entities);
         setFilteredEntities(filteredEntities);
+        setCostingTypes(costingTypes);
+        setCostingMethods(costingMethods);
       } finally {
         setModalLoading(false);
       }
@@ -59,9 +67,6 @@ const ModelModal: React.FC<IModelModalProps> = (props: IModelModalProps) => {
   const onFormFinish = async (vals: { [name: string]: any }) => {
     console.log(vals);
     //const values = vals as ICostingConfig;
-    // setLoading(true);
-    // setIsVisible(false);
-    // setShowForm(false);
     form.resetFields();
   };
 
@@ -118,10 +123,9 @@ const ModelModal: React.FC<IModelModalProps> = (props: IModelModalProps) => {
               <RadioGroup
                 defaultValue={0}
                 onChange={handleCostingTypeChange}
-                options={[
-                  { value: 0, label: 'Patient Care' },
-                  { value: 1, label: 'Claims' }
-                ]}
+                options={costingTypes.map((costingType, index) => {
+                  return { value: index, label: costingType.friendlyName };
+                })}
               />
             </Form.Item>
             <Form.Item label='GL/Payroll Entities' name='entities' rules={[{ required: true }]}>
@@ -150,10 +154,9 @@ const ModelModal: React.FC<IModelModalProps> = (props: IModelModalProps) => {
               <Form.Item label='Method' name='method' rules={[{ required: true }]}>
                 <RadioGroup
                   defaultValue={0}
-                  options={[
-                    { value: 0, label: 'Simultaneous' },
-                    { value: 1, label: 'One Level Step Down' }
-                  ]}
+                  options={costingMethods.map((costingMethod, index) => {
+                    return { value: index, label: costingMethod.friendlyName };
+                  })}
                 />
               </Form.Item>
               <Form.Item label='Options' name='options' rules={[{ required: false }]}>
