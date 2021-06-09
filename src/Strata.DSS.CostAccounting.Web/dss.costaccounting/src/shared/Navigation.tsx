@@ -5,7 +5,7 @@ import Menu from '@strata/tempo/lib/menu';
 import ButtonMenu from '@strata/tempo/lib/buttonmenu';
 import {} from '@strata/tempo/lib/buttonmenu';
 import { Switch, Route } from 'react-router-dom';
-import StatisticDrivers from '../statisticdrivers/StatisticDrivers';
+import StatisticDrivers from '../statistic-driver/StatisticDrivers';
 import Overview from '../overview/Overview';
 import CostAudit from '../cost-audit/CostAudit';
 import DepartmentCategorization from '../department-categorization/DepartmentCategorization';
