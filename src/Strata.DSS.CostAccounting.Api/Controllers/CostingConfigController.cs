@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Strata.DSS.CostAccounting.Biz.CostAccounting.Models;
 using Strata.DSS.CostAccounting.Biz.CostAccounting.Repositories;
+using Strata.DSS.CostAccounting.Biz.CostAccounting.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,10 +18,11 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
     public class CostingConfigController : ControllerBase
     {
         private readonly ICostingConfigRepository _costingConfigRepository;
-
-        public CostingConfigController(ICostingConfigRepository costingConfigRepository)
+        private readonly IEntityService _entityService;
+        public CostingConfigController(ICostingConfigRepository costingConfigRepository, IEntityService entityService)
         {
             _costingConfigRepository = costingConfigRepository;
+            _entityService = entityService;
         }
 
         [HttpGet("")]
@@ -51,7 +53,8 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
         [ProducesResponseType(200)]
         public async Task<ActionResult<IEnumerable<FiscalMonth>>> GetFiscalMonths(CancellationToken cancellationToken)
         {
-            var fiscalMonths = _costingConfigRepository.GetFiscalMonthsAsync(cancellationToken);
+            var fiscalMonths = await _costingConfigRepository.GetFiscalMonthsAsync(cancellationToken);
+            fiscalMonths = fiscalMonths.Where(x => x.FiscalMonthID != 0).OrderBy(x => x.SortOrder);
             return Ok(fiscalMonths);
 
         }
@@ -61,9 +64,28 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
         [ProducesResponseType(200)]
         public async Task<ActionResult<IEnumerable<FiscalYear>>> GetFiscalYears(CancellationToken cancellationToken)
         {
-            var fiscalYears = _costingConfigRepository.GetFiscalYearsAsync(cancellationToken);
+            var fiscalYears = await _costingConfigRepository.GetFiscalYearsAsync(cancellationToken);
+            fiscalYears = fiscalYears.Where(x => x.FiscalYearID != 0).OrderBy(x => x.Name);
             return Ok(fiscalYears);
 
+        }
+
+        [HttpGet("entity")]
+        [ProducesResponseType(200)]
+        public async Task<ActionResult<IEnumerable<Entity>>> GetEntities(CancellationToken cancellationToken)
+        {
+            var entities = await _entityService.GetEntities();
+            return Ok(entities);
+        }
+        [HttpGet("filtered-entity")]
+        [ProducesResponseType(200)]
+        public async Task<ActionResult<IEnumerable<Entity>>> GetFilteredEntities(CancellationToken cancellationToken)
+        {
+            //get system setting for costing entity security
+            var systemSettings = await _costingConfigRepository.GetSystemSettingsAsync(cancellationToken);
+            var isCostingEntityLevelSecurityEnabled = systemSettings.Any(x => x.IsCostingEntityLevelSecurityEnabled());
+            var entities = await _entityService.GetFilteredEntities(null, isCostingEntityLevelSecurityEnabled);
+            return Ok(entities);
         }
 
     }

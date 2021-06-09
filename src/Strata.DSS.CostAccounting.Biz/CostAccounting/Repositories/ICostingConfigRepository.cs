@@ -13,5 +13,8 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.Repositories
 
         public Task<IEnumerable<FiscalMonth>> GetFiscalMonthsAsync( CancellationToken cancellationToken);
         public Task<IEnumerable<FiscalYear>> GetFiscalYearsAsync(CancellationToken cancellationToken);
+        public Task<IEnumerable<Entity>> GetEntitiesAsync(CancellationToken cancellationToken);
+        public Task<IEnumerable<SystemSetting>> GetSystemSettingsAsync(CancellationToken cancellationToken);
+        public Task<IEnumerable<CostingConfigEntityLevelSecurity>> GetCCELSAsync(CancellationToken cancellationToken);
     }
 }

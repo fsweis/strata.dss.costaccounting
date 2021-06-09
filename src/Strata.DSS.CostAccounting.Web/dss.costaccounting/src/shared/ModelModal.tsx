@@ -14,7 +14,9 @@ import Text from '@strata/tempo/lib/text';
 import { usePageLoader } from '@strata/tempo/lib/pageloader';
 import { IFiscalYear } from './data/IFiscalYear';
 import { IFiscalMonth } from './data/IFiscalMonth';
+import { IEntity } from './data/IEntity';
 import { costConfigService } from './data/CostConfigService';
+import { RadioChangeEvent } from 'antd/lib/radio/interface';
 
 export interface IModelModalProps {
   visible: boolean;
@@ -26,19 +28,31 @@ const ModelModal: React.FC<IModelModalProps> = (props: IModelModalProps) => {
   const [form] = Form.useForm();
   const [fiscalYears, setFiscalYears] = useState<IFiscalYear[]>([]);
   const [fiscalMonths, setFiscalMonths] = useState<IFiscalMonth[]>([]);
+  const [entities, setEntities] = useState<IEntity[]>([]);
+  const [filteredEntities, setFilteredEntities] = useState<IEntity[]>([]);
   const { setLoading } = usePageLoader();
+  const [modalLoading, setModalLoading] = useState<boolean>(false);
+  const [costingType, setCostingType] = useState<number>(0);
+  const [entityUtilType, setEntityUtilType] = useState<number>(0);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        ///  const [fiscalMonths, fiscalYears] = await Promise.all([costConfigService.getFiscalMonths(), costConfigService.getFiscalYears()]);
-        //  setFiscalMonths(fiscalMonths);
-        //   setFiscalYears(fiscalYears);
+        const [fiscalMonths, fiscalYears, entities, filteredEntities] = await Promise.all([
+          costConfigService.getFiscalMonths(),
+          costConfigService.getFiscalYears(),
+          costConfigService.getEntities(),
+          costConfigService.getFilteredEntities()
+        ]);
+        setFiscalMonths(fiscalMonths);
+        setFiscalYears(fiscalYears);
+        setEntities(entities);
+        setFilteredEntities(filteredEntities);
       } finally {
-        // setGridLoading(false);
+        setModalLoading(false);
       }
     };
-    //  setGridLoading(true);
+    setModalLoading(true);
     fetchData();
   }, []);
 
@@ -57,6 +71,13 @@ const ModelModal: React.FC<IModelModalProps> = (props: IModelModalProps) => {
 
   const handleSave = () => {
     props.onSave();
+  };
+
+  const handleEntityTypeChange = (e: RadioChangeEvent) => {
+    setEntityUtilType(e.target.value);
+  };
+  const handleCostingTypeChange = (e: RadioChangeEvent) => {
+    setCostingType(e.target.value);
   };
 
   return (
@@ -86,66 +107,65 @@ const ModelModal: React.FC<IModelModalProps> = (props: IModelModalProps) => {
           </Form.Item>
           <Spacing itemSpacing={16}>
             <Form.Item label='Year' name='year' rules={[{ required: true }]}>
-              <DropDown itemValueField='fiscalYearID' itemTextField='name' items={fiscalYears} />
+              <DropDown itemValueField='fiscalYearID' itemTextField='name' items={fiscalYears} defaultValue={fiscalYears.find((x) => x.fiscalYearID === new Date().getFullYear())?.fiscalYearID} />
             </Form.Item>
             <Form.Item label='YTD Month' name='ytdMonth' rules={[{ required: true }]}>
-              <DropDown itemValueField='fiscalMonthID' itemTextField='name' items={fiscalMonths} />
+              <DropDown itemValueField='fiscalMonthID' itemTextField='name' items={fiscalMonths} defaultValue={fiscalMonths.find((x) => x.sortOrder === 12)?.fiscalMonthID} />
             </Form.Item>
           </Spacing>
           <Spacing itemSpacing={16}>
             <Form.Item label='Type' name='type' rules={[{ required: true }]}>
               <RadioGroup
+                defaultValue={0}
+                onChange={handleCostingTypeChange}
                 options={[
-                  { value: '1', label: 'Patient Care' },
-                  { value: '2', label: 'Claims' }
+                  { value: 0, label: 'Patient Care' },
+                  { value: 1, label: 'Claims' }
                 ]}
               />
             </Form.Item>
             <Form.Item label='GL/Payroll Entities' name='entities' rules={[{ required: true }]}>
-              <DropDown>
-                <DropDown.Item value='1'>Entity A</DropDown.Item>
-                <DropDown.Item value='2'>Entity B</DropDown.Item>
-                <DropDown.Item value='3'>Entity C</DropDown.Item>
-                <DropDown.Item value='4'>Entity D</DropDown.Item>
-              </DropDown>
+              <DropDown multiSelect itemValueField='entityID' itemTextField='description' items={filteredEntities} defaultValue={filteredEntities.find((x) => x.entityID === 0)?.entityID} />
             </Form.Item>
           </Spacing>
           <Spacing itemSpacing={16}>
             <Form.Item label='Utilization Entities' name='utilizationEntities' rules={[{ required: true }]}>
               <RadioGroup
+                defaultValue={0}
+                onChange={handleEntityTypeChange}
                 options={[
-                  { value: '1', label: 'Same as GL/Payroll' },
-                  { value: '2', label: 'Specify' }
+                  { value: 0, label: 'Same as GL/Payroll' },
+                  { value: 1, label: 'Specify' }
                 ]}
               />
             </Form.Item>
-            <Form.Item label='Specifiy Utilization Entities' name='specifyUtilizationEntities' rules={[{ required: true }]}>
-              <DropDown>
-                <DropDown.Item value='1'>Entity A</DropDown.Item>
-                <DropDown.Item value='2'>Entity B</DropDown.Item>
-                <DropDown.Item value='3'>Entity C</DropDown.Item>
-                <DropDown.Item value='4'>Entity D</DropDown.Item>
-              </DropDown>
-            </Form.Item>
+            {entityUtilType === 1 && (
+              <Form.Item label='Specifiy Utilization Entities' name='specifyUtilizationEntities' rules={[{ required: true }]}>
+                <DropDown multiSelect itemValueField='entityID' itemTextField='description' items={entities} defaultValue={filteredEntities.find((x) => x.entityID === 0)?.entityID} />
+              </Form.Item>
+            )}
           </Spacing>
-          <Spacing itemSpacing={16}>
-            <Form.Item label='Method' name='method' rules={[{ required: true }]}>
-              <RadioGroup
-                options={[
-                  { value: '1', label: 'Simultaneous' },
-                  { value: '2', label: 'One Level Step Down' }
-                ]}
-              />
-            </Form.Item>
-            <Form.Item label='Options' name='options' rules={[{ required: false }]}>
-              <CheckboxGroup
-                options={[
-                  { value: '1', label: 'Include Budget' },
-                  { value: '2', label: 'Include Payroll' }
-                ]}
-              />
-            </Form.Item>
-          </Spacing>
+          {costingType === 0 && (
+            <Spacing itemSpacing={16}>
+              <Form.Item label='Method' name='method' rules={[{ required: true }]}>
+                <RadioGroup
+                  defaultValue={0}
+                  options={[
+                    { value: 0, label: 'Simultaneous' },
+                    { value: 1, label: 'One Level Step Down' }
+                  ]}
+                />
+              </Form.Item>
+              <Form.Item label='Options' name='options' rules={[{ required: false }]}>
+                <CheckboxGroup
+                  options={[
+                    { value: '1', label: 'Include Budget' },
+                    { value: '2', label: 'Include Payroll' }
+                  ]}
+                />
+              </Form.Item>
+            </Spacing>
+          )}
         </Form>
       </Modal>
     </>

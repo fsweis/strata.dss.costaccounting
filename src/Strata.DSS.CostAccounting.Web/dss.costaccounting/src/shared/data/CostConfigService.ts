@@ -1,9 +1,10 @@
 import { appConfig, getSecureService } from '@strata/core/lib';
 import { ICostConfig } from './ICostConfig';
+import { IEntity } from './IEntity';
 import { IFiscalMonth } from './IFiscalMonth';
 import { IFiscalYear } from './IFiscalYear';
 
-const { httpGet, httpPost } = getSecureService(appConfig.apiUrl);
+const { httpGet } = getSecureService(appConfig.apiUrl);
 
 export const costConfigService = {
   getCostConfig: (): Promise<ICostConfig[]> => {
@@ -14,5 +15,11 @@ export const costConfigService = {
   },
   getFiscalYears: (): Promise<IFiscalYear[]> => {
     return httpGet<IFiscalYear[]>(`costing-configs/fiscal-year`);
+  },
+  getEntities: (): Promise<IEntity[]> => {
+    return httpGet<IEntity[]>(`costing-configs/entity`);
+  },
+  getFilteredEntities: (): Promise<IEntity[]> => {
+    return httpGet<IEntity[]>(`costing-configs/filtered-entity`);
   }
 };
