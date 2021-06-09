@@ -21,8 +21,8 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.DbContexts
         public virtual DbSet<DataTable> DataTables { get; set; }
         public virtual DbSet<RuleSet> RuleSets { get; set; }
         public virtual DbSet<CostingConfigEntity> CostingConfigs { get; set; }
+        public virtual DbSet<CostingResultEntity> CostingResults { get; set; }
         public virtual DbSet<RuleEngineIncludedMeasure> RuleEngineIncludedMeasures { get; set; }
-
         public virtual DbSet<DriverConfig> DriverConfigs { get; set; }
         public virtual DbSet<DriverConfigView> DriverConfigViews { get; set; }
 
@@ -56,6 +56,13 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.DbContexts
             {
                 entity.HasKey(e => e.CostingConfigGuid);
                 entity.ToTable("CostingConfig", "dss");
+            });
+
+            modelBuilder.Entity<CostingResultEntity>(entity =>
+            {
+                entity.HasKey(e => e.CostingResultID);
+                entity.ToTable("CostingResult", "dss");
+                entity.HasQueryFilter(e => EF.Property<bool>(e, "IsMarkedForDeletion") == false);
             });
 
             modelBuilder.Entity<RuleEngineIncludedMeasure>(entity =>

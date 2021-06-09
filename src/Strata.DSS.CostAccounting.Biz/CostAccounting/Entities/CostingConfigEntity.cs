@@ -1,5 +1,6 @@
 ﻿using Strata.DSS.CostAccounting.Biz.Enums;
 using System;
+using System.Collections.Generic;
 
 namespace Strata.DSS.CostAccounting.Biz.CostAccounting.Entities
 {
@@ -23,5 +24,6 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.Entities
         public bool IsUtilizationEntityConfigured { get; set; }
         public DateTime ModifiedAtUtc { get; set; }
         public bool IsPendingDelete { get; set; }
+        public ICollection<CostingResultEntity> CostingResults { get; set; }
     }
 }

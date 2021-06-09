@@ -33,9 +33,8 @@ const CostModelsModal: React.FC<ICostModelsModalProps> = (props: ICostModelsModa
     props.onCancel();
   };
 
-  const handleCellClick = (driverConfigGuid: string) => {
+  const handleChangeConfigs = (driverConfigGuid: string) => {
     //Switch Configs
-    //Use Coles logic
   };
 
   const handleCopy = (driverConfigGuidToCopy: string) => {
@@ -69,7 +68,7 @@ const CostModelsModal: React.FC<ICostModelsModalProps> = (props: ICostModelsModa
             body={(rowData) => (
               <>
                 <Spacing vAlign='center'>
-                  <Button type='link' onClick={() => handleCellClick(rowData.costingConfigGuid)}>
+                  <Button type='link' onClick={() => handleChangeConfigs(rowData.costingConfigGuid)}>
                     {rowData.name}
                   </Button>
                 </Spacing>
