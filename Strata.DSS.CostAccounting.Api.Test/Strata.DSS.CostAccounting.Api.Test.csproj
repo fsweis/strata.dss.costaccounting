@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <OutputType>Library</OutputType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning.ApiExplorer" Version="5.0.0" />
+    <PackageReference Include="Microsoft.Data.Sqlite.Core" Version="5.0.7" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.6" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="5.0.6" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="5.0.6" />
+    <PackageReference Include="Moq" Version="4.16.1" />
+    <PackageReference Include="Strata.SqlTools.Testing" Version="1.1.0" />
+    <PackageReference Include="Strata.Testing" Version="2.2.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\src\Strata.DSS.CostAccounting.Api\Strata.DSS.CostAccounting.Api.csproj" />
+    <ProjectReference Include="..\Strata.DSS.CostAccounting.Client\Strata.DSS.CostAccounting.Client.csproj" />
+  </ItemGroup>
+
+
+</Project>

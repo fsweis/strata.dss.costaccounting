@@ -9,6 +9,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Strata.DSS.CostAccounting.T
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Strata.DSS.CostAccounting.Biz", "src\Strata.DSS.CostAccounting.Biz\Strata.DSS.CostAccounting.Biz.csproj", "{AAEACF42-6380-43B1-A715-D8AFD120B29B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Strata.DSS.CostAccounting.Api.Test", "Strata.DSS.CostAccounting.Api.Test\Strata.DSS.CostAccounting.Api.Test.csproj", "{4D0AB6CC-CF2E-4C22-AD59-254E9860EBD9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Strata.DSS.CostAccounting.Client", "Strata.DSS.CostAccounting.Client\Strata.DSS.CostAccounting.Client.csproj", "{3C3FD749-AAA4-4307-B5F2-2F8366A55802}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +31,14 @@ Global
 		{AAEACF42-6380-43B1-A715-D8AFD120B29B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AAEACF42-6380-43B1-A715-D8AFD120B29B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AAEACF42-6380-43B1-A715-D8AFD120B29B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4D0AB6CC-CF2E-4C22-AD59-254E9860EBD9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4D0AB6CC-CF2E-4C22-AD59-254E9860EBD9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4D0AB6CC-CF2E-4C22-AD59-254E9860EBD9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4D0AB6CC-CF2E-4C22-AD59-254E9860EBD9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3C3FD749-AAA4-4307-B5F2-2F8366A55802}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3C3FD749-AAA4-4307-B5F2-2F8366A55802}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3C3FD749-AAA4-4307-B5F2-2F8366A55802}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3C3FD749-AAA4-4307-B5F2-2F8366A55802}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

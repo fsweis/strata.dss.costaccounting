@@ -18,21 +18,18 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
     [Route("api/v{api-version:apiVersion}/statistic-drivers")]
     public class StatisticDriversController : ControllerBase
     {
-        private readonly ICostAccountingRepository _costaccountingRepository;
         private readonly ICostingConfigRepository _costingConfigRepository;
         private readonly IStatisticDriversRepository _statisticDriversRepository;
         private readonly IStatisticDriversService _statisticDriversService;
         private readonly IDataSourceService _dataSourceService;
         private readonly IDataSourceLinkService _dataSourceLinkService;
 
-        public StatisticDriversController(ICostAccountingRepository costaccountingRepository
-                                            , IStatisticDriversRepository statisticDriversRepository
+        public StatisticDriversController(IStatisticDriversRepository statisticDriversRepository
                                             , IStatisticDriversService statisticDriversService
                                             , ICostingConfigRepository costingConfigRepository
                                             , IDataSourceService dataSourceService
                                             , IDataSourceLinkService dataSourceLinkService)
         {
-            _costaccountingRepository = costaccountingRepository;
             _statisticDriversRepository = statisticDriversRepository;
             _statisticDriversService = statisticDriversService;
             _costingConfigRepository = costingConfigRepository;
@@ -69,7 +66,6 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
             var isClaims = costingConfig.Type == CostingType.Claims;
             var dataSources = _dataSourceService.GetDataSources(isClaims);
             return Ok(dataSources);
-
         }
 
         [HttpGet("data-source-links")]
@@ -88,11 +84,10 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
             return Ok(dataSourceLinks);
         }
 
-
         [HttpPost("")]
         [ProducesResponseType(200)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<List<StatisticDriver>>> SaveStatisticDrivers([FromBody] StatisticDriverSaveData statisticDriverSaveData, CancellationToken cancellationToken)
+        public async Task<ActionResult<IEnumerable<StatisticDriver>>> SaveStatisticDrivers([FromBody] StatisticDriverSaveData statisticDriverSaveData, CancellationToken cancellationToken)
         {
             if (_statisticDriversService.ValidateStatisticDrivers(statisticDriverSaveData.UpdatedStatDrivers))
             {
