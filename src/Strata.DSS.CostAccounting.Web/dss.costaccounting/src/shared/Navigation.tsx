@@ -18,7 +18,7 @@ import ActivityCodeDesigner from '../activity-code-designer/ActivityCodeDesigner
 import ChargeAllocation from '../charge-allocation/ChargeAllocation';
 import DropdownConfiguration from '../drop-down-configuration/DropdownConfiguration';
 import ManualStatistics from '../manual-statistics/ManualStatistics';
-import { costConfigService } from './data/costConfigService';
+import { costConfigService } from './data/ConfigService';
 import { ICostConfig } from './data/ICostConfig';
 import { Navbar } from '@strata/navbar/lib';
 import Icon from '@strata/tempo/lib/icon/Icon';
