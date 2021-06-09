@@ -16,7 +16,7 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.Repositories
         private readonly IMapper _mapper;
         private readonly IAsyncDbContextFactory<CostAccountingDbContext> _dbContextFactory;
 
-        public CostingConfigRepository(IMapper mapper,IAsyncDbContextFactory<CostAccountingDbContext> dbContextFactory)
+        public CostingConfigRepository(IMapper mapper, IAsyncDbContextFactory<CostAccountingDbContext> dbContextFactory)
         {
             _mapper = mapper;
             _dbContextFactory = dbContextFactory;
@@ -26,7 +26,7 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.Repositories
             await using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
             var costingConfigs = await dbContext.CostingConfigs.ToListAsync(cancellationToken);
 
-            if(!costingConfigs.Any())
+            if (!costingConfigs.Any())
             {
                 return null;
             }
@@ -35,10 +35,18 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.Repositories
         }
 
         public async Task<CostingConfigModel> GetCostingConfigAsync(Guid costingConfigGuid, CancellationToken cancellationToken)
-        {            
+        {
             await using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
-            var entity = await dbContext.CostingConfigs.FirstOrDefaultAsync(cc => cc.CostingConfigGuid == costingConfigGuid,cancellationToken);
-            return _mapper.Map<CostingConfigModel>(entity);           
+            var entity = await dbContext.CostingConfigs.FirstOrDefaultAsync(cc => cc.CostingConfigGuid == costingConfigGuid, cancellationToken);
+            return _mapper.Map<CostingConfigModel>(entity);
+        }
+
+        public async Task DeleteCostingConfigAsync(Guid costingConfigGuid, CancellationToken cancellationToken)
+        {
+            await using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
+            var entity = await dbContext.CostingConfigs.FirstOrDefaultAsync(cc => cc.CostingConfigGuid == costingConfigGuid, cancellationToken);
+
+
         }
     }
 }

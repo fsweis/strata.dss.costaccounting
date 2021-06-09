@@ -10,5 +10,6 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.Repositories
     {
         public Task<IEnumerable<CostingConfigModel>> GetAllCostingConfigsAsync(CancellationToken cancellationToken);
         public Task<CostingConfigModel> GetCostingConfigAsync(Guid id, CancellationToken cancellationToken);
+        public Task DeleteCostingConfigAsync(Guid id, CancellationToken cancellationToken);
     }
 }

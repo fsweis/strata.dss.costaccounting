@@ -43,7 +43,15 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
         [ProducesResponseType(200)]
         public async Task<ActionResult<List<CostingConfigModel>>> SaveStatisticDrivers([FromBody] CostingConfigModel costingConfgData
                                                                                                 , CancellationToken cancellationToken)
-        {            
+        {
+            return Ok();
+        }
+
+        [HttpDelete("{id}")]
+        [ProducesResponseType(200)]
+        public async Task<ActionResult<List<CostingConfigModel>>> CopyStatisticDrivers([FromRoute] Guid id, CancellationToken cancellationToken)
+        {
+            await _costingConfigRepository.DeleteCostingConfigAsync(id, cancellationToken);
             return Ok();
         }
     }
