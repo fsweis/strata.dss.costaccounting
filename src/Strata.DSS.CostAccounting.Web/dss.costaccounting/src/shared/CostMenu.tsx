@@ -10,16 +10,30 @@ export interface ICostMenuProps {
 }
 
 const CostMenu: React.FC<ICostMenuProps> = ({ costConfigs }: ICostMenuProps) => {
-  const [selectedConfgItem, setSelectedCostConfigItem] = useState<ICostConfig>(newCostConfig());
+  const [selectedCostConfigItem, setSelectedCostConfigItem] = useState<ICostConfig>(newCostConfig());
 
   const history = useHistory();
   const location = useLocation();
 
+  // TODO: probably shouldn'y have two useeffects on the same
+  // object that could both set the selected config
   useEffect(() => {
     if (costConfigs.length) {
       setSelectedCostConfigItem(costConfigs[0]);
     }
   }, [costConfigs]);
+
+  useEffect(() => {
+    const splitPath = location.pathname.split('/');
+    // TODO: better solution that this
+    if (splitPath.length > 2) {
+      const pathConfigGuid = splitPath[2];
+      const config = costConfigs.find((c) => c.costingConfigGuid === pathConfigGuid);
+      if (config && config !== selectedCostConfigItem) {
+        setSelectedCostConfigItem(config);
+      }
+    }
+  }, [costConfigs, location, selectedCostConfigItem]);
 
   const getActiveUrlKey = () => {
     if (location.pathname === '/') {
@@ -37,7 +51,6 @@ const CostMenu: React.FC<ICostMenuProps> = ({ costConfigs }: ICostMenuProps) => 
       if (costConfigItem) {
         const currentLocation = location.pathname.split('/')[1];
         history.push(`/${currentLocation}/${costConfigItem.costingConfigGuid}`);
-        setSelectedCostConfigItem(costConfigItem);
       }
     }
   };
@@ -46,7 +59,7 @@ const CostMenu: React.FC<ICostMenuProps> = ({ costConfigs }: ICostMenuProps) => 
     <Menu selectedKeys={getActiveUrlKey()}>
       <Menu.ItemGroup title=''>
         <Menu.Item key=''>
-          <ButtonMenu buttonText={selectedConfgItem?.name} type='title' selectedKeys={[selectedConfgItem?.costingConfigGuid]} onClick={(e) => handleClick(e.key)}>
+          <ButtonMenu buttonText={selectedCostConfigItem?.name} type='title' selectedKeys={[selectedCostConfigItem?.costingConfigGuid]} onClick={(e) => handleClick(e.key)}>
             {costConfigs.map((item) => (
               <ButtonMenu.Item key={item.costingConfigGuid}>{item.name}</ButtonMenu.Item>
             ))}
@@ -61,51 +74,51 @@ const CostMenu: React.FC<ICostMenuProps> = ({ costConfigs }: ICostMenuProps) => 
         </Menu.Item>
       </Menu.ItemGroup>
       <Menu.ItemGroup title=''>
-        <Menu.Item key='/overview' href={`/overview/${selectedConfgItem.costingConfigGuid}`}>
+        <Menu.Item key='/overview' href={`/overview/${selectedCostConfigItem.costingConfigGuid}`}>
           Overview
         </Menu.Item>
-        <Menu.Item key='/cost-audit' href={`/cost-audit/${selectedConfgItem.costingConfigGuid}`}>
+        <Menu.Item key='/cost-audit' href={`/cost-audit/${selectedCostConfigItem.costingConfigGuid}`}>
           Cost Audit
         </Menu.Item>
       </Menu.ItemGroup>
       <Menu.ItemGroup title='CATEGORIZE'>
-        <Menu.Item key='/department-categorization' href={`/department-categorization/${selectedConfgItem.costingConfigGuid}`}>
+        <Menu.Item key='/department-categorization' href={`/department-categorization/${selectedCostConfigItem.costingConfigGuid}`}>
           Department Categorization
         </Menu.Item>
-        <Menu.Item key='/cost-components' href={`/cost-components/${selectedConfgItem.costingConfigGuid}`}>
+        <Menu.Item key='/cost-components' href={`/cost-components/${selectedCostConfigItem.costingConfigGuid}`}>
           Cost Components
         </Menu.Item>
-        <Menu.Item key='/variability' href={`/variability/${selectedConfgItem.costingConfigGuid}`}>
+        <Menu.Item key='/variability' href={`/variability/${selectedCostConfigItem.costingConfigGuid}`}>
           Variability
         </Menu.Item>
-        <Menu.Item key='/statistic-drivers' href={`/statistic-drivers/${selectedConfgItem.costingConfigGuid}`}>
+        <Menu.Item key='/statistic-drivers' href={`/statistic-drivers/${selectedCostConfigItem.costingConfigGuid}`}>
           Statistic Drivers
         </Menu.Item>
       </Menu.ItemGroup>
       <Menu.ItemGroup title='ALIGN'>
-        <Menu.Item key='/reclassification' href={`/reclassification/${selectedConfgItem.costingConfigGuid}`}>
+        <Menu.Item key='/reclassification' href={`/reclassification/${selectedCostConfigItem.costingConfigGuid}`}>
           Reclassification
         </Menu.Item>
-        <Menu.Item key='/overhead-allocation' href={`/overhead-allocation/${selectedConfgItem.costingConfigGuid}`}>
+        <Menu.Item key='/overhead-allocation' href={`/overhead-allocation/${selectedCostConfigItem.costingConfigGuid}`}>
           Overhead Allocation
         </Menu.Item>
-        <Menu.Item key='/cost-component-reclassification' href={`/cost-component-reclassification/${selectedConfgItem.costingConfigGuid}`}>
+        <Menu.Item key='/cost-component-reclassification' href={`/cost-component-reclassification/${selectedCostConfigItem.costingConfigGuid}`}>
           Cost Component Reclassification
         </Menu.Item>
       </Menu.ItemGroup>
       <Menu.ItemGroup title='ALLOCATE'>
-        <Menu.Item key='/activity-code-designer' href={`/activity-code-designer/${selectedConfgItem.costingConfigGuid}`}>
+        <Menu.Item key='/activity-code-designer' href={`/activity-code-designer/${selectedCostConfigItem.costingConfigGuid}`}>
           Activity Code Designer
         </Menu.Item>
-        <Menu.Item key='/charge-allocation' href={`/charge-allocation/${selectedConfgItem.costingConfigGuid}`}>
+        <Menu.Item key='/charge-allocation' href={`/charge-allocation/${selectedCostConfigItem.costingConfigGuid}`}>
           Charge Allocation
         </Menu.Item>
       </Menu.ItemGroup>
       <Menu.ItemGroup title='CONFIGURE'>
-        <Menu.Item key='/drop-down-configuration' href={`/drop-down-configuration/${selectedConfgItem.costingConfigGuid}`}>
+        <Menu.Item key='/drop-down-configuration' href={`/drop-down-configuration/${selectedCostConfigItem.costingConfigGuid}`}>
           Drop-down Configuration
         </Menu.Item>
-        <Menu.Item key='/manual-statistics' href={`/manual-statistics/${selectedConfgItem.costingConfigGuid}`}>
+        <Menu.Item key='/manual-statistics' href={`/manual-statistics/${selectedCostConfigItem.costingConfigGuid}`}>
           Manual Statistics
         </Menu.Item>
       </Menu.ItemGroup>
