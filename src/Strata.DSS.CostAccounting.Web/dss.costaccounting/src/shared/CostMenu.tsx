@@ -27,9 +27,6 @@ const CostMenu: React.FC<ICostMenuProps> = ({ costConfigs }: ICostMenuProps) => 
     }
   }, [costConfigs, location, selectedCostConfigItem]);
   const getActiveUrlKey = () => {
-    if (location.pathname === '/') {
-      return ['/overview'];
-    }
     const currentLocation = '/' + location.pathname.split('/')[1];
     return [currentLocation];
   };
