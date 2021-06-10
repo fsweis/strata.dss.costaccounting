@@ -45,12 +45,8 @@ const CostingConfigsModal: React.FC<ICostingConfigsModalProps> = (props: ICostin
     costConfigService.deleteCostConfig(costingConfigGuid);
   };
 
-  const getConfigType = (type: CostingType) => {
-    if (type === CostingType.Claims) {
-      return 'Claims';
-    } else {
-      return 'Patient Care';
-    }
+  const getCostingTypeName = (type: CostingType) => {
+    return type === CostingType.Claims ? 'Claims' : 'Patient Care';
   };
 
   return (
@@ -74,7 +70,7 @@ const CostingConfigsModal: React.FC<ICostingConfigsModalProps> = (props: ICostin
             )}
           ></DataGrid.Column>
           <DataGrid.Column header='Description' field='description' collapseLongText width={280} sortable />
-          <DataGrid.Column header='Type' field='type' width={120} body={(rowData) => getConfigType(rowData.type)} sortable />
+          <DataGrid.Column header='Type' field='type' width={120} body={(rowData) => getCostingTypeName(rowData.type)} sortable />
           <DataGrid.Column header='Fiscal Year' field='fiscalYearID' width={104} sortable />
           <DataGrid.DateColumn header='Last Edit' field='modifiedAtUtc' sortable width={128} />
           <DataGrid.DateColumn header='Last Published' field='lastPublishedRun' sortable width={128} />
