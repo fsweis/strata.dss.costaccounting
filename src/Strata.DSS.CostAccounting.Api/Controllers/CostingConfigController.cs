@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Strata.DSS.CostAccounting.Api.DTOs;
 using Strata.DSS.CostAccounting.Biz.CostAccounting.Models;
 using Strata.DSS.CostAccounting.Biz.CostAccounting.Repositories;
 using System;
@@ -25,10 +27,11 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
 
         [HttpGet("")]
         [ProducesResponseType(200)]
-        public async Task<ActionResult<IEnumerable<CostingConfigModel>>> GetAllCostingConfigs(CancellationToken cancellationToken)
+        public async Task<ActionResult<IEnumerable<CostingConfigDto>>> GetAllCostingConfigs(CancellationToken cancellationToken)
         {
             var costingConfigs = await _costingConfigRepository.GetAllCostingConfigsAsync(cancellationToken);
-            return Ok(costingConfigs);
+            var dtos = costingConfigs.Select(x => new CostingConfigDto(x)).ToList();
+            return Ok(dtos);
         }
 
         [HttpGet("{id}")]
