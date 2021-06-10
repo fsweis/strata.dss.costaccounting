@@ -3,7 +3,7 @@ import { useHistory, useLocation } from 'react-router-dom';
 import Menu from '@strata/tempo/lib/menu';
 import ButtonMenu from '@strata/tempo/lib/buttonmenu';
 import Icon from '@strata/tempo/lib/icon/Icon';
-import { costConfigService } from './data/costConfigService';
+import { costConfigService } from './data/CostConfigService';
 import { ICostConfig } from './data/ICostConfig';
 
 const CostingMenu: React.FC = () => {
