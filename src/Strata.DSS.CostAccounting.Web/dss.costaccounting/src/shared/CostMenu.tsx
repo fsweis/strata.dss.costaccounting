@@ -16,10 +16,10 @@ const CostMenu: React.FC<ICostMenuProps> = ({ costConfigs }: ICostMenuProps) => 
   const location = useLocation();
 
   useEffect(() => {
-    const splitPath = location.pathname.split('/');
+    const splitPath = location.pathname.split('/').filter((p) => p.trim() !== '');
     // TODO: better solution than this
-    if (splitPath.length > 2) {
-      const pathConfigGuid = splitPath[2];
+    if (splitPath.length > 1) {
+      const pathConfigGuid = splitPath[1];
       const config = costConfigs.find((c) => c.costingConfigGuid === pathConfigGuid);
       if (config && config !== selectedCostConfigItem) {
         setSelectedCostConfigItem(config);

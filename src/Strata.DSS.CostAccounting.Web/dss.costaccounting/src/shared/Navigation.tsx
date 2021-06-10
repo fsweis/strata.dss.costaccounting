@@ -68,19 +68,19 @@ const Navigation: React.FC = () => {
             <CostConfigProvider costingConfigGuid={costConfigGuid}>
               <Switch>
                 <Route path='/' exact render={() => <Redirect to={`/overview`}></Redirect>} key='default'></Route>
-                <Route path='/overview/:configGuid' component={Overview} key='overview'></Route>
-                <Route path='/statistic-drivers/:configGuid' component={StatisticDrivers} key='statistic-drivers'></Route>
-                <Route path='/cost-audit/:configGuid' component={CostAudit} key='cost-audit'></Route>
-                <Route path='/department-categorization/:configGuid' component={DepartmentCategorization} key='department-categorization'></Route>
-                <Route path='/cost-components/:configGuid' component={CostComponents} key='cost-components'></Route>
-                <Route path='/variability/:configGuid' component={Variability} key='variability'></Route>
-                <Route path='/reclassification/:configGuid' component={Reclassification} key='reclassification'></Route>
-                <Route path='/overhead-allocation/:configGuid' component={OverheadAllocation} key='overhead-allocation'></Route>
-                <Route path='/cost-component-reclassification/:configGuid' component={CostComponentReclassification} key='cost-component-reclassification'></Route>
-                <Route path='/activity-code-designer/:configGuid' component={ActivityCodeDesigner} key='activity-code-designer'></Route>
-                <Route path='/charge-allocation/:configGuid' component={ChargeAllocation} key='charge-allocation'></Route>
-                <Route path='/drop-down-configuration/:configGuid' component={DropdownConfiguration} key='drop-down-configuration'></Route>
-                <Route path='/manual-statistics/:configGuid' component={ManualStatistics} key='manual-statistics'></Route>
+                <Route path='/overview' component={Overview} key='overview'></Route>
+                <Route path='/statistic-drivers' component={StatisticDrivers} key='statistic-drivers'></Route>
+                <Route path='/cost-audit' component={CostAudit} key='cost-audit'></Route>
+                <Route path='/department-categorization' component={DepartmentCategorization} key='department-categorization'></Route>
+                <Route path='/cost-components' component={CostComponents} key='cost-components'></Route>
+                <Route path='/variability' component={Variability} key='variability'></Route>
+                <Route path='/reclassification' component={Reclassification} key='reclassification'></Route>
+                <Route path='/overhead-allocation' component={OverheadAllocation} key='overhead-allocation'></Route>
+                <Route path='/cost-component-reclassification' component={CostComponentReclassification} key='cost-component-reclassification'></Route>
+                <Route path='/activity-code-designer' component={ActivityCodeDesigner} key='activity-code-designer'></Route>
+                <Route path='/charge-allocation' component={ChargeAllocation} key='charge-allocation'></Route>
+                <Route path='/drop-down-configuration' component={DropdownConfiguration} key='drop-down-configuration'></Route>
+                <Route path='/manual-statistics' component={ManualStatistics} key='manual-statistics'></Route>
               </Switch>
             </CostConfigProvider>
           </Layout.Content>
