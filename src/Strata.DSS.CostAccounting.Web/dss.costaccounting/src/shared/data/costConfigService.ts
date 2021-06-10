@@ -4,7 +4,11 @@ import { ICostConfig } from './ICostConfig';
 const { httpGet, httpPost } = getSecureService(appConfig.apiUrl);
 
 export const costConfigService = {
-  getCostConfig: (): Promise<ICostConfig[]> => {
+  getCostConfigs: (): Promise<ICostConfig[]> => {
     return httpGet<ICostConfig[]>(`costing-configs`);
+  },
+
+  getCostConfig: (costingConfigGuid: string): Promise<ICostConfig> => {
+    return httpGet<ICostConfig>(`costing-configs/${costingConfigGuid}`);
   }
 };
