@@ -29,7 +29,7 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.Repositories
         public async Task<IEnumerable<CostingConfigModel>> GetAllCostingConfigsAsync(CancellationToken cancellationToken)
         {
             await using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
-            var costingConfigs = await dbContext.CostingConfigs.Include(x => x.CostingResults).ToListAsync();
+            var costingConfigs = await dbContext.CostingConfigs.Include(x => x.CostingResults).ToListAsync(cancellationToken);
 
             return _mapper.Map<IEnumerable<CostingConfigModel>>(costingConfigs);
         }
