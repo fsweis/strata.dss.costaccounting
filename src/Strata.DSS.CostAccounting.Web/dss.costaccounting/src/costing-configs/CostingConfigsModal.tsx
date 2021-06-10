@@ -20,7 +20,7 @@ const CostingConfigsModal: React.FC<ICostingConfigsModalProps> = (props: ICostin
 
   useEffect(() => {
     const fetchData = async () => {
-      const [costModels] = await Promise.all([costConfigService.getCostConfig()]);
+      const costModels = await costConfigService.getCostConfig();
       setCostModels(costModels);
     };
 
