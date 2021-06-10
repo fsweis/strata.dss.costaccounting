@@ -3,20 +3,19 @@ import Modal from '@strata/tempo/lib/modal';
 import Spacing from '@strata/tempo/lib/spacing';
 import Tooltip from '@strata/tempo/lib/tooltip';
 import React, { useEffect, useState } from 'react';
-import { ICostConfig } from '../shared/data/ICostConfig';
+import { ICostConfig, CostingType } from '../shared/data/ICostConfig';
 import Input from '@strata/tempo/lib/input';
 import { costConfigService } from '../shared/data/CostConfigService';
 import ActionBar from '@strata/tempo/lib/actionbar';
 import DataGrid, { IGlobalFilterValue } from '@strata/tempo/lib/datagrid/DataGrid';
 
-export interface ICostModelsModalProps {
+export interface ICostingConfigsModalProps {
   visible: boolean;
   onCancel: () => void;
 }
 
-const CostModelsModal: React.FC<ICostModelsModalProps> = (props: ICostModelsModalProps) => {
+const CostingConfigsModal: React.FC<ICostingConfigsModalProps> = (props: ICostingConfigsModalProps) => {
   const [costModels, setCostModels] = useState<ICostConfig[]>([]);
-  const gridRef = React.useRef<DataGrid>(null);
   const [globalFilterValue, setGlobalFilterValue] = useState<IGlobalFilterValue>({ fields: ['name', 'description'], value: '' });
 
   useEffect(() => {
@@ -46,11 +45,10 @@ const CostModelsModal: React.FC<ICostModelsModalProps> = (props: ICostModelsModa
     costConfigService.deleteCostConfig(costingConfigGuid);
   };
 
-  const getConfigType = (type: number) => {
-    if (type === 1) {
+  const getConfigType = (type: CostingType) => {
+    if (type === CostingType.Claims) {
       return 'Claims';
     } else {
-      //0 for Patient Care
       return 'Patient Care';
     }
   };
@@ -59,7 +57,7 @@ const CostModelsModal: React.FC<ICostModelsModalProps> = (props: ICostModelsModa
     <>
       <Modal title='All Models' visible={props.visible} onCancel={handleCancel} footer={null} width='extraLarge'>
         <ActionBar filters={<Input search width={200} onChange={(e) => setGlobalFilterValue({ fields: ['name', 'description'], value: e.target.value })} />} />
-        <DataGrid key='allModelsGrid' ref={gridRef} scrollable dataKey='costingConfigGuid' value={costModels} globalFilterValue={globalFilterValue}>
+        <DataGrid key='allModelsGrid' scrollable dataKey='costingConfigGuid' value={costModels} globalFilterValue={globalFilterValue}>
           <DataGrid.RowNumber />
           <DataGrid.Column
             header='Name'
@@ -103,4 +101,4 @@ const CostModelsModal: React.FC<ICostModelsModalProps> = (props: ICostModelsModa
   );
 };
 
-export default CostModelsModal;
+export default CostingConfigsModal;

@@ -5,9 +5,14 @@ export interface ICostConfig {
   isGLCosting: boolean;
   defaultChargeAllocationMethod: number;
   fiscalYearID: number;
-  type: number;
+  type: CostingType;
   createdAt: Date;
   modifiedAtUtc: Date;
   lastPublishedUtc: Date;
   isEditable: boolean;
+}
+
+export enum CostingType {
+  PatientCare = 0,
+  Claims = 1
 }

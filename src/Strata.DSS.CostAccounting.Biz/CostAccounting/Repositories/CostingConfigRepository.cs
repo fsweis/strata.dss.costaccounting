@@ -46,12 +46,13 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.Repositories
             var job = new EnqueueJobDto
             {
                 TaskName = "Strata.CS.Jazz.Biz.DSS.Costing.DeleteCostingConfigTask, Strata.CS.Jazz.Biz",
-                ContextData = $"<CONTEXTXML><COSTINGCONFIGGUID>{costingConfigGuid}</COSTINGCONFIGGUID></CONTEXTXML>"
+                ContextData = $"<guid xmlns=\"http://schemas.microsoft.com/2003/10/Serialization/\">{costingConfigGuid}</guid>"
             };
 
             //TODO: Create task if its not currently running? Or add isCollapsible
             var response = await _hangfireServiceClient.EnqueueJobAsync(job, cancellationToken);
             return response.JobId;
+
         }
     }
 }

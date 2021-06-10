@@ -17,7 +17,7 @@ namespace Strata.DSS.CostAccounting.Api.DTOs
             IsGLCosting = costingConfig.IsGLCosting;
             DefaultChargeAllocationMethod = costingConfig.DefaultChargeAllocationMethod;
             FiscalYearID = costingConfig.FiscalYearID;
-            Type = costingConfig.Type;
+            Type = (int)costingConfig.Type;
             CreatedAt = costingConfig.CreatedAt;
             ModifiedAtUtc = costingConfig.ModifiedAtUtc;
             LastPublishedUtc = costingConfig.LastPublishedUtc;
@@ -28,9 +28,9 @@ namespace Strata.DSS.CostAccounting.Api.DTOs
         public string Name { get; set; }
         public string Description { get; set; }
         public bool IsGLCosting { get; set; }
-        public Int16 DefaultChargeAllocationMethod { get; set; }
-        public Int16 FiscalYearID { get; set; }
-        public CostingType Type { get; set; }
+        public short DefaultChargeAllocationMethod { get; set; }
+        public short FiscalYearID { get; set; }
+        public int Type { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime ModifiedAtUtc { get; set; }
         public DateTime? LastPublishedUtc { get; set; }

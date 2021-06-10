@@ -8,6 +8,6 @@ export const costConfigService = {
     return httpGet<ICostConfig[]>(`costing-configs`);
   },
   deleteCostConfig: (costConfigGuid: string): Promise<string> => {
-    return httpDelete<string>(`costing-configs?costingConfigId=` + costConfigGuid);
+    return httpDelete<string>(`costing-configs/` + costConfigGuid);
   }
 };
