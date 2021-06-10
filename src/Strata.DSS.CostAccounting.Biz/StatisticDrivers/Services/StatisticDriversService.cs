@@ -12,19 +12,19 @@ namespace Strata.DSS.CostAccounting.Biz.StatisticDrivers.Services
 {
     public class StatisticDriversService : IStatisticDriversService
     {
-        private readonly ICostAccountingRepository _costaccountingRepository;
+        private readonly ICostAccountingRepository _costAccountingRepository;
         private readonly IStatisticDriversRepository _statisticDriversRepository;
 
-        public StatisticDriversService(ICostAccountingRepository costaccountingRepository, IStatisticDriversRepository statisticDriversRepository)
+        public StatisticDriversService(ICostAccountingRepository costAccountingRepository, IStatisticDriversRepository statisticDriversRepository)
         {
-            _costaccountingRepository = costaccountingRepository;
+            _costAccountingRepository = costAccountingRepository;
             _statisticDriversRepository = statisticDriversRepository;
         }
 
         public async Task<IList<StatisticDriver>> LoadStatisticDrivers(CostingType costingType)
         {
             var driverConfigs = await _statisticDriversRepository.GetDriverConfigsAsync(costingType, default);
-            var ruleSets = await _costaccountingRepository.GetRuleSetssAsync(default);
+            var ruleSets = await _costAccountingRepository.GetRuleSetsAsync(default);
             var usedDriverConfigGuids = await _statisticDriversRepository.GetUsedDriverConfigs(default);
             var statisticDrivers = new List<StatisticDriver>();
             var summaryGuid = costingType == CostingType.PatientCare ? DataTableConstants.PatientEncounterSummaryGuid : DataTableConstants.PatientClaimSummaryGuid;

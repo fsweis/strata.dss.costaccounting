@@ -3,47 +3,17 @@ using Microsoft.EntityFrameworkCore;
 using Moq;
 using Strata.CoreLib.Claims;
 using Strata.DSS.CostAccounting.Biz.CostAccounting.DbContexts;
+using Strata.DSS.CostAccounting.Biz.StatisticDrivers.Models;
 using Strata.DSS.CostAccounting.Client;
 using System;
 using System.Collections.Generic;
 using System.Security.Claims;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace Strata.DSS.CostAccounting.Api.Test
 {
     public static class TestData
     {
-        public const int EXPECTED_MAPPINGS = 4;
-
-        public const int TopicId1 = 100;
-        public const int TopicId2 = 101;
-
-        public const int TemplateId1 = 100;
-        public const int TemplateId2 = 101;
-        public const int TemplateIdNotFound = 999;
-
-        public const int MappingId1 = 100;
-        public const int MappingId2 = 101;
-        public const int MappingId3 = 102;
-        public const int MappingId4 = 103;
-
-        public static Guid Solution1Guid = new Guid("a5255084-1432-4b17-a9fa-49e639c2e0fb");
-
-        public static Guid Module1Guid = new Guid("e46853fa-5a3a-46df-b89f-6278c7755a31");
-        public static Guid Module2Guid = new Guid("cf371f27-ce8c-45bb-9e8b-705d6243f1f7");
-
-        public static string Dim1 = "[Dim.1]";
-        public static string Dim2 = "[Dim.2]";
-        public static string Dim3 = "[Dim.3]";
-        public static string Dim4 = "[Dim.4]";
-        public static string Dim5 = "[id.id]";
-        public static string Dim6 = "[fake.dim]";
-
-        public const string FileContents = "This is a dummy file";
-        public const string UserId = "id";
-        private static readonly List<string> _userGroups = new List<string> { "abc", "123" };
-        private const string _datasourceName = "datasource1";
         private const string _aaEmail = "aaTestUser1@example.com";
         private const string _strataId = "10";
 
@@ -54,6 +24,18 @@ namespace Strata.DSS.CostAccounting.Api.Test
                 { "isStrataUser", isStrataUser.ToString() }
             };
             return dict;
+        }
+
+        public static List<DriverConfig> GetDriverConfigs()
+        {
+            var statDriver = new DriverConfig()
+            {
+                Name = "TestStatisticDriver",
+                MeasureGuid = Guid.NewGuid(),
+                CostingType = Biz.Enums.CostingType.PatientCare
+            };
+
+            return new List<DriverConfig>() { statDriver };
         }
 
         public static CostAccountingDbContext GetJazzSqlContext(SqliteConnection connection)
@@ -71,11 +53,9 @@ namespace Strata.DSS.CostAccounting.Api.Test
         {
             await jazzDbContext.Database.EnsureDeletedAsync();
             await jazzDbContext.Database.EnsureCreatedAsync();
-            //await jazzDbContext.SystemCenterSolution.AddRangeAsync(GetSolutions());
-            //await jazzDbContext.SystemCenterModule.AddRangeAsync(GetModules());
+            await jazzDbContext.DriverConfigs.AddRangeAsync(GetDriverConfigs());
             await jazzDbContext.SaveChangesAsync();
         }
-
 
         internal static ClaimsPrincipal GetClaimsPrincipal(bool isStrata = true)
         {
