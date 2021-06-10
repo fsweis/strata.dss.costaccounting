@@ -19,7 +19,8 @@ import { costConfigService } from './data/CostConfigService';
 import { RadioChangeEvent } from 'antd/lib/radio/interface';
 import { ICostingType } from './data/ICostingType';
 import { ICostingMethod } from './data/ICostingMethod';
-
+import TreeDropDown, { ITreeDropDownNode } from '@strata/tempo/lib/treedropdown';
+import cloneDeep from 'lodash/cloneDeep';
 export interface IModelModalProps {
   visible: boolean;
   onCancel: () => void;
@@ -38,7 +39,9 @@ const ModelModal: React.FC<IModelModalProps> = (props: IModelModalProps) => {
   const [entityUtilType, setEntityUtilType] = useState<number>(0);
   const [costingTypes, setCostingTypes] = useState<ICostingType[]>([]);
   const [costingMethods, setCostingMethods] = useState<ICostingMethod[]>([]);
-
+  const [isClaimsCostingEnabled, setIsClaimsCostingEnabled] = useState<boolean>(true);
+  const [isCostingEntityLevelSecurityEnabled, setIsCostingEntityLevelSecurityEnabled] = useState<boolean>(true);
+  const [entityTreeData, setEntityTreeData] = useState<ITreeDropDownNode[]>([]);
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -63,6 +66,24 @@ const ModelModal: React.FC<IModelModalProps> = (props: IModelModalProps) => {
     setModalLoading(true);
     fetchData();
   }, []);
+
+  useEffect(() => {
+    const runEntityTreeChildren = filteredEntities.map((entity) => {
+      return { key: entity.entityID.toString(), title: entity.description, value: entity.entityID.toString() };
+    });
+
+    const rootNode = runEntityTreeChildren.find((x) => x.key === '0');
+
+    const runEntityTree = [
+      {
+        key: rootNode ? rootNode.key : '0',
+        title: rootNode ? rootNode.title : 'All Entities',
+        value: rootNode ? rootNode.value : '0',
+        children: runEntityTreeChildren.filter((x) => x.key !== '0')
+      }
+    ];
+    setEntityTreeData(runEntityTree);
+  }, [filteredEntities]);
 
   const onFormFinish = async (vals: { [name: string]: any }) => {
     console.log(vals);
@@ -119,36 +140,40 @@ const ModelModal: React.FC<IModelModalProps> = (props: IModelModalProps) => {
             </Form.Item>
           </Spacing>
           <Spacing itemSpacing={16}>
-            <Form.Item label='Type' name='type' rules={[{ required: true }]}>
-              <RadioGroup
-                defaultValue={0}
-                onChange={handleCostingTypeChange}
-                options={costingTypes.map((costingType, index) => {
-                  return { value: index, label: costingType.friendlyName };
-                })}
-              />
-            </Form.Item>
-            <Form.Item label='GL/Payroll Entities' name='entities' rules={[{ required: true }]}>
-              <DropDown multiSelect itemValueField='entityID' itemTextField='description' items={filteredEntities} defaultValue={filteredEntities.find((x) => x.entityID === 0)?.entityID} />
-            </Form.Item>
-          </Spacing>
-          <Spacing itemSpacing={16}>
-            <Form.Item label='Utilization Entities' name='utilizationEntities' rules={[{ required: true }]}>
-              <RadioGroup
-                defaultValue={0}
-                onChange={handleEntityTypeChange}
-                options={[
-                  { value: 0, label: 'Same as GL/Payroll' },
-                  { value: 1, label: 'Specify' }
-                ]}
-              />
-            </Form.Item>
-            {entityUtilType === 1 && (
-              <Form.Item label='Specifiy Utilization Entities' name='specifyUtilizationEntities' rules={[{ required: true }]}>
-                <DropDown multiSelect itemValueField='entityID' itemTextField='description' items={entities} defaultValue={filteredEntities.find((x) => x.entityID === 0)?.entityID} />
+            {isClaimsCostingEnabled && (
+              <Form.Item label='Type' name='type' rules={[{ required: true }]}>
+                <RadioGroup
+                  defaultValue={0}
+                  onChange={handleCostingTypeChange}
+                  options={costingTypes.map((costingType, index) => {
+                    return { value: index, label: costingType.friendlyName };
+                  })}
+                />
               </Form.Item>
             )}
+            <Form.Item label='GL/Payroll Entities' name='entities' rules={[{ required: true }]}>
+              <TreeDropDown treeData={entityTreeData} selectionMode='multiple' defaultValue={filteredEntities.find((x) => x.entityID === 0)?.entityID.toString()} treeDefaultExpandedKeys={['0']} />
+            </Form.Item>
           </Spacing>
+          {isCostingEntityLevelSecurityEnabled && (
+            <Spacing itemSpacing={16}>
+              <Form.Item label='Utilization Entities' name='utilizationEntities' rules={[{ required: true }]}>
+                <RadioGroup
+                  defaultValue={0}
+                  onChange={handleEntityTypeChange}
+                  options={[
+                    { value: 0, label: 'Same as GL/Payroll' },
+                    { value: 1, label: 'Specify' }
+                  ]}
+                />
+              </Form.Item>
+              {entityUtilType === 1 && (
+                <Form.Item label='Specifiy Utilization Entities' name='specifyUtilizationEntities' rules={[{ required: true }]}>
+                  <DropDown multiSelect itemValueField='entityID' itemTextField='description' items={entities} defaultValue={filteredEntities.find((x) => x.entityID === 0)?.entityID} />
+                </Form.Item>
+              )}
+            </Spacing>
+          )}
           {costingType === 0 && (
             <Spacing itemSpacing={16}>
               <Form.Item label='Method' name='method' rules={[{ required: true }]}>
