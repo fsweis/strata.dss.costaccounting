@@ -18,9 +18,11 @@ import { Navbar } from '@strata/navbar/lib';
 import CostMenu from './CostMenu';
 import CostConfigProvider from './data/CostConfigProvider';
 import { costConfigService } from './data/CostConfigService';
+import { ICostConfig } from './data/ICostConfig';
 
 const Navigation: React.FC = () => {
   const [costConfigGuid, setCostConfigGuid] = React.useState<string>('');
+  const [costConfigs, setCostConfigs] = React.useState<ICostConfig[]>([]);
   const location = useLocation();
 
   useEffect(() => {
@@ -29,6 +31,7 @@ const Navigation: React.FC = () => {
       if (costingConfigurations.length > 0) {
         const year = new Date().getFullYear();
         const sorted = costingConfigurations.filter((c) => year - c.fiscalYearID <= 1).sort((a, b) => a.name.localeCompare(b.name));
+        setCostConfigs(sorted);
         setCostConfigGuid(sorted[0].costingConfigGuid);
       }
     };
@@ -37,9 +40,12 @@ const Navigation: React.FC = () => {
 
   useEffect(() => {
     const splitPath = location.pathname.split('/');
+    // TODO: better solution that this
     if (splitPath.length > 2) {
       const pathConfigGuid = splitPath[2];
-      setCostConfigGuid(pathConfigGuid);
+      if (pathConfigGuid !== costConfigGuid) {
+        setCostConfigGuid(pathConfigGuid);
+      }
     }
   }, [location]);
 
@@ -51,7 +57,7 @@ const Navigation: React.FC = () => {
         </Layout.Nav>
         <Layout>
           <Layout.Sider collapsible>
-            <CostMenu />
+            <CostMenu costConfigs={costConfigs} />
           </Layout.Sider>
           <Layout.Content>
             <CostConfigProvider costingConfigGuid={costConfigGuid}>

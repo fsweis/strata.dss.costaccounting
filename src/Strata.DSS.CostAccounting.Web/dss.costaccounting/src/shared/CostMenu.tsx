@@ -3,25 +3,23 @@ import { useHistory, useLocation } from 'react-router-dom';
 import Menu from '@strata/tempo/lib/menu';
 import ButtonMenu from '@strata/tempo/lib/buttonmenu';
 import Icon from '@strata/tempo/lib/icon/Icon';
-import { costConfigService } from './data/CostConfigService';
-import { ICostConfig } from './data/ICostConfig';
+import { ICostConfig, newCostConfig } from './data/ICostConfig';
 
-const CostingMenu: React.FC = () => {
-  const [costConfigs, setCostConfigs] = useState<ICostConfig[]>([]);
-  const [selectedConfgItem, setSelectedCostConfigItem] = useState<ICostConfig>({
-    name: '',
-    costingConfigGuid: '',
-    isGLCosting: false,
-    defaultChargeAllocationMethod: 0,
-    fiscalYearID: 0,
-    type: 0,
-    createdAt: new Date(),
-    modifiedAtUtc: new Date()
-  });
+export interface ICostMenuProps {
+  costConfigs: ICostConfig[];
+}
+
+const CostMenu: React.FC<ICostMenuProps> = ({ costConfigs }: ICostMenuProps) => {
+  const [selectedConfgItem, setSelectedCostConfigItem] = useState<ICostConfig>(newCostConfig());
 
   const history = useHistory();
-
   const location = useLocation();
+
+  useEffect(() => {
+    if (costConfigs.length) {
+      setSelectedCostConfigItem(costConfigs[0]);
+    }
+  }, [costConfigs]);
 
   const getActiveUrlKey = () => {
     if (location.pathname === '/') {
@@ -30,19 +28,6 @@ const CostingMenu: React.FC = () => {
     const currentLocation = '/' + location.pathname.split('/')[1];
     return [currentLocation];
   };
-
-  useEffect(() => {
-    const fetchData = async () => {
-      const [costingConfigurations] = await Promise.all([costConfigService.getCostConfigs()]);
-      if (costingConfigurations.length > 0) {
-        const year = new Date().getFullYear();
-        const sorted = costingConfigurations.filter((c) => year - c.fiscalYearID <= 1).sort((a, b) => a.name.localeCompare(b.name));
-        setCostConfigs(sorted);
-        setSelectedCostConfigItem(sorted[0]);
-      }
-    };
-    fetchData();
-  }, []);
 
   const handleClick = (key: React.Key) => {
     if (key === '1') alert('All Models Page');
@@ -128,4 +113,4 @@ const CostingMenu: React.FC = () => {
   );
 };
 
-export default CostingMenu;
+export default CostMenu;
