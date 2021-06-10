@@ -15,22 +15,18 @@ const CostMenu: React.FC<ICostMenuProps> = ({ costConfigs }: ICostMenuProps) => 
   const history = useHistory();
   const location = useLocation();
 
-  // TODO: probably shouldn'y have two useeffects on the same
-  // object that could both set the selected config
-  useEffect(() => {
-    if (costConfigs.length) {
-      setSelectedCostConfigItem(costConfigs[0]);
-    }
-  }, [costConfigs]);
-
   useEffect(() => {
     const splitPath = location.pathname.split('/');
-    // TODO: better solution that this
+    // TODO: better solution than this
     if (splitPath.length > 2) {
       const pathConfigGuid = splitPath[2];
       const config = costConfigs.find((c) => c.costingConfigGuid === pathConfigGuid);
       if (config && config !== selectedCostConfigItem) {
         setSelectedCostConfigItem(config);
+      }
+    } else {
+      if (costConfigs.length) {
+        setSelectedCostConfigItem(costConfigs[0]);
       }
     }
   }, [costConfigs, location, selectedCostConfigItem]);

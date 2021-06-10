@@ -24,6 +24,7 @@ const Navigation: React.FC = () => {
   const [costConfigGuid, setCostConfigGuid] = React.useState<string>('');
   const [costConfigs, setCostConfigs] = React.useState<ICostConfig[]>([]);
   const location = useLocation();
+  const history = useHistory();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -39,15 +40,19 @@ const Navigation: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    const splitPath = location.pathname.split('/');
-    // TODO: better solution that this
-    if (splitPath.length > 2) {
-      const pathConfigGuid = splitPath[2];
+    const splitPath = location.pathname.split('/').filter((p) => p.trim() !== '');
+    // TODO: better solution than this
+    if (splitPath.length > 1) {
+      const pathConfigGuid = splitPath[1];
       if (pathConfigGuid !== costConfigGuid) {
         setCostConfigGuid(pathConfigGuid);
       }
+    } else {
+      // TODO: something here to redirect path without guid to path with guid?
+      // This doesn't work but leaving so you know not to try it
+      // history.push(`${splitPath[0]}/${costConfigGuid}`);
     }
-  }, [location]);
+  }, [costConfigGuid, history, location]);
 
   return (
     <>
@@ -62,20 +67,20 @@ const Navigation: React.FC = () => {
           <Layout.Content>
             <CostConfigProvider costingConfigGuid={costConfigGuid}>
               <Switch>
-                <Route path='/' exact render={() => <Redirect to='/overview'></Redirect>} key='default'></Route>
-                <Route path='/overview/:configGuid' exact component={Overview} key='overview'></Route>
-                <Route path='/statistic-drivers/:configGuid' exact component={StatisticDrivers} key='statistic-drivers'></Route>
-                <Route path='/cost-audit/:configGuid' exact component={CostAudit} key='cost-audit'></Route>
-                <Route path='/department-categorization/:configGuid' exact component={DepartmentCategorization} key='department-categorization'></Route>
-                <Route path='/cost-components/:configGuid' exact component={CostComponents} key='cost-components'></Route>
-                <Route path='/variability/:configGuid' exact component={Variability} key='variability'></Route>
-                <Route path='/reclassification/:configGuid' exact component={Reclassification} key='reclassification'></Route>
-                <Route path='/overhead-allocation/:configGuid' exact component={OverheadAllocation} key='overhead-allocation'></Route>
-                <Route path='/cost-component-reclassification/:configGuid' exact component={CostComponentReclassification} key='cost-component-reclassification'></Route>
-                <Route path='/activity-code-designer/:configGuid' exact component={ActivityCodeDesigner} key='activity-code-designer'></Route>
-                <Route path='/charge-allocation/:configGuid' exact component={ChargeAllocation} key='charge-allocation'></Route>
-                <Route path='/drop-down-configuration/:configGuid' exact component={DropdownConfiguration} key='drop-down-configuration'></Route>
-                <Route path='/manual-statistics/:configGuid' exact component={ManualStatistics} key='manual-statistics'></Route>
+                <Route path='/' exact render={() => <Redirect to={`/overview`}></Redirect>} key='default'></Route>
+                <Route path='/overview/:configGuid' component={Overview} key='overview'></Route>
+                <Route path='/statistic-drivers/:configGuid' component={StatisticDrivers} key='statistic-drivers'></Route>
+                <Route path='/cost-audit/:configGuid' component={CostAudit} key='cost-audit'></Route>
+                <Route path='/department-categorization/:configGuid' component={DepartmentCategorization} key='department-categorization'></Route>
+                <Route path='/cost-components/:configGuid' component={CostComponents} key='cost-components'></Route>
+                <Route path='/variability/:configGuid' component={Variability} key='variability'></Route>
+                <Route path='/reclassification/:configGuid' component={Reclassification} key='reclassification'></Route>
+                <Route path='/overhead-allocation/:configGuid' component={OverheadAllocation} key='overhead-allocation'></Route>
+                <Route path='/cost-component-reclassification/:configGuid' component={CostComponentReclassification} key='cost-component-reclassification'></Route>
+                <Route path='/activity-code-designer/:configGuid' component={ActivityCodeDesigner} key='activity-code-designer'></Route>
+                <Route path='/charge-allocation/:configGuid' component={ChargeAllocation} key='charge-allocation'></Route>
+                <Route path='/drop-down-configuration/:configGuid' component={DropdownConfiguration} key='drop-down-configuration'></Route>
+                <Route path='/manual-statistics/:configGuid' component={ManualStatistics} key='manual-statistics'></Route>
               </Switch>
             </CostConfigProvider>
           </Layout.Content>
