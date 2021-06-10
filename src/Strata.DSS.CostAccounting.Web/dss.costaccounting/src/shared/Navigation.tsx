@@ -19,13 +19,11 @@ import CostMenu from './CostMenu';
 import CostConfigProvider from './data/CostConfigProvider';
 import { costConfigService } from './data/costConfigService';
 import { ICostConfig } from './data/ICostConfig';
-
 const Navigation: React.FC = () => {
   const [costConfigGuid, setCostConfigGuid] = React.useState<string>('');
   const [costConfigs, setCostConfigs] = React.useState<ICostConfig[]>([]);
   const location = useLocation();
   const history = useHistory();
-
   useEffect(() => {
     const fetchData = async () => {
       const [costingConfigurations] = await Promise.all([costConfigService.getCostConfigs()]);
@@ -38,7 +36,6 @@ const Navigation: React.FC = () => {
     };
     fetchData();
   }, []);
-
   useEffect(() => {
     const splitPath = location.pathname.split('/').filter((p) => p.trim() !== '');
     // TODO: better solution than this
@@ -53,7 +50,6 @@ const Navigation: React.FC = () => {
       // history.push(`${splitPath[0]}/${costConfigGuid}`);
     }
   }, [costConfigGuid, history, location]);
-
   return (
     <>
       <Layout>
@@ -89,5 +85,4 @@ const Navigation: React.FC = () => {
     </>
   );
 };
-
 export default Navigation;

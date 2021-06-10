@@ -4,17 +4,13 @@ import Menu from '@strata/tempo/lib/menu';
 import ButtonMenu from '@strata/tempo/lib/buttonmenu';
 import Icon from '@strata/tempo/lib/icon/Icon';
 import { ICostConfig, newCostConfig } from './data/ICostConfig';
-
 export interface ICostMenuProps {
   costConfigs: ICostConfig[];
 }
-
 const CostMenu: React.FC<ICostMenuProps> = ({ costConfigs }: ICostMenuProps) => {
   const [selectedCostConfigItem, setSelectedCostConfigItem] = useState<ICostConfig>(newCostConfig());
-
   const history = useHistory();
   const location = useLocation();
-
   useEffect(() => {
     const splitPath = location.pathname.split('/').filter((p) => p.trim() !== '');
     // TODO: better solution than this
@@ -30,7 +26,6 @@ const CostMenu: React.FC<ICostMenuProps> = ({ costConfigs }: ICostMenuProps) => 
       }
     }
   }, [costConfigs, location, selectedCostConfigItem]);
-
   const getActiveUrlKey = () => {
     if (location.pathname === '/') {
       return ['/overview'];
@@ -38,7 +33,6 @@ const CostMenu: React.FC<ICostMenuProps> = ({ costConfigs }: ICostMenuProps) => 
     const currentLocation = '/' + location.pathname.split('/')[1];
     return [currentLocation];
   };
-
   const handleClick = (key: React.Key) => {
     if (key === '1') alert('All Models Page');
     else if (key === '2') alert('New Model Modal');
@@ -50,7 +44,6 @@ const CostMenu: React.FC<ICostMenuProps> = ({ costConfigs }: ICostMenuProps) => 
       }
     }
   };
-
   return (
     <Menu selectedKeys={getActiveUrlKey()}>
       <Menu.ItemGroup title=''>
@@ -121,5 +114,4 @@ const CostMenu: React.FC<ICostMenuProps> = ({ costConfigs }: ICostMenuProps) => 
     </Menu>
   );
 };
-
 export default CostMenu;
