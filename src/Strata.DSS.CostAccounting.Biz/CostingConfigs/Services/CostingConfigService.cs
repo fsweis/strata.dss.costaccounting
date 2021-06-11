@@ -1,5 +1,4 @@
-﻿using Strata.DSS.CostAccounting.Biz.CostAccounting.Models;
-using Strata.DSS.CostAccounting.Biz.CostAccounting.Repositories;
+﻿using Strata.DSS.CostAccounting.Biz.CostAccounting.Repositories;
 using System;
 using System.Linq;
 using System.Collections.Generic;
@@ -7,8 +6,9 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Strata.DSS.CostAccounting.Biz.CostAccounting.Constants;
 using Strata.DSS.CostAccounting.Biz.Enums;
+using Strata.DSS.CostAccounting.Biz.CostingConfigs.Models;
 
-namespace Strata.DSS.CostAccounting.Biz.CostAccounting.Services
+namespace Strata.DSS.CostAccounting.Biz.CostingConfigs.Services
 {
     public class CostingConfigService : ICostingConfigService
     {
@@ -49,7 +49,7 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.Services
             await SaveEntityLinkages(costConfigSaveData.CostingConfig.CostingConfigGuid, costConfigSaveData.CostingConfig.IsUtilizationEntityConfigured, costConfigSaveData.GlPayrollEntities, costConfigSaveData.UtilEntities);
             //save the config
             await _costingConfigRepository.AddNewCostingConfigAsync(costConfigSaveData.CostingConfig, default);
-           
+
             return costConfigSaveResult;
         }
 
@@ -63,9 +63,9 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.Services
             var glPayrollEntityLinkages = existingLinkages?.Where(l => !l.IsUtilization);
 
             //save any new gl/payroll links
-             await AddEntityLinkagesAsync(costConfigGuid, glPayrollEntityLinkages, glPayrollEntityIds);
+            await AddEntityLinkagesAsync(costConfigGuid, glPayrollEntityLinkages, glPayrollEntityIds);
             //now, delete any old gl/payroll links
-            if (glPayrollEntityLinkages!=null  && glPayrollEntityLinkages.Count() > 0)
+            if (glPayrollEntityLinkages != null && glPayrollEntityLinkages.Count() > 0)
             {
                 await DeleteEntityLinkagesAsync(glPayrollEntityLinkages, glPayrollEntityIds);
             }
@@ -73,7 +73,7 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.Services
             if (isCostingEntityLevelSecurityEnabled && isUtilizationEntityConfigured)
             {
                 //save any new util links
-                 await AddEntityLinkagesAsync(costConfigGuid, utilEntityLinkages, utilEntityIds);
+                await AddEntityLinkagesAsync(costConfigGuid, utilEntityLinkages, utilEntityIds);
                 //now, delete any old util links
                 if (utilEntityLinkages != null && utilEntityLinkages.Count() > 0)
                 {
@@ -128,5 +128,5 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.Services
         }
 
     }
-        
+
 }

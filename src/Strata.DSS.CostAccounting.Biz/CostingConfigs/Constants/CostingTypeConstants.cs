@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Strata.DSS.CostAccounting.Biz.CostAccounting.Constants
+namespace Strata.DSS.CostAccounting.Biz.CostingConfigs.Constants
 {
     public static class CostingTypeConstants
     {

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Strata.DSS.CostAccounting.Biz.CostAccounting.Services
+namespace Strata.DSS.CostAccounting.Biz.CostingConfigs.Services
 {
     public interface IEntityService
     {

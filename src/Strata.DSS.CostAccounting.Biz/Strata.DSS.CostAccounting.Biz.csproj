@@ -21,4 +21,8 @@
     </None>
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="CostingConfigs\Repositories\" />
+  </ItemGroup>
+
 </Project>

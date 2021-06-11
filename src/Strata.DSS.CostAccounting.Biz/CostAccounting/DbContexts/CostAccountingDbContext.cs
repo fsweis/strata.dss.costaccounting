@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Strata.DSS.CostAccounting.Biz.CostAccounting.Entities;
 using Strata.DSS.CostAccounting.Biz.CostAccounting.Models;
+using Strata.DSS.CostAccounting.Biz.CostingConfigs.Models;
 using Strata.DSS.CostAccounting.Biz.StatisticDrivers.Models;
 
 namespace Strata.DSS.CostAccounting.Biz.CostAccounting.DbContexts

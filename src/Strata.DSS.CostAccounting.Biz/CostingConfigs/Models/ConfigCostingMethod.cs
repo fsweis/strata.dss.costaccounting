@@ -1,18 +1,18 @@
-﻿using Strata.DSS.CostAccounting.Biz.CostAccounting.Constants;
+﻿using Strata.DSS.CostAccounting.Biz.CostingConfigs.Constants;
 using Strata.DSS.CostAccounting.Biz.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Strata.DSS.CostAccounting.Biz.CostAccounting.Models
+namespace Strata.DSS.CostAccounting.Biz.CostingConfigs.Models
 {
     public class ConfigCostingMethod
     {
-        public CostingMethod Method { get;  set; }
-        public String FriendlyName { get;  set; }
+        public CostingMethod Method { get; set; }
+        public string FriendlyName { get; set; }
 
-        public ConfigCostingMethod(CostingMethod method, String friendlyName)
+        public ConfigCostingMethod(CostingMethod method, string friendlyName)
         {
             Method = method;
             FriendlyName = friendlyName;
@@ -20,7 +20,7 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.Models
 
         public override bool Equals(object obj)
         {
-            return (obj != null) && (obj is ConfigCostingMethod) && ((obj as ConfigCostingMethod).Method == Method);
+            return obj != null && obj is ConfigCostingMethod && (obj as ConfigCostingMethod).Method == Method;
         }
         public override int GetHashCode()
         {

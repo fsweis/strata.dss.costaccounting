@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Strata.DSS.CostAccounting.Biz.CostAccounting.Services
+namespace Strata.DSS.CostAccounting.Biz.CostingConfigs.Services
 {
     public class EntityService : IEntityService
     {

@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Strata.DSS.CostAccounting.Biz.CostAccounting.Models
+namespace Strata.DSS.CostAccounting.Biz.CostingConfigs.Models
 {
     public class CostingPermissions
     {
-        public bool IsClaimsCostingEnabled  { get; set; }
+        public bool IsClaimsCostingEnabled { get; set; }
         public bool IsCostingEntityLevelSecurityEnabled { get; set; }
     }
 }

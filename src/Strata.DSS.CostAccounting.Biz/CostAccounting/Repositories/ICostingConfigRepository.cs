@@ -1,5 +1,6 @@
 ﻿using Strata.DSS.CostAccounting.Biz.CostAccounting.Entities;
 using Strata.DSS.CostAccounting.Biz.CostAccounting.Models;
+using Strata.DSS.CostAccounting.Biz.CostingConfigs.Models;
 using System;
 using System.Collections.Generic;
 using System.Threading;

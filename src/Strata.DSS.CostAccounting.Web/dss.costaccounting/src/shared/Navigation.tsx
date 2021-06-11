@@ -17,7 +17,7 @@ import ActivityCodeDesigner from '../activity-code-designer/ActivityCodeDesigner
 import ChargeAllocation from '../charge-allocation/ChargeAllocation';
 import DropdownConfiguration from '../drop-down-configuration/DropdownConfiguration';
 import ManualStatistics from '../manual-statistics/ManualStatistics';
-import ModelModal from './ModelModal';
+import ModelModal from '../costing-configs/ModelModal';
 import { Navbar } from '@strata/navbar/lib';
 import Button from '@strata/tempo/lib/button';
 

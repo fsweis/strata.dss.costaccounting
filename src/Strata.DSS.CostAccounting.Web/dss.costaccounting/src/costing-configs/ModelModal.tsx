@@ -11,17 +11,17 @@ import { useEffect, useState } from 'react';
 import Spacing from '@strata/tempo/lib/spacing';
 import DropDown from '@strata/tempo/lib/dropdown';
 import { usePageLoader } from '@strata/tempo/lib/pageloader';
-import { IFiscalYear } from './data/IFiscalYear';
-import { IFiscalMonth } from './data/IFiscalMonth';
-import { IEntity } from './data/IEntity';
-import { costConfigService } from './data/CostConfigService';
+import { IFiscalYear } from '../shared/data/IFiscalYear';
+import { IFiscalMonth } from '../shared/data/IFiscalMonth';
+import { IEntity } from '../shared/data/IEntity';
+import { costConfigService } from '../shared/data/CostConfigService';
 import { RadioChangeEvent } from 'antd/lib/radio/interface';
 import { ICostingType } from './data/ICostingType';
 import { ICostingMethod } from './data/ICostingMethod';
 import { ICostingPermissions } from './data/ICostingPermissions';
 import { ICostConfigSaveData } from './data/ICostConfigSaveData';
 import TreeDropDown, { ITreeDropDownNode } from '@strata/tempo/lib/treedropdown';
-import { getEmptyGuid } from './Utils';
+import { getEmptyGuid } from '../shared/Utils';
 
 export interface IModelModalProps {
   visible: boolean;
@@ -81,17 +81,17 @@ const ModelModal: React.FC<IModelModalProps> = (props: IModelModalProps) => {
         //set initial form
         const year = fiscalYears.find((x) => x.fiscalYearID === new Date().getFullYear())?.fiscalYearID;
         const ytdMonth = fiscalMonths.find((x) => x.sortOrder === 12)?.fiscalMonthID;
-        const fEntities = filteredEntities.find((x) => x.entityID === 0)?.entityID.toString();
-        const nEntities = entities.find((x) => x.entityID === 0)?.entityID.toString();
+        const fEntities = filteredEntities.map((x) => x.entityID.toString());
+        const nEntities = entities.map((x) => x.entityID.toString());
         const configForm = {
           name: '',
           description: '',
           year: year ? year : 0,
           ytdMonth: ytdMonth ? ytdMonth : 0,
           type: 0,
-          filteredEntities: fEntities ? [fEntities] : [],
+          filteredEntities: fEntities ? fEntities : [],
           utilizationEntities: 0,
-          specifyUtilizationEntities: nEntities ? [nEntities] : [],
+          specifyUtilizationEntities: nEntities ? nEntities : [],
           method: 0,
           options: []
         };

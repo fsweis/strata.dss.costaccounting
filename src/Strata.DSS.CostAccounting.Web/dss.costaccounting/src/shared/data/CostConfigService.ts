@@ -1,13 +1,13 @@
 import { appConfig, getSecureService } from '@strata/core/lib';
-import { ICostConfig } from './ICostConfig';
+import { ICostConfig } from '../data/ICostConfig';
 import { IEntity } from './IEntity';
 import { IFiscalMonth } from './IFiscalMonth';
 import { IFiscalYear } from './IFiscalYear';
-import { ICostingType } from './ICostingType';
-import { ICostingMethod } from './ICostingMethod';
-import { ICostingPermissions } from './ICostingPermissions';
-import { ICostConfigSaveResult } from './ICostConfigSaveResult';
-import { ICostConfigSaveData } from './ICostConfigSaveData';
+import { ICostingType } from '../../costing-configs/data/ICostingType';
+import { ICostingMethod } from '../../costing-configs/data/ICostingMethod';
+import { ICostingPermissions } from '../../costing-configs/data/ICostingPermissions';
+import { ICostConfigSaveResult } from '../../costing-configs/data/ICostConfigSaveResult';
+import { ICostConfigSaveData } from '../../costing-configs/data/ICostConfigSaveData';
 
 const { httpGet, httpPost } = getSecureService(appConfig.apiUrl);
 

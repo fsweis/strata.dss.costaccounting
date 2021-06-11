@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Strata.DSS.CostAccounting.Biz.CostAccounting.DbContexts;
 using Strata.DSS.CostAccounting.Biz.CostAccounting.Entities;
 using Strata.DSS.CostAccounting.Biz.CostAccounting.Models;
+using Strata.DSS.CostAccounting.Biz.CostingConfigs.Models;
 using Strata.SqlTools.Configuration.Common.AsyncFactory;
 using System;
 using System.Collections.Generic;
@@ -71,7 +72,7 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.Repositories
         public async Task<IEnumerable<Entity>> GetEntitiesAsync(CancellationToken cancellationToken)
         {
             await using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
-            var entities = await dbContext.Entities.ToListAsync(cancellationToken);
+            var entities = await dbContext.Entities.Where(x=>x.Description!="").ToListAsync(cancellationToken);
 
             if (!entities.Any())
             {
@@ -134,16 +135,10 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.Repositories
         public async Task AddNewCostingConfigAsync(CostingConfigModel costingConfigModel, CancellationToken cancellationToken)
         {
            await using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
-            try
-            {
-                var newConfig = _mapper.Map<CostingConfigEntity>(costingConfigModel);
-                dbContext.CostingConfigs.Add(newConfig);
-            }
-            catch(Exception e)
-            {
-                Console.WriteLine("what");
-            }
-         
+
+           var newConfig = _mapper.Map<CostingConfigEntity>(costingConfigModel);
+           dbContext.CostingConfigs.Add(newConfig);
+
            await dbContext.SaveChangesAsync(cancellationToken);
         }
     }
