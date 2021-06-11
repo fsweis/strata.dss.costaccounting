@@ -5,13 +5,17 @@ using NUnit.Framework;
 using Strata.CS;
 using Strata.DSS.CostAccounting.Api.Controllers;
 using Strata.DSS.CostAccounting.Biz.CostAccounting.DbContexts;
+using Strata.DSS.CostAccounting.Biz.CostAccounting.Models;
 using Strata.DSS.CostAccounting.Biz.CostAccounting.Repositories;
+using Strata.DSS.CostAccounting.Biz.Enums;
 using Strata.DSS.CostAccounting.Biz.StatisticDrivers.Models;
 using Strata.DSS.CostAccounting.Biz.StatisticDrivers.Repositories;
 using Strata.DSS.CostAccounting.Biz.StatisticDrivers.Services;
 using Strata.DSS.CostAccounting.Client;
 using Strata.SqlTools.Configuration.Common.AsyncFactory;
+using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Strata.DSS.CostAccounting.Api.Test.UnitTests
@@ -25,7 +29,7 @@ namespace Strata.DSS.CostAccounting.Api.Test.UnitTests
             await using var connection = new SqliteConnection("Datasource=:memory:");
             var (controller, _) = await GetTestStatisticDriverController(connection);
 
-            var statDrivers = await controller.GetStatisticDrivers(default);
+            var statDrivers = await controller.GetStatisticDrivers(CostingType.PatientCare, default);
             Assert.AreEqual(TestData.GetDriverConfigs().Count, statDrivers.Value.Count());
         }
 
@@ -36,7 +40,7 @@ namespace Strata.DSS.CostAccounting.Api.Test.UnitTests
             await using var connection = new SqliteConnection("Datasource=:memory:");
             var (controller, _) = await GetTestStatisticDriverController(connection);
 
-            var statDrivers = await controller.GetDataSources(default);
+            var statDrivers = controller.GetDataSources(CostingType.PatientCare);
             Assert.AreEqual(TestData.GetDriverConfigs().Count, statDrivers.Value.Count());
         }
 
@@ -47,7 +51,7 @@ namespace Strata.DSS.CostAccounting.Api.Test.UnitTests
             await using var connection = new SqliteConnection("Datasource=:memory:");
             var (controller, _) = await GetTestStatisticDriverController(connection);
 
-            var statDrivers = await controller.GetDataSourceLinks(default);
+            var statDrivers = await controller.GetDataSourceLinks(CostingType.PatientCare, default);
             Assert.AreEqual(TestData.GetDriverConfigs().Count, statDrivers.Value.Count());
         }
 
@@ -63,21 +67,19 @@ namespace Strata.DSS.CostAccounting.Api.Test.UnitTests
             Assert.AreEqual(TestData.GetDriverConfigs().Count, statDrivers.Value.Count());
         }
 
-        private async Task<(StatisticDriversController controller, Mock<IStatisticDriversServiceClient> sisenseServiceMock)>
-            GetTestStatisticDriverController(SqliteConnection connection, bool accessAllowed = true)
+        private async Task<(StatisticDriversController controller, Mock<IStatisticDriversServiceClient> statisticDriversServiceClient)>
+            GetTestStatisticDriverController(SqliteConnection connection)
         {
             connection.Open();
-            var jazzDbContext = TestData.GetJazzSqlContext(connection);
-
-            await TestData.CreateData(jazzDbContext);
+            var costAccountingDbContext = TestData.GetJazzSqlContext(connection);
+            await TestData.CreateData(costAccountingDbContext);
 
             var costAccountingDbContextFactory = new Mock<IAsyncDbContextFactory<CostAccountingDbContext>>();
-
-            var sisenseServiceMock = new Mock<IStatisticDriversServiceClient>();
-            var claims = TestData.GetClaimsPrincipal();
+            costAccountingDbContextFactory.Setup(c => c.CreateDbContextAsync(It.IsAny<CancellationToken>())).ReturnsAsync(costAccountingDbContext);
 
             var statisticDriversRepository = new StatisticDriversRepository(costAccountingDbContextFactory.Object);
-            var costAccountingRepository = new CostAccountingRepository(costAccountingDbContextFactory.Object);
+            var costAccountingRepository = new Mock<ICostAccountingRepository>();
+            costAccountingRepository.Setup(c => c.GetRuleSetsAsync(It.IsAny<CancellationToken>())).ReturnsAsync(new List<RuleSet>());
 
             var mockMapper = new MapperConfiguration(cfg =>
             {
@@ -85,14 +87,16 @@ namespace Strata.DSS.CostAccounting.Api.Test.UnitTests
             });
             var mapper = mockMapper.CreateMapper();
 
+            var statisticDriversService = new StatisticDriversService(costAccountingRepository.Object, statisticDriversRepository);
             var costingConfigRepository = new CostingConfigRepository(mapper, costAccountingDbContextFactory.Object);
-            var statisticDriversService = new StatisticDriversService(costAccountingRepository, statisticDriversRepository);
-            var dataSourceService = new DataSourceService(costAccountingRepository);
-            var dataSourceLinkService = new DataSourceLinkService(costAccountingRepository);
+            var dataSourceService = new DataSourceService();
+            var dataSourceLinkService = new DataSourceLinkService(costAccountingRepository.Object);
 
             var controller = new StatisticDriversController(statisticDriversRepository, statisticDriversService, costingConfigRepository, dataSourceService, dataSourceLinkService);
 
-            return (controller, sisenseServiceMock);
+            var statisticDriversServiceClient = new Mock<IStatisticDriversServiceClient>();
+
+            return (controller, statisticDriversServiceClient);
         }
     }
 }

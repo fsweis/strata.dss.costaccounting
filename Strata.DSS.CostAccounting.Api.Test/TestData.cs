@@ -38,6 +38,18 @@ namespace Strata.DSS.CostAccounting.Api.Test
             return new List<DriverConfig>() { statDriver };
         }
 
+        public static List<DriverConfigView> GetDriverConfigViews()
+        {
+            var statDriver = new DriverConfigView()
+            {
+                Name = "TestStatisticDriver",
+                MeasureGuid = Guid.NewGuid(),
+                CostingType = Biz.Enums.CostingType.PatientCare
+            };
+
+            return new List<DriverConfigView>() { statDriver };
+        }
+
         public static CostAccountingDbContext GetJazzSqlContext(SqliteConnection connection)
         {
             var optionsBuilder = new DbContextOptionsBuilder<CostAccountingDbContext>()
@@ -54,6 +66,7 @@ namespace Strata.DSS.CostAccounting.Api.Test
             await jazzDbContext.Database.EnsureDeletedAsync();
             await jazzDbContext.Database.EnsureCreatedAsync();
             await jazzDbContext.DriverConfigs.AddRangeAsync(GetDriverConfigs());
+            await jazzDbContext.DriverConfigViews.AddRangeAsync(GetDriverConfigViews());
             await jazzDbContext.SaveChangesAsync();
         }
 

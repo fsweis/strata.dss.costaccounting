@@ -1,47 +1,39 @@
 ﻿using Strata.DSS.CostAccounting.Biz.CostAccounting.Constants;
 using Strata.DSS.CostAccounting.Biz.CostAccounting.Models;
-using Strata.DSS.CostAccounting.Biz.CostAccounting.Repositories;
 using Strata.DSS.CostAccounting.Biz.Enums;
 using Strata.DSS.CostAccounting.Biz.StatisticDrivers.Constants;
-using Strata.DSS.CostAccounting.Biz.StatisticDrivers.Models;
-using Strata.DSS.CostAccounting.Biz.StatisticDrivers.Repositories;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Strata.DSS.CostAccounting.Biz.StatisticDrivers.Services
 {
 
-    public class DataSourceService:IDataSourceService
+    public class DataSourceService : IDataSourceService
     {
-        private readonly ICostAccountingRepository _costaccountingRepository;
-        public DataSourceService(ICostAccountingRepository costaccountingRepository)
+        public DataSourceService()
         {
-            _costaccountingRepository = costaccountingRepository;
-
         }
-        public IList<DataTable> GetDataSources(Boolean isClaims)
+
+        public IList<DataTable> GetDataSources(CostingType costingType)
         {
             var dataSources = new List<DataTable>();
 
-            var glSampledDataTable = new DataTable() { DataTableGuid = DataTableConstants.DSSGLGuid, GlobalID = DataTableConstants.DSSGL, FriendlyName = SDDataTableConstants.DSSGL_FriendlyName }; 
+            var glSampledDataTable = new DataTable() { DataTableGuid = DataTableConstants.DSSGLGuid, GlobalID = DataTableConstants.DSSGL, FriendlyName = SDDataTableConstants.DSSGL_FriendlyName };
             dataSources.Add(glSampledDataTable);
 
-            if (!isClaims)
+            if (costingType == CostingType.PatientCare)
             {
-               var detailDataTable = new DataTable() { DataTableGuid = DataTableConstants.PatientBillingLineItemDetailGuid, GlobalID = DataTableConstants.PatientBillingLineItemDetail, FriendlyName = SDDataTableConstants.PBLID_FriendlyName };
-               dataSources.Add(detailDataTable);
-            
-               var payrollDataTable = new DataTable() { DataTableGuid = DataTableConstants.PayrollSampledGuid, GlobalID = DataTableConstants.PayrollSampled, FriendlyName = SDDataTableConstants.Payroll_FriendlyName };
-               dataSources.Add(payrollDataTable);
-                
-               var  statDriverDataTable = new DataTable() { DataTableGuid = DataTableConstants.StatisticDriverGuid, GlobalID = DataTableConstants.StatisticDriver, FriendlyName = SDDataTableConstants.StatDriver_FriendlyName };
-               dataSources.Add(statDriverDataTable);
-    
-               var  GL_PAYROLL_DATASOURCE_ID = new Guid(SDDataTableConstants.GL_PAYROLL_DATASOURCE_ID);
+                var detailDataTable = new DataTable() { DataTableGuid = DataTableConstants.PatientBillingLineItemDetailGuid, GlobalID = DataTableConstants.PatientBillingLineItemDetail, FriendlyName = SDDataTableConstants.PBLID_FriendlyName };
+                dataSources.Add(detailDataTable);
+
+                var payrollDataTable = new DataTable() { DataTableGuid = DataTableConstants.PayrollSampledGuid, GlobalID = DataTableConstants.PayrollSampled, FriendlyName = SDDataTableConstants.Payroll_FriendlyName };
+                dataSources.Add(payrollDataTable);
+
+                var statDriverDataTable = new DataTable() { DataTableGuid = DataTableConstants.StatisticDriverGuid, GlobalID = DataTableConstants.StatisticDriver, FriendlyName = SDDataTableConstants.StatDriver_FriendlyName };
+                dataSources.Add(statDriverDataTable);
+
+                var GL_PAYROLL_DATASOURCE_ID = new Guid(SDDataTableConstants.GL_PAYROLL_DATASOURCE_ID);
                 //Load GL/Payroll combined dummy datasource
                 var glPDataTable = new DataTable() { DataTableGuid = GL_PAYROLL_DATASOURCE_ID, FriendlyName = SDDataTableConstants.GL_PAYROLL_DATASOURCE_FriendlyName, GlobalID = SDDataTableConstants.GL_PAYROLL_DATASOURCE_FriendlyName };
                 dataSources.Add(glPDataTable);

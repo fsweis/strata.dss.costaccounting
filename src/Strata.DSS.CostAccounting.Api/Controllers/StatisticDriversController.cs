@@ -6,7 +6,6 @@ using Strata.DSS.CostAccounting.Biz.Enums;
 using Strata.DSS.CostAccounting.Biz.StatisticDrivers.Models;
 using Strata.DSS.CostAccounting.Biz.StatisticDrivers.Repositories;
 using Strata.DSS.CostAccounting.Biz.StatisticDrivers.Services;
-using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -39,48 +38,25 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
 
         [HttpGet("")]
         [ProducesResponseType(200)]
-        public async Task<ActionResult<IEnumerable<StatisticDriver>>> GetStatisticDrivers(CancellationToken cancellationToken)
+        public async Task<ActionResult<IEnumerable<StatisticDriver>>> GetStatisticDrivers(CostingType costingType, CancellationToken cancellationToken)
         {
-            //TODO pass in costing config with Naviation BLI
-            //dev patient
-            //var costingConfig = await _costaccountingRepository.GetCostingConfigAsync(new Guid("da9eef04-3c9d-445b-b0c4-3a7812ca76d8"), cancellationToken);
-            //kaiser patient
-            //var costingConfig = await _costaccountingRepository.GetCostingConfigAsync(new Guid("0f559827-4df4-4f1d-843e-d49a1e1c649d"), cancellationToken);
-            //kaiser claims
-            var costingConfig = await _costingConfigRepository.GetCostingConfigAsync(new Guid("2adafbaa-c365-472a-94f1-79b823d8547a"), cancellationToken);
-            var statisticDrivers = await _statisticDriversService.LoadStatisticDrivers(costingConfig.Type);
+            var statisticDrivers = await _statisticDriversService.LoadStatisticDrivers(costingType, cancellationToken);
             return Ok(statisticDrivers);
         }
 
         [HttpGet("data-sources")]
         [ProducesResponseType(200)]
-        public async Task<ActionResult<IEnumerable<DataTable>>> GetDataSources(CancellationToken cancellationToken)
+        public ActionResult<IEnumerable<DataTable>> GetDataSources(CostingType costingType)
         {
-            //TODO pass in costing config with Naviation BLI
-            //dev patient
-            //var costingConfig = await _costaccountingRepository.GetCostingConfigAsync(new Guid("da9eef04-3c9d-445b-b0c4-3a7812ca76d8"), cancellationToken);
-            //kaiser patient
-            //var costingConfig = await _costaccountingRepository.GetCostingConfigAsync(new Guid("0f559827-4df4-4f1d-843e-d49a1e1c649d"), cancellationToken);
-            //kaiser claims
-            var costingConfig = await _costingConfigRepository.GetCostingConfigAsync(new Guid("2adafbaa-c365-472a-94f1-79b823d8547a"), cancellationToken);
-            var isClaims = costingConfig.Type == CostingType.Claims;
-            var dataSources = _dataSourceService.GetDataSources(isClaims);
+            var dataSources = _dataSourceService.GetDataSources(costingType);
             return Ok(dataSources);
         }
 
         [HttpGet("data-source-links")]
         [ProducesResponseType(200)]
-        public async Task<ActionResult<IEnumerable<DataSourceLink>>> GetDataSourceLinks(CancellationToken cancellationToken)
+        public async Task<ActionResult<IEnumerable<DataSourceLink>>> GetDataSourceLinks(CostingType costingType, CancellationToken cancellationToken)
         {
-            //TODO pass in costing config with Naviation BLI
-            //dev patient
-            //var costingConfig = await _costaccountingRepository.GetCostingConfigAsync(new Guid("da9eef04-3c9d-445b-b0c4-3a7812ca76d8"), cancellationToken);
-            //kaiser patient
-            //var costingConfig = await _costaccountingRepository.GetCostingConfigAsync(new Guid("0f559827-4df4-4f1d-843e-d49a1e1c649d"), cancellationToken);
-            //kaiser claims
-            var costingConfig = await _costingConfigRepository.GetCostingConfigAsync(new Guid("2adafbaa-c365-472a-94f1-79b823d8547a"), cancellationToken);
-            var isClaims = costingConfig.Type == CostingType.Claims;
-            var dataSourceLinks = await _dataSourceLinkService.GetDataSourceLinks(isClaims);
+            var dataSourceLinks = await _dataSourceLinkService.GetDataSourceLinks(costingType, cancellationToken);
             return Ok(dataSourceLinks);
         }
 
@@ -107,7 +83,7 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
             }
 
             var costingConfig = await _costingConfigRepository.GetCostingConfigAsync(statisticDriverSaveData.CostingConfigGuid, cancellationToken);
-            var statDrivers = await _statisticDriversService.LoadStatisticDrivers(costingConfig.Type);
+            var statDrivers = await _statisticDriversService.LoadStatisticDrivers(costingConfig.Type, cancellationToken);
 
             return Ok(statDrivers);
         }
