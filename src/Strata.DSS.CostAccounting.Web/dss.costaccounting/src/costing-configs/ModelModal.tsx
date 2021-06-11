@@ -14,7 +14,7 @@ import { usePageLoader } from '@strata/tempo/lib/pageloader';
 import { IFiscalYear } from '../shared/data/IFiscalYear';
 import { IFiscalMonth } from '../shared/data/IFiscalMonth';
 import { IEntity } from '../shared/data/IEntity';
-import { costConfigService } from '../shared/data/CostConfigService';
+import { costConfigService } from '../shared/data/costConfigService';
 import { RadioChangeEvent } from 'antd/lib/radio/interface';
 import { ICostingType } from './data/ICostingType';
 import { ICostingMethod } from './data/ICostingMethod';
@@ -185,6 +185,9 @@ const ModelModal: React.FC<IModelModalProps> = (props: IModelModalProps) => {
   };
 
   const handleCancel = () => {
+    form.resetFields();
+    setCostingType(0);
+    setEntityUtilType(0);
     props.onCancel();
   };
 

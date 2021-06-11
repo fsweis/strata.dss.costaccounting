@@ -15,10 +15,9 @@ export const costConfigService = {
   getCostConfigs: (): Promise<ICostConfig[]> => {
     return httpGet<ICostConfig[]>(`costing-configs`);
   },
-
   getCostConfig: (costingConfigGuid: string): Promise<ICostConfig> => {
     return httpGet<ICostConfig>(`costing-configs/${costingConfigGuid}`);
-  }
+  },
   getFiscalMonths: (): Promise<IFiscalMonth[]> => {
     return httpGet<IFiscalMonth[]>(`costing-configs/fiscal-month`);
   },

@@ -14,7 +14,7 @@ import ActivityCodeDesigner from '../activity-code-designer/ActivityCodeDesigner
 import ChargeAllocation from '../charge-allocation/ChargeAllocation';
 import DropdownConfiguration from '../drop-down-configuration/DropdownConfiguration';
 import ManualStatistics from '../manual-statistics/ManualStatistics';
-import ModelModal from '../costing-configs/ModelModal';
+
 import { Navbar } from '@strata/navbar/lib';
 import CostMenu from './CostMenu';
 import CostConfigProvider from './data/CostConfigProvider';
@@ -23,6 +23,7 @@ import { ICostConfig } from './data/ICostConfig';
 const Navigation: React.FC = () => {
   const [costConfigGuid, setCostConfigGuid] = React.useState<string>('');
   const [costConfigs, setCostConfigs] = React.useState<ICostConfig[]>([]);
+
   const location = useLocation();
   const history = useHistory();
   useEffect(() => {
@@ -83,15 +84,6 @@ const Navigation: React.FC = () => {
           </Layout.Content>
         </Layout>
       </Layout>
-      <ModelModal
-        visible={modelModalVisible}
-        onCancel={() => {
-          setModelModalVisibleVisible(false);
-        }}
-        onSave={() => {
-          setModelModalVisibleVisible(false);
-        }}
-      ></ModelModal>
     </>
   );
 };

@@ -56,7 +56,7 @@ const StatisticDrivers: React.FC = () => {
       }
     };
     setGridLoading(true);
-    console.log('Cost Config:', costConfig);
+
     fetchData();
   }, [costConfig]);
 
