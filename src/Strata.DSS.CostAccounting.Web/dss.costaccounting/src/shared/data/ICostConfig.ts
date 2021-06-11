@@ -7,9 +7,20 @@ export interface ICostConfig {
   type: number;
   createdAt: Date;
   modifiedAtUtc: Date;
-  isPayrollCosting: boolean;
-  fiscalMonhtID: number;
-  description: string;
-  isBudgetedAndActualCosting: boolean;
-  isUtilizationEntityConfigured: boolean;
 }
+
+export const newCostConfig = (costConfig: Partial<ICostConfig> = {}): ICostConfig => {
+  return {
+    ...{
+      costingConfigGuid: '',
+      name: '',
+      isGLCosting: false,
+      defaultChargeAllocationMethod: 0,
+      fiscalYearID: 0,
+      type: 0,
+      createdAt: new Date(),
+      modifiedAtUtc: new Date()
+    },
+    ...costConfig
+  };
+};
