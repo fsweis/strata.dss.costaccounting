@@ -39,6 +39,8 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.DbContexts
 
         public virtual DbSet<CostingConfigEntityLevelSecurity> CCELS { get; set; }
 
+        public virtual DbSet<CostingConfigEntityLinkage> CCELinks { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Measure>(entity =>
@@ -142,6 +144,11 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.DbContexts
             {
                 entity.HasKey(e => e.CostingConfigEntityLevelSecurityID);
                 entity.ToTable("CostingConfigEntityLevelSecurity", "dss");
+            });
+            modelBuilder.Entity<CostingConfigEntityLinkage>(entity =>
+            {
+                entity.HasKey(e => e.CostingConfigEntityLinkageID);
+                entity.ToTable("CostingConfigEntityLinkage", "dss");
             });
         }
     }

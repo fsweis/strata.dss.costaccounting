@@ -19,9 +19,10 @@ import { RadioChangeEvent } from 'antd/lib/radio/interface';
 import { ICostingType } from './data/ICostingType';
 import { ICostingMethod } from './data/ICostingMethod';
 import { ICostingPermissions } from './data/ICostingPermissions';
+import { ICostConfigSaveData } from './data/ICostConfigSaveData';
 import TreeDropDown, { ITreeDropDownNode } from '@strata/tempo/lib/treedropdown';
 import { getEmptyGuid } from './Utils';
-import { ICostConfig } from './data/ICostConfig';
+
 export interface IModelModalProps {
   visible: boolean;
   onCancel: () => void;
@@ -48,7 +49,6 @@ const ModelModal: React.FC<IModelModalProps> = (props: IModelModalProps) => {
   const [entities, setEntities] = useState<IEntity[]>([]);
   const [filteredEntities, setFilteredEntities] = useState<IEntity[]>([]);
   const { setLoading } = usePageLoader();
-  const [modalLoading, setModalLoading] = useState<boolean>(false);
   const [costingType, setCostingType] = useState<number>(0);
   const [entityUtilType, setEntityUtilType] = useState<number>(0);
   const [costingTypes, setCostingTypes] = useState<ICostingType[]>([]);
@@ -97,10 +97,10 @@ const ModelModal: React.FC<IModelModalProps> = (props: IModelModalProps) => {
         };
         setConfigForm(configForm);
       } finally {
-        setModalLoading(false);
+        setLoading(false);
       }
     };
-    setModalLoading(true);
+    setLoading(true);
     fetchData();
   }, []);
 
@@ -157,18 +157,30 @@ const ModelModal: React.FC<IModelModalProps> = (props: IModelModalProps) => {
       modifiedAtUtc: new Date()
     };
 
-    setModalLoading(true);
-    const result = await saveNewConfig(newConfig);
-    form.resetFields();
-    props.onSave();
-  };
+    const glPayrollEntities = values.filteredEntities ? values.filteredEntities.map((x) => +x) : [];
+    const utilEntities = values.specifyUtilizationEntities ? values.specifyUtilizationEntities.map((x) => +x) : [];
+    const configSaveData: ICostConfigSaveData = {
+      costingConfig: newConfig,
+      glPayrollEntities: glPayrollEntities,
+      utilEntities: utilEntities
+    };
 
-  const saveNewConfig = async (costConfig: ICostConfig) => {
     try {
-      const saveConfigResultMessage = await costConfigService.addNewConfig(costConfig);
-      Toast.show({ message: saveConfigResultMessage, toastType: 'success' });
+      setLoading(true);
+      const saveConfigResult = await costConfigService.addNewConfig(configSaveData);
+
+      if (saveConfigResult.success) {
+        Toast.show({ message: saveConfigResult.message, toastType: 'success' });
+        //reset form
+        form.resetFields();
+        setCostingType(0);
+        setEntityUtilType(0);
+        props.onSave();
+      } else {
+        Toast.show({ message: saveConfigResult.message, toastType: 'error' });
+      }
     } finally {
-      setModalLoading(false);
+      setLoading(false);
     }
   };
 

@@ -10,6 +10,7 @@ namespace Strata.CS
         public CostAccountingProfile()
         {
             CreateMap<CostingConfigEntity, CostingConfigModel>();
+            CreateMap<CostingConfigModel, CostingConfigEntity>();
         }
     }
 }

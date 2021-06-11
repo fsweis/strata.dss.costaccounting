@@ -129,13 +129,13 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
         }
 
 
-        [HttpPost("")]
+        [HttpPost("new-config")]
         [ProducesResponseType(200)]
-        public async Task<ActionResult<ConfigForm>> AddNewConfig([FromBody] ConfigForm configForm, CancellationToken cancellationToken)
+        public async Task<ActionResult<CostConfigSaveResult>> AddNewConfig([FromBody] CostingConfigSaveData costConfigSaveData, CancellationToken cancellationToken)
         {
 
-            var newForm = await _costingConfigService.AddNewConfig(configForm);
-            return Ok(newForm);
+            var saveResult = await _costingConfigService.AddNewConfig(costConfigSaveData);
+            return Ok(saveResult);
         }
 
     }

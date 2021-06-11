@@ -8,6 +8,6 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.Services
 {
     public interface ICostingConfigService
     {
-        public Task<ConfigForm> AddNewConfig(ConfigForm configForm);
+        public Task<CostConfigSaveResult> AddNewConfig(CostingConfigSaveData configForm);
     }
 }

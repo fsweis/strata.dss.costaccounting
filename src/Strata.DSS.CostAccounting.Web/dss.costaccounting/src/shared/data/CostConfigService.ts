@@ -6,7 +6,8 @@ import { IFiscalYear } from './IFiscalYear';
 import { ICostingType } from './ICostingType';
 import { ICostingMethod } from './ICostingMethod';
 import { ICostingPermissions } from './ICostingPermissions';
-import { IConfigForm } from '../ModelModal';
+import { ICostConfigSaveResult } from './ICostConfigSaveResult';
+import { ICostConfigSaveData } from './ICostConfigSaveData';
 
 const { httpGet, httpPost } = getSecureService(appConfig.apiUrl);
 
@@ -35,7 +36,7 @@ export const costConfigService = {
   getCostingPermissions: (): Promise<ICostingPermissions> => {
     return httpGet<ICostingPermissions>(`costing-configs/costing-permissions`);
   },
-  addNewConfig: (costConfig: ICostConfig): Promise<ICostConfig> => {
-    return httpPost<ICostConfig>(`costing-configs/new-config`, costConfig);
+  addNewConfig: (costConfigSaveData: ICostConfigSaveData): Promise<ICostConfigSaveResult> => {
+    return httpPost<ICostConfigSaveResult>(`costing-configs/new-config`, costConfigSaveData);
   }
 };

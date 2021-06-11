@@ -1,0 +1,13 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+
+namespace Strata.DSS.CostAccounting.Biz.CostAccounting.Models
+{
+    public class CostingConfigSaveData
+    {
+        public CostingConfigModel CostingConfig { get; set; }
+        public List<int> GlPayrollEntities { get; set; }
+        public List<int> UtilEntities { get; set; }
+    }
+}
