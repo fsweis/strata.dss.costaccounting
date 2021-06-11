@@ -30,6 +30,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddScoped<IDataSourceService, DataSourceService>();
             services.AddScoped<IDataSourceLinkService, DataSourceLinkService>();
             services.AddScoped<IEntityService, EntityService>();
+            services.AddScoped<ICostingConfigService, CostingConfigService>();
             services.AddCachedSmcServiceClient();
             services.AddHttpContextAccessor();
             services.TryAddScoped<IClaimsPrincipalAccessor, ClaimsPrincipalAccessor>();

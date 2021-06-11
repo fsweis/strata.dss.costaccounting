@@ -5,8 +5,10 @@ import { IFiscalMonth } from './IFiscalMonth';
 import { IFiscalYear } from './IFiscalYear';
 import { ICostingType } from './ICostingType';
 import { ICostingMethod } from './ICostingMethod';
+import { ICostingPermissions } from './ICostingPermissions';
+import { IConfigForm } from '../ModelModal';
 
-const { httpGet } = getSecureService(appConfig.apiUrl);
+const { httpGet, httpPost } = getSecureService(appConfig.apiUrl);
 
 export const costConfigService = {
   getCostConfig: (): Promise<ICostConfig[]> => {
@@ -29,5 +31,11 @@ export const costConfigService = {
   },
   getCostingMethods: (): Promise<ICostingMethod[]> => {
     return httpGet<ICostingMethod[]>(`costing-configs/costing-method`);
+  },
+  getCostingPermissions: (): Promise<ICostingPermissions> => {
+    return httpGet<ICostingPermissions>(`costing-configs/costing-permissions`);
+  },
+  addNewConfig: (costConfig: ICostConfig): Promise<ICostConfig> => {
+    return httpPost<ICostConfig>(`costing-configs/new-config`, costConfig);
   }
 };

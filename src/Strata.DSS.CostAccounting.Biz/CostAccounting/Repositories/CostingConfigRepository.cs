@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Strata.DSS.CostAccounting.Biz.CostAccounting.DbContexts;
+using Strata.DSS.CostAccounting.Biz.CostAccounting.Entities;
 using Strata.DSS.CostAccounting.Biz.CostAccounting.Models;
 using Strata.SqlTools.Configuration.Common.AsyncFactory;
 using System;
@@ -103,6 +104,17 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.Repositories
             }
 
             return _mapper.Map<IEnumerable<CostingConfigEntityLevelSecurity>>(ccels);
+        }
+
+        public async Task<CostingConfigEntity> AddNewCostingConfigAsync(CostingConfigModel costingConfigModel, CancellationToken cancellationToken)
+        {
+            await using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
+           
+           var newConfig = _mapper.Map<CostingConfigEntity>(costingConfigModel);
+           dbContext.CostingConfigs.Add(newConfig);
+            await dbContext.SaveChangesAsync(cancellationToken);
+            return newConfig;
+
         }
     }
 }

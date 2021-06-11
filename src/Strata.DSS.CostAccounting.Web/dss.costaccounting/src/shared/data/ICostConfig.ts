@@ -7,4 +7,9 @@ export interface ICostConfig {
   type: number;
   createdAt: Date;
   modifiedAtUtc: Date;
+  isPayrollCosting: boolean;
+  fiscalMonhtID: number;
+  description: string;
+  isBudgetedAndActualCosting: boolean;
+  isUtilizationEntityConfigured: boolean;
 }

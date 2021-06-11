@@ -9,6 +9,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
+using Strata.ApiLib.Standard.Models;
 
 namespace Strata.DSS.CostAccounting.Api.Controllers
 {
@@ -20,10 +22,12 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
     {
         private readonly ICostingConfigRepository _costingConfigRepository;
         private readonly IEntityService _entityService;
-        public CostingConfigController(ICostingConfigRepository costingConfigRepository, IEntityService entityService)
+        private readonly ICostingConfigService _costingConfigService;
+        public CostingConfigController(ICostingConfigRepository costingConfigRepository, IEntityService entityService, ICostingConfigService costingConfigService)
         {
             _costingConfigRepository = costingConfigRepository;
             _entityService = entityService;
+            _costingConfigService = costingConfigService;
         }
 
         [HttpGet("")]
@@ -46,7 +50,7 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
         [ProducesResponseType(200)]
         public async Task<ActionResult<List<CostingConfigModel>>> SaveStatisticDrivers([FromBody] CostingConfigModel costingConfgData
                                                                                                 , CancellationToken cancellationToken)
-        {            
+        {
             return Ok();
         }
 
@@ -93,7 +97,7 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
         [ProducesResponseType(200)]
         public ActionResult<IEnumerable<ConfigCostingMethod>> GetCostingMethods(CancellationToken cancellationToken)
         {
-            var methods =  new List<ConfigCostingMethod> { ConfigCostingMethod.LoadByMethod(CostingMethod.Simultaneous), ConfigCostingMethod.LoadByMethod(CostingMethod.SingleStepDown) };
+            var methods = new List<ConfigCostingMethod> { ConfigCostingMethod.LoadByMethod(CostingMethod.Simultaneous), ConfigCostingMethod.LoadByMethod(CostingMethod.SingleStepDown) };
             return Ok(methods);
         }
 
@@ -112,6 +116,26 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
             {
                 return new List<ConfigCostingType>();
             }
+        }
+
+        [HttpGet("costing-permissions")]
+        [ProducesResponseType(200)]
+        public async Task<ActionResult<CostingPermissions>> GetCostingPermissions(CancellationToken cancellationToken)
+        {
+            var systemSettings = await _costingConfigRepository.GetSystemSettingsAsync(cancellationToken);
+            var isClaimsCostingEnabled = systemSettings.Any(x => x.IsClaimsCostingEnabled());
+            var isCostingEntityLevelSecurityEnabled = systemSettings.Any(x => x.IsCostingEntityLevelSecurityEnabled());
+            return new CostingPermissions { IsClaimsCostingEnabled = isClaimsCostingEnabled, IsCostingEntityLevelSecurityEnabled = isCostingEntityLevelSecurityEnabled };
+        }
+
+
+        [HttpPost("")]
+        [ProducesResponseType(200)]
+        public async Task<ActionResult<ConfigForm>> AddNewConfig([FromBody] ConfigForm configForm, CancellationToken cancellationToken)
+        {
+
+            var newForm = await _costingConfigService.AddNewConfig(configForm);
+            return Ok(newForm);
         }
 
     }

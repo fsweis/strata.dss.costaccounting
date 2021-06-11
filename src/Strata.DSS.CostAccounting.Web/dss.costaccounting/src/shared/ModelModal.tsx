@@ -1,16 +1,15 @@
 import React from 'react';
 import Modal from '@strata/tempo/lib/modal';
 import Input from '@strata/tempo/lib/input';
-import useForm, { RuleObject } from '@strata/tempo/lib/form';
 import Button from '@strata/tempo/lib/button';
 import Form from '@strata/tempo/lib/form';
 import InputTextArea from '@strata/tempo/lib/inputtextarea';
 import RadioGroup from '@strata/tempo/lib/radiogroup';
 import CheckboxGroup from '@strata/tempo/lib/checkboxgroup';
-import { useEffect, useState, ChangeEvent } from 'react';
+import Toast from '@strata/tempo/lib/toast';
+import { useEffect, useState } from 'react';
 import Spacing from '@strata/tempo/lib/spacing';
-import DropDown, { DropDownValue } from '@strata/tempo/lib/dropdown';
-import Text from '@strata/tempo/lib/text';
+import DropDown from '@strata/tempo/lib/dropdown';
 import { usePageLoader } from '@strata/tempo/lib/pageloader';
 import { IFiscalYear } from './data/IFiscalYear';
 import { IFiscalMonth } from './data/IFiscalMonth';
@@ -19,12 +18,27 @@ import { costConfigService } from './data/CostConfigService';
 import { RadioChangeEvent } from 'antd/lib/radio/interface';
 import { ICostingType } from './data/ICostingType';
 import { ICostingMethod } from './data/ICostingMethod';
+import { ICostingPermissions } from './data/ICostingPermissions';
 import TreeDropDown, { ITreeDropDownNode } from '@strata/tempo/lib/treedropdown';
-import cloneDeep from 'lodash/cloneDeep';
+import { getEmptyGuid } from './Utils';
+import { ICostConfig } from './data/ICostConfig';
 export interface IModelModalProps {
   visible: boolean;
   onCancel: () => void;
   onSave: () => void;
+}
+
+export interface IConfigForm {
+  name: string;
+  description: string;
+  year: number;
+  ytdMonth: number;
+  type: number;
+  filteredEntities: string[];
+  utilizationEntities: number;
+  specifyUtilizationEntities: string[];
+  method: number;
+  options: number[];
 }
 
 const ModelModal: React.FC<IModelModalProps> = (props: IModelModalProps) => {
@@ -39,19 +53,23 @@ const ModelModal: React.FC<IModelModalProps> = (props: IModelModalProps) => {
   const [entityUtilType, setEntityUtilType] = useState<number>(0);
   const [costingTypes, setCostingTypes] = useState<ICostingType[]>([]);
   const [costingMethods, setCostingMethods] = useState<ICostingMethod[]>([]);
-  const [isClaimsCostingEnabled, setIsClaimsCostingEnabled] = useState<boolean>(true);
-  const [isCostingEntityLevelSecurityEnabled, setIsCostingEntityLevelSecurityEnabled] = useState<boolean>(true);
   const [entityTreeData, setEntityTreeData] = useState<ITreeDropDownNode[]>([]);
+  const [utilEntityTreeData, setUtilEntityTreeData] = useState<ITreeDropDownNode[]>([]);
+  const [costingPermissions, setCostingPermissions] = useState<ICostingPermissions>();
+  const [configForm, setConfigForm] = useState<IConfigForm>();
+
+  //Load initial data
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [fiscalMonths, fiscalYears, entities, filteredEntities, costingTypes, costingMethods] = await Promise.all([
+        const [fiscalMonths, fiscalYears, entities, filteredEntities, costingTypes, costingMethods, costingPermissions] = await Promise.all([
           costConfigService.getFiscalMonths(),
           costConfigService.getFiscalYears(),
           costConfigService.getEntities(),
           costConfigService.getFilteredEntities(),
           costConfigService.getCostingTypes(),
-          costConfigService.getCostingMethods()
+          costConfigService.getCostingMethods(),
+          costConfigService.getCostingPermissions()
         ]);
         setFiscalMonths(fiscalMonths);
         setFiscalYears(fiscalYears);
@@ -59,6 +77,25 @@ const ModelModal: React.FC<IModelModalProps> = (props: IModelModalProps) => {
         setFilteredEntities(filteredEntities);
         setCostingTypes(costingTypes);
         setCostingMethods(costingMethods);
+        setCostingPermissions(costingPermissions);
+        //set initial form
+        const year = fiscalYears.find((x) => x.fiscalYearID === new Date().getFullYear())?.fiscalYearID;
+        const ytdMonth = fiscalMonths.find((x) => x.sortOrder === 12)?.fiscalMonthID;
+        const fEntities = filteredEntities.find((x) => x.entityID === 0)?.entityID.toString();
+        const nEntities = entities.find((x) => x.entityID === 0)?.entityID.toString();
+        const configForm = {
+          name: '',
+          description: '',
+          year: year ? year : 0,
+          ytdMonth: ytdMonth ? ytdMonth : 0,
+          type: 0,
+          filteredEntities: fEntities ? [fEntities] : [],
+          utilizationEntities: 0,
+          specifyUtilizationEntities: nEntities ? [nEntities] : [],
+          method: 0,
+          options: []
+        };
+        setConfigForm(configForm);
       } finally {
         setModalLoading(false);
       }
@@ -67,28 +104,72 @@ const ModelModal: React.FC<IModelModalProps> = (props: IModelModalProps) => {
     fetchData();
   }, []);
 
+  //Set Filtered Entity Trees when entities are loaded
   useEffect(() => {
     const runEntityTreeChildren = filteredEntities.map((entity) => {
       return { key: entity.entityID.toString(), title: entity.description, value: entity.entityID.toString() };
     });
-
     const rootNode = runEntityTreeChildren.find((x) => x.key === '0');
-
     const runEntityTree = [
       {
         key: rootNode ? rootNode.key : '0',
         title: rootNode ? rootNode.title : 'All Entities',
         value: rootNode ? rootNode.value : '0',
-        children: runEntityTreeChildren.filter((x) => x.key !== '0')
+        children: runEntityTreeChildren.filter((x) => x.key !== '0' && x.title !== '')
       }
     ];
     setEntityTreeData(runEntityTree);
   }, [filteredEntities]);
 
+  //Set Utilization Entity Trees when entities are loaded
+  useEffect(() => {
+    const runUtilEntityTreeChildren = entities.map((entity) => {
+      return { key: entity.entityID.toString(), title: entity.description, value: entity.entityID.toString() };
+    });
+    const rootNode = runUtilEntityTreeChildren.find((x) => x.key === '0');
+    const runUtilEntityTree = [
+      {
+        key: rootNode ? rootNode.key : '0',
+        title: rootNode ? rootNode.title : 'All Entities',
+        value: rootNode ? rootNode.value : '0',
+        children: runUtilEntityTreeChildren.filter((x) => x.key !== '0' && x.title !== '')
+      }
+    ];
+    setUtilEntityTreeData(runUtilEntityTree);
+  }, [entities]);
+
+  //Form Finish
   const onFormFinish = async (vals: { [name: string]: any }) => {
-    console.log(vals);
-    //const values = vals as ICostingConfig;
+    const values = vals as IConfigForm;
+    const newConfig = {
+      costingConfigGuid: getEmptyGuid(),
+      name: values.name,
+      description: values.description,
+      isGLCosting: true,
+      defaultChargeAllocationMethod: values.method,
+      fiscalYearID: values.year,
+      fiscalMonhtID: values.ytdMonth,
+      type: values.type ? values.type : 0,
+      isPayrollCosting: values.options ? values.options.indexOf(1) >= 0 : false,
+      isBudgetedAndActualCosting: values.options ? values.options.indexOf(2) >= 0 : false,
+      isUtilizationEntityConfigured: values.utilizationEntities ? (values.utilizationEntities === 1 ? true : false) : false,
+      createdAt: new Date(),
+      modifiedAtUtc: new Date()
+    };
+
+    setModalLoading(true);
+    const result = await saveNewConfig(newConfig);
     form.resetFields();
+    props.onSave();
+  };
+
+  const saveNewConfig = async (costConfig: ICostConfig) => {
+    try {
+      const saveConfigResultMessage = await costConfigService.addNewConfig(costConfig);
+      Toast.show({ message: saveConfigResultMessage, toastType: 'success' });
+    } finally {
+      setModalLoading(false);
+    }
   };
 
   const handleCancel = () => {
@@ -96,7 +177,7 @@ const ModelModal: React.FC<IModelModalProps> = (props: IModelModalProps) => {
   };
 
   const handleSave = () => {
-    props.onSave();
+    form.submit();
   };
 
   const handleEntityTypeChange = (e: RadioChangeEvent) => {
@@ -124,7 +205,7 @@ const ModelModal: React.FC<IModelModalProps> = (props: IModelModalProps) => {
           </>
         }
       >
-        <Form form={form} onFinish={onFormFinish} layout={'vertical'} preserve={false}>
+        <Form form={form} onFinish={onFormFinish} layout={'vertical'} preserve={true} initialValues={configForm}>
           <Form.Item label='Name' name='name' rules={[{ required: true, whitespace: true }]}>
             <Input />
           </Form.Item>
@@ -133,17 +214,16 @@ const ModelModal: React.FC<IModelModalProps> = (props: IModelModalProps) => {
           </Form.Item>
           <Spacing itemSpacing={16}>
             <Form.Item label='Year' name='year' rules={[{ required: true }]}>
-              <DropDown itemValueField='fiscalYearID' itemTextField='name' items={fiscalYears} defaultValue={fiscalYears.find((x) => x.fiscalYearID === new Date().getFullYear())?.fiscalYearID} />
+              <DropDown itemValueField='fiscalYearID' itemTextField='name' items={fiscalYears} />
             </Form.Item>
             <Form.Item label='YTD Month' name='ytdMonth' rules={[{ required: true }]}>
-              <DropDown itemValueField='fiscalMonthID' itemTextField='name' items={fiscalMonths} defaultValue={fiscalMonths.find((x) => x.sortOrder === 12)?.fiscalMonthID} />
+              <DropDown itemValueField='fiscalMonthID' itemTextField='name' items={fiscalMonths} />
             </Form.Item>
           </Spacing>
           <Spacing itemSpacing={16}>
-            {isClaimsCostingEnabled && (
+            {costingPermissions?.isClaimsCostingEnabled && (
               <Form.Item label='Type' name='type' rules={[{ required: true }]}>
                 <RadioGroup
-                  defaultValue={0}
                   onChange={handleCostingTypeChange}
                   options={costingTypes.map((costingType, index) => {
                     return { value: index, label: costingType.friendlyName };
@@ -151,15 +231,14 @@ const ModelModal: React.FC<IModelModalProps> = (props: IModelModalProps) => {
                 />
               </Form.Item>
             )}
-            <Form.Item label='GL/Payroll Entities' name='entities' rules={[{ required: true }]}>
-              <TreeDropDown treeData={entityTreeData} selectionMode='multiple' defaultValue={filteredEntities.find((x) => x.entityID === 0)?.entityID.toString()} treeDefaultExpandedKeys={['0']} />
+            <Form.Item label='GL/Payroll Entities' name='filteredEntities' rules={[{ required: true }]}>
+              <TreeDropDown treeData={entityTreeData} selectionMode='multiple' treeDefaultExpandedKeys={['0']} />
             </Form.Item>
           </Spacing>
-          {isCostingEntityLevelSecurityEnabled && (
+          {costingPermissions?.isCostingEntityLevelSecurityEnabled && (
             <Spacing itemSpacing={16}>
               <Form.Item label='Utilization Entities' name='utilizationEntities' rules={[{ required: true }]}>
                 <RadioGroup
-                  defaultValue={0}
                   onChange={handleEntityTypeChange}
                   options={[
                     { value: 0, label: 'Same as GL/Payroll' },
@@ -169,7 +248,7 @@ const ModelModal: React.FC<IModelModalProps> = (props: IModelModalProps) => {
               </Form.Item>
               {entityUtilType === 1 && (
                 <Form.Item label='Specifiy Utilization Entities' name='specifyUtilizationEntities' rules={[{ required: true }]}>
-                  <DropDown multiSelect itemValueField='entityID' itemTextField='description' items={entities} defaultValue={filteredEntities.find((x) => x.entityID === 0)?.entityID} />
+                  <TreeDropDown treeData={utilEntityTreeData} selectionMode='multiple' treeDefaultExpandedKeys={['0']} />
                 </Form.Item>
               )}
             </Spacing>
@@ -178,7 +257,6 @@ const ModelModal: React.FC<IModelModalProps> = (props: IModelModalProps) => {
             <Spacing itemSpacing={16}>
               <Form.Item label='Method' name='method' rules={[{ required: true }]}>
                 <RadioGroup
-                  defaultValue={0}
                   options={costingMethods.map((costingMethod, index) => {
                     return { value: index, label: costingMethod.friendlyName };
                   })}
