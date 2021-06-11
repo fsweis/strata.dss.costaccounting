@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import DataGrid from '@strata/tempo/lib/datagrid';
 import Header from '@strata/tempo/lib/header';
 import Tooltip from '@strata/tempo/lib/tooltip';
@@ -23,6 +23,7 @@ import cloneDeep from 'lodash/cloneDeep';
 import { IDataSource } from '../shared/data/IDataSource';
 import PatientDriverTreeModal from './PatientDriverTreeModal';
 import useStatDriverRulesEditWindow from './data/useStatDriverRulesEditWindow';
+import { CostConfigContext } from '../shared/data/CostConfigContext';
 
 const StatisticDrivers: React.FC = () => {
   const [statDrivers, setStatDrivers] = useState<IStatisticDriver[]>([]);
@@ -35,6 +36,8 @@ const StatisticDrivers: React.FC = () => {
   const gridRef = React.useRef<DataGrid>(null);
   const { setLoading } = usePageLoader();
   const [gridLoading, setGridLoading] = useState<boolean>(false);
+
+  const { costConfig } = useContext(CostConfigContext);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -53,8 +56,9 @@ const StatisticDrivers: React.FC = () => {
       }
     };
     setGridLoading(true);
+    console.log('Cost Config:', costConfig);
     fetchData();
-  }, []);
+  }, [costConfig]);
 
   const handleCancel = () => {
     const emptyGuid = getEmptyGuid();
