@@ -2,7 +2,11 @@
 using Microsoft.EntityFrameworkCore;
 using Moq;
 using Strata.CoreLib.Claims;
+using Strata.DSS.CostAccounting.Biz.CostAccounting.Constants;
 using Strata.DSS.CostAccounting.Biz.CostAccounting.DbContexts;
+using Strata.DSS.CostAccounting.Biz.CostAccounting.Models;
+using Strata.DSS.CostAccounting.Biz.Enums;
+using Strata.DSS.CostAccounting.Biz.StatisticDrivers.Constants;
 using Strata.DSS.CostAccounting.Biz.StatisticDrivers.Models;
 using Strata.DSS.CostAccounting.Client;
 using System;
@@ -50,6 +54,67 @@ namespace Strata.DSS.CostAccounting.Api.Test
             return new List<DriverConfigView>() { statDriver };
         }
 
+        internal static List<DataTable> GetDataSources(CostingType costingType)
+        {
+            var dataSources = new List<DataTable>();
+            var glSampledDataTable = new DataTable() { DataTableGuid = DataTableConstants.DSSGLGuid, GlobalID = DataTableConstants.DSSGL, FriendlyName = SDDataTableConstants.DSSGL_FriendlyName };
+            dataSources.Add(glSampledDataTable);
+
+            if (costingType == CostingType.PatientCare)
+            {
+                var detailDataTable = new DataTable() { DataTableGuid = DataTableConstants.PatientBillingLineItemDetailGuid, GlobalID = DataTableConstants.PatientBillingLineItemDetail, FriendlyName = SDDataTableConstants.PBLID_FriendlyName };
+                dataSources.Add(detailDataTable);
+                var payrollDataTable = new DataTable() { DataTableGuid = DataTableConstants.PayrollSampledGuid, GlobalID = DataTableConstants.PayrollSampled, FriendlyName = SDDataTableConstants.Payroll_FriendlyName };
+                dataSources.Add(payrollDataTable);
+                var statDriverDataTable = new DataTable() { DataTableGuid = DataTableConstants.StatisticDriverGuid, GlobalID = DataTableConstants.StatisticDriver, FriendlyName = SDDataTableConstants.StatDriver_FriendlyName };
+                dataSources.Add(statDriverDataTable);
+                var GL_PAYROLL_DATASOURCE_ID = new Guid(SDDataTableConstants.GL_PAYROLL_DATASOURCE_ID);
+                var glPDataTable = new DataTable() { DataTableGuid = GL_PAYROLL_DATASOURCE_ID, FriendlyName = SDDataTableConstants.GL_PAYROLL_DATASOURCE_FriendlyName, GlobalID = SDDataTableConstants.GL_PAYROLL_DATASOURCE_FriendlyName };
+                dataSources.Add(glPDataTable);
+            }
+            else
+            {
+                var claimDetailDataTable = new DataTable() { DataTableGuid = DataTableConstants.PatientClaimChargeLineItemDetailGuid, GlobalID = DataTableConstants.PatientClaimChargeLineItemDetail, FriendlyName = SDDataTableConstants.ClaimDetail_FriendlyName };
+                dataSources.Add(claimDetailDataTable);
+
+                var claimStatisticDriverDataTable = new DataTable() { DataTableGuid = DataTableConstants.ClaimStatisticDriverGuid, GlobalID = DataTableConstants.ClaimStatisticDriver, FriendlyName = SDDataTableConstants.ClaimStatDriver_FriendlyName };
+                dataSources.Add(claimStatisticDriverDataTable);
+            }
+
+            return dataSources;
+        }
+
+        internal static List<DataSourceLink> GetDataSourceLinks()
+        {
+            var dataSourceLinks = new List<DataSourceLink>();
+
+            var glMeasure = GetGLMeasure();
+            var glDataSourceLink = new DataSourceLink(glMeasure.MeasureGuid, SDMeasureConstants.Dollars_FriendlyName, glMeasure.DataTableGuid, true);
+            dataSourceLinks.Add(glDataSourceLink);
+
+            var summaryMeasure = GetSummaryMeasure();
+            var summaryDataSourceLink = new DataSourceLink(summaryMeasure.MeasureGuid, SDMeasureConstants.Encounters_FriendlyName, DataTableConstants.PatientBillingLineItemDetailGuid, false);
+            dataSourceLinks.Add(summaryDataSourceLink);
+
+            var dollarsMeasure = GetDollarsMeasure();
+            var dollarsDataSourceLink = new DataSourceLink(dollarsMeasure.MeasureGuid, SDMeasureConstants.Dollars_FriendlyName, dollarsMeasure.DataTableGuid, false);
+            dataSourceLinks.Add(dollarsDataSourceLink);
+
+            var hoursMeasure = GetDollarsMeasure();
+            var hoursDataSourceLink = new DataSourceLink(hoursMeasure.MeasureGuid, SDMeasureConstants.Hours_FriendlyName, hoursMeasure.DataTableGuid, false);
+            dataSourceLinks.Add(hoursDataSourceLink);
+
+            var unitsMeasure = GetDollarsMeasure();
+            var unitsDataSourceLink = new DataSourceLink(unitsMeasure.MeasureGuid, unitsMeasure.FriendlyName, unitsMeasure.DataTableGuid, false);
+            dataSourceLinks.Add(unitsDataSourceLink);
+
+            var GL_PAYROLL_DATASOURCE_ID = new Guid(SDDataTableConstants.GL_PAYROLL_DATASOURCE_ID);
+            var glPayrollDataSourceLink = new DataSourceLink(GL_PAYROLL_DATASOURCE_ID, SDMeasureConstants.Dollars_FriendlyName, GL_PAYROLL_DATASOURCE_ID, true);
+            dataSourceLinks.Add(glPayrollDataSourceLink);
+
+            return dataSourceLinks;
+        }
+
         public static CostAccountingDbContext GetJazzSqlContext(SqliteConnection connection)
         {
             var optionsBuilder = new DbContextOptionsBuilder<CostAccountingDbContext>()
@@ -67,7 +132,73 @@ namespace Strata.DSS.CostAccounting.Api.Test
             await jazzDbContext.Database.EnsureCreatedAsync();
             await jazzDbContext.DriverConfigs.AddRangeAsync(GetDriverConfigs());
             await jazzDbContext.DriverConfigViews.AddRangeAsync(GetDriverConfigViews());
+            await jazzDbContext.Measures.AddAsync(GetGLMeasure());
             await jazzDbContext.SaveChangesAsync();
+        }
+
+        internal static Measure GetGLMeasure()
+        {
+            var measure = new Measure()
+            {
+                MeasureGuid = new Guid("d33709b1-e53b-4c54-b606-d647fdcad52e"),
+                DataTableGuid = DataTableConstants.DSSGLGuid,
+                FriendlyName = "Test GL Measure",
+                SQLColumnName = MeasureConstants.YTDDollarsMeasure
+            };
+
+            return measure;
+        }
+
+        internal static Measure GetSummaryMeasure()
+        {
+            var measure = new Measure()
+            {
+                MeasureGuid = new Guid("6f322ca6-7b21-4498-9457-fb0654c3872e"),
+                DataTableGuid = DataTableConstants.PatientEncounterSummaryGuid,
+                FriendlyName = "Test Summary Measure",
+                SQLColumnName = MeasureConstants.PES_EncounterRecordNumber_ColumnName
+            };
+
+            return measure;
+        }
+
+        internal static Measure GetDollarsMeasure()
+        {
+            var measure = new Measure()
+            {
+                MeasureGuid = new Guid("9178ea60-a4bb-4e5d-ae35-7cae55156947"),
+                DataTableGuid = DataTableConstants.PayrollSampledGuid,
+                FriendlyName = "Test Dollars Measure",
+                SQLColumnName = MeasureConstants.YTDDollarsMeasure
+            };
+
+            return measure;
+        }
+
+        internal static Measure GetHoursMeasure()
+        {
+            var measure = new Measure()
+            {
+                MeasureGuid = new Guid("55476349-4b1c-4042-a214-9312826f49e2"),
+                DataTableGuid = DataTableConstants.PayrollSampledGuid,
+                FriendlyName = "Test Hours Measure",
+                SQLColumnName = MeasureConstants.YTDHoursMeasure
+            };
+
+            return measure;
+        }
+
+        internal static Measure GetUnitsMeasure()
+        {
+            var measure = new Measure()
+            {
+                MeasureGuid = new Guid("70376aec-d3b2-45d9-adbd-002e3e6d3479"),
+                DataTableGuid = DataTableConstants.StatisticDriverGuid,
+                FriendlyName = "Test Units Measure",
+                SQLColumnName = SDMeasureConstants.AmountCol_FriendlyName
+            };
+
+            return measure;
         }
 
         internal static ClaimsPrincipal GetClaimsPrincipal(bool isStrata = true)

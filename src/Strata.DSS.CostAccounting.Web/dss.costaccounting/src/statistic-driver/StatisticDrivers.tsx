@@ -40,9 +40,9 @@ const StatisticDrivers: React.FC = () => {
     const fetchData = async () => {
       try {
         const [dataSources, dataSourceLinks, statisticDrivers] = await Promise.all([
-          statisticDriverService.getDataSources(),
-          statisticDriverService.getDataSourceLinks(),
-          statisticDriverService.getStatisticDrivers()
+          statisticDriverService.getDataSources(0),
+          statisticDriverService.getDataSourceLinks(0),
+          statisticDriverService.getStatisticDrivers(0)
         ]);
         setDataSources(dataSources);
         setDataSourceLinks(dataSourceLinks);
@@ -113,7 +113,7 @@ const StatisticDrivers: React.FC = () => {
       const statDriverSaveData: IStatisticDriverSaveData = {
         updatedStatDrivers: updatedStatDrivers,
         deletedStatDrivers: deletedDriverGuids,
-        costingConfigGuid: '2adafbaa-c365-472a-94f1-79b823d8547a'
+        costingType: 0
       };
 
       // Don't actually save if there are no changes

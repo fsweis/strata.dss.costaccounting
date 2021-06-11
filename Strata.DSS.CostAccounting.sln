@@ -5,13 +5,11 @@ VisualStudioVersion = 16.0.29613.14
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Strata.DSS.CostAccounting.Api", "src\Strata.DSS.CostAccounting.Api\Strata.DSS.CostAccounting.Api.csproj", "{3D2F9C32-2AD4-4F73-AB34-27D73683E4B8}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Strata.DSS.CostAccounting.Test.Unit", "tests\Strata.DSS.CostAccounting.Test.Unit\Strata.DSS.CostAccounting.Test.Unit.csproj", "{AD3FCA7B-DE42-4659-86EE-5880F2FFEE72}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Strata.DSS.CostAccounting.Biz", "src\Strata.DSS.CostAccounting.Biz\Strata.DSS.CostAccounting.Biz.csproj", "{AAEACF42-6380-43B1-A715-D8AFD120B29B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Strata.DSS.CostAccounting.Api.Test", "Strata.DSS.CostAccounting.Api.Test\Strata.DSS.CostAccounting.Api.Test.csproj", "{4D0AB6CC-CF2E-4C22-AD59-254E9860EBD9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Strata.DSS.CostAccounting.Api.Test", "Strata.DSS.CostAccounting.Api.Test\Strata.DSS.CostAccounting.Api.Test.csproj", "{4D0AB6CC-CF2E-4C22-AD59-254E9860EBD9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Strata.DSS.CostAccounting.Client", "Strata.DSS.CostAccounting.Client\Strata.DSS.CostAccounting.Client.csproj", "{3C3FD749-AAA4-4307-B5F2-2F8366A55802}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Strata.DSS.CostAccounting.Client", "Strata.DSS.CostAccounting.Client\Strata.DSS.CostAccounting.Client.csproj", "{3C3FD749-AAA4-4307-B5F2-2F8366A55802}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,10 +21,6 @@ Global
 		{3D2F9C32-2AD4-4F73-AB34-27D73683E4B8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3D2F9C32-2AD4-4F73-AB34-27D73683E4B8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3D2F9C32-2AD4-4F73-AB34-27D73683E4B8}.Release|Any CPU.Build.0 = Release|Any CPU
-		{AD3FCA7B-DE42-4659-86EE-5880F2FFEE72}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{AD3FCA7B-DE42-4659-86EE-5880F2FFEE72}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{AD3FCA7B-DE42-4659-86EE-5880F2FFEE72}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{AD3FCA7B-DE42-4659-86EE-5880F2FFEE72}.Release|Any CPU.Build.0 = Release|Any CPU
 		{AAEACF42-6380-43B1-A715-D8AFD120B29B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{AAEACF42-6380-43B1-A715-D8AFD120B29B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AAEACF42-6380-43B1-A715-D8AFD120B29B}.Release|Any CPU.ActiveCfg = Release|Any CPU

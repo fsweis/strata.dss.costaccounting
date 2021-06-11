@@ -1,11 +1,12 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Strata.DSS.CostAccounting.Biz.CostAccounting.Models;
-using Strata.DSS.CostAccounting.Biz.CostAccounting.Repositories;
 using Strata.DSS.CostAccounting.Biz.Enums;
+using Strata.DSS.CostAccounting.Biz.Exceptions;
 using Strata.DSS.CostAccounting.Biz.StatisticDrivers.Models;
 using Strata.DSS.CostAccounting.Biz.StatisticDrivers.Repositories;
 using Strata.DSS.CostAccounting.Biz.StatisticDrivers.Services;
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -17,7 +18,6 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
     [Route("api/v{api-version:apiVersion}/statistic-drivers")]
     public class StatisticDriversController : ControllerBase
     {
-        private readonly ICostingConfigRepository _costingConfigRepository;
         private readonly IStatisticDriversRepository _statisticDriversRepository;
         private readonly IStatisticDriversService _statisticDriversService;
         private readonly IDataSourceService _dataSourceService;
@@ -25,39 +25,54 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
 
         public StatisticDriversController(IStatisticDriversRepository statisticDriversRepository
                                             , IStatisticDriversService statisticDriversService
-                                            , ICostingConfigRepository costingConfigRepository
                                             , IDataSourceService dataSourceService
                                             , IDataSourceLinkService dataSourceLinkService)
         {
             _statisticDriversRepository = statisticDriversRepository;
             _statisticDriversService = statisticDriversService;
-            _costingConfigRepository = costingConfigRepository;
             _dataSourceService = dataSourceService;
             _dataSourceLinkService = dataSourceLinkService;
         }
 
         [HttpGet("")]
         [ProducesResponseType(200)]
-        public async Task<ActionResult<IEnumerable<StatisticDriver>>> GetStatisticDrivers(CostingType costingType, CancellationToken cancellationToken)
+        public async Task<IEnumerable<StatisticDriver>> GetStatisticDrivers(CostingType costingType, CancellationToken cancellationToken)
         {
-            var statisticDrivers = await _statisticDriversService.LoadStatisticDrivers(costingType, cancellationToken);
-            return Ok(statisticDrivers);
+            IEnumerable<StatisticDriver> statisticDrivers;
+            try
+            {
+                statisticDrivers = await _statisticDriversService.LoadStatisticDrivers(costingType, cancellationToken);
+            }
+            catch (Exception e)
+            {
+                throw new ApiException("Error calling GetStatisticDrivers", e);
+            }
+            return statisticDrivers;
         }
 
         [HttpGet("data-sources")]
         [ProducesResponseType(200)]
-        public ActionResult<IEnumerable<DataTable>> GetDataSources(CostingType costingType)
+        public IEnumerable<DataTable> GetDataSources(CostingType costingType)
         {
             var dataSources = _dataSourceService.GetDataSources(costingType);
-            return Ok(dataSources);
+
+            return dataSources;
         }
 
         [HttpGet("data-source-links")]
         [ProducesResponseType(200)]
-        public async Task<ActionResult<IEnumerable<DataSourceLink>>> GetDataSourceLinks(CostingType costingType, CancellationToken cancellationToken)
+        public async Task<IEnumerable<DataSourceLink>> GetDataSourceLinks(CostingType costingType, CancellationToken cancellationToken)
         {
-            var dataSourceLinks = await _dataSourceLinkService.GetDataSourceLinks(costingType, cancellationToken);
-            return Ok(dataSourceLinks);
+            IEnumerable<DataSourceLink> dataSourceLinks;
+            try
+            {
+                dataSourceLinks = await _dataSourceLinkService.GetDataSourceLinks(costingType, cancellationToken);
+            }
+            catch (Exception e)
+            {
+                throw new ApiException("Error calling GetDataSourceLinks", e);
+            }
+            return dataSourceLinks;
         }
 
         [HttpPost("")]
@@ -81,9 +96,7 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
             {
                 await _statisticDriversRepository.DeleteStatisticDriversAsync(statisticDriverSaveData.DeletedStatDrivers, cancellationToken);
             }
-
-            var costingConfig = await _costingConfigRepository.GetCostingConfigAsync(statisticDriverSaveData.CostingConfigGuid, cancellationToken);
-            var statDrivers = await _statisticDriversService.LoadStatisticDrivers(costingConfig.Type, cancellationToken);
+            var statDrivers = await _statisticDriversService.LoadStatisticDrivers(statisticDriverSaveData.CostingType, cancellationToken);
 
             return Ok(statDrivers);
         }

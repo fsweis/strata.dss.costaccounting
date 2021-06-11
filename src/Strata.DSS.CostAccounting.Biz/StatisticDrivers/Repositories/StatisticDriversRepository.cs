@@ -23,7 +23,7 @@ namespace Strata.DSS.CostAccounting.Biz.StatisticDrivers.Repositories
 
         public async Task<IEnumerable<DriverConfigView>> GetDriverConfigsAsync(CostingType costingType, CancellationToken cancellationToken)
         {
-            await using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
+            var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
             var allOnesGuid = new Guid(GeneralConstants.ALL_ONES_GUID_STRING);
             var drivers = await dbContext.DriverConfigViews.Where(dc => dc.DriverConfigGuid != Guid.Empty && dc.DriverConfigGuid != allOnesGuid && dc.CostingConfigGuid == Guid.Empty && dc.CostingType == costingType).OrderBy(dr => dr.Name).ToListAsync(cancellationToken);
             return drivers;
@@ -31,7 +31,7 @@ namespace Strata.DSS.CostAccounting.Biz.StatisticDrivers.Repositories
 
         public async Task<List<Guid>> GetUsedDriverConfigs(CancellationToken cancellationToken)
         {
-            await using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
+            var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
 
             var driverConfigGuids = dbContext.AccountReclasses.Select(x => x.DriverConfigGuid)
                                            .Union(dbContext.PayCodeJobCodeReclasses.Select(x => x.DriverConfigGuid))
@@ -44,7 +44,7 @@ namespace Strata.DSS.CostAccounting.Biz.StatisticDrivers.Repositories
 
         public async Task UpdateStatisticDriversAsync(List<StatisticDriver> statisticDrivers, CancellationToken cancellationToken)
         {
-            await using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
+            var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
             foreach (var statDriver in statisticDrivers)
             {
                 var driver = await dbContext.DriverConfigs.Where(dc => dc.DriverConfigGuid == statDriver.DriverConfigGuid).FirstOrDefaultAsync();
@@ -72,7 +72,7 @@ namespace Strata.DSS.CostAccounting.Biz.StatisticDrivers.Repositories
 
         public async Task DeleteStatisticDriversAsync(List<Guid> statisticDriverGuids, CancellationToken cancellationToken)
         {
-            await using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
+            var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
             foreach (var statDriverGuid in statisticDriverGuids)
             {
                 var driver = await dbContext.DriverConfigs.Where(dc => dc.DriverConfigGuid == statDriverGuid).FirstOrDefaultAsync();

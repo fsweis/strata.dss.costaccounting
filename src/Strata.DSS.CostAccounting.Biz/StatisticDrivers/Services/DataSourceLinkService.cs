@@ -14,16 +14,16 @@ namespace Strata.DSS.CostAccounting.Biz.StatisticDrivers.Services
 {
     public class DataSourceLinkService : IDataSourceLinkService
     {
-        private readonly ICostAccountingRepository _costaccountingRepository;
+        private readonly ICostAccountingRepository _costAccountingRepository;
         public DataSourceLinkService(ICostAccountingRepository costaccountingRepository)
         {
-            _costaccountingRepository = costaccountingRepository;
+            _costAccountingRepository = costaccountingRepository;
 
         }
         public async Task<IList<DataSourceLink>> GetDataSourceLinks(CostingType costingType, CancellationToken cancellationToken)
         {
-            var measures = await _costaccountingRepository.GetMeasuresAsync(StatisticDriverDataSourceUtil.GetDataTableGuids(costingType == CostingType.Claims), cancellationToken);
-            var ruleEngineIncludedMeasures = await _costaccountingRepository.GetRuleEngineIncludedMeasuresAsync(cancellationToken);
+            var measures = await _costAccountingRepository.GetMeasuresAsync(StatisticDriverDataSourceUtil.GetDataTableGuids(costingType == CostingType.Claims), cancellationToken);
+            var ruleEngineIncludedMeasures = await _costAccountingRepository.GetRuleEngineIncludedMeasuresAsync(cancellationToken);
 
             var dataSourceLinks = new List<DataSourceLink>();
             //Load GL Sampled Measures
