@@ -7,14 +7,16 @@ import { ICostConfig, newCostConfig } from './data/ICostConfig';
 import ModelModal from '../costing-configs/ModelModal';
 import CostingConfigsModal from '../costing-configs/CostingConfigsModal';
 export interface ICostMenuProps {
+  costConfigsFiltered: ICostConfig[];
   costConfigs: ICostConfig[];
 }
-const CostMenu: React.FC<ICostMenuProps> = ({ costConfigs }: ICostMenuProps) => {
+const CostMenu: React.FC<ICostMenuProps> = ({ costConfigsFiltered, costConfigs }: ICostMenuProps) => {
   const [selectedCostConfigItem, setSelectedCostConfigItem] = useState<ICostConfig>(newCostConfig());
   const [modelModalVisible, setModelModalVisibleVisible] = React.useState<boolean>(false);
   const [costingConfigsModalVisible, setcostingConfigsModalVisible] = React.useState<boolean>(false);
   const history = useHistory();
   const location = useLocation();
+  console.log(location, costConfigs, selectedCostConfigItem);
   useEffect(() => {
     const splitPath = location.pathname.split('/').filter((p) => p.trim() !== '');
     // TODO: better solution than this
@@ -51,7 +53,7 @@ const CostMenu: React.FC<ICostMenuProps> = ({ costConfigs }: ICostMenuProps) => 
         <Menu.ItemGroup title=''>
           <Menu.Item key=''>
             <ButtonMenu buttonText={selectedCostConfigItem?.name} type='title' selectedKeys={[selectedCostConfigItem?.costingConfigGuid]} onClick={(e) => handleClick(e.key)}>
-              {costConfigs.map((item) => (
+              {costConfigsFiltered.map((item) => (
                 <ButtonMenu.Item key={item.costingConfigGuid}>{item.name}</ButtonMenu.Item>
               ))}
               <ButtonMenu.Divider />
