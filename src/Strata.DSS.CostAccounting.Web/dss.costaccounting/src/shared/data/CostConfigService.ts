@@ -1,5 +1,5 @@
 import { appConfig, getSecureService } from '@strata/core/lib';
-import { ICostConfig } from '../data/ICostConfig';
+import { ICostConfig } from './ICostConfig';
 import { IEntity } from './IEntity';
 import { IFiscalMonth } from './IFiscalMonth';
 import { IFiscalYear } from './IFiscalYear';

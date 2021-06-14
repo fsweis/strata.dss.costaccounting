@@ -16,7 +16,6 @@ const CostMenu: React.FC<ICostMenuProps> = ({ costConfigsFiltered, costConfigs }
   const [costingConfigsModalVisible, setcostingConfigsModalVisible] = React.useState<boolean>(false);
   const history = useHistory();
   const location = useLocation();
-  console.log(location, costConfigs, selectedCostConfigItem);
   useEffect(() => {
     const splitPath = location.pathname.split('/').filter((p) => p.trim() !== '');
     // TODO: better solution than this
@@ -47,6 +46,13 @@ const CostMenu: React.FC<ICostMenuProps> = ({ costConfigsFiltered, costConfigs }
       }
     }
   };
+
+  const handleChangeConfigs = (costingConfigGuid: string) => {
+    const currentLocation = location.pathname.split('/')[1];
+    history.push(`/${currentLocation}/${costingConfigGuid}`);
+    setcostingConfigsModalVisible(false);
+  };
+
   return (
     <>
       <Menu selectedKeys={getActiveUrlKey()}>
@@ -125,7 +131,11 @@ const CostMenu: React.FC<ICostMenuProps> = ({ costConfigsFiltered, costConfigs }
           setModelModalVisibleVisible(false);
         }}
       ></ModelModal>
-      <CostingConfigsModal onCancel={() => setcostingConfigsModalVisible(false)} visible={costingConfigsModalVisible}></CostingConfigsModal>
+      <CostingConfigsModal
+        onCancel={() => setcostingConfigsModalVisible(false)}
+        onChangeConfigs={(costingConfigGuid: string) => handleChangeConfigs(costingConfigGuid)}
+        visible={costingConfigsModalVisible}
+      ></CostingConfigsModal>
     </>
   );
 };
