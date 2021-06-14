@@ -34,12 +34,12 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddAsyncDbContextFactory<CostAccountingDbContext>(options =>
             {
                 options
+                .UseSqlServer()
 #if DEBUG
-                    .WithConnectionString(GetConnectionStringUsingIntegratedSecurity)
+                    .WithConnectionString(GetConnectionStringUsingIntegratedSecurity);
 #else
-                    .WithConnectionString(GetConnectionStringUserPass)
+                   .WithConnectionString((provider, cancellationToken) => provider.GetConnectionStringFromSmc(cancellationToken));
 #endif
-                    .WithDbContextOptions((connectionString, builder) => builder.UseSqlServer(connectionString));
             });
 
             services.ConfigureHangfireOptionsFromAws(options =>
