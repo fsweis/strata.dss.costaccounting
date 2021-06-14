@@ -17,7 +17,7 @@ import ManualStatistics from '../manual-statistics/ManualStatistics';
 import { Navbar } from '@strata/navbar/lib';
 import CostMenu from './CostMenu';
 import CostConfigProvider from './data/CostConfigProvider';
-import { costConfigService } from './data/costConfigService';
+import { costConfigService } from './data/garbageFile';
 import { ICostConfig } from './data/ICostConfig';
 const Navigation: React.FC = () => {
   const [costConfigGuid, setCostConfigGuid] = React.useState<string>('');
