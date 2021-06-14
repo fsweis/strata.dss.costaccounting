@@ -56,11 +56,17 @@ namespace Strata.DSS.CostAccounting.Api.Test.UnitTests
         [Test]
         public async Task TestSaveStatisticDrivers()
         {
-            //TODO
             await using var connection = new SqliteConnection("Datasource=:memory:");
             var (controller, _) = await GetTestStatisticDriverController(connection);
 
             var statDriverSaveData = new StatisticDriverSaveData();
+            statDriverSaveData.DeletedStatDrivers = new List<Guid>() { new Guid("") };
+            statDriverSaveData.UpdatedStatDrivers = new List<StatisticDriver>() {
+                new StatisticDriver() {
+                    Name = "",
+                    CostingType = CostingType.PatientCare,
+                    MeasureGuid = new Guid("") }
+            };
             var statDrivers = await controller.SaveStatisticDrivers(statDriverSaveData, default);
             Assert.AreEqual(TestData.GetDriverConfigs().Count, statDrivers.Value.Count());
         }

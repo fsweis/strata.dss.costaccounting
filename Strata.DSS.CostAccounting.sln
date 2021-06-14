@@ -7,9 +7,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Strata.DSS.CostAccounting.A
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Strata.DSS.CostAccounting.Biz", "src\Strata.DSS.CostAccounting.Biz\Strata.DSS.CostAccounting.Biz.csproj", "{AAEACF42-6380-43B1-A715-D8AFD120B29B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Strata.DSS.CostAccounting.Api.Test", "Strata.DSS.CostAccounting.Api.Test\Strata.DSS.CostAccounting.Api.Test.csproj", "{4D0AB6CC-CF2E-4C22-AD59-254E9860EBD9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Strata.DSS.CostAccounting.Api.Test", "src\Strata.DSS.CostAccounting.Api.Test\Strata.DSS.CostAccounting.Api.Test.csproj", "{4D0AB6CC-CF2E-4C22-AD59-254E9860EBD9}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Strata.DSS.CostAccounting.Client", "Strata.DSS.CostAccounting.Client\Strata.DSS.CostAccounting.Client.csproj", "{3C3FD749-AAA4-4307-B5F2-2F8366A55802}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Strata.DSS.CostAccounting.Client", "src\Strata.DSS.CostAccounting.Client\Strata.DSS.CostAccounting.Client.csproj", "{3C3FD749-AAA4-4307-B5F2-2F8366A55802}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

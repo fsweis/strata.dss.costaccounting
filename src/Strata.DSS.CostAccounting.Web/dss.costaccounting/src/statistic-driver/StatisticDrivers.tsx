@@ -42,21 +42,22 @@ const StatisticDrivers: React.FC = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [dataSources, dataSourceLinks, statisticDrivers] = await Promise.all([
-          statisticDriverService.getDataSources(0),
-          statisticDriverService.getDataSourceLinks(0),
-          statisticDriverService.getStatisticDrivers(0)
-        ]);
-        setDataSources(dataSources);
-        setDataSourceLinks(dataSourceLinks);
-        setStatDrivers(statisticDrivers);
-        setTempStatDrivers(cloneDeep(statisticDrivers));
+        if (costConfig) {
+          const [dataSources, dataSourceLinks, statisticDrivers] = await Promise.all([
+            statisticDriverService.getDataSources(costConfig.type),
+            statisticDriverService.getDataSourceLinks(costConfig.type),
+            statisticDriverService.getStatisticDrivers(costConfig.type)
+          ]);
+          setDataSources(dataSources);
+          setDataSourceLinks(dataSourceLinks);
+          setStatDrivers(statisticDrivers);
+          setTempStatDrivers(cloneDeep(statisticDrivers));
+        }
       } finally {
         setGridLoading(false);
       }
     };
     setGridLoading(true);
-    console.log('Cost Config:', costConfig);
     fetchData();
   }, [costConfig]);
 

@@ -1,0 +1,71 @@
+﻿using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.Data.Sqlite;
+using Microsoft.Extensions.DependencyInjection;
+using Moq;
+using NUnit.Framework;
+using Strata.DSS.CostAccounting.Biz.CostAccounting.DbContexts;
+using Strata.DSS.CostAccounting.Biz.CostAccounting.Models;
+using Strata.DSS.CostAccounting.Biz.Enums;
+using Strata.SMC.Client;
+using Strata.SqlTools.Configuration.Common.AsyncFactory;
+using Strata.SqlTools.Testing.Interceptors;
+using Strata.Testing.Integration.Hosting;
+using System;
+using System.Collections.Generic;
+using System.Net.Http;
+using System.Threading;
+using System.Threading.Tasks;
+
+namespace Strata.DSS.CostAccounting.Api.Test.IntegrationTests
+{
+    public class StatisticDriversIntegrationTests : TestBase
+    {
+        private QueryCountInterceptor _interceptor;
+
+        private async Task<WebApplicationFactory<Program>> InitServer(SqliteConnection connection, bool downloadAccessAllowed = true)
+        {
+            _interceptor = new QueryCountInterceptor(true);
+            connection.Open();
+            var costAccountingDbContext = TestData.GetJazzSqlContext(connection);
+            await TestData.CreateData(costAccountingDbContext);
+
+            var costAccountingDbContextFactory = new Mock<IAsyncDbContextFactory<CostAccountingDbContext>>();
+            costAccountingDbContextFactory.Setup(c => c.CreateDbContextAsync(It.IsAny<CancellationToken>())).ReturnsAsync(costAccountingDbContext);
+
+            var db = new StrataSensitiveDatabaseDto { DatabaseGUID = new Guid("7c9e6679-7425-40de-944b-e07fc1f90ae7") };
+            var mockSmcServiceClient = new Mock<ISMCServiceClient>();
+            mockSmcServiceClient.Setup(c => c.GetDatabaseAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>())).ReturnsAsync(db);
+
+            var factory = TestHost.GetAppFactory<Program, TestStartup>(TestData.GetConnectionConfig(ConnectionString), null,
+                (typeof(IAsyncDbContextFactory<CostAccountingDbContext>), services => services.AddScoped(r => costAccountingDbContextFactory.Object)),
+                (typeof(ISMCServiceClient), services => services.AddScoped(r => mockSmcServiceClient.Object)));
+            return factory;
+        }
+
+        [TearDown]
+        public void Teardown()
+        {
+            // Reset stored queries
+            _interceptor.Clear();
+        }
+
+        [Test]
+        public async Task TestGetDataSources()
+        {
+            await using var connection = new SqliteConnection("Datasource=:memory:");
+            var client = await GetHttpClient(connection);
+
+            var dataSources = await client.GetAsync("api/v1/statistic-drivers/data-sources?costingType=PatientCare").ToValue<List<DataTable>>();
+
+            Assert.AreEqual(TestData.GetDataSources(CostingType.PatientCare).Count, dataSources.Count);
+        }
+
+        private async Task<HttpClient> GetHttpClient(SqliteConnection connection, bool downloadAccessAllowed = true)
+        {
+            var server = await InitServer(connection, downloadAccessAllowed);
+            var client = server.CreateClient();
+
+            return client;
+        }
+    }
+}

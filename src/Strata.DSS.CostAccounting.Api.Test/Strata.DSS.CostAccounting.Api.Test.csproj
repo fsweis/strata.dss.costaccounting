@@ -11,15 +11,17 @@
     </PackageReference>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.9.1" />
     <PackageReference Include="Moq" Version="4.16.1" />
-    <PackageReference Include="NUnit" Version="3.13.1" />
+    <PackageReference Include="NUnit" Version="3.13.2" />
     <PackageReference Include="NUnit3TestAdapter" Version="3.17.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="5.0.6" />    
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="5.0.6" />
+    <PackageReference Include="Strata.SqlTools.Testing" Version="1.1.0" />
+    <PackageReference Include="Strata.Testing" Version="2.2.0" />    
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\src\Strata.DSS.CostAccounting.Api\Strata.DSS.CostAccounting.Api.csproj" />
+    <ProjectReference Include="..\Strata.DSS.CostAccounting.Api\Strata.DSS.CostAccounting.Api.csproj" />
     <ProjectReference Include="..\Strata.DSS.CostAccounting.Client\Strata.DSS.CostAccounting.Client.csproj" />
   </ItemGroup>
 </Project>
