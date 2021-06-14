@@ -212,11 +212,15 @@ const ModelModal: React.FC<IModelModalProps> = (props: IModelModalProps) => {
         okText='Save'
         footer={
           <>
-            <Button type='tertiary' icon='InfoCircle' />
-            <Button onClick={handleCancel}>Cancel</Button>
-            <Button type='primary' htmlType='submit' onClick={handleSave}>
-              Save
-            </Button>
+            <Spacing hAlign={'space-between'}>
+              <Button type='tertiary' icon='InfoCircle' />
+              <Spacing>
+                <Button onClick={handleCancel}>Cancel</Button>
+                <Button type='primary' htmlType='submit' onClick={handleSave}>
+                  Save
+                </Button>
+              </Spacing>
+            </Spacing>
           </>
         }
       >
