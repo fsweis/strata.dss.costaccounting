@@ -14,6 +14,7 @@ using System.Threading;
 using Strata.CoreLib.Claims.Extensions;
 using Strata.SMC.Client;
 using Microsoft.Data.SqlClient;
+using Strata.DSS.CostAccounting.Biz.CostingConfigs.Services;
 
 // ReSharper disable once CheckNamespace
 namespace Microsoft.Extensions.DependencyInjection
@@ -28,6 +29,8 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddScoped<IStatisticDriversService, StatisticDriversService>();
             services.AddScoped<IDataSourceService, DataSourceService>();
             services.AddScoped<IDataSourceLinkService, DataSourceLinkService>();
+            services.AddScoped<IEntityService, EntityService>();
+            services.AddScoped<ICostingConfigService, CostingConfigService>();
             services.AddCachedSmcServiceClient();
             services.AddHttpContextAccessor();
             services.TryAddScoped<IClaimsPrincipalAccessor, ClaimsPrincipalAccessor>();

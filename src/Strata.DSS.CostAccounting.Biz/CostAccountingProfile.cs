@@ -13,6 +13,7 @@ namespace Strata.CS
             CreateMap<CostingConfigEntity, CostingConfigModel>()
                 .ForMember(cm => cm.LastPublishedUtc,
                 opt => opt.MapFrom(src => src.CostingResults.SingleOrDefault(x => x.IsDraft == false).CreatedAtUtc));
+            CreateMap<CostingConfigModel, CostingConfigEntity>();
         }
     }
 }
