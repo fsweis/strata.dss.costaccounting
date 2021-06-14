@@ -3,9 +3,12 @@ using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using NUnit.Framework;
+using Strata.DSS.CostAccounting.Biz.CostAccounting.Constants;
 using Strata.DSS.CostAccounting.Biz.CostAccounting.DbContexts;
 using Strata.DSS.CostAccounting.Biz.CostAccounting.Models;
+using Strata.DSS.CostAccounting.Biz.CostAccounting.Repositories;
 using Strata.DSS.CostAccounting.Biz.Enums;
+using Strata.DSS.CostAccounting.Biz.StatisticDrivers.Models;
 using Strata.SMC.Client;
 using Strata.SqlTools.Configuration.Common.AsyncFactory;
 using Strata.SqlTools.Testing.Interceptors;
@@ -36,9 +39,30 @@ namespace Strata.DSS.CostAccounting.Api.Test.IntegrationTests
             var mockSmcServiceClient = new Mock<ISMCServiceClient>();
             mockSmcServiceClient.Setup(c => c.GetDatabaseAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>())).ReturnsAsync(db);
 
+            var costAccountingRepository = new Mock<ICostAccountingRepository>();
+            costAccountingRepository.Setup(c => c.GetRuleSetsAsync(It.IsAny<CancellationToken>())).ReturnsAsync(new List<RuleSet>());
+            var listPatientCareGuids = new List<Guid>() {
+                DataTableConstants.DSSGLGuid,
+                DataTableConstants.PatientBillingLineItemDetailGuid,
+                DataTableConstants.PatientEncounterSummaryGuid,
+                DataTableConstants.CostingStatisticDriverGuid,
+                DataTableConstants.StatisticDriverGuid,
+                DataTableConstants.PayrollSampledGuid
+            };
+            costAccountingRepository.Setup(c => c.GetMeasuresAsync(listPatientCareGuids, It.IsAny<CancellationToken>())).ReturnsAsync(
+                new List<Measure>() {
+                    TestData.GetGLMeasure(),
+                    TestData.GetSummaryMeasure(),
+                    TestData.GetDollarsMeasure(),
+                    TestData.GetHoursMeasure(),
+                    TestData.GetUnitsMeasure()
+                });
+            costAccountingRepository.Setup(c => c.GetRuleEngineIncludedMeasuresAsync(It.IsAny<CancellationToken>())).ReturnsAsync(new List<RuleEngineIncludedMeasure>());
+
             var factory = TestHost.GetAppFactory<Program, TestStartup>(TestData.GetConnectionConfig(ConnectionString), null,
                 (typeof(IAsyncDbContextFactory<CostAccountingDbContext>), services => services.AddScoped(r => costAccountingDbContextFactory.Object)),
-                (typeof(ISMCServiceClient), services => services.AddScoped(r => mockSmcServiceClient.Object)));
+                (typeof(ISMCServiceClient), services => services.AddScoped(r => mockSmcServiceClient.Object)),
+                (typeof(ICostAccountingRepository), services => services.AddScoped(r => costAccountingRepository.Object)));
             return factory;
         }
 
@@ -52,12 +76,34 @@ namespace Strata.DSS.CostAccounting.Api.Test.IntegrationTests
         [Test]
         public async Task TestGetDataSources()
         {
-            await using var connection = new SqliteConnection("Datasource=:memory:");
+            var connection = new SqliteConnection("Datasource=:memory:");
             var client = await GetHttpClient(connection);
 
             var dataSources = await client.GetAsync("api/v1/statistic-drivers/data-sources?costingType=PatientCare").ToValue<List<DataTable>>();
 
             Assert.AreEqual(TestData.GetDataSources(CostingType.PatientCare).Count, dataSources.Count);
+        }
+
+        [Test]
+        public async Task TestGetDataSourceLinks()
+        {
+            var connection = new SqliteConnection("Datasource=:memory:");
+            var client = await GetHttpClient(connection);
+
+            var dataSourceLinks = await client.GetAsync("api/v1/statistic-drivers/data-source-links?costingType=PatientCare").ToValue<List<DataSourceLink>>();
+
+            Assert.AreEqual(TestData.GetDataSourceLinks().Count, dataSourceLinks.Count);
+        }
+
+        [Test]
+        public async Task TestGetStatisticDrivers()
+        {
+            var connection = new SqliteConnection("Datasource=:memory:");
+            var client = await GetHttpClient(connection);
+
+            var dataSources = await client.GetAsync("api/v1/statistic-drivers?costingType=PatientCare").ToValue<List<StatisticDriver>>();
+
+            Assert.AreEqual(TestData.GetDriverConfigs().Count, dataSources.Count);
         }
 
         private async Task<HttpClient> GetHttpClient(SqliteConnection connection)

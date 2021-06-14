@@ -27,7 +27,7 @@ namespace Strata.DSS.CostAccounting.Api.Test.UnitTests
         [Test]
         public async Task TestGetStatisticDrivers()
         {
-            await using var connection = new SqliteConnection("Datasource=:memory:");
+            var connection = new SqliteConnection("Datasource=:memory:");
             var (controller, _) = await GetTestStatisticDriverController(connection);
 
             var statDrivers = await controller.GetStatisticDrivers(CostingType.PatientCare, default);
@@ -37,7 +37,7 @@ namespace Strata.DSS.CostAccounting.Api.Test.UnitTests
         [Test]
         public async Task TestGetDataSources()
         {
-            await using var connection = new SqliteConnection("Datasource=:memory:");
+            var connection = new SqliteConnection("Datasource=:memory:");
             var (controller, _) = await GetTestStatisticDriverController(connection);
 
             var dataSources = controller.GetDataSources(CostingType.PatientCare);
@@ -47,7 +47,7 @@ namespace Strata.DSS.CostAccounting.Api.Test.UnitTests
         [Test]
         public async Task TestGetDataSourceLinks()
         {
-            await using var connection = new SqliteConnection("Datasource=:memory:");
+            var connection = new SqliteConnection("Datasource=:memory:");
             var (controller, _) = await GetTestStatisticDriverController(connection);
 
             var dataSourceLinks = await controller.GetDataSourceLinks(CostingType.PatientCare, default);
@@ -57,7 +57,7 @@ namespace Strata.DSS.CostAccounting.Api.Test.UnitTests
         [Test]
         public async Task TestSaveStatisticDrivers()
         {
-            await using var connection = new SqliteConnection("Datasource=:memory:");
+            var connection = new SqliteConnection("Datasource=:memory:");
             var (controller, _) = await GetTestStatisticDriverController(connection);
 
             var statDriverSaveData = new StatisticDriverSaveData();
@@ -103,12 +103,6 @@ namespace Strata.DSS.CostAccounting.Api.Test.UnitTests
                     TestData.GetUnitsMeasure()
                 });
             costAccountingRepository.Setup(c => c.GetRuleEngineIncludedMeasuresAsync(It.IsAny<CancellationToken>())).ReturnsAsync(new List<RuleEngineIncludedMeasure>());
-
-            //var mockMapper = new MapperConfiguration(cfg =>
-            //{
-            //    cfg.AddProfile(new CostAccountingProfile());
-            //});
-            //var mapper = mockMapper.CreateMapper();
 
             var statisticDriversService = new StatisticDriversService(costAccountingRepository.Object, statisticDriversRepository);
             var dataSourceService = new DataSourceService();
