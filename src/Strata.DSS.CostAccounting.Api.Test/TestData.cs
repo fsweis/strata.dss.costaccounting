@@ -25,7 +25,8 @@ namespace Strata.DSS.CostAccounting.Api.Test
         {
             var dict = new Dictionary<string, string> {
                 { "connectionString", connectionString },
-                { "isStrataUser", isStrataUser.ToString() }
+                { "isStrataUser", isStrataUser.ToString() },
+                { "contentRoot", @"C:\Git\strata.dss.costaccounting\src\Strata.DSS.CostAccounting.Api"}
             };
             return dict;
         }
@@ -35,11 +36,20 @@ namespace Strata.DSS.CostAccounting.Api.Test
             var statDriver = new DriverConfig()
             {
                 Name = "TestStatisticDriver",
-                MeasureGuid = Guid.NewGuid(),
-                CostingType = Biz.Enums.CostingType.PatientCare
+                DriverConfigGuid = new Guid("4014ab8a-13ab-4708-899d-4f6bc88033e6"),
+                MeasureGuid = new Guid("d33709b1-e53b-4c54-b606-d647fdcad52e"),
+                CostingType = CostingType.PatientCare
             };
 
-            return new List<DriverConfig>() { statDriver };
+            var statDriver2 = new DriverConfig()
+            {
+                Name = "TestStatisticDriver2",
+                DriverConfigGuid = new Guid("f5177bdd-298d-4b66-b6b3-73dff3249ee7"),
+                MeasureGuid = new Guid("6f322ca6-7b21-4498-9457-fb0654c3872e"),
+                CostingType = CostingType.PatientCare
+            };
+
+            return new List<DriverConfig>() { statDriver, statDriver2 };
         }
 
         public static List<DriverConfigView> GetDriverConfigViews()
@@ -47,11 +57,22 @@ namespace Strata.DSS.CostAccounting.Api.Test
             var statDriver = new DriverConfigView()
             {
                 Name = "TestStatisticDriver",
-                MeasureGuid = Guid.NewGuid(),
-                CostingType = Biz.Enums.CostingType.PatientCare
+                DriverConfigGuid = new Guid("4014ab8a-13ab-4708-899d-4f6bc88033e6"),
+                MeasureGuid = new Guid("d33709b1-e53b-4c54-b606-d647fdcad52e"),
+                DataTableGuid = DataTableConstants.DSSGLGuid,
+                CostingType = CostingType.PatientCare
             };
 
-            return new List<DriverConfigView>() { statDriver };
+            var statDriver2 = new DriverConfigView()
+            {
+                Name = "TestStatisticDriver2",
+                DriverConfigGuid = new Guid("f5177bdd-298d-4b66-b6b3-73dff3249ee7"),
+                MeasureGuid = new Guid("6f322ca6-7b21-4498-9457-fb0654c3872e"),
+                DataTableGuid = DataTableConstants.PatientEncounterSummaryGuid,
+                CostingType = CostingType.PatientCare
+            };
+
+            return new List<DriverConfigView>() { statDriver, statDriver2 };
         }
 
         internal static List<DataTable> GetDataSources(CostingType costingType)

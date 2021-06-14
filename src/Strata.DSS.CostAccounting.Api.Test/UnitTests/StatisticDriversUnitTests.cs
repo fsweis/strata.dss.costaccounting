@@ -1,4 +1,5 @@
-﻿using Microsoft.Data.Sqlite;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.Sqlite;
 using Moq;
 using NUnit.Framework;
 using Strata.DSS.CostAccounting.Api.Controllers;
@@ -60,15 +61,16 @@ namespace Strata.DSS.CostAccounting.Api.Test.UnitTests
             var (controller, _) = await GetTestStatisticDriverController(connection);
 
             var statDriverSaveData = new StatisticDriverSaveData();
-            statDriverSaveData.DeletedStatDrivers = new List<Guid>() { new Guid("") };
+            statDriverSaveData.DeletedStatDrivers = new List<Guid>() { new Guid("4014ab8a-13ab-4708-899d-4f6bc88033e6") };
             statDriverSaveData.UpdatedStatDrivers = new List<StatisticDriver>() {
                 new StatisticDriver() {
-                    Name = "",
+                    Name = "New Statistic Driver",
+                    DriverConfigGuid = Guid.Empty,
                     CostingType = CostingType.PatientCare,
-                    MeasureGuid = new Guid("") }
+                    MeasureGuid = new Guid("43dff3a4-1d1b-4645-bf8a-c093f0e83269") }
             };
             var statDrivers = await controller.SaveStatisticDrivers(statDriverSaveData, default);
-            Assert.AreEqual(TestData.GetDriverConfigs().Count, statDrivers.Value.Count());
+            Assert.AreEqual(TestData.GetDriverConfigs().Count, ((IEnumerable<StatisticDriver>)((OkObjectResult)statDrivers.Result).Value).Count());
         }
 
         private async Task<(StatisticDriversController controller, Mock<IStatisticDriversServiceClient> statisticDriversServiceClient)>

@@ -45,12 +45,15 @@ namespace Strata.DSS.CostAccounting.Biz.StatisticDrivers.Repositories
         public async Task UpdateStatisticDriversAsync(List<StatisticDriver> statisticDrivers, CancellationToken cancellationToken)
         {
             var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
-            foreach (var statDriver in statisticDrivers)
+            foreach (var statDriver in statisticDrivers.Where(d => d.DriverConfigGuid != Guid.Empty))
             {
                 var driver = await dbContext.DriverConfigs.Where(dc => dc.DriverConfigGuid == statDriver.DriverConfigGuid).FirstOrDefaultAsync();
-                driver.MeasureGuid = statDriver.MeasureGuid;
-                driver.IsInverted = statDriver.IsInverted;
-                driver.Name = statDriver.Name;
+                if (driver != null)
+                {
+                    driver.MeasureGuid = statDriver.MeasureGuid;
+                    driver.IsInverted = statDriver.IsInverted;
+                    driver.Name = statDriver.Name;
+                }
             }
 
             foreach (var newStatDriver in statisticDrivers.Where(d => d.DriverConfigGuid == Guid.Empty))

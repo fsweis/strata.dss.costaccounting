@@ -1,5 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc.Testing;
+﻿using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.AspNetCore.TestHost;
 using Microsoft.Data.Sqlite;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using NUnit.Framework;
@@ -12,6 +15,7 @@ using Strata.SqlTools.Testing.Interceptors;
 using Strata.Testing.Integration.Hosting;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -22,7 +26,7 @@ namespace Strata.DSS.CostAccounting.Api.Test.IntegrationTests
     {
         private QueryCountInterceptor _interceptor;
 
-        private async Task<WebApplicationFactory<Program>> InitServer(SqliteConnection connection, bool downloadAccessAllowed = true)
+        private async Task<WebApplicationFactory<Program>> InitServer(SqliteConnection connection)
         {
             _interceptor = new QueryCountInterceptor(true);
             connection.Open();
@@ -36,7 +40,7 @@ namespace Strata.DSS.CostAccounting.Api.Test.IntegrationTests
             var mockSmcServiceClient = new Mock<ISMCServiceClient>();
             mockSmcServiceClient.Setup(c => c.GetDatabaseAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>())).ReturnsAsync(db);
 
-            var factory = TestHost.GetAppFactory<Program, TestStartup>(TestData.GetConnectionConfig(ConnectionString), null,
+            var factory = TestHost.GetAppFactory<Program, TestStartup>(TestData.GetConnectionConfig(ConnectionString), webBuilder => webBuilder.UseUrls("https://localhost:8443"),
                 (typeof(IAsyncDbContextFactory<CostAccountingDbContext>), services => services.AddScoped(r => costAccountingDbContextFactory.Object)),
                 (typeof(ISMCServiceClient), services => services.AddScoped(r => mockSmcServiceClient.Object)));
             return factory;
@@ -60,11 +64,20 @@ namespace Strata.DSS.CostAccounting.Api.Test.IntegrationTests
             Assert.AreEqual(TestData.GetDataSources(CostingType.PatientCare).Count, dataSources.Count);
         }
 
-        private async Task<HttpClient> GetHttpClient(SqliteConnection connection, bool downloadAccessAllowed = true)
+        private async Task<HttpClient> GetHttpClient(SqliteConnection connection)
         {
-            var server = await InitServer(connection, downloadAccessAllowed);
-            var client = server.CreateClient();
+            var server = await InitServer(connection);
+            var projectDir = Directory.GetCurrentDirectory();
+            var configPath = Path.Combine(projectDir, "appsettings.json");
 
+            var client = server.WithWebHostBuilder(builder =>
+            {
+                builder.UseSolutionRelativeContentRoot(@"src\Strata.DSS.CostAccounting.Api");
+                builder.ConfigureAppConfiguration((context, conf) =>
+                {
+                    conf.AddJsonFile(configPath);
+                });
+            }).CreateClient(new WebApplicationFactoryClientOptions() { BaseAddress = new Uri("https://localhost:8443") });
             return client;
         }
     }
