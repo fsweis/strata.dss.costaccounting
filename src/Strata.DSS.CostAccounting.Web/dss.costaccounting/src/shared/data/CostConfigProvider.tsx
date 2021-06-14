@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { useEffect } from 'react';
-import { costConfigService } from './garbageFile';
+import { costConfigService } from './costConfigService';
 import { ICostConfig } from './ICostConfig';
 import { CostConfigContext } from './CostConfigContext';
 
