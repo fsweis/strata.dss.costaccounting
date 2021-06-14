@@ -1,8 +1,5 @@
-﻿using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.AspNetCore.TestHost;
+﻿using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Data.Sqlite;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using NUnit.Framework;
@@ -15,7 +12,6 @@ using Strata.SqlTools.Testing.Interceptors;
 using Strata.Testing.Integration.Hosting;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -40,7 +36,7 @@ namespace Strata.DSS.CostAccounting.Api.Test.IntegrationTests
             var mockSmcServiceClient = new Mock<ISMCServiceClient>();
             mockSmcServiceClient.Setup(c => c.GetDatabaseAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>())).ReturnsAsync(db);
 
-            var factory = TestHost.GetAppFactory<Program, TestStartup>(TestData.GetConnectionConfig(ConnectionString), webBuilder => webBuilder.UseUrls("https://localhost:8443"),
+            var factory = TestHost.GetAppFactory<Program, TestStartup>(TestData.GetConnectionConfig(ConnectionString), null,
                 (typeof(IAsyncDbContextFactory<CostAccountingDbContext>), services => services.AddScoped(r => costAccountingDbContextFactory.Object)),
                 (typeof(ISMCServiceClient), services => services.AddScoped(r => mockSmcServiceClient.Object)));
             return factory;
@@ -67,17 +63,19 @@ namespace Strata.DSS.CostAccounting.Api.Test.IntegrationTests
         private async Task<HttpClient> GetHttpClient(SqliteConnection connection)
         {
             var server = await InitServer(connection);
-            var projectDir = Directory.GetCurrentDirectory();
-            var configPath = Path.Combine(projectDir, "appsettings.json");
+            //var projectDir = Directory.GetCurrentDirectory();
+            //var configPath = Path.Combine(projectDir, "appsettings.json");
 
-            var client = server.WithWebHostBuilder(builder =>
-            {
-                builder.UseSolutionRelativeContentRoot(@"src\Strata.DSS.CostAccounting.Api");
-                builder.ConfigureAppConfiguration((context, conf) =>
-                {
-                    conf.AddJsonFile(configPath);
-                });
-            }).CreateClient(new WebApplicationFactoryClientOptions() { BaseAddress = new Uri("https://localhost:8443") });
+            //var client = server.WithWebHostBuilder(builder =>
+            //{
+            //    builder.UseSolutionRelativeContentRoot(@"src\Strata.DSS.CostAccounting.Api");
+            //    builder.ConfigureAppConfiguration((context, conf) =>
+            //    {
+            //        conf.AddJsonFile(configPath);
+            //    });
+            //}).CreateClient();
+
+            var client = server.CreateClient();
             return client;
         }
     }

@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.Extensions.Configuration;
+using Strata.Testing.Hosting;
 
 namespace Strata.DSS.CostAccounting.Api.Test
 {
@@ -17,7 +18,7 @@ namespace Strata.DSS.CostAccounting.Api.Test
         {
             var isStrataUser = _config.GetValue<bool>("isStrataUser");
             var principal = TestData.GetClaimsPrincipal(isStrataUser);
-            //app.AddTestPrincipal(principal.Claims);
+            app.AddTestPrincipal(principal.Claims);
             base.Configure(app, env, provider);
         }
     }
