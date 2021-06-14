@@ -22,13 +22,16 @@ export const newCostConfig = (costConfig: Partial<ICostConfig> = {}): ICostConfi
     ...{
       costingConfigGuid: '',
       name: '',
+      description: '',
       isGLCosting: false,
       defaultChargeAllocationMethod: 0,
-      type: 0,
       fiscalYearID: 0,
+      type: 0,
       createdAt: new Date(),
-      modifiedAtUtc: new Date()
+      modifiedAtUtc: new Date(),
+      lastPublishedUtc: new Date(),
+      isEditable: true
     },
     ...costConfig
-};
   };
+};

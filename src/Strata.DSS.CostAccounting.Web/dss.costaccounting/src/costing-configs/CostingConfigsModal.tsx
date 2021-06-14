@@ -5,9 +5,10 @@ import Tooltip from '@strata/tempo/lib/tooltip';
 import React, { useEffect, useState } from 'react';
 import { ICostConfig, CostingType } from '../shared/data/ICostConfig';
 import Input from '@strata/tempo/lib/input';
-import { costConfigService } from '../shared/data/CostConfigService';
+import { costConfigService } from '../shared/data/costConfigService';
 import ActionBar from '@strata/tempo/lib/actionbar';
 import DataGrid, { IGlobalFilterValue } from '@strata/tempo/lib/datagrid/DataGrid';
+import { useHistory, useLocation } from 'react-router-dom';
 
 export interface ICostingConfigsModalProps {
   visible: boolean;
@@ -17,10 +18,12 @@ export interface ICostingConfigsModalProps {
 const CostingConfigsModal: React.FC<ICostingConfigsModalProps> = (props: ICostingConfigsModalProps) => {
   const [costModels, setCostModels] = useState<ICostConfig[]>([]);
   const [globalFilterValue, setGlobalFilterValue] = useState<IGlobalFilterValue>({ fields: ['name', 'description'], value: '' });
+  const history = useHistory();
+  const location = useLocation();
 
   useEffect(() => {
     const fetchData = async () => {
-      const costModels = await costConfigService.getCostConfig();
+      const costModels = await costConfigService.getCostConfigs();
       setCostModels(costModels);
     };
 
@@ -34,6 +37,8 @@ const CostingConfigsModal: React.FC<ICostingConfigsModalProps> = (props: ICostin
   const handleChangeConfigs = (costingConfigGuid: string) => {
     //TODO
     //Switch Configs
+    const currentLocation = location.pathname.split('/')[1];
+    history.push(`/${currentLocation}/${costingConfigGuid}`);
   };
 
   const handleCopy = (costingConfigGuid: string) => {

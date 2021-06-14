@@ -9,7 +9,7 @@ import { ICostingPermissions } from '../../costing-configs/data/ICostingPermissi
 import { ICostConfigSaveResult } from '../../costing-configs/data/ICostConfigSaveResult';
 import { ICostConfigSaveData } from '../../costing-configs/data/ICostConfigSaveData';
 
-const { httpGet, httpDelete } = getSecureService(appConfig.apiUrl);
+const { httpGet, httpDelete, httpPost } = getSecureService(appConfig.apiUrl);
 
 export const costConfigService = {
   getCostConfigs: (): Promise<ICostConfig[]> => {
@@ -17,7 +17,7 @@ export const costConfigService = {
   },
   deleteCostConfig: (costConfigGuid: string): Promise<string> => {
     return httpDelete<string>(`costing-configs/` + costConfigGuid);
-  }
+  },
   getCostConfig: (costingConfigGuid: string): Promise<ICostConfig> => {
     return httpGet<ICostConfig>(`costing-configs/${costingConfigGuid}`);
   },

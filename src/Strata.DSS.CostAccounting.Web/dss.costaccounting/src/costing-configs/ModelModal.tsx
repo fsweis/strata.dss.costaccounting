@@ -154,7 +154,9 @@ const ModelModal: React.FC<IModelModalProps> = (props: IModelModalProps) => {
       isBudgetedAndActualCosting: values.options ? values.options.indexOf(2) >= 0 : false,
       isUtilizationEntityConfigured: values.utilizationEntities ? (values.utilizationEntities === 1 ? true : false) : false,
       createdAt: new Date(),
-      modifiedAtUtc: new Date()
+      modifiedAtUtc: new Date(),
+      lastPublishedUtc: new Date(),
+      isEditable: true
     };
 
     const glPayrollEntities = values.filteredEntities ? values.filteredEntities.map((x) => +x) : [];

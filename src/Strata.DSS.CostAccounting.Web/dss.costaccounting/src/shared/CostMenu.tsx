@@ -5,12 +5,14 @@ import ButtonMenu from '@strata/tempo/lib/buttonmenu';
 import Icon from '@strata/tempo/lib/icon/Icon';
 import { ICostConfig, newCostConfig } from './data/ICostConfig';
 import ModelModal from '../costing-configs/ModelModal';
+import CostingConfigsModal from '../costing-configs/CostingConfigsModal';
 export interface ICostMenuProps {
   costConfigs: ICostConfig[];
 }
 const CostMenu: React.FC<ICostMenuProps> = ({ costConfigs }: ICostMenuProps) => {
   const [selectedCostConfigItem, setSelectedCostConfigItem] = useState<ICostConfig>(newCostConfig());
   const [modelModalVisible, setModelModalVisibleVisible] = React.useState<boolean>(false);
+  const [costingConfigsModalVisible, setcostingConfigsModalVisible] = React.useState<boolean>(false);
   const history = useHistory();
   const location = useLocation();
   useEffect(() => {
@@ -33,7 +35,7 @@ const CostMenu: React.FC<ICostMenuProps> = ({ costConfigs }: ICostMenuProps) => 
     return [currentLocation];
   };
   const handleClick = (key: React.Key) => {
-    if (key === '1') alert('All Models Page');
+    if (key === '1') setcostingConfigsModalVisible(true);
     else if (key === '2') setModelModalVisibleVisible(true);
     else {
       const costConfigItem = costConfigs.find((config) => config.costingConfigGuid === key);
@@ -121,6 +123,7 @@ const CostMenu: React.FC<ICostMenuProps> = ({ costConfigs }: ICostMenuProps) => 
           setModelModalVisibleVisible(false);
         }}
       ></ModelModal>
+      <CostingConfigsModal onCancel={() => setcostingConfigsModalVisible(false)} visible={costingConfigsModalVisible}></CostingConfigsModal>
     </>
   );
 };
