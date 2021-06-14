@@ -1,13 +1,13 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using Strata.DSS.CostAccounting.Biz.CostAccounting.DbContexts;
+using Strata.DSS.CostAccounting.Biz.CostAccounting.Entities;
+using Strata.DSS.CostAccounting.Biz.CostAccounting.Models;
+using Strata.SqlTools.Configuration.Common.AsyncFactory;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
-using Strata.SqlTools.Configuration.Common.AsyncFactory;
-using Strata.DSS.CostAccounting.Biz.CostAccounting.DbContexts;
-using Strata.DSS.CostAccounting.Biz.CostAccounting.Entities;
-using Strata.DSS.CostAccounting.Biz.CostAccounting.Models;
 
 namespace Strata.DSS.CostAccounting.Biz.CostAccounting.Repositories
 {
@@ -30,7 +30,7 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.Repositories
         public async Task<CostAccountingModel> GetCostAccountingAsync(Guid id, CancellationToken cancellationToken)
         {
             await using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
-            var entity = await dbContext.CostAccountings.FindAsync(new object[] {id}, cancellationToken);
+            var entity = await dbContext.CostAccountings.FindAsync(new object[] { id }, cancellationToken);
 
             return ToModel(entity);
         }
@@ -39,11 +39,11 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.Repositories
         {
             return new CostAccountingModel
             {
-                Id = entity.Id, 
+                Id = entity.Id,
                 Name = entity.Name
             };
         }
-       
+
         public async Task<IList<Measure>> GetMeasuresAsync(IList<Guid> dataTableGuids, CancellationToken cancellationToken)
         {
             await using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
@@ -63,7 +63,7 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.Repositories
             return measures;
         }
 
-        public async Task<IList<RuleSet>> GetRuleSetssAsync(CancellationToken cancellationToken)
+        public async Task<IList<RuleSet>> GetRuleSetsAsync(CancellationToken cancellationToken)
         {
             await using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
             var ruleSets = await dbContext.RuleSets.ToListAsync(cancellationToken);

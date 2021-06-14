@@ -1,10 +1,5 @@
-﻿using Strata.DSS.CostAccounting.Biz.CostAccounting.Models;
-using Strata.DSS.CostAccounting.Biz.Enums;
-using Strata.DSS.CostAccounting.Biz.StatisticDrivers.Models;
+﻿using Strata.DSS.CostAccounting.Biz.Enums;
 using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Text.Json.Serialization;
 
 namespace Strata.DSS.CostAccounting.Biz.StatisticDrivers.Models
 {
@@ -16,13 +11,8 @@ namespace Strata.DSS.CostAccounting.Biz.StatisticDrivers.Models
         public string Name { get; set; }
         public bool HasRules { get; set; }
         public bool IsInverted { get; set; }
-        public bool IsNew { get; set; }
-      
         public bool IsUsed { get; set; }
-
         public CostingType CostingType { get; set; }
-
-
 
         public StatisticDriver()
         {
@@ -31,7 +21,7 @@ namespace Strata.DSS.CostAccounting.Biz.StatisticDrivers.Models
         public StatisticDriver(DriverConfigView driverConfigTemp, bool isUsed, bool hasRules, Guid summaryDataTableGuid, Guid detailDataTableGuid)
         {
             var dtGuid = driverConfigTemp.DataTableGuid;
-            if(dtGuid==summaryDataTableGuid)
+            if (dtGuid == summaryDataTableGuid)
             {
                 dtGuid = detailDataTableGuid;
             }
@@ -39,12 +29,10 @@ namespace Strata.DSS.CostAccounting.Biz.StatisticDrivers.Models
             MeasureGuid = driverConfigTemp.MeasureGuid;
             DataTableGuid = dtGuid;
             Name = driverConfigTemp.Name;
-            IsNew = false;
             IsUsed = isUsed;
             IsInverted = driverConfigTemp.IsInverted;
             HasRules = hasRules;
             CostingType = driverConfigTemp.CostingType;
         }
-
     }
 }

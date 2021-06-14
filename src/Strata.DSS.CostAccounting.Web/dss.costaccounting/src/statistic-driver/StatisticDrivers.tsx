@@ -18,7 +18,7 @@ import { IStatisticDriverSaveData } from './data/IStatisticDriverSaveData';
 import { IStatisticDriver } from './data/IStatisticDriver';
 import { statisticDriverService } from './data/statisticDriverService';
 import { IDataSourceLink } from './data/IDataSourceLink';
-import { getNewGuid } from '../shared/Utils';
+import { getEmptyGuid } from '../shared/Utils';
 import cloneDeep from 'lodash/cloneDeep';
 import { IDataSource } from '../shared/data/IDataSource';
 import PatientDriverTreeModal from './PatientDriverTreeModal';
@@ -42,26 +42,28 @@ const StatisticDrivers: React.FC = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [dataSources, dataSourceLinks, statisticDrivers] = await Promise.all([
-          statisticDriverService.getDataSources(),
-          statisticDriverService.getDataSourceLinks(),
-          statisticDriverService.getStatisticDrivers()
-        ]);
-        setDataSources(dataSources);
-        setDataSourceLinks(dataSourceLinks);
-        setStatDrivers(statisticDrivers);
-        setTempStatDrivers(cloneDeep(statisticDrivers));
+        if (costConfig && costConfig.type) {
+          const [dataSources, dataSourceLinks, statisticDrivers] = await Promise.all([
+            statisticDriverService.getDataSources(costConfig.type),
+            statisticDriverService.getDataSourceLinks(costConfig.type),
+            statisticDriverService.getStatisticDrivers(costConfig.type)
+          ]);
+          setDataSources(dataSources);
+          setDataSourceLinks(dataSourceLinks);
+          setStatDrivers(statisticDrivers);
+          setTempStatDrivers(cloneDeep(statisticDrivers));
+        }
       } finally {
         setGridLoading(false);
       }
     };
     setGridLoading(true);
-
     fetchData();
   }, [costConfig]);
 
   const handleCancel = () => {
-    if (updatedDriverGuids.length > 0 || deletedDriverGuids.length > 0) {
+    const emptyGuid = getEmptyGuid();
+    if (updatedDriverGuids.length > 0 || deletedDriverGuids.length > 0 || tempStatDrivers.some((d) => d.driverConfigGuid === emptyGuid)) {
       Modal.confirm({
         title: 'Discard unsaved changes?',
         content: 'Changes will be discarded.',
@@ -83,15 +85,13 @@ const StatisticDrivers: React.FC = () => {
   };
 
   const handleAdd = () => {
-    const newGuid = getNewGuid();
-
+    const emptyGuid = getEmptyGuid();
     const newDriver: IStatisticDriver = {
-      driverConfigGuid: newGuid,
+      driverConfigGuid: emptyGuid,
       dataTableGuid: '',
       measureGuid: '',
       hasRules: false,
       isInverted: false,
-      isNew: true,
       isUsed: false,
       name: '',
       costingType: 1 //this should be costing type from context
@@ -112,17 +112,17 @@ const StatisticDrivers: React.FC = () => {
   const handleSave = async () => {
     if (await validateStatisticDrivers()) {
       const guids = updatedDriverGuids.filter((guid) => !deletedDriverGuids.includes(guid));
-      const updatedStatDrivers = tempStatDrivers.filter((d) => guids.includes(d.driverConfigGuid) && !d.isNew);
-      const addedStatDrivers = tempStatDrivers.filter((d) => guids.includes(d.driverConfigGuid) && d.isNew);
+      const updatedStatDrivers = tempStatDrivers.filter((d) => guids.includes(d.driverConfigGuid) || d.driverConfigGuid === getEmptyGuid());
 
+      //hook up configGUid from route once we have it
       const statDriverSaveData: IStatisticDriverSaveData = {
-        addedStatDrivers: addedStatDrivers,
         updatedStatDrivers: updatedStatDrivers,
-        deletedStatDrivers: deletedDriverGuids
+        deletedStatDrivers: deletedDriverGuids,
+        costingType: 0
       };
 
       // Don't actually save if there are no changes
-      if (!statDriverSaveData.addedStatDrivers.length && !statDriverSaveData.updatedStatDrivers.length && !statDriverSaveData.deletedStatDrivers.length) {
+      if (!statDriverSaveData.updatedStatDrivers.length && !statDriverSaveData.deletedStatDrivers.length) {
         // TODO: Get exact language here
         Toast.show({
           toastType: 'info',
@@ -147,7 +147,7 @@ const StatisticDrivers: React.FC = () => {
         // TODO: Get exact language here
         Modal.alert({
           title: 'Changes not saved',
-          content: 'Something went wrong when attempting to save changes',
+          content: 'Try again later. If the problem persists, contact your system administrator.',
           alertType: 'error'
         });
       } finally {
@@ -459,7 +459,12 @@ const StatisticDrivers: React.FC = () => {
         statDrivers={statDrivers}
         visible={patientDriverTreeModalVisible}
       ></PatientDriverTreeModal>
-      <RouteConfirm showPrompt={updatedDriverGuids.length > 0 || deletedDriverGuids.length > 0} title={'Discard unsaved changes?'} okText={'Discard Changes'} cancelText={'Keep Changes'} />
+      <RouteConfirm
+        showPrompt={updatedDriverGuids.length > 0 || deletedDriverGuids.length > 0 || tempStatDrivers.some((d) => d.driverConfigGuid === getEmptyGuid())}
+        title={'Discard unsaved changes?'}
+        okText={'Discard Changes'}
+        cancelText={'Keep Changes'}
+      />
     </>
   );
 };
