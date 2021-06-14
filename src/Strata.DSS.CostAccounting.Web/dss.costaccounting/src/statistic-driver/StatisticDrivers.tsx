@@ -42,7 +42,7 @@ const StatisticDrivers: React.FC = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        if (costConfig) {
+        if (costConfig && costConfig.type) {
           const [dataSources, dataSourceLinks, statisticDrivers] = await Promise.all([
             statisticDriverService.getDataSources(costConfig.type),
             statisticDriverService.getDataSourceLinks(costConfig.type),
