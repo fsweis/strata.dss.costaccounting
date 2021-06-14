@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.VisualStudio.TestPlatform.TestHost;
 using Moq;
 using NUnit.Framework;
 using Strata.DSS.CostAccounting.Biz.CostAccounting.DbContexts;
@@ -64,17 +63,6 @@ namespace Strata.DSS.CostAccounting.Api.Test.IntegrationTests
         private async Task<HttpClient> GetHttpClient(SqliteConnection connection)
         {
             var server = await InitServer(connection);
-            //var projectDir = Directory.GetCurrentDirectory();
-            //var configPath = Path.Combine(projectDir, "appsettings.json");
-
-            //var client = server.WithWebHostBuilder(builder =>
-            //{
-            //    builder.UseSolutionRelativeContentRoot(@"src\Strata.DSS.CostAccounting.Api");
-            //    builder.ConfigureAppConfiguration((context, conf) =>
-            //    {
-            //        conf.AddJsonFile(configPath);
-            //    });
-            //}).CreateClient();
 
             var client = server.CreateClient();
             return client;

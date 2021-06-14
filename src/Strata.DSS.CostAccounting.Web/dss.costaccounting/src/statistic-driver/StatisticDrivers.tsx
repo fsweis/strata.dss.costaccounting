@@ -439,7 +439,7 @@ const StatisticDrivers: React.FC = () => {
                   <Button
                     type='link'
                     /*hard coding configGuid until we can pull from route/Url*/
-                    onClick={() => handleRulesClick('2adafbaa-c365-472a-94f1-79b823d8547a', rowData.driverConfigGuid)}
+                    onClick={() => handleRulesClick(costConfig?.costingConfigGuid ?? '', rowData.driverConfigGuid)}
                     disabled={rowData.isNew}
                   >
                     {rowData.hasRules ? 'Edit Rules' : 'Add Rules'}
