@@ -36,7 +36,7 @@ const StatisticDrivers: React.FC = () => {
   const gridRef = React.useRef<DataGrid>(null);
   const { setLoading } = usePageLoader();
   const [gridLoading, setGridLoading] = useState<boolean>(false);
-
+  const emptyGuid = getEmptyGuid();
   const { costConfig } = useContext(CostConfigContext);
 
   useEffect(() => {
@@ -62,7 +62,6 @@ const StatisticDrivers: React.FC = () => {
   }, [costConfig]);
 
   const handleCancel = () => {
-    const emptyGuid = getEmptyGuid();
     if (updatedDriverGuids.length > 0 || deletedDriverGuids.length > 0 || tempStatDrivers.some((d) => d.driverConfigGuid === emptyGuid)) {
       Modal.confirm({
         title: 'Discard unsaved changes?',
@@ -85,7 +84,6 @@ const StatisticDrivers: React.FC = () => {
   };
 
   const handleAdd = () => {
-    const emptyGuid = getEmptyGuid();
     const newDriver: IStatisticDriver = {
       driverConfigGuid: emptyGuid,
       dataTableGuid: '',
@@ -112,7 +110,7 @@ const StatisticDrivers: React.FC = () => {
   const handleSave = async () => {
     if (await validateStatisticDrivers()) {
       const guids = updatedDriverGuids.filter((guid) => !deletedDriverGuids.includes(guid));
-      const updatedStatDrivers = tempStatDrivers.filter((d) => guids.includes(d.driverConfigGuid) || d.driverConfigGuid === getEmptyGuid());
+      const updatedStatDrivers = tempStatDrivers.filter((d) => guids.includes(d.driverConfigGuid) || d.driverConfigGuid === emptyGuid);
 
       const statDriverSaveData: IStatisticDriverSaveData = {
         updatedStatDrivers: updatedStatDrivers,
@@ -434,18 +432,18 @@ const StatisticDrivers: React.FC = () => {
           body={(rowData) => (
             <>
               <Spacing vAlign='center'>
-                <Tooltip title={rowData.driverConfigGuid === getEmptyGuid() ? 'Save driver to add rules' : ''}>
+                <Tooltip title={rowData.driverConfigGuid === emptyGuid ? 'Save driver to add rules' : ''}>
                   <Button
                     type='link'
                     /*hard coding configGuid until we can pull from route/Url*/
                     onClick={() => handleRulesClick(costConfig?.costingConfigGuid ?? '', rowData.driverConfigGuid)}
-                    disabled={rowData.driverConfigGuid === getEmptyGuid()}
+                    disabled={rowData.driverConfigGuid === emptyGuid}
                   >
                     {rowData.hasRules ? 'Edit Rules' : 'Add Rules'}
                   </Button>
                 </Tooltip>
                 <Tooltip placement='left' title={rowData.isUsed ? "Can't delete drivers in use" : 'Delete'}>
-                  <Button type='link' icon='Delete' disabled={rowData.isUsed} onClick={() => handleDelete(rowData.driverConfigGuid, rowData.driverConfigGuid === getEmptyGuid())} />
+                  <Button type='link' icon='Delete' disabled={rowData.isUsed} onClick={() => handleDelete(rowData.driverConfigGuid, rowData.driverConfigGuid === emptyGuid)} />
                 </Tooltip>
               </Spacing>
             </>
@@ -459,7 +457,7 @@ const StatisticDrivers: React.FC = () => {
         visible={patientDriverTreeModalVisible}
       ></PatientDriverTreeModal>
       <RouteConfirm
-        showPrompt={updatedDriverGuids.length > 0 || deletedDriverGuids.length > 0 || tempStatDrivers.some((d) => d.driverConfigGuid === getEmptyGuid())}
+        showPrompt={updatedDriverGuids.length > 0 || deletedDriverGuids.length > 0 || tempStatDrivers.some((d) => d.driverConfigGuid === emptyGuid)}
         title={'Discard unsaved changes?'}
         okText={'Discard Changes'}
         cancelText={'Keep Changes'}
