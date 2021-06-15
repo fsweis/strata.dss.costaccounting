@@ -13,7 +13,7 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.Repositories
         public Task<IEnumerable<CostingConfigModel>> GetAllCostingConfigsAsync(CancellationToken cancellationToken);
         public Task<CostingConfigModel> GetCostingConfigAsync(Guid id, CancellationToken cancellationToken);
 
-        public Task<IEnumerable<FiscalMonth>> GetFiscalMonthsAsync( CancellationToken cancellationToken);
+        public Task<IEnumerable<FiscalMonth>> GetFiscalMonthsAsync(CancellationToken cancellationToken);
         public Task<IEnumerable<FiscalYear>> GetFiscalYearsAsync(CancellationToken cancellationToken);
         public Task<IEnumerable<Entity>> GetEntitiesAsync(CancellationToken cancellationToken);
         public Task<IEnumerable<SystemSetting>> GetSystemSettingsAsync(CancellationToken cancellationToken);
@@ -23,5 +23,6 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.Repositories
         public Task DeleteCCELinksAsync(List<CostingConfigEntityLinkage> cceLinks, CancellationToken cancellationToken);
         public Task AddNewCostingConfigAsync(CostingConfigModel costingConfigModel, CancellationToken cancellationToken);
         public Task<Guid> DeleteCostingConfigAsync(Guid id, CancellationToken cancellationToken);
+        public Task<IEnumerable<CostingConfigEntityLinkage>> GetCostingConfigEntityLinkagesAsync(Guid costingConfigGuid, CancellationToken cancellationToken);
     }
 }

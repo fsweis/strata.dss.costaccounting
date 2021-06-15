@@ -15,9 +15,10 @@ namespace Strata.DSS.CostAccounting.Api.DTOs
             Name = costingConfig.Name;
             Description = costingConfig.Description;
             IsGLCosting = costingConfig.IsGLCosting;
+            IsPayrollCosting = costingConfig.IsPayrollCosting;
             DefaultChargeAllocationMethod = costingConfig.DefaultChargeAllocationMethod;
             FiscalYearID = costingConfig.FiscalYearID;
-            Type = (int)costingConfig.Type;
+            FiscalMonthID = costingConfig.FiscalMonthID;
             CreatedAt = costingConfig.CreatedAt;
             ModifiedAtUtc = costingConfig.ModifiedAtUtc;
             LastPublishedUtc = costingConfig.LastPublishedUtc;
@@ -28,12 +29,18 @@ namespace Strata.DSS.CostAccounting.Api.DTOs
         public string Name { get; set; }
         public string Description { get; set; }
         public bool IsGLCosting { get; set; }
+        public bool IsPayrollCosting { get; set; }
+        public bool IsBudgetedAndActualCosting { get; set; }
+        public bool IsUtilizationEntityConfigured { get; set; }
         public short DefaultChargeAllocationMethod { get; set; }
         public short FiscalYearID { get; set; }
+        public short FiscalMonthID { get; set; }
         public int Type { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime ModifiedAtUtc { get; set; }
         public DateTime? LastPublishedUtc { get; set; }
         public bool IsEditable { get; set; }
+        public List<int> GlPayrollEntities { get; set; }
+        public List<int> UtilEntities { get; set; }
     }
 }

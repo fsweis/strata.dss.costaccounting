@@ -43,6 +43,15 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.Repositories
             return _mapper.Map<CostingConfigModel>(entity);
         }
 
+        public async Task<IEnumerable<CostingConfigEntityLinkage>> GetCostingConfigEntityLinkagesAsync(Guid costingConfigGuid, CancellationToken cancellationToken)
+        {
+            await using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
+
+            var entities = await dbContext.CCELinks.Where(x => x.CostingConfigGuid == costingConfigGuid).ToListAsync(cancellationToken);
+
+            return _mapper.Map<IEnumerable<CostingConfigEntityLinkage>>(entities);
+        }
+
         public async Task<IEnumerable<FiscalMonth>> GetFiscalMonthsAsync(CancellationToken cancellationToken)
         {
             await using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
@@ -72,7 +81,7 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.Repositories
         public async Task<IEnumerable<Entity>> GetEntitiesAsync(CancellationToken cancellationToken)
         {
             await using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
-            var entities = await dbContext.Entities.Where(x=>x.Description!="").ToListAsync(cancellationToken);
+            var entities = await dbContext.Entities.Where(x => x.Description != "").ToListAsync(cancellationToken);
 
             if (!entities.Any())
             {
@@ -109,13 +118,13 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.Repositories
         public async Task<IEnumerable<CostingConfigEntityLinkage>> GetCCELinksByConfigGuidAsync(Guid configGuid, CancellationToken cancellationToken)
         {
             await using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
-            var ccels = await dbContext.CCELinks.Where(x=>x.CostingConfigGuid==configGuid).ToListAsync(cancellationToken);
+            var ccels = await dbContext.CCELinks.Where(x => x.CostingConfigGuid == configGuid).ToListAsync(cancellationToken);
 
             if (!ccels.Any())
             {
                 return null;
             }
-          
+
             return _mapper.Map<IEnumerable<CostingConfigEntityLinkage>>(ccels);
         }
 
@@ -134,12 +143,12 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.Repositories
 
         public async Task AddNewCostingConfigAsync(CostingConfigModel costingConfigModel, CancellationToken cancellationToken)
         {
-           await using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
+            await using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
 
-           var newConfig = _mapper.Map<CostingConfigEntity>(costingConfigModel);
-           dbContext.CostingConfigs.Add(newConfig);
+            var newConfig = _mapper.Map<CostingConfigEntity>(costingConfigModel);
+            dbContext.CostingConfigs.Add(newConfig);
 
-           await dbContext.SaveChangesAsync(cancellationToken);
+            await dbContext.SaveChangesAsync(cancellationToken);
         }
 
         public async Task<Guid> DeleteCostingConfigAsync(Guid costingConfigGuid, CancellationToken cancellationToken)

@@ -7,7 +7,6 @@ import { ICostingType } from '../../costing-configs/data/ICostingType';
 import { ICostingMethod } from '../../costing-configs/data/ICostingMethod';
 import { ICostingPermissions } from '../../costing-configs/data/ICostingPermissions';
 import { ICostConfigSaveResult } from '../../costing-configs/data/ICostConfigSaveResult';
-import { ICostConfigSaveData } from '../../costing-configs/data/ICostConfigSaveData';
 
 const { httpGet, httpPost, httpDelete } = getSecureService(appConfig.apiUrl);
 
@@ -15,12 +14,14 @@ export const costConfigService = {
   getCostConfigs: (): Promise<ICostConfig[]> => {
     return httpGet<ICostConfig[]>(`costing-configs`);
   },
-
   getCostConfig: (costingConfigGuid: string): Promise<ICostConfig> => {
     return httpGet<ICostConfig>(`costing-configs/${costingConfigGuid}`);
   },
+  getCostConfigForCopy: (costingConfigGuid: string): Promise<ICostConfig> => {
+    return httpGet<ICostConfig>(`costing-configs/copy/${costingConfigGuid}`);
+  },
   deleteCostConfig: (costConfigGuid: string): Promise<string> => {
-    return httpDelete<string>(`costing-configs/` + costConfigGuid);
+    return httpDelete<string>(`costing-configs/${costConfigGuid}`);
   },
   getFiscalMonths: (): Promise<IFiscalMonth[]> => {
     return httpGet<IFiscalMonth[]>(`costing-configs/fiscal-month`);
@@ -43,7 +44,7 @@ export const costConfigService = {
   getCostingPermissions: (): Promise<ICostingPermissions> => {
     return httpGet<ICostingPermissions>(`costing-configs/costing-permissions`);
   },
-  addNewConfig: (costConfigSaveData: ICostConfigSaveData): Promise<ICostConfigSaveResult> => {
-    return httpPost<ICostConfigSaveResult>(`costing-configs/new-config`, costConfigSaveData);
+  addNewConfig: (costConfig: ICostConfig): Promise<ICostConfigSaveResult> => {
+    return httpPost<ICostConfigSaveResult>(`costing-configs/new-config`, costConfig);
   }
 };

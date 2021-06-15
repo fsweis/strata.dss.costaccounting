@@ -13,6 +13,7 @@ export interface ICostingConfigsModalProps {
   visible: boolean;
   onCancel: () => void;
   onChangeConfigs: (costingConfigGuid: string) => void;
+  onCopyConfig: (costingConfigGuid: string) => void;
 }
 
 const CostingConfigsModal: React.FC<ICostingConfigsModalProps> = (props: ICostingConfigsModalProps) => {
@@ -37,8 +38,7 @@ const CostingConfigsModal: React.FC<ICostingConfigsModalProps> = (props: ICostin
   };
 
   const handleCopy = (costingConfigGuid: string) => {
-    //TODO
-    //Open new modal
+    props.onCopyConfig(costingConfigGuid);
   };
 
   const handleDelete = (costingConfigGuid: string) => {

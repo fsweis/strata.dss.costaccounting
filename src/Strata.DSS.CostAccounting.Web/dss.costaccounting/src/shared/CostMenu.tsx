@@ -13,7 +13,8 @@ export interface ICostMenuProps {
 const CostMenu: React.FC<ICostMenuProps> = ({ costConfigsFiltered, costConfigs }: ICostMenuProps) => {
   const [selectedCostConfigItem, setSelectedCostConfigItem] = useState<ICostConfig>(newCostConfig());
   const [modelModalVisible, setModelModalVisibleVisible] = React.useState<boolean>(false);
-  const [costingConfigsModalVisible, setcostingConfigsModalVisible] = React.useState<boolean>(false);
+  const [costingConfigsModalVisible, setCostingConfigsModalVisible] = React.useState<boolean>(false);
+  const [copyCostingConfigGuid, setCopyCostingConfigGuid] = React.useState<string>('');
   const history = useHistory();
   const location = useLocation();
   useEffect(() => {
@@ -36,9 +37,11 @@ const CostMenu: React.FC<ICostMenuProps> = ({ costConfigsFiltered, costConfigs }
     return [currentLocation];
   };
   const handleClick = (key: React.Key) => {
-    if (key === '1') setcostingConfigsModalVisible(true);
-    else if (key === '2') setModelModalVisibleVisible(true);
-    else {
+    if (key === '1') setCostingConfigsModalVisible(true);
+    else if (key === '2') {
+      setCopyCostingConfigGuid('');
+      setModelModalVisibleVisible(true);
+    } else {
       const costConfigItem = costConfigs.find((config) => config.costingConfigGuid === key);
       if (costConfigItem) {
         const currentLocation = location.pathname.split('/')[1];
@@ -50,7 +53,13 @@ const CostMenu: React.FC<ICostMenuProps> = ({ costConfigsFiltered, costConfigs }
   const handleChangeConfigs = (costingConfigGuid: string) => {
     const currentLocation = location.pathname.split('/')[1];
     history.push(`/${currentLocation}/${costingConfigGuid}`);
-    setcostingConfigsModalVisible(false);
+    setCostingConfigsModalVisible(false);
+  };
+
+  const handleCopyConfigs = (costingConfigGuid: string) => {
+    setCopyCostingConfigGuid(costingConfigGuid);
+    setCostingConfigsModalVisible(false);
+    setModelModalVisibleVisible(true);
   };
 
   return (
@@ -130,10 +139,12 @@ const CostMenu: React.FC<ICostMenuProps> = ({ costConfigsFiltered, costConfigs }
         onSave={() => {
           setModelModalVisibleVisible(false);
         }}
+        costingConfigGuid={copyCostingConfigGuid}
       ></ModelModal>
       <CostingConfigsModal
-        onCancel={() => setcostingConfigsModalVisible(false)}
+        onCancel={() => setCostingConfigsModalVisible(false)}
         onChangeConfigs={(costingConfigGuid: string) => handleChangeConfigs(costingConfigGuid)}
+        onCopyConfig={(costingConfigGuid: string) => handleCopyConfigs(costingConfigGuid)}
         visible={costingConfigsModalVisible}
       ></CostingConfigsModal>
     </>

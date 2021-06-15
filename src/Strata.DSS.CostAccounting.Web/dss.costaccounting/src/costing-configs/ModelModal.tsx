@@ -22,11 +22,14 @@ import { ICostingPermissions } from './data/ICostingPermissions';
 import { ICostConfigSaveData } from './data/ICostConfigSaveData';
 import TreeDropDown, { ITreeDropDownNode } from '@strata/tempo/lib/treedropdown';
 import { getEmptyGuid } from '../shared/Utils';
+import { config } from 'process';
+import { ICostConfig } from '../shared/data/ICostConfig';
 
 export interface IModelModalProps {
   visible: boolean;
   onCancel: () => void;
   onSave: () => void;
+  costingConfigGuid: string;
 }
 
 export interface IConfigForm {
@@ -35,9 +38,9 @@ export interface IConfigForm {
   year: number;
   ytdMonth: number;
   type: number;
-  filteredEntities: string[];
+  filteredEntities: number[];
   utilizationEntities: number;
-  specifyUtilizationEntities: string[];
+  specifyUtilizationEntities: number[];
   method: number;
   options: number[];
 }
@@ -57,7 +60,7 @@ const ModelModal: React.FC<IModelModalProps> = (props: IModelModalProps) => {
   const [utilEntityTreeData, setUtilEntityTreeData] = useState<ITreeDropDownNode[]>([]);
   const [costingPermissions, setCostingPermissions] = useState<ICostingPermissions>();
   const [configForm, setConfigForm] = useState<IConfigForm>();
-
+  const [title, setTitle] = useState<string>('');
   //Load initial data
   useEffect(() => {
     const fetchData = async () => {
@@ -78,11 +81,12 @@ const ModelModal: React.FC<IModelModalProps> = (props: IModelModalProps) => {
         setCostingTypes(costingTypes);
         setCostingMethods(costingMethods);
         setCostingPermissions(costingPermissions);
-        //set initial form
+
         const year = fiscalYears.find((x) => x.fiscalYearID === new Date().getFullYear())?.fiscalYearID;
         const ytdMonth = fiscalMonths.find((x) => x.sortOrder === 12)?.fiscalMonthID;
-        const fEntities = filteredEntities.map((x) => x.entityID.toString());
-        const nEntities = entities.map((x) => x.entityID.toString());
+        const fEntities = filteredEntities.map((x) => x.entityID);
+        const nEntities = entities.map((x) => x.entityID);
+
         const configForm = {
           name: '',
           description: '',
@@ -95,14 +99,38 @@ const ModelModal: React.FC<IModelModalProps> = (props: IModelModalProps) => {
           method: 0,
           options: []
         };
-        setConfigForm(configForm);
+
+        if (props.costingConfigGuid !== '') {
+          const fetchModel = async () => {
+            const costModel = await costConfigService.getCostConfigForCopy(props.costingConfigGuid);
+
+            configForm.name = costModel.name + ' - Copy';
+            configForm.description = costModel.description;
+            configForm.year = costModel.fiscalYearID;
+            configForm.type = costModel.type;
+            configForm.ytdMonth = costModel.fiscalMonthId;
+            //TODO: I do not think the ones below are mapped correctly?
+            configForm.filteredEntities = costModel.glPayrollEntities;
+            configForm.specifyUtilizationEntities = costModel.utilEntities;
+            configForm.method = costModel.defaultChargeAllocationMethod;
+            setConfigForm(configForm);
+          };
+          fetchModel();
+
+          setTitle('Copy Model');
+        } else {
+          setConfigForm(configForm);
+          setTitle('New Model');
+        }
       } finally {
         setLoading(false);
       }
     };
     setLoading(true);
     fetchData();
-  }, []);
+  }, [props.costingConfigGuid]);
+
+  //useEffect(() => {}, [props.costingConfigGuid]);
 
   //Set Filtered Entity Trees when entities are loaded
   useEffect(() => {
@@ -141,14 +169,18 @@ const ModelModal: React.FC<IModelModalProps> = (props: IModelModalProps) => {
   //Form Finish
   const onFormFinish = async (vals: { [name: string]: any }) => {
     const values = vals as IConfigForm;
-    const newConfig = {
+
+    const glPayrollEntities = values.filteredEntities ? values.filteredEntities.map((x) => +x) : [];
+    const utilEntities = values.specifyUtilizationEntities ? values.specifyUtilizationEntities.map((x) => +x) : [];
+
+    const newConfig: ICostConfig = {
       costingConfigGuid: getEmptyGuid(),
       name: values.name,
       description: values.description,
       isGLCosting: true,
       defaultChargeAllocationMethod: values.method,
       fiscalYearID: values.year,
-      fiscalMonhtID: values.ytdMonth,
+      fiscalMonthId: values.ytdMonth,
       type: values.type ? values.type : 0,
       isPayrollCosting: values.options ? values.options.indexOf(1) >= 0 : false,
       isBudgetedAndActualCosting: values.options ? values.options.indexOf(2) >= 0 : false,
@@ -156,20 +188,14 @@ const ModelModal: React.FC<IModelModalProps> = (props: IModelModalProps) => {
       createdAt: new Date(),
       modifiedAtUtc: new Date(),
       lastPublishedUtc: new Date(),
-      isEditable: true
-    };
-
-    const glPayrollEntities = values.filteredEntities ? values.filteredEntities.map((x) => +x) : [];
-    const utilEntities = values.specifyUtilizationEntities ? values.specifyUtilizationEntities.map((x) => +x) : [];
-    const configSaveData: ICostConfigSaveData = {
-      costingConfig: newConfig,
+      isEditable: true,
       glPayrollEntities: glPayrollEntities,
       utilEntities: utilEntities
     };
 
     try {
       setLoading(true);
-      const saveConfigResult = await costConfigService.addNewConfig(configSaveData);
+      const saveConfigResult = await costConfigService.addNewConfig(newConfig as ICostConfig);
 
       if (saveConfigResult.success) {
         Toast.show({ message: saveConfigResult.message, toastType: 'success' });
@@ -207,7 +233,7 @@ const ModelModal: React.FC<IModelModalProps> = (props: IModelModalProps) => {
   return (
     <>
       <Modal
-        title='New Model'
+        title={title}
         visible={props.visible}
         onCancel={handleCancel}
         onOk={handleSave}

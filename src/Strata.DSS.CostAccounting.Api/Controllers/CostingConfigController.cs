@@ -44,10 +44,26 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
 
         [HttpGet("{id}")]
         [ProducesResponseType(200)]
-        public async Task<ActionResult<CostingConfigModel>> GetCostingConfig([FromRoute] Guid id, CancellationToken cancellationToken)
+        public async Task<ActionResult<CostingConfigDto>> GetCostingConfig([FromRoute] Guid id, CancellationToken cancellationToken)
         {
             var costingConfig = await _costingConfigRepository.GetCostingConfigAsync(id, cancellationToken);
-            return costingConfig;
+            return Ok(new CostingConfigDto(costingConfig));
+        }
+
+        [HttpGet("copy/{id}")]//better naming potentially?
+        [ProducesResponseType(200)]
+        public async Task<ActionResult<CostingConfigDto>> GetCostingConfigForCopy([FromRoute] Guid id, CancellationToken cancellationToken)
+        {
+            var costingConfig = await _costingConfigRepository.GetCostingConfigAsync(id, cancellationToken);
+            var entityLinkages = await _costingConfigRepository.GetCostingConfigEntityLinkagesAsync(id, cancellationToken);
+
+            var dto = new CostingConfigDto(costingConfig)
+            {
+                GlPayrollEntities = entityLinkages.Where(x => x.IsUtilization == false).Select(x => x.EntityID).ToList(),
+                UtilEntities = entityLinkages.Where(x => x.IsUtilization == true).Select(x => x.EntityID).ToList()
+            };
+
+            return Ok(new CostingConfigDto(costingConfig));
         }
 
         [HttpPost]
@@ -132,13 +148,26 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
             return new CostingPermissions { IsClaimsCostingEnabled = isClaimsCostingEnabled, IsCostingEntityLevelSecurityEnabled = isCostingEntityLevelSecurityEnabled };
         }
 
-
         [HttpPost("new-config")]
         [ProducesResponseType(200)]
-        public async Task<ActionResult<CostConfigSaveResult>> AddNewConfig([FromBody] CostingConfigSaveData costConfigSaveData, CancellationToken cancellationToken)
+        public async Task<ActionResult<CostConfigSaveResult>> AddNewConfig([FromBody] CostingConfigDto costingConfigDto, CancellationToken cancellationToken)
         {
+            var costingConfigModel = new CostingConfigModel()
+            {
+                CostingConfigGuid = costingConfigDto.CostingConfigGuid,
+                Name = costingConfigDto.Name,
+                Description = costingConfigDto.Description,
+                IsGLCosting = costingConfigDto.IsGLCosting,
+                DefaultChargeAllocationMethod = costingConfigDto.DefaultChargeAllocationMethod,
+                FiscalYearID = costingConfigDto.FiscalYearID,
+                FiscalMonthID = (byte)costingConfigDto.FiscalMonthID,
+                CreatedAt = costingConfigDto.CreatedAt,
+                ModifiedAtUtc = costingConfigDto.ModifiedAtUtc,
+                LastPublishedUtc = costingConfigDto.LastPublishedUtc,
+                IsEditable = costingConfigDto.IsEditable,
+            };
 
-            var saveResult = await _costingConfigService.AddNewConfig(costConfigSaveData);
+            var saveResult = await _costingConfigService.AddNewConfig(new CostingConfigSaveData(costingConfigModel, costingConfigDto.GlPayrollEntities, costingConfigDto.UtilEntities));
             return Ok(saveResult);
         }
 
