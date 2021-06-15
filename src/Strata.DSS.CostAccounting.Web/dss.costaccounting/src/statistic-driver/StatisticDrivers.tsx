@@ -434,7 +434,7 @@ const StatisticDrivers: React.FC = () => {
           body={(rowData) => (
             <>
               <Spacing vAlign='center'>
-                <Tooltip title={rowData.isNew ? 'Save driver to add rules' : ''}>
+                <Tooltip title={rowData.driverConfigGuid === getEmptyGuid() ? 'Save driver to add rules' : ''}>
                   <Button
                     type='link'
                     /*hard coding configGuid until we can pull from route/Url*/
