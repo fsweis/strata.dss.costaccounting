@@ -431,21 +431,14 @@ const StatisticDrivers: React.FC = () => {
           width={144}
           body={(rowData) => (
             <>
-              <Spacing vAlign='center'>
-                <Tooltip title={rowData.driverConfigGuid === emptyGuid ? 'Save driver to add rules' : ''}>
-                  <Button
-                    type='link'
-                    /*hard coding configGuid until we can pull from route/Url*/
-                    onClick={() => handleRulesClick(costConfig?.costingConfigGuid ?? '', rowData.driverConfigGuid)}
-                    disabled={rowData.driverConfigGuid === emptyGuid}
-                  >
-                    {rowData.hasRules ? 'Edit Rules' : 'Add Rules'}
-                  </Button>
-                </Tooltip>
-                <Tooltip placement='left' title={rowData.isUsed ? "Can't delete drivers in use" : 'Delete'}>
-                  <Button type='link' icon='Delete' disabled={rowData.isUsed} onClick={() => handleDelete(rowData.driverConfigGuid, rowData.driverConfigGuid === emptyGuid)} />
-                </Tooltip>
-              </Spacing>
+              <Tooltip title={rowData.driverConfigGuid === emptyGuid ? 'Save driver to add rules' : ''}>
+                <Button type='link' onClick={() => handleRulesClick(costConfig?.costingConfigGuid ?? '', rowData.driverConfigGuid)} disabled={rowData.driverConfigGuid === emptyGuid}>
+                  {rowData.hasRules ? 'Edit Rules' : 'Add Rules'}
+                </Button>
+              </Tooltip>
+              <Tooltip placement='left' title={rowData.isUsed ? "Can't delete drivers in use" : 'Delete'}>
+                <Button type='link' icon='Delete' disabled={rowData.isUsed} onClick={() => handleDelete(rowData.driverConfigGuid, rowData.driverConfigGuid === emptyGuid)} />
+              </Tooltip>
             </>
           )}
         />
