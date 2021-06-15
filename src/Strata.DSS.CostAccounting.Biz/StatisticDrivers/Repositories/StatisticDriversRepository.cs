@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Strata.DSS.CostAccounting.Biz.CostAccounting.Constants;
 using Strata.DSS.CostAccounting.Biz.CostAccounting.DbContexts;
 using Strata.DSS.CostAccounting.Biz.Enums;
+using Strata.DSS.CostAccounting.Biz.StatisticDrivers.Constants;
 using Strata.DSS.CostAccounting.Biz.StatisticDrivers.Models;
 using Strata.SqlTools.Configuration.Common.AsyncFactory;
 using System;
@@ -25,7 +26,13 @@ namespace Strata.DSS.CostAccounting.Biz.StatisticDrivers.Repositories
         {
             var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
             var allOnesGuid = new Guid(GeneralConstants.ALL_ONES_GUID_STRING);
+
             var drivers = await dbContext.DriverConfigViews.Where(dc => dc.DriverConfigGuid != Guid.Empty && dc.DriverConfigGuid != allOnesGuid && dc.CostingConfigGuid == Guid.Empty && dc.CostingType == costingType).OrderBy(dr => dr.Name).ToListAsync(cancellationToken);
+            foreach (var driver in drivers.Where(d => d.MeasureGuid == new Guid(SDDataTableConstants.GL_PAYROLL_DATASOURCE_ID)))
+            {
+                driver.DataTableGuid = new Guid(SDDataTableConstants.GL_PAYROLL_DATASOURCE_ID);
+            }
+
             return drivers;
         }
 
