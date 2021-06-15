@@ -1,5 +1,3 @@
-import { formatDiagnosticsWithColorAndContext } from 'typescript';
-
 export interface ICostConfig {
   costingConfigGuid: string;
   name: string;
@@ -9,7 +7,6 @@ export interface ICostConfig {
   isBudgetedAndActualCosting: boolean;
   isUtilizationEntityConfigured: boolean;
   defaultChargeAllocationMethod: number;
-
   fiscalYearID: number;
   fiscalMonthId: number;
   type: CostingType;
@@ -17,8 +14,8 @@ export interface ICostConfig {
   modifiedAtUtc: Date;
   lastPublishedUtc: Date;
   isEditable: boolean;
-  glPayrollEntities: number[];
-  utilEntities: number[];
+  glPayrollEntities: string[];
+  utilEntities: string[];
 }
 
 export enum CostingType {

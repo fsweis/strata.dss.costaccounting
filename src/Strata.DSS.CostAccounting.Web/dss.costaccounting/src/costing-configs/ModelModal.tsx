@@ -38,9 +38,9 @@ export interface IConfigForm {
   year: number;
   ytdMonth: number;
   type: number;
-  filteredEntities: number[];
+  filteredEntities: string[];
   utilizationEntities: number;
-  specifyUtilizationEntities: number[];
+  specifyUtilizationEntities: string[];
   method: number;
   options: number[];
 }
@@ -81,56 +81,56 @@ const ModelModal: React.FC<IModelModalProps> = (props: IModelModalProps) => {
         setCostingTypes(costingTypes);
         setCostingMethods(costingMethods);
         setCostingPermissions(costingPermissions);
-
-        const year = fiscalYears.find((x) => x.fiscalYearID === new Date().getFullYear())?.fiscalYearID;
-        const ytdMonth = fiscalMonths.find((x) => x.sortOrder === 12)?.fiscalMonthID;
-        const fEntities = filteredEntities.map((x) => x.entityID);
-        const nEntities = entities.map((x) => x.entityID);
-
-        const configForm = {
-          name: '',
-          description: '',
-          year: year ? year : 0,
-          ytdMonth: ytdMonth ? ytdMonth : 0,
-          type: 0,
-          filteredEntities: fEntities ? fEntities : [],
-          utilizationEntities: 0,
-          specifyUtilizationEntities: nEntities ? nEntities : [],
-          method: 0,
-          options: []
-        };
-
-        if (props.costingConfigGuid !== '') {
-          const fetchModel = async () => {
-            const costModel = await costConfigService.getCostConfigForCopy(props.costingConfigGuid);
-
-            configForm.name = costModel.name + ' - Copy';
-            configForm.description = costModel.description;
-            configForm.year = costModel.fiscalYearID;
-            configForm.type = costModel.type;
-            configForm.ytdMonth = costModel.fiscalMonthId;
-            //TODO: I do not think the ones below are mapped correctly?
-            configForm.filteredEntities = costModel.glPayrollEntities;
-            configForm.specifyUtilizationEntities = costModel.utilEntities;
-            configForm.method = costModel.defaultChargeAllocationMethod;
-            setConfigForm(configForm);
-          };
-          fetchModel();
-
-          setTitle('Copy Model');
-        } else {
-          setConfigForm(configForm);
-          setTitle('New Model');
-        }
       } finally {
         setLoading(false);
       }
     };
     setLoading(true);
     fetchData();
-  }, [props.costingConfigGuid]);
+  }, []);
 
-  //useEffect(() => {}, [props.costingConfigGuid]);
+  useEffect(() => {
+    const year = fiscalYears.find((x) => x.fiscalYearID === new Date().getFullYear())?.fiscalYearID;
+    const ytdMonth = fiscalMonths.find((x) => x.sortOrder === 12)?.fiscalMonthID;
+    const fEntities = filteredEntities.map((x) => x.entityID.toString());
+    const nEntities = entities.map((x) => x.entityID.toString());
+
+    const cfgForm: IConfigForm = {
+      name: '',
+      description: '',
+      year: year ? year : 0,
+      ytdMonth: ytdMonth ? ytdMonth : 0,
+      type: 0,
+      filteredEntities: fEntities ? fEntities : [],
+      utilizationEntities: 0,
+      specifyUtilizationEntities: nEntities ? nEntities : [],
+      method: 0,
+      options: []
+    };
+
+    if (props.costingConfigGuid !== '') {
+      const fetchModel = async () => {
+        const costModel = await costConfigService.getCostConfigForCopy(props.costingConfigGuid);
+
+        cfgForm.name = costModel.name + ' - Copy';
+        cfgForm.description = costModel.description;
+        cfgForm.year = costModel.fiscalYearID;
+        cfgForm.type = costModel.type;
+        cfgForm.ytdMonth = costModel.fiscalMonthId;
+        cfgForm.filteredEntities = costModel.glPayrollEntities;
+        cfgForm.specifyUtilizationEntities = costModel.utilEntities;
+        cfgForm.method = costModel.defaultChargeAllocationMethod;
+
+        setConfigForm(cfgForm);
+        form.setFieldsValue(cfgForm);
+        setTitle('Copy Model');
+      };
+      fetchModel();
+    } else {
+      setConfigForm(cfgForm);
+      setTitle('New Model');
+    }
+  }, [props.costingConfigGuid]);
 
   //Set Filtered Entity Trees when entities are loaded
   useEffect(() => {
@@ -189,8 +189,8 @@ const ModelModal: React.FC<IModelModalProps> = (props: IModelModalProps) => {
       modifiedAtUtc: new Date(),
       lastPublishedUtc: new Date(),
       isEditable: true,
-      glPayrollEntities: glPayrollEntities,
-      utilEntities: utilEntities
+      glPayrollEntities: glPayrollEntities.map(String),
+      utilEntities: utilEntities.map(String)
     };
 
     try {
@@ -248,7 +248,7 @@ const ModelModal: React.FC<IModelModalProps> = (props: IModelModalProps) => {
           </>
         }
       >
-        <Form form={form} onFinish={onFormFinish} layout={'vertical'} preserve={true} initialValues={configForm}>
+        <Form form={form} onFinish={onFormFinish} layout={'vertical'} preserve={false} initialValues={configForm}>
           <Form.Item label='Name' name='name' rules={[{ required: true, whitespace: true }]}>
             <Input />
           </Form.Item>
