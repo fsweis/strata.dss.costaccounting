@@ -65,7 +65,6 @@ const StatisticDrivers: React.FC = () => {
     if (updatedDriverGuids.length > 0 || deletedDriverGuids.length > 0 || tempStatDrivers.some((d) => d.driverConfigGuid === emptyGuid)) {
       Modal.confirm({
         title: 'Discard unsaved changes?',
-        content: 'Changes will be discarded.',
         okText: 'Discard Changes',
         cancelText: 'Keep Changes',
         onOk() {
