@@ -26,11 +26,11 @@ const CostMenu: React.FC<ICostMenuProps> = ({ costConfigsFiltered, costConfigs }
         setSelectedCostConfigItem(config);
       }
     } else {
-      if (costConfigs.length) {
-        setSelectedCostConfigItem(costConfigs[0]);
+      if (costConfigsFiltered.length) {
+        setSelectedCostConfigItem(costConfigsFiltered[0]);
       }
     }
-  }, [costConfigs, location, selectedCostConfigItem]);
+  }, [costConfigs, costConfigsFiltered, location, selectedCostConfigItem]);
   const getActiveUrlKey = () => {
     const currentLocation = '/' + location.pathname.split('/')[1];
     return [currentLocation];
