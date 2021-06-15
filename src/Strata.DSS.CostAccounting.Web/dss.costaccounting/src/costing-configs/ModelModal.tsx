@@ -93,7 +93,7 @@ const ModelModal: React.FC<IModelModalProps> = (props: IModelModalProps) => {
           utilizationEntities: 0,
           specifyUtilizationEntities: nEntities ? nEntities : [],
           method: 0,
-          options: []
+          options: [0, 0]
         };
         setConfigForm(configForm);
       } finally {
@@ -281,11 +281,11 @@ const ModelModal: React.FC<IModelModalProps> = (props: IModelModalProps) => {
                   })}
                 />
               </Form.Item>
-              <Form.Item label='Options' name='options' rules={[{ required: false }]}>
+              <Form.Item label='Options' name='options' rules={[{ required: true }]}>
                 <CheckboxGroup
                   options={[
-                    { value: '1', label: 'Include Budget' },
-                    { value: '2', label: 'Include Payroll' }
+                    { value: 1, label: 'Include Budget' },
+                    { value: 2, label: 'Include Payroll' }
                   ]}
                 />
               </Form.Item>
