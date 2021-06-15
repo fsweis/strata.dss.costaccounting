@@ -439,13 +439,13 @@ const StatisticDrivers: React.FC = () => {
                     type='link'
                     /*hard coding configGuid until we can pull from route/Url*/
                     onClick={() => handleRulesClick(costConfig?.costingConfigGuid ?? '', rowData.driverConfigGuid)}
-                    disabled={rowData.isNew}
+                    disabled={rowData.driverConfigGuid === getEmptyGuid()}
                   >
                     {rowData.hasRules ? 'Edit Rules' : 'Add Rules'}
                   </Button>
                 </Tooltip>
                 <Tooltip placement='left' title={rowData.isUsed ? "Can't delete drivers in use" : 'Delete'}>
-                  <Button type='link' icon='Delete' disabled={rowData.isUsed} onClick={() => handleDelete(rowData.driverConfigGuid, rowData.isNew)} />
+                  <Button type='link' icon='Delete' disabled={rowData.isUsed} onClick={() => handleDelete(rowData.driverConfigGuid, rowData.driverConfigGuid === getEmptyGuid())} />
                 </Tooltip>
               </Spacing>
             </>
