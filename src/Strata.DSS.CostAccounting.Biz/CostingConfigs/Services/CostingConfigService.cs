@@ -13,11 +13,11 @@ namespace Strata.DSS.CostAccounting.Biz.CostingConfigs.Services
     public class CostingConfigService : ICostingConfigService
     {
         private readonly ICostingConfigRepository _costingConfigRepository;
-        private readonly ICostAccountingRepository _costAccountingRepository;
-        public CostingConfigService(ICostingConfigRepository costingConfigRepository, ICostAccountingRepository costAccountingRepository)
+        private readonly ISystemSettingRepository _systemSettingRepository;
+        public CostingConfigService(ICostingConfigRepository costingConfigRepository, ISystemSettingRepository systemSettingRepository)
         {
             _costingConfigRepository = costingConfigRepository;
-            _costAccountingRepository = costAccountingRepository;
+            _systemSettingRepository = systemSettingRepository;
         }
 
         public async Task<CostConfigSaveResult> AddNewConfigAsync(CostingConfigSaveData costConfigSaveData)
@@ -57,8 +57,8 @@ namespace Strata.DSS.CostAccounting.Biz.CostingConfigs.Services
 
         private async Task SaveEntityLinkages(Guid costConfigGuid, bool isUtilizationEntityConfigured, List<int> glPayrollEntityIds, List<int> utilEntityIds)
         {
-            var systemSettings = await _costingConfigRepository.GetSystemSettingsAsync(default);
-            var isCostingEntityLevelSecurityEnabled = systemSettings.Any(x => x.IsCostingEntityLevelSecurityEnabled());
+
+            var isCostingEntityLevelSecurityEnabled = await _systemSettingRepository.GetIsCostingEntityLevelSecurityEnabledAsync(default);
 
             var existingLinkages = await _costingConfigRepository.GetCCELinksByConfigGuidAsync(costConfigGuid, default);
             var utilEntityLinkages = existingLinkages?.Where(l => l.IsUtilization);

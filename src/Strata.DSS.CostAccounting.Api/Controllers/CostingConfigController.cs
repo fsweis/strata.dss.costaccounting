@@ -23,11 +23,13 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
         private readonly ICostingConfigRepository _costingConfigRepository;
         private readonly IEntityService _entityService;
         private readonly ICostingConfigService _costingConfigService;
-        public CostingConfigController(ICostingConfigRepository costingConfigRepository, IEntityService entityService, ICostingConfigService costingConfigService)
+        private readonly ISystemSettingRepository _systemSettingRepository;
+        public CostingConfigController(ICostingConfigRepository costingConfigRepository, IEntityService entityService, ICostingConfigService costingConfigService, ISystemSettingRepository systemSettingRepository)
         {
             _costingConfigRepository = costingConfigRepository;
             _entityService = entityService;
             _costingConfigService = costingConfigService;
+            _systemSettingRepository = systemSettingRepository;
         }
 
         [HttpGet("")]
@@ -79,8 +81,7 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
         public async Task<IEnumerable<Entity>> GetFilteredEntities(CancellationToken cancellationToken)
         {
             //get system setting for costing entity security
-            var systemSettings = await _costingConfigRepository.GetSystemSettingsAsync(cancellationToken);
-            var isCostingEntityLevelSecurityEnabled = systemSettings.Any(x => x.IsCostingEntityLevelSecurityEnabled());
+            var isCostingEntityLevelSecurityEnabled = await _systemSettingRepository.GetIsCostingEntityLevelSecurityEnabledAsync(default);
             var entities = await _entityService.GetFilteredEntities(null, isCostingEntityLevelSecurityEnabled);
             return entities;
         }
@@ -97,8 +98,7 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
         [ProducesResponseType(200)]
         public async Task<IEnumerable<ConfigCostingType>> GetCostingTypes(CancellationToken cancellationToken)
         {
-            var systemSettings = await _costingConfigRepository.GetSystemSettingsAsync(cancellationToken);
-            var isClaimsCostingEnabled = systemSettings.Any(x => x.IsClaimsCostingEnabled());
+            var isClaimsCostingEnabled = await _systemSettingRepository.GetIsClaimsCostingEnabledAsync(default);
 
             if (isClaimsCostingEnabled)
             {
@@ -114,9 +114,9 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
         [ProducesResponseType(200)]
         public async Task<CostingPermissions> GetCostingPermissions(CancellationToken cancellationToken)
         {
-            var systemSettings = await _costingConfigRepository.GetSystemSettingsAsync(cancellationToken);
-            var isClaimsCostingEnabled = systemSettings.Any(x => x.IsClaimsCostingEnabled());
-            var isCostingEntityLevelSecurityEnabled = systemSettings.Any(x => x.IsCostingEntityLevelSecurityEnabled());
+            
+            var isClaimsCostingEnabled = await _systemSettingRepository.GetIsClaimsCostingEnabledAsync(default);
+            var isCostingEntityLevelSecurityEnabled = await _systemSettingRepository.GetIsCostingEntityLevelSecurityEnabledAsync(default);
             return new CostingPermissions { IsClaimsCostingEnabled = isClaimsCostingEnabled, IsCostingEntityLevelSecurityEnabled = isCostingEntityLevelSecurityEnabled };
         }
 

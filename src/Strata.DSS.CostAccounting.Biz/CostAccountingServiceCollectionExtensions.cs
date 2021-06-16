@@ -29,6 +29,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddScoped<ICostAccountingRepository, CostAccountingRepository>();
             services.AddScoped<ICostingConfigRepository, CostingConfigRepository>();
             services.AddScoped<IStatisticDriversRepository, StatisticDriversRepository>();
+            services.AddScoped<ISystemSettingRepository, SystemSettingRepository>();
             services.AddScoped<IStatisticDriversService, StatisticDriversService>();
             services.AddScoped<IDataSourceService, DataSourceService>();
             services.AddScoped<IDataSourceLinkService, DataSourceLinkService>();

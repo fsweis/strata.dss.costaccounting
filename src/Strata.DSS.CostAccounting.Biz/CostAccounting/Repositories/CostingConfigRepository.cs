@@ -81,18 +81,6 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.Repositories
 
             return _mapper.Map<IEnumerable<Entity>>(entities);
         }
-        public async Task<IEnumerable<SystemSetting>> GetSystemSettingsAsync(CancellationToken cancellationToken)
-        {
-            await using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
-            var systemSettings = await dbContext.SystemSettings.ToListAsync(cancellationToken);
-
-            if (!systemSettings.Any())
-            {
-                return null;
-            }
-
-            return _mapper.Map<IEnumerable<SystemSetting>>(systemSettings);
-        }
 
         public async Task<IEnumerable<CostingConfigEntityLevelSecurity>> GetCCELSAsync(CancellationToken cancellationToken)
         {
