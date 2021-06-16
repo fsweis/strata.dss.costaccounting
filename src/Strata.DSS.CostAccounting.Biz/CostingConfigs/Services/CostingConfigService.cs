@@ -50,7 +50,7 @@ namespace Strata.DSS.CostAccounting.Biz.CostingConfigs.Services
             //save the config
             await _costingConfigRepository.AddNewCostingConfigAsync(costConfigSaveData.CostingConfig, default);
 
-            costConfigSaveResult.CostingConfigGuid = costConfigSaveData.CostingConfig.CostingConfigGuid;
+            costConfigSaveResult.CostingConfig = costConfigSaveData.CostingConfig;
 
             return costConfigSaveResult;
         }

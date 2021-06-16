@@ -62,7 +62,12 @@ const Navigation: React.FC = () => {
         </Layout.Nav>
         <Layout>
           <Layout.Sider collapsible>
-            <CostMenu costConfigsFiltered={costConfigsFiltered} costConfigs={costConfigs} />
+            <CostMenu
+              costConfigsFiltered={costConfigsFiltered}
+              costConfigs={costConfigs}
+              setCostConfigs={(costConfigs: ICostConfig[]) => setCostConfigs(costConfigs)}
+              setCostConfigsFiltered={(costConfigs: ICostConfig[]) => setCostConfigsFiltered(costConfigs)}
+            />
           </Layout.Sider>
           <Layout.Content>
             <CostConfigProvider costingConfigGuid={costConfigGuid}>

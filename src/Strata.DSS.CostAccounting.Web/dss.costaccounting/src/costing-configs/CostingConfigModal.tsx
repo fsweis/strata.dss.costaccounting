@@ -22,12 +22,13 @@ import { ICostingPermissions } from './data/ICostingPermissions';
 import { ICostConfigSaveData } from './data/ICostConfigSaveData';
 import TreeDropDown, { ITreeDropDownNode } from '@strata/tempo/lib/treedropdown';
 import { getEmptyGuid } from '../shared/Utils';
+import { ICostConfig } from '../shared/data/ICostConfig';
 
 export interface IModelModalProps {
   visible: boolean;
   onCancel: () => void;
   onSave: () => void;
-  onChangeConfigs: (costingConfigGuid: string) => void;
+  onAddConfig: (costingConfig: ICostConfig) => void;
 }
 
 export interface IConfigForm {
@@ -176,7 +177,7 @@ const CostingConfigModal: React.FC<IModelModalProps> = (props: IModelModalProps)
         form.resetFields();
         setCostingType(0);
         setEntityUtilType(0);
-        props.onChangeConfigs(saveConfigResult.costingConfigGuid);
+        props.onAddConfig(saveConfigResult.costingConfig);
         props.onSave();
       } else {
         Toast.show({ message: saveConfigResult.message, toastType: 'error' });
@@ -283,7 +284,7 @@ const CostingConfigModal: React.FC<IModelModalProps> = (props: IModelModalProps)
                   })}
                 />
               </Form.Item>
-              <Form.Item label='Budget & Payroll' name='options' rules={[{ required: false }]}>
+              <Form.Item label='Additional Data' name='options' rules={[{ required: false }]}>
                 <CheckboxGroup
                   options={[
                     { value: 1, label: 'Include Budget' },

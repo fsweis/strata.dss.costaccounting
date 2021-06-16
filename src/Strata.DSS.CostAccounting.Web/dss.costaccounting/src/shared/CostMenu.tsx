@@ -8,18 +8,22 @@ import CostingConfigModal from '../costing-configs/CostingConfigModal';
 export interface ICostMenuProps {
   costConfigsFiltered: ICostConfig[];
   costConfigs: ICostConfig[];
+  setCostConfigs: (costingConfigs: ICostConfig[]) => void;
+  setCostConfigsFiltered: (costConfigs: ICostConfig[]) => void;
 }
-const CostMenu: React.FC<ICostMenuProps> = ({ costConfigsFiltered, costConfigs }: ICostMenuProps) => {
+const CostMenu: React.FC<ICostMenuProps> = ({ costConfigsFiltered, costConfigs, setCostConfigs, setCostConfigsFiltered }: ICostMenuProps) => {
   const [selectedCostConfigItem, setSelectedCostConfigItem] = useState<ICostConfig>(newCostConfig());
   const [costingConfigModalVisible, setCostingConfigModalVisible] = React.useState<boolean>(false);
   const history = useHistory();
   const location = useLocation();
+
   useEffect(() => {
     const splitPath = location.pathname.split('/').filter((p) => p.trim() !== '');
     // TODO: better solution than this
     if (splitPath.length > 1) {
       const pathConfigGuid = splitPath[1];
       const config = costConfigs.find((c) => c.costingConfigGuid === pathConfigGuid);
+      console.log('not filtered', config?.costingConfigGuid, pathConfigGuid);
       if (config && config !== selectedCostConfigItem) {
         setSelectedCostConfigItem(config);
       }
@@ -29,10 +33,12 @@ const CostMenu: React.FC<ICostMenuProps> = ({ costConfigsFiltered, costConfigs }
       }
     }
   }, [costConfigs, costConfigsFiltered, location, selectedCostConfigItem]);
+
   const getActiveUrlKey = () => {
     const currentLocation = '/' + location.pathname.split('/')[1];
     return [currentLocation];
   };
+
   const handleClick = (key: React.Key) => {
     if (key === '1') alert('All Models Page');
     else if (key === '2') setCostingConfigModalVisible(true);
@@ -45,11 +51,18 @@ const CostMenu: React.FC<ICostMenuProps> = ({ costConfigsFiltered, costConfigs }
     }
   };
 
-  const handleChangeConfigs = (costingConfigGuid: string) => {
-    console.log(costingConfigGuid);
+  const handleAddConfig = (newConfig: ICostConfig) => {
+    const newCostConfigs = [...costConfigs, newConfig];
+
+    if (newCostConfigs.length > 0) {
+      const year = new Date().getFullYear();
+      const newCostConfigsFiltered = newCostConfigs.filter((c) => year - c.fiscalYearID <= 1).sort((a, b) => a.name.localeCompare(b.name));
+      setCostConfigs(newCostConfigs);
+      setCostConfigsFiltered(newCostConfigsFiltered);
+    }
+    //set location for new costing config
     const currentLocation = location.pathname.split('/')[1];
-    history.push(`/${currentLocation}/${costingConfigGuid}`);
-    setCostingConfigModalVisible(false);
+    history.push(`/${currentLocation}/${newConfig.costingConfigGuid}`);
   };
 
   return (
@@ -129,7 +142,7 @@ const CostMenu: React.FC<ICostMenuProps> = ({ costConfigsFiltered, costConfigs }
         onSave={() => {
           setCostingConfigModalVisible(false);
         }}
-        onChangeConfigs={(costingConfigGuid: string) => handleChangeConfigs(costingConfigGuid)}
+        onAddConfig={(costingConfig: ICostConfig) => handleAddConfig(costingConfig)}
       ></CostingConfigModal>
     </>
   );

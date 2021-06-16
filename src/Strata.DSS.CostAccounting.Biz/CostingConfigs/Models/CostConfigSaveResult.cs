@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Strata.DSS.CostAccounting.Biz.CostAccounting.Models;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -8,6 +9,6 @@ namespace Strata.DSS.CostAccounting.Biz.CostingConfigs.Models
     {
         public bool Success { get; set; }
         public string Message { get; set; }
-        public Guid CostingConfigGuid { get; set; }
+        public CostingConfigModel CostingConfig { get; set; }
     }
 }
