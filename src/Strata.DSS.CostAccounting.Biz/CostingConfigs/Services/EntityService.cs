@@ -55,7 +55,7 @@ namespace Strata.DSS.CostAccounting.Biz.CostingConfigs.Services
                     }
                     else
                     {
-                        entitiesToReturn = entities.Where(x => filteredEntities.Any(y => y.EntityID == x.EntityID)).ToList();
+                        entitiesToReturn = entities.Where(x => filteredEntities.Any(y => y.EntityId == x.EntityId)).ToList();
                     }
                 }
             }

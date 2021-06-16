@@ -51,7 +51,7 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
         public async Task<IEnumerable<FiscalMonth>> GetFiscalMonths(CancellationToken cancellationToken)
         {
             var fiscalMonths = await _costingConfigRepository.GetFiscalMonthsAsync(cancellationToken);
-            fiscalMonths = fiscalMonths.Where(x => x.FiscalMonthID != 0).OrderBy(x => x.SortOrder);
+            fiscalMonths = fiscalMonths.Where(x => x.FiscalMonthId != 0).OrderBy(x => x.SortOrder);
             return fiscalMonths;
 
         }
@@ -62,7 +62,7 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
         public async Task<IEnumerable<FiscalYear>> GetFiscalYears(CancellationToken cancellationToken)
         {
             var fiscalYears = await _costingConfigRepository.GetFiscalYearsAsync(cancellationToken);
-            fiscalYears = fiscalYears.Where(x => x.FiscalYearID != 0).OrderBy(x => x.Name);
+            fiscalYears = fiscalYears.Where(x => x.FiscalYearId != 0).OrderBy(x => x.Name);
             return fiscalYears;
 
         }

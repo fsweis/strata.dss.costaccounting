@@ -6,7 +6,7 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.Models
 {
     public class SystemSetting
     {
-        public int SystemSettingID { get; set; }
+        public int SystemSettingId { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
         public string Value { get; set; }

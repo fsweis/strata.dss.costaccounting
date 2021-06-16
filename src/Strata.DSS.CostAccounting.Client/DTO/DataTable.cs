@@ -6,6 +6,6 @@ namespace Strata.DSS.CostAccounting.Client.DTO
     {
         public string FriendlyName { get; set; }
         public Guid DataTableGuid { get; set; }
-        public string GlobalID { get; set; }
+        public string GlobalId { get; set; }
     }
 }

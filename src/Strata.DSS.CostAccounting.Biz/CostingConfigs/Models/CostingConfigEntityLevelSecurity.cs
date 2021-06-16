@@ -6,8 +6,8 @@ namespace Strata.DSS.CostAccounting.Biz.CostingConfigs.Models
 {
     public class CostingConfigEntityLevelSecurity
     {
-        public int CostingConfigEntityLevelSecurityID { get; set; }
+        public int CostingConfigEntityLevelSecurityId { get; set; }
         public Guid CostingConfigGuid { get; set; }
-        public int EntityID { get; set; }
+        public int EntityId { get; set; }
     }
 }

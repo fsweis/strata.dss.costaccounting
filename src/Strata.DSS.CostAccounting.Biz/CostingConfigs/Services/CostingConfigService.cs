@@ -93,14 +93,14 @@ namespace Strata.DSS.CostAccounting.Biz.CostingConfigs.Services
         private async Task AddEntityLinkagesAsync(Guid costConfigGuid, IEnumerable<CostingConfigEntityLinkage> links, List<int> entities)
         {
             var newLinks = new List<CostingConfigEntityLinkage>();
-            foreach (var id in entities.Where(e => e != 0)) //we don't want to save the 'Not Specified' entity, so filter out EntityID = 0
+            foreach (var id in entities.Where(e => e != 0)) //we don't want to save the 'Not Specified' entity, so filter out EntityId = 0
             {
-                var existingLink = links?.FirstOrDefault(e => e.EntityID == id);
+                var existingLink = links?.FirstOrDefault(e => e.EntityId == id);
                 if (existingLink == null) //new link
                 {
                     var ccel = new CostingConfigEntityLinkage()
                     {
-                        EntityID = id,
+                        EntityId = id,
                         CostingConfigGuid = costConfigGuid,
                         IsUtilization = false
                     };
@@ -117,8 +117,8 @@ namespace Strata.DSS.CostAccounting.Biz.CostingConfigs.Services
             var deleteLinks = new List<CostingConfigEntityLinkage>();
             foreach (CostingConfigEntityLinkage link in links)
             {
-                var savedLink = entities.FirstOrDefault(s => s == link.EntityID);
-                if (savedLink == 0) //not in list of saved entity ID's - should be deleted
+                var savedLink = entities.FirstOrDefault(s => s == link.EntityId);
+                if (savedLink == 0) //not in list of saved entity Id's - should be deleted
                 {
                     deleteLinks.Add(link);
                 }

@@ -50,10 +50,10 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.Repositories
             var measures = await dbContext.Measures.Where(m => dataTableGuids.Contains(m.DataTableGuid) && m.MeasureGuid != Guid.Empty).ToListAsync(cancellationToken);
             return measures;
         }
-        public async Task<IList<DataTable>> GetDataTablesAsync(IList<string> globalIDs, CancellationToken cancellationToken)
+        public async Task<IList<DataTable>> GetDataTablesAsync(IList<string> globalIds, CancellationToken cancellationToken)
         {
             var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
-            var dataTables = await dbContext.DataTables.Where(dt => globalIDs.Contains(dt.GlobalID) && dt.GlobalID != "").ToListAsync(cancellationToken);
+            var dataTables = await dbContext.DataTables.Where(dt => globalIds.Contains(dt.GlobalId) && dt.GlobalId != "").ToListAsync(cancellationToken);
             return dataTables;
         }
         public async Task<IList<RuleEngineIncludedMeasure>> GetRuleEngineIncludedMeasuresAsync(CancellationToken cancellationToken)
