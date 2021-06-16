@@ -1,32 +1,29 @@
 ﻿using Strata.DSS.CostAccounting.Biz.CostAccounting.Constants;
-using Strata.DSS.CostAccounting.Biz.CostAccounting.Models;
 using Strata.DSS.CostAccounting.Biz.CostAccounting.Repositories;
 using Strata.DSS.CostAccounting.Biz.Enums;
 using Strata.DSS.CostAccounting.Biz.StatisticDrivers.Constants;
 using Strata.DSS.CostAccounting.Biz.StatisticDrivers.Models;
-using Strata.DSS.CostAccounting.Biz.StatisticDrivers.Repositories;
 using Strata.DSS.CostAccounting.Biz.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace Strata.DSS.CostAccounting.Biz.StatisticDrivers.Services
 {
-    public class DataSourceLinkService:IDataSourceLinkService
+    public class DataSourceLinkService : IDataSourceLinkService
     {
-        private readonly ICostAccountingRepository _costaccountingRepository;
+        private readonly ICostAccountingRepository _costAccountingRepository;
         public DataSourceLinkService(ICostAccountingRepository costaccountingRepository)
         {
-            _costaccountingRepository = costaccountingRepository;
+            _costAccountingRepository = costaccountingRepository;
 
         }
-        public async Task<IList<DataSourceLink>> GetDataSourceLinks(Boolean isClaims)
+        public async Task<IList<DataSourceLink>> GetDataSourceLinks(CostingType costingType, CancellationToken cancellationToken)
         {
-            var measures = await _costaccountingRepository.GetMeasuresAsync( StatisticDriverDataSourceUtil.GetDataTableGuids(isClaims), default);
-            var ruleEngineIncludedMeasures = await _costaccountingRepository.GetRuleEngineIncludedMeasuresAsync(default);
+            var measures = await _costAccountingRepository.GetMeasuresAsync(StatisticDriverDataSourceUtil.GetDataTableGuids(costingType == CostingType.Claims), cancellationToken);
+            var ruleEngineIncludedMeasures = await _costAccountingRepository.GetRuleEngineIncludedMeasuresAsync(cancellationToken);
 
             var dataSourceLinks = new List<DataSourceLink>();
             //Load GL Sampled Measures
@@ -35,7 +32,7 @@ namespace Strata.DSS.CostAccounting.Biz.StatisticDrivers.Services
             {
                 dataSourceLinks.Add(new DataSourceLink(measure.MeasureGuid, SDMeasureConstants.Dollars_FriendlyName, DataTableConstants.DSSGLGuid, true));
             }
-            if (!isClaims)
+            if (costingType == CostingType.PatientCare)
             {
                 //Load Encounter Summary Measures
                 var summaryMeasure = measures.Single(x => x.DataTableGuid == DataTableConstants.PatientEncounterSummaryGuid && string.Equals(x.SQLColumnName, MeasureConstants.PES_EncounterRecordNumber_ColumnName));

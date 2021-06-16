@@ -14,7 +14,6 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.DbContexts
 
         public CostAccountingDbContext(DbContextOptions<CostAccountingDbContext> options) : base(options)
         {
-
         }
 
         public virtual DbSet<Measure> Measures { get; set; }

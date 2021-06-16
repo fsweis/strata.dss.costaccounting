@@ -1,10 +1,8 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Strata.DSS.CostAccounting.Biz.CostAccounting.Models;
 using Strata.DSS.CostAccounting.Biz.CostAccounting.Repositories;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -37,14 +35,6 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
         {
             var costingConfig = await _costingConfigRepository.GetCostingConfigAsync(id, cancellationToken);
             return costingConfig;
-        }
-
-        [HttpPost]
-        [ProducesResponseType(200)]
-        public async Task<ActionResult<List<CostingConfigModel>>> SaveStatisticDrivers([FromBody] CostingConfigModel costingConfgData
-                                                                                                , CancellationToken cancellationToken)
-        {            
-            return Ok();
         }
     }
 }

@@ -23,10 +23,17 @@ namespace Strata.DSS.CostAccounting.Api
     public class Startup
     {
         private readonly IConfiguration _configuration;
+        private readonly string _connectionString;
 
         public Startup(IConfiguration configuration)
         {
             _configuration = configuration;
+        }
+
+        public Startup(IConfiguration configuration, string connectionString)
+        {
+            _configuration = configuration;
+            _connectionString = connectionString;
         }
 
         // This method gets called by the runtime. Use this method to add services to the container.
@@ -67,7 +74,7 @@ namespace Strata.DSS.CostAccounting.Api
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IApiVersionDescriptionProvider provider)
+        public virtual void Configure(IApplicationBuilder app, IWebHostEnvironment env, IApiVersionDescriptionProvider provider)
         {
             app.UseGlobalExceptionMiddleware();
             app.UseRouting();

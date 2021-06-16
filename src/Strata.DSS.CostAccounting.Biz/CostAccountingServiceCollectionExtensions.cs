@@ -1,19 +1,19 @@
-﻿using Microsoft.Extensions.Configuration;
-using Strata.DSS.CostAccounting.Biz.CostAccounting.Repositories;
-using Strata.Hangfire.Configuration;
-using Strata.SqlTools.Configuration.SqlServer;
-using Strata.ApiCommunication.Http.MessageHandlers;
-using Microsoft.Extensions.DependencyInjection.Extensions;
-using Strata.DSS.CostAccounting.Biz.CostAccounting.DbContexts;
+﻿using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Strata.ApiCommunication.Http.MessageHandlers;
+using Strata.CoreLib.Claims.Extensions;
+using Strata.DSS.CostAccounting.Biz.CostAccounting.DbContexts;
+using Strata.DSS.CostAccounting.Biz.CostAccounting.Repositories;
 using Strata.DSS.CostAccounting.Biz.StatisticDrivers.Repositories;
 using Strata.DSS.CostAccounting.Biz.StatisticDrivers.Services;
-using System.Threading.Tasks;
+using Strata.Hangfire.Configuration;
+using Strata.SMC.Client;
+using Strata.SqlTools.Configuration.SqlServer;
 using System;
 using System.Threading;
-using Strata.CoreLib.Claims.Extensions;
-using Strata.SMC.Client;
-using Microsoft.Data.SqlClient;
+using System.Threading.Tasks;
 
 // ReSharper disable once CheckNamespace
 namespace Microsoft.Extensions.DependencyInjection
@@ -34,12 +34,12 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddAsyncDbContextFactory<CostAccountingDbContext>(options =>
             {
                 options
-                    #if DEBUG
-                    .WithConnectionString(GetConnectionStringUsingIntegratedSecurity)
-                    #else
-                    .WithConnectionString(GetConnectionStringUserPass)
-                    #endif
-                    .WithDbContextOptions((connectionString, builder) => builder.UseSqlServer(connectionString));
+                .UseSqlServer()
+#if DEBUG
+                    .WithConnectionString(GetConnectionStringUsingIntegratedSecurity);
+#else
+                   .WithConnectionString((provider, cancellationToken) => provider.GetConnectionStringFromSmc(cancellationToken));
+#endif
             });
 
             services.ConfigureHangfireOptionsFromAws(options =>
@@ -56,7 +56,7 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             var claimsAccessor = provider.GetRequiredService<IClaimsPrincipalAccessor>();
             var databaseGuid = claimsAccessor.GetCurrentClaimsPrincipal()?.GetStrataDatabaseGuid();
-         
+
             if (!databaseGuid.HasValue)
             {
                 throw new InvalidOperationException(
@@ -73,7 +73,7 @@ namespace Microsoft.Extensions.DependencyInjection
                 throw new ArgumentNullException(nameof(username),
                     "Sql username for jazz database not found in configuration");
             }
-            
+
             var connectionStringBuilder = new SqlConnectionStringBuilder
             {
                 DataSource = database.ServerName,
@@ -93,7 +93,7 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             var claimsAccessor = provider.GetRequiredService<IClaimsPrincipalAccessor>();
             var databaseGuid = claimsAccessor.GetCurrentClaimsPrincipal()?.GetStrataDatabaseGuid();
-         
+
             if (!databaseGuid.HasValue)
             {
                 throw new InvalidOperationException(
@@ -101,7 +101,7 @@ namespace Microsoft.Extensions.DependencyInjection
             }
             var smc = provider.GetRequiredService<ISMCServiceClient>();
             var database = await smc.GetDatabaseAsync(databaseGuid.Value, cancellationToken);
-            
+
             var connectionStringBuilder = new SqlConnectionStringBuilder
             {
                 DataSource = database.ServerName,

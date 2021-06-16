@@ -10,6 +10,10 @@ namespace Strata.DSS.CostAccounting.Biz.StatisticDrivers.Models
         public string FriendlyName { get; set; }
         public bool IsFirstSelect { get; set; }
 
+        public DataSourceLink()
+        {
+        }
+
         public DataSourceLink(Measure measure)
         {
             MeasureGuid = measure.MeasureGuid;
