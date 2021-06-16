@@ -20,7 +20,7 @@ namespace Strata.DSS.CostAccounting.Biz.CostingConfigs.Services
             _costAccountingRepository = costAccountingRepository;
         }
 
-        public async Task<CostConfigSaveResult> AddNewConfig(CostingConfigSaveData costConfigSaveData)
+        public async Task<CostConfigSaveResult> AddNewConfigAsync(CostingConfigSaveData costConfigSaveData)
         {
             var costConfigSaveResult = new CostConfigSaveResult { Success = true, Message = "Costing Model Saved" };
             var costingConfigs = await _costingConfigRepository.GetAllCostingConfigsAsync(default);
@@ -44,11 +44,13 @@ namespace Strata.DSS.CostAccounting.Biz.CostingConfigs.Services
                 costConfigSaveData.CostingConfig.IsPayrollCosting = false;
                 costConfigSaveData.CostingConfig.IsGLCosting = false;
             }
-
+          
             //handle add/delete linkages for existing and new configs
             await SaveEntityLinkages(costConfigSaveData.CostingConfig.CostingConfigGuid, costConfigSaveData.CostingConfig.IsUtilizationEntityConfigured, costConfigSaveData.GlPayrollEntities, costConfigSaveData.UtilEntities);
             //save the config
             await _costingConfigRepository.AddNewCostingConfigAsync(costConfigSaveData.CostingConfig, default);
+
+            costConfigSaveResult.CostingConfigGuid = costConfigSaveData.CostingConfig.CostingConfigGuid;
 
             return costConfigSaveResult;
         }

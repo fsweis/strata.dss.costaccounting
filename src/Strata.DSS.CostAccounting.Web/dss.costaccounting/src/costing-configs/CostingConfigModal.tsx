@@ -11,9 +11,9 @@ import { useEffect, useState } from 'react';
 import Spacing from '@strata/tempo/lib/spacing';
 import DropDown from '@strata/tempo/lib/dropdown';
 import { usePageLoader } from '@strata/tempo/lib/pageloader';
-import { IFiscalYear } from '../shared/data/IFiscalYear';
-import { IFiscalMonth } from '../shared/data/IFiscalMonth';
-import { IEntity } from '../shared/data/IEntity';
+import { IFiscalYear } from './data/IFiscalYear';
+import { IFiscalMonth } from './data/IFiscalMonth';
+import { IEntity } from './data/IEntity';
 import { costConfigService } from '../shared/data/costConfigService';
 import { RadioChangeEvent } from 'antd/lib/radio/interface';
 import { ICostingType } from './data/ICostingType';
@@ -27,6 +27,7 @@ export interface IModelModalProps {
   visible: boolean;
   onCancel: () => void;
   onSave: () => void;
+  onChangeConfigs: (costingConfigGuid: string) => void;
 }
 
 export interface IConfigForm {
@@ -42,7 +43,7 @@ export interface IConfigForm {
   options: number[];
 }
 
-const ModelModal: React.FC<IModelModalProps> = (props: IModelModalProps) => {
+const CostingConfigModal: React.FC<IModelModalProps> = (props: IModelModalProps) => {
   const [form] = Form.useForm();
   const [fiscalYears, setFiscalYears] = useState<IFiscalYear[]>([]);
   const [fiscalMonths, setFiscalMonths] = useState<IFiscalMonth[]>([]);
@@ -148,7 +149,7 @@ const ModelModal: React.FC<IModelModalProps> = (props: IModelModalProps) => {
       isGLCosting: true,
       defaultChargeAllocationMethod: values.method,
       fiscalYearID: values.year,
-      fiscalMonhtID: values.ytdMonth,
+      fiscalMonthID: values.ytdMonth,
       type: values.type ? values.type : 0,
       isPayrollCosting: values.options ? values.options.indexOf(1) >= 0 : false,
       isBudgetedAndActualCosting: values.options ? values.options.indexOf(2) >= 0 : false,
@@ -175,6 +176,7 @@ const ModelModal: React.FC<IModelModalProps> = (props: IModelModalProps) => {
         form.resetFields();
         setCostingType(0);
         setEntityUtilType(0);
+        props.onChangeConfigs(saveConfigResult.costingConfigGuid);
         props.onSave();
       } else {
         Toast.show({ message: saveConfigResult.message, toastType: 'error' });
@@ -281,7 +283,7 @@ const ModelModal: React.FC<IModelModalProps> = (props: IModelModalProps) => {
                   })}
                 />
               </Form.Item>
-              <Form.Item label='Options' name='options' rules={[{ required: true }]}>
+              <Form.Item label='Budget & Payroll' name='options' rules={[{ required: false }]}>
                 <CheckboxGroup
                   options={[
                     { value: 1, label: 'Include Budget' },
@@ -297,4 +299,4 @@ const ModelModal: React.FC<IModelModalProps> = (props: IModelModalProps) => {
   );
 };
 
-export default ModelModal;
+export default CostingConfigModal;

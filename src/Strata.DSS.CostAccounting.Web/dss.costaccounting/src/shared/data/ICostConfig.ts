@@ -7,6 +7,11 @@ export interface ICostConfig {
   type: number;
   createdAt: Date;
   modifiedAtUtc: Date;
+  description: string;
+  fiscalMonthID: number;
+  isPayrollCosting: boolean;
+  isBudgetedAndActualCosting: boolean;
+  isUtilizationEntityConfigured: boolean;
 }
 
 export const newCostConfig = (costConfig: Partial<ICostConfig> = {}): ICostConfig => {
@@ -19,7 +24,12 @@ export const newCostConfig = (costConfig: Partial<ICostConfig> = {}): ICostConfi
       fiscalYearID: 0,
       type: 0,
       createdAt: new Date(),
-      modifiedAtUtc: new Date()
+      modifiedAtUtc: new Date(),
+      description: '',
+      fiscalMonthID: 0,
+      isPayrollCosting: false,
+      isBudgetedAndActualCosting: false,
+      isUtilizationEntityConfigured: false
     },
     ...costConfig
   };

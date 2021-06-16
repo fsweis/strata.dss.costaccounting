@@ -47,15 +47,7 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
             return costingConfig;
         }
 
-        [HttpPost]
-        [ProducesResponseType(200)]
-        public async Task<ActionResult<List<CostingConfigModel>>> SaveStatisticDrivers([FromBody] CostingConfigModel costingConfgData
-                                                                                                , CancellationToken cancellationToken)
-        {
-            return Ok();
-        }
-
-        [HttpGet("fiscal-month")]
+        [HttpGet("fiscal-months")]
         [ProducesResponseType(200)]
         public async Task<ActionResult<IEnumerable<FiscalMonth>>> GetFiscalMonths(CancellationToken cancellationToken)
         {
@@ -66,7 +58,7 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
         }
 
 
-        [HttpGet("fiscal-year")]
+        [HttpGet("fiscal-years")]
         [ProducesResponseType(200)]
         public async Task<ActionResult<IEnumerable<FiscalYear>>> GetFiscalYears(CancellationToken cancellationToken)
         {
@@ -76,14 +68,14 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
 
         }
 
-        [HttpGet("entity")]
+        [HttpGet("entities")]
         [ProducesResponseType(200)]
         public async Task<ActionResult<IEnumerable<Entity>>> GetEntities(CancellationToken cancellationToken)
         {
             var entities = await _entityService.GetEntities();
             return Ok(entities);
         }
-        [HttpGet("filtered-entity")]
+        [HttpGet("filtered-entities")]
         [ProducesResponseType(200)]
         public async Task<ActionResult<IEnumerable<Entity>>> GetFilteredEntities(CancellationToken cancellationToken)
         {
@@ -94,7 +86,7 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
             return Ok(entities);
         }
 
-        [HttpGet("costing-method")]
+        [HttpGet("costing-methods")]
         [ProducesResponseType(200)]
         public ActionResult<IEnumerable<ConfigCostingMethod>> GetCostingMethods(CancellationToken cancellationToken)
         {
@@ -102,7 +94,7 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
             return Ok(methods);
         }
 
-        [HttpGet("costing-type")]
+        [HttpGet("costing-types")]
         [ProducesResponseType(200)]
         public async Task<ActionResult<IEnumerable<ConfigCostingType>>> GetCostingTypes(CancellationToken cancellationToken)
         {
@@ -130,12 +122,12 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
         }
 
 
-        [HttpPost("new-config")]
+        [HttpPost("")]
         [ProducesResponseType(200)]
         public async Task<ActionResult<CostConfigSaveResult>> AddNewConfig([FromBody] CostingConfigSaveData costConfigSaveData, CancellationToken cancellationToken)
         {
 
-            var saveResult = await _costingConfigService.AddNewConfig(costConfigSaveData);
+            var saveResult = await _costingConfigService.AddNewConfigAsync(costConfigSaveData);
             return Ok(saveResult);
         }
 

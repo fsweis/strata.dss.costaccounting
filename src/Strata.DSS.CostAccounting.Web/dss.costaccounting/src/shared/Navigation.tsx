@@ -22,6 +22,7 @@ import { costConfigService } from './data/costConfigService';
 import { ICostConfig } from './data/ICostConfig';
 const Navigation: React.FC = () => {
   const [costConfigGuid, setCostConfigGuid] = React.useState<string>('');
+  const [costConfigsFiltered, setCostConfigsFiltered] = React.useState<ICostConfig[]>([]);
   const [costConfigs, setCostConfigs] = React.useState<ICostConfig[]>([]);
 
   const location = useLocation();
@@ -29,10 +30,11 @@ const Navigation: React.FC = () => {
   useEffect(() => {
     const fetchData = async () => {
       const [costingConfigurations] = await Promise.all([costConfigService.getCostConfigs()]);
+      setCostConfigs(costingConfigurations);
       if (costingConfigurations.length > 0) {
         const year = new Date().getFullYear();
         const sorted = costingConfigurations.filter((c) => year - c.fiscalYearID <= 1).sort((a, b) => a.name.localeCompare(b.name));
-        setCostConfigs(sorted);
+        setCostConfigsFiltered(sorted);
         setCostConfigGuid(sorted[0].costingConfigGuid);
       }
     };
@@ -60,7 +62,7 @@ const Navigation: React.FC = () => {
         </Layout.Nav>
         <Layout>
           <Layout.Sider collapsible>
-            <CostMenu costConfigs={costConfigs} />
+            <CostMenu costConfigsFiltered={costConfigsFiltered} costConfigs={costConfigs} />
           </Layout.Sider>
           <Layout.Content>
             <CostConfigProvider costingConfigGuid={costConfigGuid}>

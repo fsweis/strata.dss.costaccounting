@@ -97,7 +97,7 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.Repositories
         public async Task<IEnumerable<CostingConfigEntityLevelSecurity>> GetCCELSAsync(CancellationToken cancellationToken)
         {
             await using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
-            var ccels = await dbContext.CCELS.ToListAsync(cancellationToken);
+            var ccels = await dbContext.CostingConfigEntityLevelSecurities.ToListAsync(cancellationToken);
 
             if (!ccels.Any())
             {
@@ -109,7 +109,7 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.Repositories
         public async Task<IEnumerable<CostingConfigEntityLinkage>> GetCCELinksByConfigGuidAsync(Guid configGuid, CancellationToken cancellationToken)
         {
             await using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
-            var ccels = await dbContext.CCELinks.Where(x=>x.CostingConfigGuid==configGuid).ToListAsync(cancellationToken);
+            var ccels = await dbContext.CostingConfigEntityLinkages.Where(x=>x.CostingConfigGuid==configGuid).ToListAsync(cancellationToken);
 
             if (!ccels.Any())
             {
@@ -122,13 +122,13 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.Repositories
         public async Task UpdateCCELinksAsync(List<CostingConfigEntityLinkage> cceLinks, CancellationToken cancellationToken)
         {
             await using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
-            dbContext.CCELinks.AddRange(cceLinks);
+            dbContext.CostingConfigEntityLinkages.AddRange(cceLinks);
             await dbContext.SaveChangesAsync(cancellationToken);
         }
         public async Task DeleteCCELinksAsync(List<CostingConfigEntityLinkage> cceLinks, CancellationToken cancellationToken)
         {
             await using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
-            dbContext.CCELinks.RemoveRange(cceLinks);
+            dbContext.CostingConfigEntityLinkages.RemoveRange(cceLinks);
             await dbContext.SaveChangesAsync(cancellationToken);
         }
 

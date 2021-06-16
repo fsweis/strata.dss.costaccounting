@@ -4,13 +4,14 @@ import Menu from '@strata/tempo/lib/menu';
 import ButtonMenu from '@strata/tempo/lib/buttonmenu';
 import Icon from '@strata/tempo/lib/icon/Icon';
 import { ICostConfig, newCostConfig } from './data/ICostConfig';
-import ModelModal from '../costing-configs/ModelModal';
+import CostingConfigModal from '../costing-configs/CostingConfigModal';
 export interface ICostMenuProps {
+  costConfigsFiltered: ICostConfig[];
   costConfigs: ICostConfig[];
 }
-const CostMenu: React.FC<ICostMenuProps> = ({ costConfigs }: ICostMenuProps) => {
+const CostMenu: React.FC<ICostMenuProps> = ({ costConfigsFiltered, costConfigs }: ICostMenuProps) => {
   const [selectedCostConfigItem, setSelectedCostConfigItem] = useState<ICostConfig>(newCostConfig());
-  const [modelModalVisible, setModelModalVisibleVisible] = React.useState<boolean>(false);
+  const [costingConfigModalVisible, setCostingConfigModalVisible] = React.useState<boolean>(false);
   const history = useHistory();
   const location = useLocation();
   useEffect(() => {
@@ -23,18 +24,18 @@ const CostMenu: React.FC<ICostMenuProps> = ({ costConfigs }: ICostMenuProps) => 
         setSelectedCostConfigItem(config);
       }
     } else {
-      if (costConfigs.length) {
-        setSelectedCostConfigItem(costConfigs[0]);
+      if (costConfigsFiltered.length) {
+        setSelectedCostConfigItem(costConfigsFiltered[0]);
       }
     }
-  }, [costConfigs, location, selectedCostConfigItem]);
+  }, [costConfigs, costConfigsFiltered, location, selectedCostConfigItem]);
   const getActiveUrlKey = () => {
     const currentLocation = '/' + location.pathname.split('/')[1];
     return [currentLocation];
   };
   const handleClick = (key: React.Key) => {
     if (key === '1') alert('All Models Page');
-    else if (key === '2') setModelModalVisibleVisible(true);
+    else if (key === '2') setCostingConfigModalVisible(true);
     else {
       const costConfigItem = costConfigs.find((config) => config.costingConfigGuid === key);
       if (costConfigItem) {
@@ -43,13 +44,21 @@ const CostMenu: React.FC<ICostMenuProps> = ({ costConfigs }: ICostMenuProps) => 
       }
     }
   };
+
+  const handleChangeConfigs = (costingConfigGuid: string) => {
+    console.log(costingConfigGuid);
+    const currentLocation = location.pathname.split('/')[1];
+    history.push(`/${currentLocation}/${costingConfigGuid}`);
+    setCostingConfigModalVisible(false);
+  };
+
   return (
     <>
       <Menu selectedKeys={getActiveUrlKey()}>
         <Menu.ItemGroup title=''>
           <Menu.Item key=''>
             <ButtonMenu buttonText={selectedCostConfigItem?.name} type='title' selectedKeys={[selectedCostConfigItem?.costingConfigGuid]} onClick={(e) => handleClick(e.key)}>
-              {costConfigs.map((item) => (
+              {costConfigsFiltered.map((item) => (
                 <ButtonMenu.Item key={item.costingConfigGuid}>{item.name}</ButtonMenu.Item>
               ))}
               <ButtonMenu.Divider />
@@ -112,15 +121,16 @@ const CostMenu: React.FC<ICostMenuProps> = ({ costConfigs }: ICostMenuProps) => 
           </Menu.Item>
         </Menu.ItemGroup>
       </Menu>
-      <ModelModal
-        visible={modelModalVisible}
+      <CostingConfigModal
+        visible={costingConfigModalVisible}
         onCancel={() => {
-          setModelModalVisibleVisible(false);
+          setCostingConfigModalVisible(false);
         }}
         onSave={() => {
-          setModelModalVisibleVisible(false);
+          setCostingConfigModalVisible(false);
         }}
-      ></ModelModal>
+        onChangeConfigs={(costingConfigGuid: string) => handleChangeConfigs(costingConfigGuid)}
+      ></CostingConfigModal>
     </>
   );
 };

@@ -38,9 +38,9 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.DbContexts
 
         public virtual DbSet<SystemSetting> SystemSettings { get; set; }
 
-        public virtual DbSet<CostingConfigEntityLevelSecurity> CCELS { get; set; }
+        public virtual DbSet<CostingConfigEntityLevelSecurity> CostingConfigEntityLevelSecurities { get; set; }
 
-        public virtual DbSet<CostingConfigEntityLinkage> CCELinks { get; set; }
+        public virtual DbSet<CostingConfigEntityLinkage> CostingConfigEntityLinkages { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
