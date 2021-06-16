@@ -32,15 +32,15 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
 
         [HttpGet("")]
         [ProducesResponseType(200)]
-        public async Task<ActionResult<IEnumerable<CostingConfigModel>>> GetAllCostingConfigs(CancellationToken cancellationToken)
+        public async Task<IEnumerable<CostingConfigModel>> GetAllCostingConfigs(CancellationToken cancellationToken)
         {
             var costingConfigs = await _costingConfigRepository.GetAllCostingConfigsAsync(cancellationToken);
-            return Ok(costingConfigs);
+            return costingConfigs;
         }
 
         [HttpGet("{id}")]
         [ProducesResponseType(200)]
-        public async Task<ActionResult<CostingConfigModel>> GetCostingConfig([FromRoute] Guid id, CancellationToken cancellationToken)
+        public async Task<CostingConfigModel> GetCostingConfig([FromRoute] Guid id, CancellationToken cancellationToken)
         {
             var costingConfig = await _costingConfigRepository.GetCostingConfigAsync(id, cancellationToken);
             return costingConfig;
@@ -48,54 +48,54 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
 
         [HttpGet("fiscal-months")]
         [ProducesResponseType(200)]
-        public async Task<ActionResult<IEnumerable<FiscalMonth>>> GetFiscalMonths(CancellationToken cancellationToken)
+        public async Task<IEnumerable<FiscalMonth>> GetFiscalMonths(CancellationToken cancellationToken)
         {
             var fiscalMonths = await _costingConfigRepository.GetFiscalMonthsAsync(cancellationToken);
             fiscalMonths = fiscalMonths.Where(x => x.FiscalMonthID != 0).OrderBy(x => x.SortOrder);
-            return Ok(fiscalMonths);
+            return fiscalMonths;
 
         }
 
 
         [HttpGet("fiscal-years")]
         [ProducesResponseType(200)]
-        public async Task<ActionResult<IEnumerable<FiscalYear>>> GetFiscalYears(CancellationToken cancellationToken)
+        public async Task<IEnumerable<FiscalYear>> GetFiscalYears(CancellationToken cancellationToken)
         {
             var fiscalYears = await _costingConfigRepository.GetFiscalYearsAsync(cancellationToken);
             fiscalYears = fiscalYears.Where(x => x.FiscalYearID != 0).OrderBy(x => x.Name);
-            return Ok(fiscalYears);
+            return fiscalYears;
 
         }
 
         [HttpGet("entities")]
         [ProducesResponseType(200)]
-        public async Task<ActionResult<IEnumerable<Entity>>> GetEntities(CancellationToken cancellationToken)
+        public async Task<IEnumerable<Entity>> GetEntities(CancellationToken cancellationToken)
         {
             var entities = await _entityService.GetEntities();
-            return Ok(entities);
+            return entities;
         }
         [HttpGet("filtered-entities")]
         [ProducesResponseType(200)]
-        public async Task<ActionResult<IEnumerable<Entity>>> GetFilteredEntities(CancellationToken cancellationToken)
+        public async Task<IEnumerable<Entity>> GetFilteredEntities(CancellationToken cancellationToken)
         {
             //get system setting for costing entity security
             var systemSettings = await _costingConfigRepository.GetSystemSettingsAsync(cancellationToken);
             var isCostingEntityLevelSecurityEnabled = systemSettings.Any(x => x.IsCostingEntityLevelSecurityEnabled());
             var entities = await _entityService.GetFilteredEntities(null, isCostingEntityLevelSecurityEnabled);
-            return Ok(entities);
+            return entities;
         }
 
         [HttpGet("costing-methods")]
         [ProducesResponseType(200)]
-        public ActionResult<IEnumerable<ConfigCostingMethod>> GetCostingMethods(CancellationToken cancellationToken)
+        public IEnumerable<ConfigCostingMethod> GetCostingMethods(CancellationToken cancellationToken)
         {
             var methods = new List<ConfigCostingMethod> { ConfigCostingMethod.LoadByMethod(CostingMethod.Simultaneous), ConfigCostingMethod.LoadByMethod(CostingMethod.SingleStepDown) };
-            return Ok(methods);
+            return methods;
         }
 
         [HttpGet("costing-types")]
         [ProducesResponseType(200)]
-        public async Task<ActionResult<IEnumerable<ConfigCostingType>>> GetCostingTypes(CancellationToken cancellationToken)
+        public async Task<IEnumerable<ConfigCostingType>> GetCostingTypes(CancellationToken cancellationToken)
         {
             var systemSettings = await _costingConfigRepository.GetSystemSettingsAsync(cancellationToken);
             var isClaimsCostingEnabled = systemSettings.Any(x => x.IsClaimsCostingEnabled());
@@ -112,7 +112,7 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
 
         [HttpGet("costing-permissions")]
         [ProducesResponseType(200)]
-        public async Task<ActionResult<CostingPermissions>> GetCostingPermissions(CancellationToken cancellationToken)
+        public async Task<CostingPermissions> GetCostingPermissions(CancellationToken cancellationToken)
         {
             var systemSettings = await _costingConfigRepository.GetSystemSettingsAsync(cancellationToken);
             var isClaimsCostingEnabled = systemSettings.Any(x => x.IsClaimsCostingEnabled());
@@ -123,11 +123,11 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
 
         [HttpPost("")]
         [ProducesResponseType(200)]
-        public async Task<ActionResult<CostConfigSaveResult>> AddNewConfig([FromBody] CostingConfigSaveData costConfigSaveData, CancellationToken cancellationToken)
+        public async Task<CostConfigSaveResult> AddNewConfig([FromBody] CostingConfigSaveData costConfigSaveData, CancellationToken cancellationToken)
         {
 
             var saveResult = await _costingConfigService.AddNewConfigAsync(costConfigSaveData);
-            return Ok(saveResult);
+            return saveResult;
         }
 
     }
