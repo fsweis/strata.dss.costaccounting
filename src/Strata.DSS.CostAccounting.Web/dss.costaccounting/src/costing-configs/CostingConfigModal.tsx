@@ -81,10 +81,10 @@ const CostingConfigModal: React.FC<IModelModalProps> = (props: IModelModalProps)
         setCostingMethods(costingMethods);
         setCostingPermissions(costingPermissions);
         //set initial form
-        const year = fiscalYears.find((x) => x.fiscalYearID === new Date().getFullYear())?.fiscalYearID;
-        const ytdMonth = fiscalMonths.find((x) => x.sortOrder === 12)?.fiscalMonthID;
-        const fEntities = filteredEntities.map((x) => x.entityID.toString());
-        const nEntities = entities.map((x) => x.entityID.toString());
+        const year = fiscalYears.find((x) => x.fiscalYearId === new Date().getFullYear())?.fiscalYearId;
+        const ytdMonth = fiscalMonths.find((x) => x.sortOrder === 12)?.fiscalMonthId;
+        const fEntities = filteredEntities.map((x) => x.entityId.toString());
+        const nEntities = entities.map((x) => x.entityId.toString());
         const configForm = {
           name: '',
           description: '',
@@ -109,7 +109,7 @@ const CostingConfigModal: React.FC<IModelModalProps> = (props: IModelModalProps)
   //Set Filtered Entity Trees when entities are loaded
   useEffect(() => {
     const runEntityTreeChildren = filteredEntities.map((entity) => {
-      return { key: entity.entityID.toString(), title: entity.description, value: entity.entityID.toString() };
+      return { key: entity.entityId.toString(), title: entity.description, value: entity.entityId.toString() };
     });
     const rootNode = runEntityTreeChildren.find((x) => x.key === '0');
     const runEntityTree = [
@@ -126,7 +126,7 @@ const CostingConfigModal: React.FC<IModelModalProps> = (props: IModelModalProps)
   //Set Utilization Entity Trees when entities are loaded
   useEffect(() => {
     const runUtilEntityTreeChildren = entities.map((entity) => {
-      return { key: entity.entityID.toString(), title: entity.description, value: entity.entityID.toString() };
+      return { key: entity.entityId.toString(), title: entity.description, value: entity.entityId.toString() };
     });
     const rootNode = runUtilEntityTreeChildren.find((x) => x.key === '0');
     const runUtilEntityTree = [
@@ -149,8 +149,8 @@ const CostingConfigModal: React.FC<IModelModalProps> = (props: IModelModalProps)
       description: values.description,
       isGLCosting: true,
       defaultChargeAllocationMethod: values.method,
-      fiscalYearID: values.year,
-      fiscalMonthID: values.ytdMonth,
+      fiscalYearId: values.year,
+      fiscalMonthId: values.ytdMonth,
       type: values.type ? values.type : 0,
       isPayrollCosting: values.options ? values.options.indexOf(1) >= 0 : false,
       isBudgetedAndActualCosting: values.options ? values.options.indexOf(2) >= 0 : false,
@@ -236,10 +236,10 @@ const CostingConfigModal: React.FC<IModelModalProps> = (props: IModelModalProps)
           </Form.Item>
           <Spacing itemSpacing={16}>
             <Form.Item label='Year' name='year' rules={[{ required: true }]}>
-              <DropDown itemValueField='fiscalYearID' itemTextField='name' items={fiscalYears} />
+              <DropDown itemValueField='fiscalYearId' itemTextField='name' items={fiscalYears} />
             </Form.Item>
             <Form.Item label='YTD Month' name='ytdMonth' rules={[{ required: true }]}>
-              <DropDown itemValueField='fiscalMonthID' itemTextField='name' items={fiscalMonths} />
+              <DropDown itemValueField='fiscalMonthId' itemTextField='name' items={fiscalMonths} />
             </Form.Item>
           </Spacing>
           <Spacing itemSpacing={16}>

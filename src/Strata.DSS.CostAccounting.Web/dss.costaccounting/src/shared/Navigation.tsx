@@ -33,7 +33,7 @@ const Navigation: React.FC = () => {
       setCostConfigs(costingConfigurations);
       if (costingConfigurations.length > 0) {
         const year = new Date().getFullYear();
-        const sorted = costingConfigurations.filter((c) => year - c.fiscalYearID <= 1).sort((a, b) => a.name.localeCompare(b.name));
+        const sorted = costingConfigurations.filter((c) => year - c.fiscalYearId <= 1).sort((a, b) => a.name.localeCompare(b.name));
         setCostConfigsFiltered(sorted);
         setCostConfigGuid(sorted[0].costingConfigGuid);
       }

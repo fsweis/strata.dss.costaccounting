@@ -23,7 +23,6 @@ const CostMenu: React.FC<ICostMenuProps> = ({ costConfigsFiltered, costConfigs, 
     if (splitPath.length > 1) {
       const pathConfigGuid = splitPath[1];
       const config = costConfigs.find((c) => c.costingConfigGuid === pathConfigGuid);
-      console.log('not filtered', config?.costingConfigGuid, pathConfigGuid);
       if (config && config !== selectedCostConfigItem) {
         setSelectedCostConfigItem(config);
       }
@@ -56,7 +55,7 @@ const CostMenu: React.FC<ICostMenuProps> = ({ costConfigsFiltered, costConfigs, 
 
     if (newCostConfigs.length > 0) {
       const year = new Date().getFullYear();
-      const newCostConfigsFiltered = newCostConfigs.filter((c) => year - c.fiscalYearID <= 1).sort((a, b) => a.name.localeCompare(b.name));
+      const newCostConfigsFiltered = newCostConfigs.filter((c) => year - c.fiscalYearId <= 1).sort((a, b) => a.name.localeCompare(b.name));
       setCostConfigs(newCostConfigs);
       setCostConfigsFiltered(newCostConfigsFiltered);
     }
