@@ -44,15 +44,15 @@ namespace Strata.DSS.CostAccounting.Biz.CostingConfigs.Models
 
         #region Factory Methods
 
-        public static IEnumerable<ConfigCostingType> LoadAll()
+        public static IEnumerable<ConfigCostingType> GetAll()
         {
             yield return new ConfigCostingType(CostingType.PatientCare, CostingTypeConstants.PatientCare_FriendlyName);
             yield return new ConfigCostingType(CostingType.Claims, CostingTypeConstants.Claims_FriendlyName);
         }
 
-        public static ConfigCostingType LoadByType(CostingType type)
+        public static ConfigCostingType GetByType(CostingType type)
         {
-            return LoadAll().FirstOrDefault(c => c.Type == type);
+            return GetAll().FirstOrDefault(c => c.Type == type);
         }
 
         #endregion

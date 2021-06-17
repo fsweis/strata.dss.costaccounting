@@ -90,7 +90,7 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
         [ProducesResponseType(200)]
         public IEnumerable<ConfigCostingMethod> GetCostingMethods()
         {
-            var methods = new List<ConfigCostingMethod> { ConfigCostingMethod.LoadByMethod(CostingMethod.Simultaneous), ConfigCostingMethod.LoadByMethod(CostingMethod.SingleStepDown) };
+            var methods = new List<ConfigCostingMethod> { ConfigCostingMethod.GetByMethod(CostingMethod.Simultaneous), ConfigCostingMethod.GetByMethod(CostingMethod.SingleStepDown) };
             return methods;
         }
 
@@ -102,7 +102,7 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
 
             if (isClaimsCostingEnabled)
             {
-                return new List<ConfigCostingType> { ConfigCostingType.LoadByType(CostingType.PatientCare), ConfigCostingType.LoadByType(CostingType.Claims) };
+                return new List<ConfigCostingType> { ConfigCostingType.GetByType(CostingType.PatientCare), ConfigCostingType.GetByType(CostingType.Claims) };
             }
             else
             {

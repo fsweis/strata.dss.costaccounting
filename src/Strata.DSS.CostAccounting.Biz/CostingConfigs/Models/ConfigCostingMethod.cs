@@ -27,7 +27,7 @@ namespace Strata.DSS.CostAccounting.Biz.CostingConfigs.Models
             return FriendlyName.GetHashCode();
         }
 
-        public static IEnumerable<ConfigCostingMethod> LoadAll()
+        public static IEnumerable<ConfigCostingMethod> GetAll()
         {
             yield return new ConfigCostingMethod(CostingMethod.Simultaneous, CostingMethodContants.Simultaneous_FriendlyName);
             yield return new ConfigCostingMethod(CostingMethod.SingleStepDown, CostingMethodContants.SingleStepDown_FriendlyName);
@@ -35,9 +35,9 @@ namespace Strata.DSS.CostAccounting.Biz.CostingConfigs.Models
             yield return new ConfigCostingMethod(CostingMethod.NLevelStepDown, CostingMethodContants.NLevelStepDown_FriendlyName);
         }
 
-        public static ConfigCostingMethod LoadByMethod(CostingMethod method)
+        public static ConfigCostingMethod GetByMethod(CostingMethod method)
         {
-            return LoadAll().FirstOrDefault(c => c.Method == method);
+            return GetAll().FirstOrDefault(c => c.Method == method);
         }
     }
 }
