@@ -25,7 +25,7 @@ namespace Strata.DSS.CostAccounting.Biz.CostingConfigs.Services
             entities = entities.OrderBy(x => x.SortOrder);
             return entities.ToList();
         }
-        public async Task<IList<Entity>> GetFilteredEntities(CostingConfigModel costingConfig, bool isCostingEntityLevelSecurityEnabled, CancellationToken cancellationToken)
+        public async Task<IList<Entity>> GetFilteredEntities(Guid costingConfigGuid, bool isCostingEntityLevelSecurityEnabled, CancellationToken cancellationToken)
         {
             var entitiesToReturn = new List<Entity>();
 
@@ -35,7 +35,7 @@ namespace Strata.DSS.CostAccounting.Biz.CostingConfigs.Services
 
             if (isCostingEntityLevelSecurityEnabled)
             {
-                if (costingConfig == null)
+                if (costingConfigGuid == null || costingConfigGuid==Guid.Empty)
                 {
                     var noneEntity = new Entity
                     {
@@ -45,7 +45,7 @@ namespace Strata.DSS.CostAccounting.Biz.CostingConfigs.Services
                 }
                 else
                 {
-                    var filteredEntities = await _costingConfigRepository.GetCCELSAsync(costingConfig.CostingConfigGuid, cancellationToken);
+                    var filteredEntities = await _costingConfigRepository.GetCCELSAsync(costingConfigGuid, cancellationToken);
                     if (filteredEntities.Count() == 0)
                     {
                         var noneEntity = new Entity

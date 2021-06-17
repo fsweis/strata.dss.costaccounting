@@ -55,13 +55,13 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
             var entities = await _entityService.GetEntities(cancellationToken);
             return entities;
         }
-        [HttpGet("filtered-entities")]
+        [HttpGet("filtered-entities/{costingConfigGuid}")]
         [ProducesResponseType(200)]
-        public async Task<IEnumerable<Entity>> GetFilteredEntities(CancellationToken cancellationToken)
+        public async Task<IEnumerable<Entity>> GetFilteredEntities([FromRoute] Guid costingConfigGuid, CancellationToken cancellationToken)
         {
             //get system setting for costing entity security
             var isCostingEntityLevelSecurityEnabled = await _systemSettingRepository.GetIsCostingEntityLevelSecurityEnabledAsync(cancellationToken);
-            var entities = await _entityService.GetFilteredEntities(null, isCostingEntityLevelSecurityEnabled, cancellationToken);
+            var entities = await _entityService.GetFilteredEntities(costingConfigGuid, isCostingEntityLevelSecurityEnabled, cancellationToken);
             return entities;
         }
 

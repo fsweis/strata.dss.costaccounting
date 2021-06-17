@@ -70,7 +70,7 @@ const CostingConfigModal: React.FC<IModelModalProps> = (props: IModelModalProps)
           dateService.getFiscalMonths(),
           dateService.getFiscalYears(),
           costConfigService.getEntities(),
-          costConfigService.getFilteredEntities(),
+          costConfigService.getFilteredEntities(getEmptyGuid()),
           costConfigService.getCostingTypes(),
           costConfigService.getCostingMethods(),
           systemSettingService.getIsClaimsCostingEnabled(),
