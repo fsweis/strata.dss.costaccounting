@@ -12,9 +12,6 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.Repositories
     {
         public Task<IEnumerable<CostingConfigModel>> GetAllCostingConfigsAsync(CancellationToken cancellationToken);
         public Task<CostingConfigModel> GetCostingConfigAsync(Guid id, CancellationToken cancellationToken);
-
-        public Task<IEnumerable<FiscalMonth>> GetFiscalMonthsAsync( CancellationToken cancellationToken);
-        public Task<IEnumerable<FiscalYear>> GetFiscalYearsAsync(CancellationToken cancellationToken);
         public Task<IEnumerable<Entity>> GetEntitiesAsync(CancellationToken cancellationToken);
         public Task<IEnumerable<CostingConfigEntityLevelSecurity>> GetCCELSAsync(CancellationToken cancellationToken);
         public Task<IEnumerable<CostingConfigEntityLinkage>> GetCCELinksByConfigGuidAsync(Guid configGuid, CancellationToken cancellationToken);

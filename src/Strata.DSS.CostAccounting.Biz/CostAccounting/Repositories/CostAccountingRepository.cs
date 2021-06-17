@@ -70,5 +70,30 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.Repositories
             return ruleSets;
         }
 
+        public async Task<IEnumerable<FiscalMonth>> GetFiscalMonthsAsync(CancellationToken cancellationToken)
+        {
+            await using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
+            var fiscalMonths = await dbContext.FiscalMonths.ToListAsync(cancellationToken);
+
+            if (!fiscalMonths.Any())
+            {
+                return null;
+            }
+
+            return fiscalMonths;
+        }
+
+        public async Task<IEnumerable<FiscalYear>> GetFiscalYearsAsync(CancellationToken cancellationToken)
+        {
+            await using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
+            var fiscalYears = await dbContext.FiscalYears.ToListAsync(cancellationToken);
+
+            if (!fiscalYears.Any())
+            {
+                return null;
+            }
+
+            return fiscalYears;
+        }
     }
 }
