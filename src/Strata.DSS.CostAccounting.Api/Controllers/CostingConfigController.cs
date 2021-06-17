@@ -89,17 +89,6 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
             }
         }
 
-        [HttpGet("costing-permissions")]
-        [ProducesResponseType(200)]
-        public async Task<CostingPermissions> GetCostingPermissions(CancellationToken cancellationToken)
-        {
-            
-            var isClaimsCostingEnabled = await _systemSettingRepository.GetIsClaimsCostingEnabledAsync(cancellationToken);
-            var isCostingEntityLevelSecurityEnabled = await _systemSettingRepository.GetIsCostingEntityLevelSecurityEnabledAsync(cancellationToken);
-            return new CostingPermissions { IsClaimsCostingEnabled = isClaimsCostingEnabled, IsCostingEntityLevelSecurityEnabled = isCostingEntityLevelSecurityEnabled };
-        }
-
-
         [HttpPost("")]
         [ProducesResponseType(200)]
         public async Task<CostConfigSaveResult> AddNewConfig([FromBody] CostingConfigSaveData costConfigSaveData, CancellationToken cancellationToken)

@@ -3,7 +3,6 @@ import { ICostConfig } from '../data/ICostConfig';
 import { IEntity } from '../../costing-configs/data/IEntity';
 import { ICostingType } from '../../costing-configs/data/ICostingType';
 import { ICostingMethod } from '../../costing-configs/data/ICostingMethod';
-import { ICostingPermissions } from '../../costing-configs/data/ICostingPermissions';
 import { ICostConfigSaveResult } from '../../costing-configs/data/ICostConfigSaveResult';
 import { ICostConfigSaveData } from '../../costing-configs/data/ICostConfigSaveData';
 
@@ -27,9 +26,6 @@ export const costConfigService = {
   },
   getCostingMethods: (): Promise<ICostingMethod[]> => {
     return httpGet<ICostingMethod[]>(`costing-configs/costing-methods`);
-  },
-  getCostingPermissions: (): Promise<ICostingPermissions> => {
-    return httpGet<ICostingPermissions>(`costing-configs/costing-permissions`);
   },
   addNewConfig: (costConfigSaveData: ICostConfigSaveData): Promise<ICostConfigSaveResult> => {
     return httpPost<ICostConfigSaveResult>(`costing-configs/`, costConfigSaveData);

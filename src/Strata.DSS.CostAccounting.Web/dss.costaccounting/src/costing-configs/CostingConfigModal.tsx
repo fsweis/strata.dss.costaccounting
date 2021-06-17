@@ -15,11 +15,11 @@ import { IFiscalYear } from '../shared/data/IFiscalYear';
 import { IFiscalMonth } from '../shared/data/IFiscalMonth';
 import { IEntity } from './data/IEntity';
 import { costConfigService } from '../shared/data/costConfigService';
+import { systemSettingService } from '../shared/data/systemSettingService';
 import { dateService } from '../shared/data/dateService';
 import { RadioChangeEvent } from 'antd/lib/radio/interface';
 import { ICostingType } from './data/ICostingType';
 import { ICostingMethod } from './data/ICostingMethod';
-import { ICostingPermissions } from './data/ICostingPermissions';
 import { ICostConfigSaveData } from './data/ICostConfigSaveData';
 import TreeDropDown, { ITreeDropDownNode } from '@strata/tempo/lib/treedropdown';
 import { getEmptyGuid } from '../shared/Utils';
@@ -58,21 +58,23 @@ const CostingConfigModal: React.FC<IModelModalProps> = (props: IModelModalProps)
   const [costingMethods, setCostingMethods] = useState<ICostingMethod[]>([]);
   const [entityTreeData, setEntityTreeData] = useState<ITreeDropDownNode[]>([]);
   const [utilEntityTreeData, setUtilEntityTreeData] = useState<ITreeDropDownNode[]>([]);
-  const [costingPermissions, setCostingPermissions] = useState<ICostingPermissions>();
+  const [isClaimsCostingEnabled, setIsClaimsCostingEnabled] = useState<boolean>(false);
+  const [isCostingEntityLevelSecurityEnabled, setIsCostingEntityLevelSecurityEnabled] = useState<boolean>(false);
   const [configForm, setConfigForm] = useState<IConfigForm>();
 
   //Load initial data
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [fiscalMonths, fiscalYears, entities, filteredEntities, costingTypes, costingMethods, costingPermissions] = await Promise.all([
+        const [fiscalMonths, fiscalYears, entities, filteredEntities, costingTypes, costingMethods, isClaimsCostingEnabled, isCostingEntityLevelSecurityEnabled] = await Promise.all([
           dateService.getFiscalMonths(),
           dateService.getFiscalYears(),
           costConfigService.getEntities(),
           costConfigService.getFilteredEntities(),
           costConfigService.getCostingTypes(),
           costConfigService.getCostingMethods(),
-          costConfigService.getCostingPermissions()
+          systemSettingService.getIsClaimsCostingEnabled(),
+          systemSettingService.getIsCostingEntityLevelSecurityEnabled()
         ]);
         setFiscalMonths(fiscalMonths);
         setFiscalYears(fiscalYears);
@@ -80,7 +82,8 @@ const CostingConfigModal: React.FC<IModelModalProps> = (props: IModelModalProps)
         setFilteredEntities(filteredEntities);
         setCostingTypes(costingTypes);
         setCostingMethods(costingMethods);
-        setCostingPermissions(costingPermissions);
+        setIsClaimsCostingEnabled(isClaimsCostingEnabled);
+        setIsCostingEntityLevelSecurityEnabled(isCostingEntityLevelSecurityEnabled);
         //set initial form
         const year = fiscalYears.find((x) => x.fiscalYearId === new Date().getFullYear())?.fiscalYearId;
         const ytdMonth = fiscalMonths.find((x) => x.sortOrder === 12)?.fiscalMonthId;
@@ -244,7 +247,7 @@ const CostingConfigModal: React.FC<IModelModalProps> = (props: IModelModalProps)
             </Form.Item>
           </Spacing>
           <Spacing itemSpacing={16}>
-            {costingPermissions?.isClaimsCostingEnabled && (
+            {isClaimsCostingEnabled && (
               <Form.Item label='Type' name='type' rules={[{ required: true }]}>
                 <RadioGroup
                   onChange={handleCostingTypeChange}
@@ -258,7 +261,7 @@ const CostingConfigModal: React.FC<IModelModalProps> = (props: IModelModalProps)
               <TreeDropDown treeData={entityTreeData} selectionMode='multiple' treeDefaultExpandedKeys={['0']} />
             </Form.Item>
           </Spacing>
-          {costingPermissions?.isCostingEntityLevelSecurityEnabled && (
+          {isCostingEntityLevelSecurityEnabled && (
             <Spacing itemSpacing={16}>
               <Form.Item label='Utilization Entities' name='utilizationEntities' rules={[{ required: true }]}>
                 <RadioGroup

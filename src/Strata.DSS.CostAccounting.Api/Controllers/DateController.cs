@@ -42,7 +42,6 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
             var fiscalYears = await _costAccountingRepository.GetFiscalYearsAsync(cancellationToken);
             fiscalYears = fiscalYears.Where(x => x.FiscalYearId != 0).OrderBy(x => x.Name);
             return fiscalYears;
-
         }
     }
 }

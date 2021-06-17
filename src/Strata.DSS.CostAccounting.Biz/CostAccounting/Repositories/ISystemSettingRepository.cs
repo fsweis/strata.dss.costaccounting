@@ -10,5 +10,6 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.Repositories
     {
         public Task<Boolean> GetIsClaimsCostingEnabledAsync(CancellationToken cancellationToken);
         public Task<Boolean> GetIsCostingEntityLevelSecurityEnabledAsync(CancellationToken cancellationToken);
+        public Task<Int32> GetCurrentFiscalYearAsync(CancellationToken cancellationToken);
     }
 }
