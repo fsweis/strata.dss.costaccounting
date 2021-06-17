@@ -25,7 +25,7 @@ namespace Strata.DSS.CostAccounting.Biz.CostingConfigs.Services
             entities = entities.OrderBy(x => x.SortOrder);
             return entities.ToList();
         }
-        public async Task<IList<Entity>> GetFilteredEntities(Guid costingConfigGuid, bool isCostingEntityLevelSecurityEnabled, CancellationToken cancellationToken)
+        public async Task<IList<Entity>> GetFilteredEntities(Guid costingConfigGuid, CancellationToken cancellationToken)
         {
             var entitiesToReturn = new List<Entity>();
 
@@ -33,9 +33,18 @@ namespace Strata.DSS.CostAccounting.Biz.CostingConfigs.Services
             entities.First(x => x.Description == "Not Specified").Description = "All";
             entities = entities.OrderBy(x => x.SortOrder);
 
-            if (isCostingEntityLevelSecurityEnabled)
+            if (costingConfigGuid == null || costingConfigGuid == Guid.Empty)
             {
-                if (costingConfigGuid == null || costingConfigGuid==Guid.Empty)
+                var noneEntity = new Entity
+                {
+                    Description = "None"
+                };
+                entitiesToReturn.Add(noneEntity);
+            }
+            else
+            {
+                var filteredEntities = await _costingConfigRepository.GetCCELSAsync(costingConfigGuid, cancellationToken);
+                if (filteredEntities.Count() == 0)
                 {
                     var noneEntity = new Entity
                     {
@@ -45,25 +54,11 @@ namespace Strata.DSS.CostAccounting.Biz.CostingConfigs.Services
                 }
                 else
                 {
-                    var filteredEntities = await _costingConfigRepository.GetCCELSAsync(costingConfigGuid, cancellationToken);
-                    if (filteredEntities.Count() == 0)
-                    {
-                        var noneEntity = new Entity
-                        {
-                            Description = "None"
-                        };
-                        entitiesToReturn.Add(noneEntity);
-                    }
-                    else
-                    {
-                        entitiesToReturn = entities.Where(x => filteredEntities.Any(y => y.EntityId == x.EntityId)).ToList();
-                    }
+                    entitiesToReturn = entities.Where(x => filteredEntities.Any(y => y.EntityId == x.EntityId)).ToList();
                 }
             }
-            else
-            {
-                entitiesToReturn = entities.ToList();
-            }
+
+
             return entitiesToReturn;
         }
     }

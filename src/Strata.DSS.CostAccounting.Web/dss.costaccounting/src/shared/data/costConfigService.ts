@@ -18,8 +18,12 @@ export const costConfigService = {
   getUtilEntities: (): Promise<IEntity[]> => {
     return httpGet<IEntity[]>(`costing-configs/entities`);
   },
-  getGlPayrollEntities: (costingConfigGuid: string): Promise<IEntity[]> => {
-    return httpGet<IEntity[]>(`costing-configs/filtered-entities/${costingConfigGuid}`);
+  getGlPayrollEntities: (isCostingEntityLevelSecurityEnabled: boolean, costingConfigGuid: string): Promise<IEntity[]> => {
+    if (isCostingEntityLevelSecurityEnabled) {
+      return httpGet<IEntity[]>(`costing-configs/filtered-entities/${costingConfigGuid}`);
+    } else {
+      return httpGet<IEntity[]>(`costing-configs/entities`);
+    }
   },
   getCostingTypes: (): Promise<ICostingType[]> => {
     return httpGet<ICostingType[]>(`costing-configs/costing-types`);

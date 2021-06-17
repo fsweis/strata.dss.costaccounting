@@ -66,15 +66,20 @@ const CostingConfigModal: React.FC<IModelModalProps> = (props: IModelModalProps)
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [fiscalMonths, fiscalYears, glPayrollEntities, utilEntities, costingTypes, costingMethods, isClaimsCostingEnabled, isCostingEntityLevelSecurityEnabled] = await Promise.all([
-          dateService.getFiscalMonths(),
-          dateService.getFiscalYears(),
-          costConfigService.getGlPayrollEntities(getEmptyGuid()),
-          costConfigService.getUtilEntities(),
-          costConfigService.getCostingTypes(),
-          costConfigService.getCostingMethods(),
+        const [isClaimsCostingEnabled, isCostingEntityLevelSecurityEnabled] = await Promise.all([
           systemSettingService.getIsClaimsCostingEnabled(),
           systemSettingService.getIsCostingEntityLevelSecurityEnabled()
+        ]);
+        setIsClaimsCostingEnabled(isClaimsCostingEnabled);
+        setIsCostingEntityLevelSecurityEnabled(isCostingEntityLevelSecurityEnabled);
+
+        const [fiscalMonths, fiscalYears, glPayrollEntities, utilEntities, costingTypes, costingMethods] = await Promise.all([
+          dateService.getFiscalMonths(),
+          dateService.getFiscalYears(),
+          costConfigService.getGlPayrollEntities(isCostingEntityLevelSecurityEnabled, getEmptyGuid()),
+          isCostingEntityLevelSecurityEnabled ? costConfigService.getUtilEntities() : [],
+          costConfigService.getCostingTypes(),
+          costConfigService.getCostingMethods()
         ]);
         setFiscalMonths(fiscalMonths);
         setFiscalYears(fiscalYears);
@@ -82,8 +87,6 @@ const CostingConfigModal: React.FC<IModelModalProps> = (props: IModelModalProps)
         setUtilEntities(utilEntities);
         setCostingTypes(costingTypes);
         setCostingMethods(costingMethods);
-        setIsClaimsCostingEnabled(isClaimsCostingEnabled);
-        setIsCostingEntityLevelSecurityEnabled(isCostingEntityLevelSecurityEnabled);
         //set initial form
         const year = fiscalYears.find((x) => x.fiscalYearId === new Date().getFullYear())?.fiscalYearId;
         const ytdMonth = fiscalMonths.find((x) => x.sortOrder === 12)?.fiscalMonthId;
@@ -108,7 +111,7 @@ const CostingConfigModal: React.FC<IModelModalProps> = (props: IModelModalProps)
     };
     setLoading(true);
     fetchData();
-  }, []);
+  }, [setLoading]);
 
   //Set Filtered Entity Trees when entities are loaded
   useEffect(() => {
@@ -156,8 +159,8 @@ const CostingConfigModal: React.FC<IModelModalProps> = (props: IModelModalProps)
       fiscalYearId: values.year,
       fiscalMonthId: values.ytdMonth,
       type: values.type ? values.type : 0,
-      isPayrollCosting: values.options ? values.options.indexOf(1) >= 0 : false,
-      isBudgetedAndActualCosting: values.options ? values.options.indexOf(2) >= 0 : false,
+      isPayrollCosting: values.options ? values.options.indexOf(2) >= 0 : false,
+      isBudgetedAndActualCosting: values.options ? values.options.indexOf(1) >= 0 : false,
       isUtilizationEntityConfigured: values.isUtilizingEntities ? (values.isUtilizingEntities === 1 ? true : false) : false,
       createdAt: new Date(),
       modifiedAtUtc: new Date()
