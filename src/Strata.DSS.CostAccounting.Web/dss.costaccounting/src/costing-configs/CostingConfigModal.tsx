@@ -76,7 +76,7 @@ const CostingConfigModal: React.FC<IModelModalProps> = (props: IModelModalProps)
         const [fiscalMonths, fiscalYears, glPayrollEntities, utilEntities, costingTypes, costingMethods] = await Promise.all([
           dateService.getFiscalMonths(),
           dateService.getFiscalYears(),
-          costConfigService.getGlPayrollEntities(isCostingEntityLevelSecurityEnabled, getEmptyGuid()),
+          costConfigService.getGlPayrollEntities(getEmptyGuid()),
           isCostingEntityLevelSecurityEnabled ? costConfigService.getUtilEntities() : [],
           costConfigService.getCostingTypes(),
           costConfigService.getCostingMethods()

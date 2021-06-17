@@ -3,7 +3,6 @@ using Strata.DSS.CostAccounting.Biz.CostAccounting.Repositories;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -25,7 +24,7 @@ namespace Strata.DSS.CostAccounting.Biz.CostingConfigs.Services
             entities = entities.OrderBy(x => x.SortOrder);
             return entities.ToList();
         }
-        public async Task<IList<Entity>> GetFilteredEntities(Guid costingConfigGuid, CancellationToken cancellationToken)
+        public async Task<IList<Entity>> GetFilteredEntities(Guid costingConfigGuid, bool isCostingEntityLevelSecurityEnabled, CancellationToken cancellationToken)
         {
             var entitiesToReturn = new List<Entity>();
 
@@ -33,18 +32,9 @@ namespace Strata.DSS.CostAccounting.Biz.CostingConfigs.Services
             entities.First(x => x.Description == "Not Specified").Description = "All";
             entities = entities.OrderBy(x => x.SortOrder);
 
-            if (costingConfigGuid == null || costingConfigGuid == Guid.Empty)
+            if (isCostingEntityLevelSecurityEnabled)
             {
-                var noneEntity = new Entity
-                {
-                    Description = "None"
-                };
-                entitiesToReturn.Add(noneEntity);
-            }
-            else
-            {
-                var filteredEntities = await _costingConfigRepository.GetCCELSAsync(costingConfigGuid, cancellationToken);
-                if (filteredEntities.Count() == 0)
+                if (costingConfigGuid == null || costingConfigGuid == Guid.Empty)
                 {
                     var noneEntity = new Entity
                     {
@@ -54,10 +44,25 @@ namespace Strata.DSS.CostAccounting.Biz.CostingConfigs.Services
                 }
                 else
                 {
-                    entitiesToReturn = entities.Where(x => filteredEntities.Any(y => y.EntityId == x.EntityId)).ToList();
+                    var filteredEntities = await _costingConfigRepository.GetCCELSAsync(costingConfigGuid, cancellationToken);
+                    if (filteredEntities.Count() == 0)
+                    {
+                        var noneEntity = new Entity
+                        {
+                            Description = "None"
+                        };
+                        entitiesToReturn.Add(noneEntity);
+                    }
+                    else
+                    {
+                        entitiesToReturn = entities.Where(x => filteredEntities.Any(y => y.EntityId == x.EntityId)).ToList();
+                    }
                 }
             }
-
+            else
+            {
+                entitiesToReturn.AddRange(entities);
+            }
 
             return entitiesToReturn;
         }
