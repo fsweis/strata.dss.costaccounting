@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Strata.DSS.CostAccounting.Biz.CostingConfigs.Services
@@ -16,18 +17,18 @@ namespace Strata.DSS.CostAccounting.Biz.CostingConfigs.Services
             _costingConfigRepository = costingConfigRepository;
 
         }
-        public async Task<IList<Entity>> GetEntities()
+        public async Task<IList<Entity>> GetEntities(CancellationToken cancellationToken)
         {
-            var entities = await _costingConfigRepository.GetEntitiesAsync(default);
+            var entities = await _costingConfigRepository.GetEntitiesAsync(cancellationToken);
             entities.First(x => x.Description == "Not Specified").Description = "All";
             entities = entities.OrderBy(x => x.SortOrder);
             return entities.ToList();
         }
-        public async Task<IList<Entity>> GetFilteredEntities(CostingConfigModel costingConfig, bool isCostingEntityLevelSecurityEnabled)
+        public async Task<IList<Entity>> GetFilteredEntities(CostingConfigModel costingConfig, bool isCostingEntityLevelSecurityEnabled, CancellationToken cancellationToken)
         {
             var entitiesToReturn = new List<Entity>();
 
-            var entities = await _costingConfigRepository.GetEntitiesAsync(default);
+            var entities = await _costingConfigRepository.GetEntitiesAsync(cancellationToken);
             entities.First(x => x.Description == "Not Specified").Description = "All";
             entities = entities.OrderBy(x => x.SortOrder);
 
@@ -43,7 +44,7 @@ namespace Strata.DSS.CostAccounting.Biz.CostingConfigs.Services
                 }
                 else
                 {
-                    var filteredEntities = await _costingConfigRepository.GetCCELSAsync(default);
+                    var filteredEntities = await _costingConfigRepository.GetCCELSAsync(cancellationToken);
                     filteredEntities = filteredEntities.Where(x => x.CostingConfigGuid == costingConfig.CostingConfigGuid);
                     if (filteredEntities.Count() == 0)
                     {

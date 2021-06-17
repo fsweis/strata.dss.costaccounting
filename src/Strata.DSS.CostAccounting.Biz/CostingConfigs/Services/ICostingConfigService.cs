@@ -2,12 +2,13 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Strata.DSS.CostAccounting.Biz.CostingConfigs.Services
 {
     public interface ICostingConfigService
     {
-        public Task<CostConfigSaveResult> AddNewConfigAsync(CostingConfigSaveData configForm);
+        public Task<CostConfigSaveResult> AddNewConfigAsync(CostingConfigSaveData configForm, CancellationToken cancellationToken);
     }
 }

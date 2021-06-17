@@ -73,7 +73,7 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
         [ProducesResponseType(200)]
         public async Task<IEnumerable<Entity>> GetEntities(CancellationToken cancellationToken)
         {
-            var entities = await _entityService.GetEntities();
+            var entities = await _entityService.GetEntities(cancellationToken);
             return entities;
         }
         [HttpGet("filtered-entities")]
@@ -81,14 +81,14 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
         public async Task<IEnumerable<Entity>> GetFilteredEntities(CancellationToken cancellationToken)
         {
             //get system setting for costing entity security
-            var isCostingEntityLevelSecurityEnabled = await _systemSettingRepository.GetIsCostingEntityLevelSecurityEnabledAsync(default);
-            var entities = await _entityService.GetFilteredEntities(null, isCostingEntityLevelSecurityEnabled);
+            var isCostingEntityLevelSecurityEnabled = await _systemSettingRepository.GetIsCostingEntityLevelSecurityEnabledAsync(cancellationToken);
+            var entities = await _entityService.GetFilteredEntities(null, isCostingEntityLevelSecurityEnabled, cancellationToken);
             return entities;
         }
 
         [HttpGet("costing-methods")]
         [ProducesResponseType(200)]
-        public IEnumerable<ConfigCostingMethod> GetCostingMethods(CancellationToken cancellationToken)
+        public IEnumerable<ConfigCostingMethod> GetCostingMethods()
         {
             var methods = new List<ConfigCostingMethod> { ConfigCostingMethod.LoadByMethod(CostingMethod.Simultaneous), ConfigCostingMethod.LoadByMethod(CostingMethod.SingleStepDown) };
             return methods;
@@ -98,7 +98,7 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
         [ProducesResponseType(200)]
         public async Task<IEnumerable<ConfigCostingType>> GetCostingTypes(CancellationToken cancellationToken)
         {
-            var isClaimsCostingEnabled = await _systemSettingRepository.GetIsClaimsCostingEnabledAsync(default);
+            var isClaimsCostingEnabled = await _systemSettingRepository.GetIsClaimsCostingEnabledAsync(cancellationToken);
 
             if (isClaimsCostingEnabled)
             {
@@ -115,8 +115,8 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
         public async Task<CostingPermissions> GetCostingPermissions(CancellationToken cancellationToken)
         {
             
-            var isClaimsCostingEnabled = await _systemSettingRepository.GetIsClaimsCostingEnabledAsync(default);
-            var isCostingEntityLevelSecurityEnabled = await _systemSettingRepository.GetIsCostingEntityLevelSecurityEnabledAsync(default);
+            var isClaimsCostingEnabled = await _systemSettingRepository.GetIsClaimsCostingEnabledAsync(cancellationToken);
+            var isCostingEntityLevelSecurityEnabled = await _systemSettingRepository.GetIsCostingEntityLevelSecurityEnabledAsync(cancellationToken);
             return new CostingPermissions { IsClaimsCostingEnabled = isClaimsCostingEnabled, IsCostingEntityLevelSecurityEnabled = isCostingEntityLevelSecurityEnabled };
         }
 
@@ -126,7 +126,7 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
         public async Task<CostConfigSaveResult> AddNewConfig([FromBody] CostingConfigSaveData costConfigSaveData, CancellationToken cancellationToken)
         {
 
-            var saveResult = await _costingConfigService.AddNewConfigAsync(costConfigSaveData);
+            var saveResult = await _costingConfigService.AddNewConfigAsync(costConfigSaveData, cancellationToken);
             return saveResult;
         }
 
