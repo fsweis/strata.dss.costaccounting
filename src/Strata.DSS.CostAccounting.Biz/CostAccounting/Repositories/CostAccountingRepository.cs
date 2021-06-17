@@ -95,5 +95,17 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.Repositories
 
             return fiscalYears;
         }
+        public async Task<IEnumerable<Entity>> GetEntitiesAsync(CancellationToken cancellationToken)
+        {
+            await using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
+            var entities = await dbContext.Entities.Where(x => x.Description != "").ToListAsync(cancellationToken);
+
+            if (!entities.Any())
+            {
+                return null;
+            }
+
+            return entities;
+        }
     }
 }

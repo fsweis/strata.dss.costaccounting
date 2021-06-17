@@ -15,6 +15,7 @@ import { IFiscalYear } from '../shared/data/IFiscalYear';
 import { IFiscalMonth } from '../shared/data/IFiscalMonth';
 import { IEntity } from './data/IEntity';
 import { costConfigService } from '../shared/data/costConfigService';
+import { dateService } from '../shared/data/dateService';
 import { RadioChangeEvent } from 'antd/lib/radio/interface';
 import { ICostingType } from './data/ICostingType';
 import { ICostingMethod } from './data/ICostingMethod';
@@ -24,14 +25,14 @@ import TreeDropDown, { ITreeDropDownNode } from '@strata/tempo/lib/treedropdown'
 import { getEmptyGuid } from '../shared/Utils';
 import { ICostConfig } from '../shared/data/ICostConfig';
 
-export interface IModelModalProps {
+interface IModelModalProps {
   visible: boolean;
   onCancel: () => void;
   onSave: () => void;
   onAddConfig: (costingConfig: ICostConfig) => void;
 }
 
-export interface IConfigForm {
+interface IConfigForm {
   name: string;
   description: string;
   year: number;
@@ -65,8 +66,8 @@ const CostingConfigModal: React.FC<IModelModalProps> = (props: IModelModalProps)
     const fetchData = async () => {
       try {
         const [fiscalMonths, fiscalYears, entities, filteredEntities, costingTypes, costingMethods, costingPermissions] = await Promise.all([
-          costConfigService.getFiscalMonths(),
-          costConfigService.getFiscalYears(),
+          dateService.getFiscalMonths(),
+          dateService.getFiscalYears(),
           costConfigService.getEntities(),
           costConfigService.getFilteredEntities(),
           costConfigService.getCostingTypes(),

@@ -43,6 +43,17 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.Repositories
             }
             return false;
         }
+
+        public async Task<Boolean> GetCurrentFiscalYearAsync(CancellationToken cancellationToken)
+        {
+            await using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
+            var systemSetting = await dbContext.SystemSettings.Where(x => x.Name == "Current FiscalYear").FirstOrDefaultAsync();
+            if (systemSetting != null)
+            {
+                return Convert.ToInt32(systemSetting.Value) == 1;
+            }
+            return false;
+        }
     }
 }
 

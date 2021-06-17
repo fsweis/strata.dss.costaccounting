@@ -1,8 +1,6 @@
 import { appConfig, getSecureService } from '@strata/core/lib';
 import { ICostConfig } from '../data/ICostConfig';
 import { IEntity } from '../../costing-configs/data/IEntity';
-import { IFiscalMonth } from './IFiscalMonth';
-import { IFiscalYear } from './IFiscalYear';
 import { ICostingType } from '../../costing-configs/data/ICostingType';
 import { ICostingMethod } from '../../costing-configs/data/ICostingMethod';
 import { ICostingPermissions } from '../../costing-configs/data/ICostingPermissions';
@@ -17,12 +15,6 @@ export const costConfigService = {
   },
   getCostConfig: (costingConfigGuid: string): Promise<ICostConfig> => {
     return httpGet<ICostConfig>(`costing-configs/${costingConfigGuid}`);
-  },
-  getFiscalMonths: (): Promise<IFiscalMonth[]> => {
-    return httpGet<IFiscalMonth[]>(`date/fiscal-months`);
-  },
-  getFiscalYears: (): Promise<IFiscalYear[]> => {
-    return httpGet<IFiscalYear[]>(`date/fiscal-years`);
   },
   getEntities: (): Promise<IEntity[]> => {
     return httpGet<IEntity[]>(`costing-configs/entities`);
