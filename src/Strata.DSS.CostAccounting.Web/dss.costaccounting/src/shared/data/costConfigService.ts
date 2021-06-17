@@ -15,10 +15,10 @@ export const costConfigService = {
   getCostConfig: (costingConfigGuid: string): Promise<ICostConfig> => {
     return httpGet<ICostConfig>(`costing-configs/${costingConfigGuid}`);
   },
-  getEntities: (): Promise<IEntity[]> => {
+  getUtilEntities: (): Promise<IEntity[]> => {
     return httpGet<IEntity[]>(`costing-configs/entities`);
   },
-  getFilteredEntities: (costingConfigGuid: string): Promise<IEntity[]> => {
+  getGlPayrollEntities: (costingConfigGuid: string): Promise<IEntity[]> => {
     return httpGet<IEntity[]>(`costing-configs/filtered-entities/${costingConfigGuid}`);
   },
   getCostingTypes: (): Promise<ICostingType[]> => {
