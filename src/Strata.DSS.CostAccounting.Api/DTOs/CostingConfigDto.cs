@@ -1,4 +1,5 @@
 ﻿using Strata.DSS.CostAccounting.Biz.CostAccounting.Models;
+using Strata.DSS.CostAccounting.Biz.CostingConfigs.Models;
 using Strata.DSS.CostAccounting.Biz.Enums;
 using System;
 using System.Collections.Generic;
@@ -9,6 +10,8 @@ namespace Strata.DSS.CostAccounting.Api.DTOs
 {
     public class CostingConfigDto
     {
+        private CostConfigSaveResult saveResult;
+
         public CostingConfigDto(CostingConfigModel costingConfig)
         {
             CostingConfigGuid = costingConfig.CostingConfigGuid;
@@ -17,8 +20,8 @@ namespace Strata.DSS.CostAccounting.Api.DTOs
             IsGLCosting = costingConfig.IsGLCosting;
             IsPayrollCosting = costingConfig.IsPayrollCosting;
             DefaultChargeAllocationMethod = costingConfig.DefaultChargeAllocationMethod;
-            FiscalYearID = costingConfig.FiscalYearID;
-            FiscalMonthID = costingConfig.FiscalMonthID;
+            FiscalYearId = costingConfig.FiscalYearId;
+            FiscalMonthId = costingConfig.FiscalMonthId;
             CreatedAt = costingConfig.CreatedAt;
             ModifiedAtUtc = costingConfig.ModifiedAtUtc;
             LastPublishedUtc = costingConfig.LastPublishedUtc;
@@ -33,8 +36,8 @@ namespace Strata.DSS.CostAccounting.Api.DTOs
         public bool IsBudgetedAndActualCosting { get; set; }
         public bool IsUtilizationEntityConfigured { get; set; }
         public short DefaultChargeAllocationMethod { get; set; }
-        public short FiscalYearID { get; set; }
-        public short FiscalMonthID { get; set; }
+        public short FiscalYearId { get; set; }
+        public short FiscalMonthId { get; set; }
         public int Type { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime ModifiedAtUtc { get; set; }

@@ -9,6 +9,7 @@ using Strata.DSS.CostAccounting.Biz.CostingConfigs.Services;
 using Strata.DSS.CostAccounting.Biz.Enums;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -58,8 +59,8 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
 
             var dto = new CostingConfigDto(costingConfig)
             {
-                GlPayrollEntities = entityLinkages.Where(x => x.IsUtilization == false).Select(x => x.EntityID).ToList(),
-                UtilEntities = entityLinkages.Where(x => x.IsUtilization == true).Select(x => x.EntityID).ToList()
+                GlPayrollEntities = entityLinkages.Where(x => x.IsUtilization == false).Select(x => x.EntityId).ToList(),
+                UtilEntities = entityLinkages.Where(x => x.IsUtilization == true).Select(x => x.EntityId).ToList()
             };
 
             return Ok(new CostingConfigDto(costingConfig));
@@ -110,25 +111,9 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
         [ProducesResponseType(200)]
         public async Task<CostConfigSaveResult> AddNewConfig([FromBody] CostingConfigSaveData costConfigSaveData, CancellationToken cancellationToken)
         {
-            var costingConfigModel = new CostingConfigModel()
-            {
-                CostingConfigGuid = costingConfigDto.CostingConfigGuid,
-                Name = costingConfigDto.Name,
-                Description = costingConfigDto.Description,
-                IsGLCosting = costingConfigDto.IsGLCosting,
-                DefaultChargeAllocationMethod = costingConfigDto.DefaultChargeAllocationMethod,
-                FiscalYearID = costingConfigDto.FiscalYearID,
-                FiscalMonthID = (byte)costingConfigDto.FiscalMonthID,
-                CreatedAt = costingConfigDto.CreatedAt,
-                ModifiedAtUtc = costingConfigDto.ModifiedAtUtc,
-                LastPublishedUtc = costingConfigDto.LastPublishedUtc,
-                IsEditable = costingConfigDto.IsEditable,
-            };
-
-            var saveResult = await _costingConfigService.AddNewConfig(new CostingConfigSaveData(costingConfigModel, costingConfigDto.GlPayrollEntities, costingConfigDto.UtilEntities));
-            return Ok(saveResult);
+            var saveResult = await _costingConfigService.AddNewConfigAsync(costConfigSaveData, cancellationToken);
+            return saveResult;
         }
-
 
         [HttpDelete("{costingConfigId}")]
         [ProducesResponseType(200)]
