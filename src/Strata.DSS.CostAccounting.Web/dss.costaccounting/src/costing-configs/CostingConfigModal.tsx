@@ -163,7 +163,11 @@ const CostingConfigModal: React.FC<IModelModalProps> = (props: IModelModalProps)
       isBudgetedAndActualCosting: values.options ? values.options.indexOf(1) >= 0 : false,
       isUtilizationEntityConfigured: values.isUtilizingEntities ? (values.isUtilizingEntities === 1 ? true : false) : false,
       createdAt: new Date(),
-      modifiedAtUtc: new Date()
+      modifiedAtUtc: new Date(),
+      lastPublishedUtc: new Date(),
+      isEditable: true,
+      glPayrollEntities: [],
+      utilEntities: []
     };
 
     const glPayrollEntities = values.glPayrollEntities ? values.glPayrollEntities.map((x) => +x) : [];

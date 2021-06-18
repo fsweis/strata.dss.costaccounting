@@ -1,9 +1,10 @@
 import { appConfig, getSecureService } from '@strata/core/lib';
-import { ICostConfig } from '../data/ICostConfig';
+import { ICostConfig } from './ICostConfig';
 import { IEntity } from '../../costing-configs/data/IEntity';
 import { ICostingType } from '../../costing-configs/data/ICostingType';
 import { ICostingMethod } from '../../costing-configs/data/ICostingMethod';
 import { ICostConfigSaveResult } from '../../costing-configs/data/ICostConfigSaveResult';
+import { ICostConfigSaveData } from '../../costing-configs/data/ICostConfigSaveData';
 
 const { httpGet, httpPost, httpDelete } = getSecureService(appConfig.apiUrl);
 
@@ -17,12 +18,6 @@ export const costConfigService = {
   getUtilEntities: (): Promise<IEntity[]> => {
     return httpGet<IEntity[]>(`costing-configs/entities`);
   },
-    return httpGet<ICostConfig>(`costing-configs/copy/${costingConfigGuid}`);
-  getCostConfigForCopy: (costingConfigGuid: string): Promise<ICostConfig> => {
-  },
-    return httpDelete<string>(`costing-configs/${costConfigGuid}`);
-  deleteCostConfig: (costConfigGuid: string): Promise<string> => {
-  },
   getGlPayrollEntities: (costingConfigGuid: string): Promise<IEntity[]> => {
     return httpGet<IEntity[]>(`costing-configs/filtered-entities/${costingConfigGuid}`);
   },
@@ -34,5 +29,11 @@ export const costConfigService = {
   },
   addNewConfig: (costConfigSaveData: ICostConfigSaveData): Promise<ICostConfigSaveResult> => {
     return httpPost<ICostConfigSaveResult>(`costing-configs/`, costConfigSaveData);
+  },
+  getCostConfigForCopy: (costingConfigGuid: string): Promise<ICostConfig> => {
+    return httpGet<ICostConfig>(`costing-configs/copy/${costingConfigGuid}`);
+  },
+  deleteCostConfig: (costConfigGuid: string): Promise<string> => {
+    return httpDelete<string>(`costing-configs/${costConfigGuid}`);
   }
 };

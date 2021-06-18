@@ -67,7 +67,6 @@ const CostMenu: React.FC<ICostMenuProps> = ({ costConfigsFiltered, costConfigs, 
     history.push(`/${currentLocation}/${newConfig.costingConfigGuid}`);
   };
 
-
   const handleChangeConfigs = (costingConfigGuid: string) => {
     const currentLocation = location.pathname.split('/')[1];
     history.push(`/${currentLocation}/${costingConfigGuid}`);
@@ -77,7 +76,7 @@ const CostMenu: React.FC<ICostMenuProps> = ({ costConfigsFiltered, costConfigs, 
   const handleCopyConfigs = (costingConfigGuid: string) => {
     setCopyCostingConfigGuid(costingConfigGuid);
     setCostingConfigsModalVisible(false);
-    setModelModalVisibleVisible(true);
+    setCostingConfigModalVisible(true);
   };
 
   return (
@@ -149,7 +148,7 @@ const CostMenu: React.FC<ICostMenuProps> = ({ costConfigsFiltered, costConfigs, 
           </Menu.Item>
         </Menu.ItemGroup>
       </Menu>
-<CostingConfigModal
+      <CostingConfigModal
         visible={costingConfigModalVisible}
         onCancel={() => {
           setCostingConfigModalVisible(false);
@@ -157,18 +156,15 @@ const CostMenu: React.FC<ICostMenuProps> = ({ costConfigsFiltered, costConfigs, 
         onSave={() => {
           setCostingConfigModalVisible(false);
         }}
-
-                onAddConfig={(costingConfig: ICostConfig) => handleAddConfig(costingConfig)}
+        onAddConfig={(costingConfig: ICostConfig) => handleAddConfig(costingConfig)}
       ></CostingConfigModal>
-      
+
       <CostingConfigsModal
         onCancel={() => setCostingConfigsModalVisible(false)}
         onChangeConfigs={(costingConfigGuid: string) => handleChangeConfigs(costingConfigGuid)}
         onCopyConfig={(costingConfigGuid: string) => handleCopyConfigs(costingConfigGuid)}
         visible={costingConfigsModalVisible}
       ></CostingConfigsModal>
-
-
     </>
   );
 };
