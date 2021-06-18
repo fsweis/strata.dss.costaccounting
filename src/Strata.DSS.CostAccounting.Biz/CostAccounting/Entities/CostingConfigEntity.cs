@@ -15,6 +15,7 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.Entities
         public bool IsEditable { get; set; }
         public DateTime CreatedAt { get; set; }
         public Guid GLDataTableGuid { get; set; }
+        public byte DefaultMethod { get; set; }
         public Int16 DefaultChargeAllocationMethod { get; set; }
         public string Description { get; set; }
         public string CubePartitionName { get; set; }

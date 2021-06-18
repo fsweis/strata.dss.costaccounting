@@ -41,7 +41,7 @@ interface IConfigForm {
   glPayrollEntities: string[];
   isUtilizingEntities: number;
   utilEntities: string[];
-  method: number;
+  defaultMethod: number;
   options: number[];
 }
 
@@ -101,7 +101,7 @@ const CostingConfigModal: React.FC<IModelModalProps> = (props: IModelModalProps)
           glPayrollEntities: fEntities ? fEntities : [],
           isUtilizingEntities: 0,
           utilEntities: uEntities ? uEntities : [],
-          method: 0,
+          defaultMethod: 0,
           options: []
         };
         setConfigForm(configForm);
@@ -155,7 +155,8 @@ const CostingConfigModal: React.FC<IModelModalProps> = (props: IModelModalProps)
       name: values.name,
       description: values.description,
       isGLCosting: true,
-      defaultChargeAllocationMethod: values.method,
+      defaultChargeAllocationMethod: 0,
+      defaultMethod: values.defaultMethod,
       fiscalYearId: values.year,
       fiscalMonthId: values.ytdMonth,
       type: values.type,
@@ -289,7 +290,7 @@ const CostingConfigModal: React.FC<IModelModalProps> = (props: IModelModalProps)
           )}
           {costingType === 0 && (
             <Spacing itemSpacing={16}>
-              <Form.Item label='Method' name='method' rules={[{ required: true }]}>
+              <Form.Item label='Method' name='defaultMethod' rules={[{ required: true }]}>
                 <RadioGroup
                   options={costingMethods.map((costingMethod, index) => {
                     return { value: index, label: costingMethod.friendlyName };

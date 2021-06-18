@@ -29,7 +29,8 @@ export const newCostConfig = (costConfig: Partial<ICostConfig> = {}): ICostConfi
       fiscalMonthId: 0,
       isPayrollCosting: false,
       isBudgetedAndActualCosting: false,
-      isUtilizationEntityConfigured: false
+      isUtilizationEntityConfigured: false,
+      defaultMethod: 0
     },
     ...costConfig
   };
