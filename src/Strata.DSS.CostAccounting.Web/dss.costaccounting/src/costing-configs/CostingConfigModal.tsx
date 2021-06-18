@@ -157,15 +157,15 @@ const CostingConfigModal: React.FC<IModelModalProps> = (props: IModelModalProps)
       fiscalYearId: values.year,
       fiscalMonthId: values.ytdMonth,
       type: values.type,
-      isPayrollCosting: values.options ? values.options.includes(2) : false,
-      isBudgetedAndActualCosting: values.options ? values.options.includes(1) : false,
+      isPayrollCosting: values.type === CostingTypes.PatientCare ? values.options.includes(2) : false,
+      isBudgetedAndActualCosting: values.type === CostingTypes.PatientCare ? values.options.includes(1) : false,
       isUtilizationEntityConfigured: values.isUtilizingEntities === 1,
       createdAt: new Date(),
       modifiedAtUtc: new Date()
     };
 
     const glPayrollEntities = values.glPayrollEntities.map((x) => +x);
-    const utilEntities = values.utilEntities ? values.utilEntities.map((x) => +x) : [];
+    const utilEntities = values.type === CostingTypes.PatientCare ? values.utilEntities.map((x) => +x) : [];
     const configSaveData: ICostConfigSaveData = {
       costingConfig: newConfig,
       glPayrollEntities: glPayrollEntities,
