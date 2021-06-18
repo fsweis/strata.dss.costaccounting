@@ -45,7 +45,7 @@ interface IConfigForm {
   options: number[];
 }
 
-const CostingConfigModal: React.FC<IModelModalProps> = (props: IModelModalProps) => {
+const ConfigureCostingConfigModal: React.FC<IModelModalProps> = (props: IModelModalProps) => {
   const [form] = Form.useForm();
   const [fiscalYears, setFiscalYears] = useState<IFiscalYear[]>([]);
   const [fiscalMonths, setFiscalMonths] = useState<IFiscalMonth[]>([]);
@@ -311,4 +311,4 @@ const CostingConfigModal: React.FC<IModelModalProps> = (props: IModelModalProps)
   );
 };
 
-export default CostingConfigModal;
+export default ConfigureCostingConfigModal;

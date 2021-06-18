@@ -5,7 +5,7 @@ import ButtonMenu from '@strata/tempo/lib/buttonmenu';
 import Icon from '@strata/tempo/lib/icon/Icon';
 import { ICostConfig, newCostConfig } from './data/ICostConfig';
 import CostingConfigsModal from '../costing-configs/CostingConfigsModal';
-import CostingConfigModal from '../costing-configs/CostingConfigModal';
+import ConfigureCostingConfigModal from '../costing-configs/ConfigureCostingConfigModal';
 export interface ICostMenuProps {
   costConfigsFiltered: ICostConfig[];
   costConfigs: ICostConfig[];
@@ -14,7 +14,7 @@ export interface ICostMenuProps {
 }
 const CostMenu: React.FC<ICostMenuProps> = ({ costConfigsFiltered, costConfigs, setCostConfigs, setCostConfigsFiltered }: ICostMenuProps) => {
   const [selectedCostConfigItem, setSelectedCostConfigItem] = useState<ICostConfig>(newCostConfig());
-  const [costingConfigModalVisible, setCostingConfigModalVisible] = React.useState<boolean>(false);
+  const [costingConfigModalVisible, setConfigureCostingConfigModalVisible] = React.useState<boolean>(false);
   const [costingConfigsModalVisible, setCostingConfigsModalVisible] = React.useState<boolean>(false);
   const [copyCostingConfigGuid, setCopyCostingConfigGuid] = React.useState<string>('');
   const history = useHistory();
@@ -43,7 +43,7 @@ const CostMenu: React.FC<ICostMenuProps> = ({ costConfigsFiltered, costConfigs, 
 
   const handleClick = (key: React.Key) => {
     if (key === '1') setCostingConfigsModalVisible(true);
-    else if (key === '2') setCostingConfigModalVisible(true);
+    else if (key === '2') setConfigureCostingConfigModalVisible(true);
     else {
       const costConfigItem = costConfigs.find((config) => config.costingConfigGuid === key);
       if (costConfigItem) {
@@ -76,7 +76,7 @@ const CostMenu: React.FC<ICostMenuProps> = ({ costConfigsFiltered, costConfigs, 
   const handleCopyConfigs = (costingConfigGuid: string) => {
     setCopyCostingConfigGuid(costingConfigGuid);
     setCostingConfigsModalVisible(false);
-    setCostingConfigModalVisible(true);
+    setConfigureCostingConfigModalVisible(true);
   };
 
   return (
@@ -148,16 +148,16 @@ const CostMenu: React.FC<ICostMenuProps> = ({ costConfigsFiltered, costConfigs, 
           </Menu.Item>
         </Menu.ItemGroup>
       </Menu>
-      <CostingConfigModal
+      <ConfigureCostingConfigModal
         visible={costingConfigModalVisible}
         onCancel={() => {
-          setCostingConfigModalVisible(false);
+          setConfigureCostingConfigModalVisible(false);
         }}
         onSave={() => {
-          setCostingConfigModalVisible(false);
+          setConfigureCostingConfigModalVisible(false);
         }}
         onAddConfig={(costingConfig: ICostConfig) => handleAddConfig(costingConfig)}
-      ></CostingConfigModal>
+      ></ConfigureCostingConfigModal>
 
       <CostingConfigsModal
         onCancel={() => setCostingConfigsModalVisible(false)}
