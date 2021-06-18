@@ -22,8 +22,8 @@ import { ICostingType } from './data/ICostingType';
 import { ICostingMethod } from './data/ICostingMethod';
 import { ICostConfigSaveData } from './data/ICostConfigSaveData';
 import TreeDropDown, { ITreeDropDownNode } from '@strata/tempo/lib/treedropdown';
-import { getEmptyGuid } from '../shared/Utils';
 import { ICostConfig } from '../shared/data/ICostConfig';
+import { getEmptyGuid } from '../shared/Utils';
 
 interface IModelModalProps {
   visible: boolean;
@@ -61,7 +61,7 @@ const CostingConfigModal: React.FC<IModelModalProps> = (props: IModelModalProps)
   const [isClaimsCostingEnabled, setIsClaimsCostingEnabled] = useState<boolean>(false);
   const [isCostingEntityLevelSecurityEnabled, setIsCostingEntityLevelSecurityEnabled] = useState<boolean>(false);
   const [configForm, setConfigForm] = useState<IConfigForm>();
-
+  const emptyGuid = getEmptyGuid();
   //Load initial data
   useEffect(() => {
     const fetchData = async () => {
@@ -76,7 +76,7 @@ const CostingConfigModal: React.FC<IModelModalProps> = (props: IModelModalProps)
         const [fiscalMonths, fiscalYears, glPayrollEntities, utilEntities, costingTypes, costingMethods] = await Promise.all([
           dateService.getFiscalMonths(),
           dateService.getFiscalYears(),
-          costConfigService.getGlPayrollEntities(getEmptyGuid()),
+          costConfigService.getGlPayrollEntities(emptyGuid),
           isCostingEntityLevelSecurityEnabled ? costConfigService.getUtilEntities() : [],
           costConfigService.getCostingTypes(),
           costConfigService.getCostingMethods()
@@ -102,7 +102,7 @@ const CostingConfigModal: React.FC<IModelModalProps> = (props: IModelModalProps)
           isUtilizingEntities: 0,
           utilEntities: uEntities ? uEntities : [],
           method: 0,
-          options: [0, 0]
+          options: []
         };
         setConfigForm(configForm);
       } finally {
@@ -151,22 +151,22 @@ const CostingConfigModal: React.FC<IModelModalProps> = (props: IModelModalProps)
   const onFormFinish = async (vals: { [name: string]: any }) => {
     const values = vals as IConfigForm;
     const newConfig = {
-      costingConfigGuid: getEmptyGuid(),
+      costingConfigGuid: emptyGuid,
       name: values.name,
       description: values.description,
       isGLCosting: true,
       defaultChargeAllocationMethod: values.method,
       fiscalYearId: values.year,
       fiscalMonthId: values.ytdMonth,
-      type: values.type ? values.type : 0,
-      isPayrollCosting: values.options ? values.options.indexOf(2) >= 0 : false,
-      isBudgetedAndActualCosting: values.options ? values.options.indexOf(1) >= 0 : false,
-      isUtilizationEntityConfigured: values.isUtilizingEntities ? (values.isUtilizingEntities === 1 ? true : false) : false,
+      type: values.type,
+      isPayrollCosting: values.options ? values.options.includes(2) : false,
+      isBudgetedAndActualCosting: values.options ? values.options.includes(1) : false,
+      isUtilizationEntityConfigured: values.isUtilizingEntities === 1,
       createdAt: new Date(),
       modifiedAtUtc: new Date()
     };
 
-    const glPayrollEntities = values.glPayrollEntities ? values.glPayrollEntities.map((x) => +x) : [];
+    const glPayrollEntities = values.glPayrollEntities.map((x) => +x);
     const utilEntities = values.utilEntities ? values.utilEntities.map((x) => +x) : [];
     const configSaveData: ICostConfigSaveData = {
       costingConfig: newConfig,
@@ -187,7 +187,11 @@ const CostingConfigModal: React.FC<IModelModalProps> = (props: IModelModalProps)
         props.onAddConfig(saveConfigResult.costingConfig);
         props.onSave();
       } else {
-        Toast.show({ message: saveConfigResult.message, toastType: 'error' });
+        if (saveConfigResult.message === '') {
+          Toast.show({ message: 'Changes not saved. Try again and contact your administrator if the issue continues.', toastType: 'error' });
+        } else {
+          Toast.show({ message: saveConfigResult.message, toastType: 'info' });
+        }
       }
     } finally {
       setLoading(false);
@@ -198,6 +202,7 @@ const CostingConfigModal: React.FC<IModelModalProps> = (props: IModelModalProps)
     form.resetFields();
     setCostingType(0);
     setEntityUtilType(0);
+    Toast.show({ message: 'Changes Discarded', toastType: 'info' });
     props.onCancel();
   };
 
