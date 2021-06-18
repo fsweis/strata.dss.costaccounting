@@ -18,12 +18,14 @@ import { costConfigService } from '../shared/data/costConfigService';
 import { systemSettingService } from '../shared/data/systemSettingService';
 import { dateService } from '../shared/data/dateService';
 import { RadioChangeEvent } from 'antd/lib/radio/interface';
-import { ICostingType } from './data/ICostingType';
-import { ICostingMethod } from './data/ICostingMethod';
 import { ICostConfigSaveData } from './data/ICostConfigSaveData';
 import TreeDropDown, { ITreeDropDownNode } from '@strata/tempo/lib/treedropdown';
 import { ICostConfig } from '../shared/data/ICostConfig';
 import { getEmptyGuid } from '../shared/Utils';
+import { Simultaneous_FriendlyName, SingleStepDown_FriendlyName } from './constants/CostingMethodConstants';
+import { PatientCare_FriendlyName, Claims_FriendlyName } from './constants/CostingTypeConstants';
+import { CostingMethods } from './enums/CostingMethodEnum';
+import { CostingTypes } from './enums/CostingTypeEnum';
 
 interface IModelModalProps {
   visible: boolean;
@@ -54,8 +56,6 @@ const CostingConfigModal: React.FC<IModelModalProps> = (props: IModelModalProps)
   const { setLoading } = usePageLoader();
   const [costingType, setCostingType] = useState<number>(0);
   const [entityUtilType, setEntityUtilType] = useState<number>(0);
-  const [costingTypes, setCostingTypes] = useState<ICostingType[]>([]);
-  const [costingMethods, setCostingMethods] = useState<ICostingMethod[]>([]);
   const [entityTreeData, setEntityTreeData] = useState<ITreeDropDownNode[]>([]);
   const [utilEntityTreeData, setUtilEntityTreeData] = useState<ITreeDropDownNode[]>([]);
   const [isClaimsCostingEnabled, setIsClaimsCostingEnabled] = useState<boolean>(false);
@@ -73,20 +73,17 @@ const CostingConfigModal: React.FC<IModelModalProps> = (props: IModelModalProps)
         setIsClaimsCostingEnabled(isClaimsCostingEnabled);
         setIsCostingEntityLevelSecurityEnabled(isCostingEntityLevelSecurityEnabled);
 
-        const [fiscalMonths, fiscalYears, glPayrollEntities, utilEntities, costingTypes, costingMethods] = await Promise.all([
+        const [fiscalMonths, fiscalYears, glPayrollEntities, utilEntities] = await Promise.all([
           dateService.getFiscalMonths(),
           dateService.getFiscalYears(),
           costConfigService.getGlPayrollEntities(emptyGuid),
-          isCostingEntityLevelSecurityEnabled ? costConfigService.getUtilEntities() : [],
-          costConfigService.getCostingTypes(),
-          costConfigService.getCostingMethods()
+          isCostingEntityLevelSecurityEnabled ? costConfigService.getUtilEntities() : []
         ]);
         setFiscalMonths(fiscalMonths);
         setFiscalYears(fiscalYears);
         setGlPayrollEntities(glPayrollEntities);
         setUtilEntities(utilEntities);
-        setCostingTypes(costingTypes);
-        setCostingMethods(costingMethods);
+
         //set initial form
         const year = fiscalYears.find((x) => x.fiscalYearId === new Date().getFullYear())?.fiscalYearId;
         const ytdMonth = fiscalMonths.find((x) => x.sortOrder === 12)?.fiscalMonthId;
@@ -260,9 +257,10 @@ const CostingConfigModal: React.FC<IModelModalProps> = (props: IModelModalProps)
               <Form.Item label='Type' name='type' rules={[{ required: true }]}>
                 <RadioGroup
                   onChange={handleCostingTypeChange}
-                  options={costingTypes.map((costingType, index) => {
-                    return { value: index, label: costingType.friendlyName };
-                  })}
+                  options={[
+                    { value: CostingTypes.PatientCare, label: PatientCare_FriendlyName },
+                    { value: CostingTypes.Claims, label: Claims_FriendlyName }
+                  ]}
                 />
               </Form.Item>
             )}
@@ -292,9 +290,10 @@ const CostingConfigModal: React.FC<IModelModalProps> = (props: IModelModalProps)
             <Spacing itemSpacing={16}>
               <Form.Item label='Method' name='defaultMethod' rules={[{ required: true }]}>
                 <RadioGroup
-                  options={costingMethods.map((costingMethod, index) => {
-                    return { value: index, label: costingMethod.friendlyName };
-                  })}
+                  options={[
+                    { value: CostingMethods.Simultaneous, label: Simultaneous_FriendlyName },
+                    { value: CostingMethods.SingleStepDown, label: SingleStepDown_FriendlyName }
+                  ]}
                 />
               </Form.Item>
               <Form.Item label='Additional Data' name='options' rules={[{ required: false }]}>
