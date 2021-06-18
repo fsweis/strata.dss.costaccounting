@@ -16,6 +16,9 @@ export interface ICostConfig {
   isEditable: boolean;
   glPayrollEntities: string[];
   utilEntities: string[];
+  isUtilizationEntityConfigured: boolean;
+  isBudgetedAndActualCosting: boolean;
+  isPayrollCosting: boolean;
 }
 
 export enum CostingType {
@@ -43,6 +46,9 @@ export const newCostConfig = (costConfig: Partial<ICostConfig> = {}): ICostConfi
       isEditable: true,
       glPayrollEntities: [],
       utilEntities: []
+      isUtilizationEntityConfigured: false
+      isBudgetedAndActualCosting: false,
+      isPayrollCosting: false,
     },
     ...costConfig
   };

@@ -27,7 +27,7 @@ namespace Strata.DSS.CostAccounting.Biz.StatisticDrivers.Models
             }
             DriverConfigGuid = driverConfigTemp.DriverConfigGuid;
             MeasureGuid = driverConfigTemp.MeasureGuid;
-            DataTableGuid = dtGuid;
+            DataTableGuid = (Guid)dtGuid;
             Name = driverConfigTemp.Name;
             IsUsed = isUsed;
             IsInverted = driverConfigTemp.IsInverted;

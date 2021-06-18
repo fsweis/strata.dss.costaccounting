@@ -1,12 +1,5 @@
 export interface IFiscalMonth {
   name: string;
-  fiscalMonthID: number;
+  fiscalMonthId: number;
   sortOrder: number;
-  fiscalMonthCode: string;
-  abbreviation: string;
-  daysInMonth: number;
-  yTDDaysInMonth: number;
-  monthColumnName: string;
-  daysInLeapYearMonth: number;
-  yTDDaysInLeapYearMonth: number;
 }

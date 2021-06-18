@@ -4,16 +4,13 @@ using Microsoft.AspNetCore.Mvc;
 using Strata.DSS.CostAccounting.Api.DTOs;
 using Strata.DSS.CostAccounting.Biz.CostAccounting.Models;
 using Strata.DSS.CostAccounting.Biz.CostAccounting.Repositories;
+using Strata.DSS.CostAccounting.Biz.CostingConfigs.Models;
+using Strata.DSS.CostAccounting.Biz.CostingConfigs.Services;
 using Strata.DSS.CostAccounting.Biz.Enums;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
-using Strata.ApiLib.Standard.Models;
-using Strata.DSS.CostAccounting.Biz.CostingConfigs.Services;
-using Strata.DSS.CostAccounting.Biz.CostingConfigs.Models;
 
 namespace Strata.DSS.CostAccounting.Api.Controllers
 {
@@ -26,11 +23,13 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
         private readonly ICostingConfigRepository _costingConfigRepository;
         private readonly IEntityService _entityService;
         private readonly ICostingConfigService _costingConfigService;
-        public CostingConfigController(ICostingConfigRepository costingConfigRepository, IEntityService entityService, ICostingConfigService costingConfigService)
+        private readonly ISystemSettingRepository _systemSettingRepository;
+        public CostingConfigController(ICostingConfigRepository costingConfigRepository, IEntityService entityService, ICostingConfigService costingConfigService, ISystemSettingRepository systemSettingRepository)
         {
             _costingConfigRepository = costingConfigRepository;
             _entityService = entityService;
             _costingConfigService = costingConfigService;
+            _systemSettingRepository = systemSettingRepository;
         }
 
         [HttpGet("")]
@@ -66,71 +65,40 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
             return Ok(new CostingConfigDto(costingConfig));
         }
 
-        [HttpPost]
+        [HttpGet("entities")]
         [ProducesResponseType(200)]
-        public async Task<ActionResult<List<CostingConfigModel>>> SaveStatisticDrivers([FromBody] CostingConfigModel costingConfgData
-                                                                                                , CancellationToken cancellationToken)
+        public async Task<IEnumerable<Entity>> GetEntities(CancellationToken cancellationToken)
         {
-            return Ok();
+            var entities = await _entityService.GetEntities(cancellationToken);
+            return entities;
+        }
+        [HttpGet("filtered-entities/{costingConfigGuid}")]
+        [ProducesResponseType(200)]
+        public async Task<IEnumerable<Entity>> GetFilteredEntities([FromRoute] Guid costingConfigGuid, CancellationToken cancellationToken)
+        {
+            var isCostingEntityLevelSecurityEnabled = await _systemSettingRepository.GetIsCostingEntityLevelSecurityEnabledAsync(cancellationToken);
+
+            var entities = await _entityService.GetFilteredEntities(costingConfigGuid, isCostingEntityLevelSecurityEnabled, cancellationToken);
+            return entities;
         }
 
-        [HttpGet("fiscal-month")]
+        [HttpGet("costing-methods")]
         [ProducesResponseType(200)]
-        public async Task<ActionResult<IEnumerable<FiscalMonth>>> GetFiscalMonths(CancellationToken cancellationToken)
+        public IEnumerable<ConfigCostingMethod> GetCostingMethods()
         {
-            var fiscalMonths = await _costingConfigRepository.GetFiscalMonthsAsync(cancellationToken);
-            fiscalMonths = fiscalMonths.Where(x => x.FiscalMonthID != 0).OrderBy(x => x.SortOrder);
-            return Ok(fiscalMonths);
-
+            var methods = new List<ConfigCostingMethod> { ConfigCostingMethod.GetByMethod(CostingMethod.Simultaneous), ConfigCostingMethod.GetByMethod(CostingMethod.SingleStepDown) };
+            return methods;
         }
 
-
-        [HttpGet("fiscal-year")]
+        [HttpGet("costing-types")]
         [ProducesResponseType(200)]
-        public async Task<ActionResult<IEnumerable<FiscalYear>>> GetFiscalYears(CancellationToken cancellationToken)
+        public async Task<IEnumerable<ConfigCostingType>> GetCostingTypes(CancellationToken cancellationToken)
         {
-            var fiscalYears = await _costingConfigRepository.GetFiscalYearsAsync(cancellationToken);
-            fiscalYears = fiscalYears.Where(x => x.FiscalYearID != 0).OrderBy(x => x.Name);
-            return Ok(fiscalYears);
-
-        }
-
-        [HttpGet("entity")]
-        [ProducesResponseType(200)]
-        public async Task<ActionResult<IEnumerable<Entity>>> GetEntities(CancellationToken cancellationToken)
-        {
-            var entities = await _entityService.GetEntities();
-            return Ok(entities);
-        }
-        [HttpGet("filtered-entity")]
-        [ProducesResponseType(200)]
-        public async Task<ActionResult<IEnumerable<Entity>>> GetFilteredEntities(CancellationToken cancellationToken)
-        {
-            //get system setting for costing entity security
-            var systemSettings = await _costingConfigRepository.GetSystemSettingsAsync(cancellationToken);
-            var isCostingEntityLevelSecurityEnabled = systemSettings.Any(x => x.IsCostingEntityLevelSecurityEnabled());
-            var entities = await _entityService.GetFilteredEntities(null, isCostingEntityLevelSecurityEnabled);
-            return Ok(entities);
-        }
-
-        [HttpGet("costing-method")]
-        [ProducesResponseType(200)]
-        public ActionResult<IEnumerable<ConfigCostingMethod>> GetCostingMethods(CancellationToken cancellationToken)
-        {
-            var methods = new List<ConfigCostingMethod> { ConfigCostingMethod.LoadByMethod(CostingMethod.Simultaneous), ConfigCostingMethod.LoadByMethod(CostingMethod.SingleStepDown) };
-            return Ok(methods);
-        }
-
-        [HttpGet("costing-type")]
-        [ProducesResponseType(200)]
-        public async Task<ActionResult<IEnumerable<ConfigCostingType>>> GetCostingTypes(CancellationToken cancellationToken)
-        {
-            var systemSettings = await _costingConfigRepository.GetSystemSettingsAsync(cancellationToken);
-            var isClaimsCostingEnabled = systemSettings.Any(x => x.IsClaimsCostingEnabled());
+            var isClaimsCostingEnabled = await _systemSettingRepository.GetIsClaimsCostingEnabledAsync(cancellationToken);
 
             if (isClaimsCostingEnabled)
             {
-                return new List<ConfigCostingType> { ConfigCostingType.LoadByType(CostingType.PatientCare), ConfigCostingType.LoadByType(CostingType.Claims) };
+                return new List<ConfigCostingType> { ConfigCostingType.GetByType(CostingType.PatientCare), ConfigCostingType.GetByType(CostingType.Claims) };
             }
             else
             {
@@ -138,19 +106,9 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
             }
         }
 
-        [HttpGet("costing-permissions")]
+        [HttpPost("")]
         [ProducesResponseType(200)]
-        public async Task<ActionResult<CostingPermissions>> GetCostingPermissions(CancellationToken cancellationToken)
-        {
-            var systemSettings = await _costingConfigRepository.GetSystemSettingsAsync(cancellationToken);
-            var isClaimsCostingEnabled = systemSettings.Any(x => x.IsClaimsCostingEnabled());
-            var isCostingEntityLevelSecurityEnabled = systemSettings.Any(x => x.IsCostingEntityLevelSecurityEnabled());
-            return new CostingPermissions { IsClaimsCostingEnabled = isClaimsCostingEnabled, IsCostingEntityLevelSecurityEnabled = isCostingEntityLevelSecurityEnabled };
-        }
-
-        [HttpPost("new-config")]
-        [ProducesResponseType(200)]
-        public async Task<ActionResult<CostConfigSaveResult>> AddNewConfig([FromBody] CostingConfigDto costingConfigDto, CancellationToken cancellationToken)
+        public async Task<CostConfigSaveResult> AddNewConfig([FromBody] CostingConfigSaveData costConfigSaveData, CancellationToken cancellationToken)
         {
             var costingConfigModel = new CostingConfigModel()
             {

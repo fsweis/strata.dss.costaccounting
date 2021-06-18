@@ -37,9 +37,9 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.DbContexts
 
         public virtual DbSet<SystemSetting> SystemSettings { get; set; }
 
-        public virtual DbSet<CostingConfigEntityLevelSecurity> CCELS { get; set; }
+        public virtual DbSet<CostingConfigEntityLevelSecurity> CostingConfigEntityLevelSecurities { get; set; }
 
-        public virtual DbSet<CostingConfigEntityLinkage> CCELinks { get; set; }
+        public virtual DbSet<CostingConfigEntityLinkage> CostingConfigEntityLinkages { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -62,22 +62,22 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.DbContexts
             });
             modelBuilder.Entity<SystemSetting>(entity =>
             {
-                entity.HasKey(e => e.SystemSettingID);
+                entity.HasKey(e => e.SystemSettingId);
                 entity.ToTable("SystemSetting", "dss");
             });
             modelBuilder.Entity<Entity>(entity =>
             {
-                entity.HasKey(e => e.EntityID);
+                entity.HasKey(e => e.EntityId);
                 entity.ToTable("DimEntity", "fw");
             });
             modelBuilder.Entity<FiscalMonth>(entity =>
             {
-                entity.HasKey(e => e.FiscalMonthID);
+                entity.HasKey(e => e.FiscalMonthId);
                 entity.ToTable("DimFiscalMonth", "fw");
             });
             modelBuilder.Entity<FiscalYear>(entity =>
             {
-                entity.HasKey(e => e.FiscalYearID);
+                entity.HasKey(e => e.FiscalYearId);
                 entity.ToTable("DimFiscalYear", "fw");
             });
 
@@ -144,17 +144,17 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.DbContexts
 
             modelBuilder.Entity<RuleSet>(entity =>
             {
-                entity.HasKey(e => e.RuleSetID);
+                entity.HasKey(e => e.RuleSetId);
                 entity.ToTable("RuleSet", "dbo");
             });
             modelBuilder.Entity<CostingConfigEntityLevelSecurity>(entity =>
             {
-                entity.HasKey(e => e.CostingConfigEntityLevelSecurityID);
+                entity.HasKey(e => e.CostingConfigEntityLevelSecurityId);
                 entity.ToTable("CostingConfigEntityLevelSecurity", "dss");
             });
             modelBuilder.Entity<CostingConfigEntityLinkage>(entity =>
             {
-                entity.HasKey(e => e.CostingConfigEntityLinkageID);
+                entity.HasKey(e => e.CostingConfigEntityLinkageId);
                 entity.ToTable("CostingConfigEntityLinkage", "dss");
             });
         }

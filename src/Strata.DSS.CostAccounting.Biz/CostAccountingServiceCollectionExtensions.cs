@@ -13,11 +13,11 @@ using Strata.SMC.Client;
 using Strata.SqlTools.Configuration.SqlServer;
 using System;
 using System.Threading;
+using System.Threading.Tasks;
 using Strata.CoreLib.Claims.Extensions;
 using Strata.SMC.Client;
 using Microsoft.Data.SqlClient;
 using Strata.DSS.CostAccounting.Biz.CostingConfigs.Services;
-using System.Threading.Tasks;
 
 // ReSharper disable once CheckNamespace
 namespace Microsoft.Extensions.DependencyInjection
@@ -29,6 +29,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddScoped<ICostAccountingRepository, CostAccountingRepository>();
             services.AddScoped<ICostingConfigRepository, CostingConfigRepository>();
             services.AddScoped<IStatisticDriversRepository, StatisticDriversRepository>();
+            services.AddScoped<ISystemSettingRepository, SystemSettingRepository>();
             services.AddScoped<IStatisticDriversService, StatisticDriversService>();
             services.AddScoped<IDataSourceService, DataSourceService>();
             services.AddScoped<IDataSourceLinkService, DataSourceLinkService>();

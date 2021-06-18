@@ -1,5 +1,5 @@
 export interface IEntity {
-  entityID: number;
+  entityId: number;
   code: string;
   description: string;
   sortOrder: number;

@@ -22,14 +22,14 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.Repositories
 
         public async Task<IEnumerable<CostAccountingModel>> GetAllCostAccountingsAsync(CancellationToken cancellationToken)
         {
-            await using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
+            var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
             var entities = await dbContext.CostAccountings.ToListAsync(cancellationToken);
             return entities.Select(ToModel);
         }
 
         public async Task<CostAccountingModel> GetCostAccountingAsync(Guid id, CancellationToken cancellationToken)
         {
-            await using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
+            var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
             var entity = await dbContext.CostAccountings.FindAsync(new object[] { id }, cancellationToken);
 
             return ToModel(entity);
@@ -46,29 +46,66 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.Repositories
 
         public async Task<IList<Measure>> GetMeasuresAsync(IList<Guid> dataTableGuids, CancellationToken cancellationToken)
         {
-            await using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
+            var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
             var measures = await dbContext.Measures.Where(m => dataTableGuids.Contains(m.DataTableGuid) && m.MeasureGuid != Guid.Empty).ToListAsync(cancellationToken);
             return measures;
         }
-        public async Task<IList<DataTable>> GetDataTablesAsync(IList<string> globalIDs, CancellationToken cancellationToken)
+        public async Task<IList<DataTable>> GetDataTablesAsync(IList<string> globalIds, CancellationToken cancellationToken)
         {
-            await using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
-            var dataTables = await dbContext.DataTables.Where(dt => globalIDs.Contains(dt.GlobalID) && dt.GlobalID != "").ToListAsync(cancellationToken);
+            var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
+            var dataTables = await dbContext.DataTables.Where(dt => globalIds.Contains(dt.GlobalId) && dt.GlobalId != "").ToListAsync(cancellationToken);
             return dataTables;
         }
         public async Task<IList<RuleEngineIncludedMeasure>> GetRuleEngineIncludedMeasuresAsync(CancellationToken cancellationToken)
         {
-            await using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
+            var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
             var measures = await dbContext.RuleEngineIncludedMeasures.ToListAsync(cancellationToken);
             return measures;
         }
 
         public async Task<IList<RuleSet>> GetRuleSetsAsync(CancellationToken cancellationToken)
         {
-            await using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
+            var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
             var ruleSets = await dbContext.RuleSets.ToListAsync(cancellationToken);
             return ruleSets;
         }
 
+        public async Task<IEnumerable<FiscalMonth>> GetFiscalMonthsAsync(CancellationToken cancellationToken)
+        {
+            await using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
+            var fiscalMonths = await dbContext.FiscalMonths.ToListAsync(cancellationToken);
+
+            if (!fiscalMonths.Any())
+            {
+                return null;
+            }
+
+            return fiscalMonths;
+        }
+
+        public async Task<IEnumerable<FiscalYear>> GetFiscalYearsAsync(CancellationToken cancellationToken)
+        {
+            await using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
+            var fiscalYears = await dbContext.FiscalYears.ToListAsync(cancellationToken);
+
+            if (!fiscalYears.Any())
+            {
+                return null;
+            }
+
+            return fiscalYears;
+        }
+        public async Task<IEnumerable<Entity>> GetEntitiesAsync(CancellationToken cancellationToken)
+        {
+            await using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
+            var entities = await dbContext.Entities.Where(x => x.Description != "").ToListAsync(cancellationToken);
+
+            if (!entities.Any())
+            {
+                return null;
+            }
+
+            return entities;
+        }
     }
 }

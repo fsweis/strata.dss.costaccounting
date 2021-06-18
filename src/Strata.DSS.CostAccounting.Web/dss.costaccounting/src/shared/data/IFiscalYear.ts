@@ -1,5 +1,5 @@
 export interface IFiscalYear {
   name: string;
-  fiscalYearID: number;
+  fiscalYearId: number;
   sortOrder: string;
 }

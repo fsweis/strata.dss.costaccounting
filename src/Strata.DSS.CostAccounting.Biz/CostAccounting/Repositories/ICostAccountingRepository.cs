@@ -14,5 +14,8 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.Repositories
         public Task<IList<Measure>> GetMeasuresAsync(IList<Guid> dataTableGuids, CancellationToken cancellationToken);
         public Task<IList<RuleEngineIncludedMeasure>> GetRuleEngineIncludedMeasuresAsync(CancellationToken cancellationToken);
         public Task<IList<RuleSet>> GetRuleSetsAsync(CancellationToken cancellationToken);
+        public Task<IEnumerable<FiscalMonth>> GetFiscalMonthsAsync(CancellationToken cancellationToken);
+        public Task<IEnumerable<FiscalYear>> GetFiscalYearsAsync(CancellationToken cancellationToken);
+        public Task<IEnumerable<Entity>> GetEntitiesAsync(CancellationToken cancellationToken);
     }
 }

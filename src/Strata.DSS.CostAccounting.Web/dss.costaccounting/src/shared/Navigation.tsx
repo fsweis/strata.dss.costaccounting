@@ -20,6 +20,7 @@ import CostMenu from './CostMenu';
 import CostConfigProvider from './data/CostConfigProvider';
 import { costConfigService } from './data/costConfigService';
 import { ICostConfig } from './data/ICostConfig';
+import { systemSettingService } from './data/systemSettingService';
 const Navigation: React.FC = () => {
   const [costConfigGuid, setCostConfigGuid] = React.useState<string>('');
   const [costConfigsFiltered, setCostConfigsFiltered] = React.useState<ICostConfig[]>([]);
@@ -29,11 +30,10 @@ const Navigation: React.FC = () => {
   const history = useHistory();
   useEffect(() => {
     const fetchData = async () => {
-      const [costingConfigurations] = await Promise.all([costConfigService.getCostConfigs()]);
+      const [costingConfigurations, currentFiscalYear] = await Promise.all([costConfigService.getCostConfigs(), systemSettingService.getCurrentFiscalYear()]);
       setCostConfigs(costingConfigurations);
       if (costingConfigurations.length > 0) {
-        const year = new Date().getFullYear();
-        const sorted = costingConfigurations.filter((c) => year - c.fiscalYearID <= 1).sort((a, b) => a.name.localeCompare(b.name));
+        const sorted = costingConfigurations.filter((c) => currentFiscalYear - c.fiscalYearId <= 1).sort((a, b) => a.name.localeCompare(b.name));
         setCostConfigsFiltered(sorted);
         setCostConfigGuid(sorted[0].costingConfigGuid);
       }
@@ -62,7 +62,12 @@ const Navigation: React.FC = () => {
         </Layout.Nav>
         <Layout>
           <Layout.Sider collapsible>
-            <CostMenu costConfigsFiltered={costConfigsFiltered} costConfigs={costConfigs} />
+            <CostMenu
+              costConfigsFiltered={costConfigsFiltered}
+              costConfigs={costConfigs}
+              setCostConfigs={(costConfigs: ICostConfig[]) => setCostConfigs(costConfigs)}
+              setCostConfigsFiltered={(costConfigs: ICostConfig[]) => setCostConfigsFiltered(costConfigs)}
+            />
           </Layout.Sider>
           <Layout.Content>
             <CostConfigProvider costingConfigGuid={costConfigGuid}>
