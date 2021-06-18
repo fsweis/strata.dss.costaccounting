@@ -43,8 +43,10 @@ const CostMenu: React.FC<ICostMenuProps> = ({ costConfigsFiltered, costConfigs, 
 
   const handleClick = (key: React.Key) => {
     if (key === '1') setCostingConfigsModalVisible(true);
-    else if (key === '2') setConfigureCostingConfigModalVisible(true);
-    else {
+    else if (key === '2') {
+      setCopyCostingConfigGuid('');
+      setConfigureCostingConfigModalVisible(true);
+    } else {
       const costConfigItem = costConfigs.find((config) => config.costingConfigGuid === key);
       if (costConfigItem) {
         const currentLocation = location.pathname.split('/')[1];
@@ -150,6 +152,7 @@ const CostMenu: React.FC<ICostMenuProps> = ({ costConfigsFiltered, costConfigs, 
       </Menu>
       <ConfigureCostingConfigModal
         visible={costingConfigModalVisible}
+        costingConfigGuid={copyCostingConfigGuid}
         onCancel={() => {
           setConfigureCostingConfigModalVisible(false);
         }}

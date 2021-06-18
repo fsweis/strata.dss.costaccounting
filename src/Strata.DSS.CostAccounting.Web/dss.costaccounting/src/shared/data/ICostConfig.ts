@@ -7,6 +7,7 @@ export interface ICostConfig {
   isBudgetedAndActualCosting: boolean;
   isUtilizationEntityConfigured: boolean;
   defaultChargeAllocationMethod: number;
+  defaultMethod: number;
   fiscalYearId: number;
   fiscalMonthId: number;
   type: CostingType;
@@ -34,9 +35,10 @@ export const newCostConfig = (costConfig: Partial<ICostConfig> = {}): ICostConfi
       isBudgetedAndActualCosting: false,
       isUtilizationEntityConfigured: false,
       defaultChargeAllocationMethod: 0,
+      defaultMethod: 0,
       fiscalYearId: 0,
       fiscalMonthId: 0,
-      type: 0,
+      type: CostingType.PatientCare,
       createdAt: new Date(),
       modifiedAtUtc: new Date(),
       lastPublishedUtc: new Date(),

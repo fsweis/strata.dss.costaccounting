@@ -59,11 +59,11 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
 
             var dto = new CostingConfigDto(costingConfig)
             {
-                GlPayrollEntities = entityLinkages.Where(x => x.IsUtilization == false).Select(x => x.EntityId).ToList(),
-                UtilEntities = entityLinkages.Where(x => x.IsUtilization == true).Select(x => x.EntityId).ToList()
+                GlPayrollEntities = entityLinkages.Where(x => x.IsUtilization == false).Select(x => x.EntityId.ToString()).ToList(),
+                UtilEntities = entityLinkages.Where(x => x.IsUtilization == true).Select(x => x.EntityId.ToString()).ToList()
             };
 
-            return Ok(new CostingConfigDto(costingConfig));
+            return Ok(dto);
         }
 
         [HttpGet("entities")]
