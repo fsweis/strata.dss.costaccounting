@@ -8,6 +8,7 @@ using Strata.DSS.CostAccounting.Biz.CostAccounting.Constants;
 using Strata.DSS.CostAccounting.Biz.Enums;
 using Strata.DSS.CostAccounting.Biz.CostingConfigs.Models;
 using System.Threading;
+using Strata.DSS.CostAccounting.Biz.CostAccounting.Models;
 
 namespace Strata.DSS.CostAccounting.Biz.CostingConfigs.Services
 {
@@ -21,18 +22,8 @@ namespace Strata.DSS.CostAccounting.Biz.CostingConfigs.Services
             _systemSettingRepository = systemSettingRepository;
         }
 
-        public async Task<CostConfigSaveResult> AddNewConfigAsync(CostingConfigSaveData costConfigSaveData, CancellationToken cancellationToken)
+        public async Task<CostingConfigModel> AddNewConfigAsync(CostingConfigSaveData costConfigSaveData, CancellationToken cancellationToken)
         {
-            var costConfigSaveResult = new CostConfigSaveResult { Success = true, Message = "Changes Saved" };
-            var costingConfigs = await _costingConfigRepository.GetAllCostingConfigsAsync(cancellationToken);
-
-            var isDuplicate = costingConfigs.Any(x => x.Name.Equals(costConfigSaveData.CostingConfig.Name, StringComparison.OrdinalIgnoreCase));
-
-            if (isDuplicate)
-            {
-                return new CostConfigSaveResult { Success = false, Message = "Duplicate names are not allowed." };
-            }
-
             //assign defaults
             costConfigSaveData.CostingConfig.CostingConfigGuid = Guid.NewGuid();
             costConfigSaveData.CostingConfig.IsEditable = true;
@@ -46,20 +37,12 @@ namespace Strata.DSS.CostAccounting.Biz.CostingConfigs.Services
                 costConfigSaveData.CostingConfig.IsGLCosting = false;
             }
 
-            try
-            {
-                //handle add/delete linkages for existing and new configs
-                await SaveEntityLinkages(costConfigSaveData.CostingConfig.CostingConfigGuid, costConfigSaveData.CostingConfig.IsUtilizationEntityConfigured, costConfigSaveData.GlPayrollEntities, costConfigSaveData.UtilEntities, cancellationToken);
-                //save the config
-                await _costingConfigRepository.AddNewCostingConfigAsync(costConfigSaveData.CostingConfig, cancellationToken);
-            }catch(Exception e)
-            {
-                return new CostConfigSaveResult { Success = false, Message = "" };
-            }
-            
-            costConfigSaveResult.CostingConfig = costConfigSaveData.CostingConfig;
+            //handle add/delete linkages for existing and new configs
+            await SaveEntityLinkages(costConfigSaveData.CostingConfig.CostingConfigGuid, costConfigSaveData.CostingConfig.IsUtilizationEntityConfigured, costConfigSaveData.GlPayrollEntities, costConfigSaveData.UtilEntities, cancellationToken);
+            //save the config
+            await _costingConfigRepository.AddNewCostingConfigAsync(costConfigSaveData.CostingConfig, cancellationToken);
 
-            return costConfigSaveResult;
+            return costConfigSaveData.CostingConfig;
         }
 
         private async Task SaveEntityLinkages(Guid costConfigGuid, bool isUtilizationEntityConfigured, List<int> glPayrollEntityIds, List<int> utilEntityIds, CancellationToken cancellationToken)

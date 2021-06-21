@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Strata.DSS.CostAccounting.Biz.CostAccounting.Models;
 using Strata.DSS.CostAccounting.Biz.CostAccounting.Repositories;
 using Strata.DSS.CostAccounting.Biz.CostingConfigs.Models;
@@ -64,11 +65,10 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
 
         [HttpPost("")]
         [ProducesResponseType(200)]
-        public async Task<CostConfigSaveResult> AddNewConfig([FromBody] CostingConfigSaveData costConfigSaveData, CancellationToken cancellationToken)
+        public async Task<CostingConfigModel> AddNewConfig([FromBody] CostingConfigSaveData costConfigSaveData, CancellationToken cancellationToken)
         {
-
-            var saveResult = await _costingConfigService.AddNewConfigAsync(costConfigSaveData, cancellationToken);
-            return saveResult;
+            var costConfig = await _costingConfigService.AddNewConfigAsync(costConfigSaveData, cancellationToken);
+            return costConfig;
         }
 
     }

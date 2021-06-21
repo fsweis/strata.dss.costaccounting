@@ -1,9 +1,6 @@
 import { appConfig, getSecureService } from '@strata/core/lib';
 import { ICostConfig } from '../data/ICostConfig';
 import { IEntity } from '../../costing-configs/data/IEntity';
-import { ICostingType } from '../../costing-configs/data/ICostingType';
-import { ICostingMethod } from '../../costing-configs/data/ICostingMethod';
-import { ICostConfigSaveResult } from '../../costing-configs/data/ICostConfigSaveResult';
 import { ICostConfigSaveData } from '../../costing-configs/data/ICostConfigSaveData';
 
 const { httpGet, httpPost } = getSecureService(appConfig.apiUrl);
@@ -21,7 +18,7 @@ export const costConfigService = {
   getGlPayrollEntities: (costingConfigGuid: string): Promise<IEntity[]> => {
     return httpGet<IEntity[]>(`costing-configs/filtered-entities/${costingConfigGuid}`);
   },
-  addNewConfig: (costConfigSaveData: ICostConfigSaveData): Promise<ICostConfigSaveResult> => {
-    return httpPost<ICostConfigSaveResult>(`costing-configs/`, costConfigSaveData);
+  addNewConfig: (costConfigSaveData: ICostConfigSaveData): Promise<ICostConfig> => {
+    return httpPost<ICostConfig>(`costing-configs/`, costConfigSaveData);
   }
 };

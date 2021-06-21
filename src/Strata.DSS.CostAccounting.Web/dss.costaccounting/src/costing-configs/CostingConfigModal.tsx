@@ -32,6 +32,7 @@ interface IModelModalProps {
   onCancel: () => void;
   onSave: () => void;
   onAddConfig: (costingConfig: ICostConfig) => void;
+  costConfigs: ICostConfig[];
 }
 
 interface IConfigForm {
@@ -108,7 +109,7 @@ const CostingConfigModal: React.FC<IModelModalProps> = (props: IModelModalProps)
     };
     setLoading(true);
     fetchData();
-  }, [setLoading]);
+  }, [setLoading, emptyGuid]);
 
   //Set Filtered Entity Trees when entities are loaded
   useEffect(() => {
@@ -147,52 +148,52 @@ const CostingConfigModal: React.FC<IModelModalProps> = (props: IModelModalProps)
   //Form Finish
   const onFormFinish = async (vals: { [name: string]: any }) => {
     const values = vals as IConfigForm;
-    const newConfig = {
-      costingConfigGuid: emptyGuid,
-      name: values.name,
-      description: values.description,
-      isGLCosting: true,
-      defaultChargeAllocationMethod: 0,
-      defaultMethod: values.defaultMethod,
-      fiscalYearId: values.year,
-      fiscalMonthId: values.ytdMonth,
-      type: values.type,
-      isPayrollCosting: values.type === CostingTypes.PatientCare ? values.options.includes(2) : false,
-      isBudgetedAndActualCosting: values.type === CostingTypes.PatientCare ? values.options.includes(1) : false,
-      isUtilizationEntityConfigured: values.isUtilizingEntities === 1,
-      createdAt: new Date(),
-      modifiedAtUtc: new Date()
-    };
+    //Duplicate name check
+    const dupe = props.costConfigs.find((x) => x.name === values.name);
+    if (dupe !== undefined) {
+      Toast.show({ message: 'Duplicate names are not allowed.', toastType: 'info' });
+    } else {
+      //Create new cost model
+      const newConfig = {
+        costingConfigGuid: emptyGuid,
+        name: values.name,
+        description: values.description,
+        isGLCosting: true,
+        defaultChargeAllocationMethod: 0,
+        defaultMethod: values.defaultMethod,
+        fiscalYearId: values.year,
+        fiscalMonthId: values.ytdMonth,
+        type: values.type,
+        isPayrollCosting: values.type === CostingTypes.PatientCare ? values.options.includes(2) : false,
+        isBudgetedAndActualCosting: values.type === CostingTypes.PatientCare ? values.options.includes(1) : false,
+        isUtilizationEntityConfigured: values.isUtilizingEntities === 1,
+        createdAt: new Date(),
+        modifiedAtUtc: new Date()
+      };
 
-    const glPayrollEntities = values.glPayrollEntities.map((x) => +x);
-    const utilEntities = values.type === CostingTypes.PatientCare ? values.utilEntities.map((x) => +x) : [];
-    const configSaveData: ICostConfigSaveData = {
-      costingConfig: newConfig,
-      glPayrollEntities: glPayrollEntities,
-      utilEntities: utilEntities
-    };
+      const glPayrollEntities = values.glPayrollEntities.map((x) => +x);
+      const utilEntities = values.type === CostingTypes.PatientCare && values.isUtilizingEntities === 1 ? values.utilEntities.map((x) => +x) : [];
+      const configSaveData: ICostConfigSaveData = {
+        costingConfig: newConfig,
+        glPayrollEntities: glPayrollEntities,
+        utilEntities: utilEntities
+      };
 
-    try {
-      setLoading(true);
-      const saveConfigResult = await costConfigService.addNewConfig(configSaveData);
-
-      if (saveConfigResult.success) {
-        Toast.show({ message: saveConfigResult.message, toastType: 'success' });
+      try {
+        setLoading(true);
+        const newConfig = await costConfigService.addNewConfig(configSaveData);
+        Toast.show({ message: 'Changes Saved', toastType: 'success' });
         //reset form
         form.resetFields();
         setCostingType(0);
         setEntityUtilType(0);
-        props.onAddConfig(saveConfigResult.costingConfig);
+        props.onAddConfig(newConfig);
         props.onSave();
-      } else {
-        if (saveConfigResult.message === '') {
-          Toast.show({ message: 'Changes not saved. Try again and contact your administrator if the issue continues.', toastType: 'error' });
-        } else {
-          Toast.show({ message: saveConfigResult.message, toastType: 'info' });
-        }
+      } catch (error) {
+        Toast.show({ message: 'Changes not saved. Try again and contact your administrator if the issue continues.', toastType: 'error' });
+      } finally {
+        setLoading(false);
       }
-    } finally {
-      setLoading(false);
     }
   };
 
