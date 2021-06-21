@@ -23,7 +23,7 @@ namespace Strata.DSS.CostAccounting.Biz.CostingConfigs.Services
 
         public async Task<CostConfigSaveResult> AddNewConfigAsync(CostingConfigSaveData costConfigSaveData, CancellationToken cancellationToken)
         {
-            var costConfigSaveResult = new CostConfigSaveResult { Success = true, Message = "Costing Model Saved" };
+            var costConfigSaveResult = new CostConfigSaveResult { Success = true, Message = "Changes Saved" };
             var costingConfigs = await _costingConfigRepository.GetAllCostingConfigsAsync(cancellationToken);
 
             var isDuplicate = costingConfigs.Any(x => x.Name.Equals(costConfigSaveData.CostingConfig.Name, StringComparison.OrdinalIgnoreCase));
@@ -45,12 +45,18 @@ namespace Strata.DSS.CostAccounting.Biz.CostingConfigs.Services
                 costConfigSaveData.CostingConfig.IsPayrollCosting = false;
                 costConfigSaveData.CostingConfig.IsGLCosting = false;
             }
-          
-            //handle add/delete linkages for existing and new configs
-            await SaveEntityLinkages(costConfigSaveData.CostingConfig.CostingConfigGuid, costConfigSaveData.CostingConfig.IsUtilizationEntityConfigured, costConfigSaveData.GlPayrollEntities, costConfigSaveData.UtilEntities, cancellationToken);
-            //save the config
-            await _costingConfigRepository.AddNewCostingConfigAsync(costConfigSaveData.CostingConfig, cancellationToken);
 
+            try
+            {
+                //handle add/delete linkages for existing and new configs
+                await SaveEntityLinkages(costConfigSaveData.CostingConfig.CostingConfigGuid, costConfigSaveData.CostingConfig.IsUtilizationEntityConfigured, costConfigSaveData.GlPayrollEntities, costConfigSaveData.UtilEntities, cancellationToken);
+                //save the config
+                await _costingConfigRepository.AddNewCostingConfigAsync(costConfigSaveData.CostingConfig, cancellationToken);
+            }catch(Exception e)
+            {
+                return new CostConfigSaveResult { Success = false, Message = "" };
+            }
+            
             costConfigSaveResult.CostingConfig = costConfigSaveData.CostingConfig;
 
             return costConfigSaveResult;

@@ -83,30 +83,6 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
             return entities;
         }
 
-        [HttpGet("costing-methods")]
-        [ProducesResponseType(200)]
-        public IEnumerable<ConfigCostingMethod> GetCostingMethods()
-        {
-            var methods = new List<ConfigCostingMethod> { ConfigCostingMethod.GetByMethod(CostingMethod.Simultaneous), ConfigCostingMethod.GetByMethod(CostingMethod.SingleStepDown) };
-            return methods;
-        }
-
-        [HttpGet("costing-types")]
-        [ProducesResponseType(200)]
-        public async Task<IEnumerable<ConfigCostingType>> GetCostingTypes(CancellationToken cancellationToken)
-        {
-            var isClaimsCostingEnabled = await _systemSettingRepository.GetIsClaimsCostingEnabledAsync(cancellationToken);
-
-            if (isClaimsCostingEnabled)
-            {
-                return new List<ConfigCostingType> { ConfigCostingType.GetByType(CostingType.PatientCare), ConfigCostingType.GetByType(CostingType.Claims) };
-            }
-            else
-            {
-                return new List<ConfigCostingType>();
-            }
-        }
-
         [HttpPost("")]
         [ProducesResponseType(200)]
         public async Task<CostConfigSaveResult> AddNewConfig([FromBody] CostingConfigSaveData costConfigSaveData, CancellationToken cancellationToken)

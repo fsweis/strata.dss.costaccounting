@@ -21,12 +21,6 @@ export const costConfigService = {
   getGlPayrollEntities: (costingConfigGuid: string): Promise<IEntity[]> => {
     return httpGet<IEntity[]>(`costing-configs/filtered-entities/${costingConfigGuid}`);
   },
-  getCostingTypes: (): Promise<ICostingType[]> => {
-    return httpGet<ICostingType[]>(`costing-configs/costing-types`);
-  },
-  getCostingMethods: (): Promise<ICostingMethod[]> => {
-    return httpGet<ICostingMethod[]>(`costing-configs/costing-methods`);
-  },
   addNewConfig: (costConfigSaveData: ICostConfigSaveData): Promise<ICostConfigSaveResult> => {
     return httpPost<ICostConfigSaveResult>(`costing-configs/`, costConfigSaveData);
   },
