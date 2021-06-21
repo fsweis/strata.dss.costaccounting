@@ -26,6 +26,7 @@ import { Simultaneous_FriendlyName, SingleStepDown_FriendlyName } from './consta
 import { PatientCare_FriendlyName, Claims_FriendlyName } from './constants/CostingTypeConstants';
 import { CostingMethods } from './enums/CostingMethodEnum';
 import { CostingTypes } from './enums/CostingTypeEnum';
+import { EntityTypes } from './enums/EntityTypeEnum';
 
 interface IModelModalProps {
   visible: boolean;
@@ -166,13 +167,13 @@ const CostingConfigModal: React.FC<IModelModalProps> = (props: IModelModalProps)
         type: values.type,
         isPayrollCosting: values.type === CostingTypes.PatientCare ? values.options.includes(2) : false,
         isBudgetedAndActualCosting: values.type === CostingTypes.PatientCare ? values.options.includes(1) : false,
-        isUtilizationEntityConfigured: values.isUtilizingEntities === 1,
+        isUtilizationEntityConfigured: values.isUtilizingEntities === EntityTypes.Specify,
         createdAt: new Date(),
         modifiedAtUtc: new Date()
       };
 
       const glPayrollEntities = values.glPayrollEntities.map((x) => +x);
-      const utilEntities = values.type === CostingTypes.PatientCare && values.isUtilizingEntities === 1 ? values.utilEntities.map((x) => +x) : [];
+      const utilEntities = values.type === CostingTypes.PatientCare && values.isUtilizingEntities === EntityTypes.Specify ? values.utilEntities.map((x) => +x) : [];
       const configSaveData: ICostConfigSaveData = {
         costingConfig: newConfig,
         glPayrollEntities: glPayrollEntities,
@@ -275,19 +276,19 @@ const CostingConfigModal: React.FC<IModelModalProps> = (props: IModelModalProps)
                 <RadioGroup
                   onChange={handleEntityTypeChange}
                   options={[
-                    { value: 0, label: 'Same as GL/Payroll' },
-                    { value: 1, label: 'Specify' }
+                    { value: EntityTypes.GlPayroll, label: 'Same as GL/Payroll' },
+                    { value: EntityTypes.Specify, label: 'Specify' }
                   ]}
                 />
               </Form.Item>
-              {entityUtilType === 1 && (
+              {entityUtilType === EntityTypes.Specify && (
                 <Form.Item label='Specifiy Utilization Entities' name='utilEntities' rules={[{ required: true }]}>
                   <TreeDropDown treeData={utilEntityTreeData} selectionMode='multiple' treeDefaultExpandedKeys={['0']} />
                 </Form.Item>
               )}
             </Spacing>
           )}
-          {costingType === 0 && (
+          {costingType === CostingTypes.PatientCare && (
             <Spacing itemSpacing={16}>
               <Form.Item label='Method' name='defaultMethod' rules={[{ required: true }]}>
                 <RadioGroup
