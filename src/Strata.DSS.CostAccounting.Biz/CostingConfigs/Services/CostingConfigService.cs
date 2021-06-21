@@ -50,7 +50,7 @@ namespace Strata.DSS.CostAccounting.Biz.CostingConfigs.Services
 
             var isCostingEntityLevelSecurityEnabled = await _systemSettingRepository.GetIsCostingEntityLevelSecurityEnabledAsync(cancellationToken);
 
-            var existingLinkages = await _costingConfigRepository.GetCCELinksByConfigGuidAsync(costConfigGuid, cancellationToken);
+            var existingLinkages = await _costingConfigRepository.GetCostingConfigEntityLinkagesAsync(costConfigGuid, cancellationToken);
             var utilEntityLinkages = existingLinkages?.Where(l => l.IsUtilization);
             var glPayrollEntityLinkages = existingLinkages?.Where(l => !l.IsUtilization);
 
