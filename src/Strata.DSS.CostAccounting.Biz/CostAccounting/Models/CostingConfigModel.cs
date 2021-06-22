@@ -10,13 +10,13 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.Models
         public bool IsGLCosting { get; set; }
         public bool IsPayrollCosting { get; set; }
         public Guid PayrollDataTableGuid { get; set; }
-        public Int16 FiscalYearId { get; set; }
+        public short FiscalYearId { get; set; }
         public CostingType Type { get; set; }
         public bool IsEditable { get; set; }
         public DateTime CreatedAt { get; set; }
         public Guid GLDataTableGuid { get; set; }
         public byte DefaultMethod { get; set; }
-        public Int16 DefaultChargeAllocationMethod { get; set; }
+        public short DefaultChargeAllocationMethod { get; set; }
         public string Description { get; set; }
         public string CubePartitionName { get; set; }
         public bool IsBudgetedAndActualCosting { get; set; }
