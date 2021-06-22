@@ -18,6 +18,7 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.Entities
         public Guid GLDataTableGuid { get; set; }
         public short DefaultChargeAllocationMethod { get; set; }
         public byte DefaultMethod { get; set; }
+        public short DefaultChargeAllocationMethod { get; set; }
         public string Description { get; set; }
         public string CubePartitionName { get; set; }
         public bool IsBudgetedAndActualCosting { get; set; }

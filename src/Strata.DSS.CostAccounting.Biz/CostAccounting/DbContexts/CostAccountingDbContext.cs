@@ -11,8 +11,6 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.DbContexts
     // and the following sample: https://git.sdt.local/projects/DOCKER/repos/strata.demos.microservices.reviews/browse
     public class CostAccountingDbContext : DbContext
     {
-        public DbSet<CostAccountingEntity> CostAccountings { get; set; }
-
         public CostAccountingDbContext(DbContextOptions<CostAccountingDbContext> options) : base(options)
         {
         }

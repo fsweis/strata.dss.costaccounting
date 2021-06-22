@@ -8,7 +8,6 @@ import Input from '@strata/tempo/lib/input';
 import { costConfigService } from '../shared/data/costConfigService';
 import ActionBar from '@strata/tempo/lib/actionbar';
 import DataGrid, { IGlobalFilterValue } from '@strata/tempo/lib/datagrid/DataGrid';
-
 export interface ICostingConfigsModalProps {
   visible: boolean;
   onCancel: () => void;
@@ -17,9 +16,9 @@ export interface ICostingConfigsModalProps {
 }
 
 const CostingConfigsModal: React.FC<ICostingConfigsModalProps> = (props: ICostingConfigsModalProps) => {
-  const [costModels, setCostModels] = useState<ICostConfig[]>([]);
+  const [costingConfigModalVisible, setCostingConfigModalVisible] = React.useState<boolean>(false);
+  const [costConfigs, setCostConfigs] = useState<ICostConfig[]>([]);
   const [globalFilterValue, setGlobalFilterValue] = useState<IGlobalFilterValue>({ fields: ['name', 'description'], value: '' });
-
   useEffect(() => {
     const fetchData = async () => {
       const costModels = await costConfigService.getCostConfigs();
@@ -33,6 +32,10 @@ const CostingConfigsModal: React.FC<ICostingConfigsModalProps> = (props: ICostin
     props.onCancel();
   };
 
+  const handleAddConfig = (newConfig: ICostConfig) => {
+    //const newCostConfigs = [...costConfigs, newConfig];
+    setCostingConfigModalVisible(false);
+  };
   const handleChangeConfigs = (costingConfigGuid: string) => {
     props.onChangeConfigs(costingConfigGuid);
   };
@@ -52,7 +55,21 @@ const CostingConfigsModal: React.FC<ICostingConfigsModalProps> = (props: ICostin
   return (
     <>
       <Modal title='All Models' visible={props.visible} onCancel={handleCancel} footer={null} width='extraLarge'>
-        <ActionBar filters={<Input search width={200} onChange={(e) => setGlobalFilterValue({ fields: ['name', 'description'], value: e.target.value })} />} />
+        <ActionBar 
+            filters={<Input search width={200} onChange={(e) => setGlobalFilterValue({ fields: ['name', 'description'], value: e.target.value })} />} 
+          actions={
+            <>
+              <Button
+                icon='Plus'
+                onClick={() => {
+                  setCostingConfigModalVisible(true);
+                }}
+              >
+                Add Model
+              </Button>
+            </>
+          }
+        />
         <DataGrid key='allModelsGrid' scrollable dataKey='costingConfigGuid' value={costModels} globalFilterValue={globalFilterValue}>
           <DataGrid.RowNumber />
           <DataGrid.Column
@@ -93,8 +110,15 @@ const CostingConfigsModal: React.FC<ICostingConfigsModalProps> = (props: ICostin
           ></DataGrid.Column>
         </DataGrid>
       </Modal>
+      <CostingConfigModal
+        visible={costingConfigModalVisible}
+        onCancel={() => {
+          setCostingConfigModalVisible(false);
+        }}
+        onSave={(costingConfig: ICostConfig) => handleAddConfig(costingConfig)}
+        costConfigs={costConfigs}
+      ></CostingConfigModal>
     </>
   );
 };
-
 export default CostingConfigsModal;

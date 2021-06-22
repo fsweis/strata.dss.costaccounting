@@ -1,9 +1,6 @@
 import { appConfig, getSecureService } from '@strata/core/lib';
 import { ICostConfig } from './ICostConfig';
 import { IEntity } from '../../costing-configs/data/IEntity';
-import { ICostingType } from '../../costing-configs/data/ICostingType';
-import { ICostingMethod } from '../../costing-configs/data/ICostingMethod';
-import { ICostConfigSaveResult } from '../../costing-configs/data/ICostConfigSaveResult';
 import { ICostConfigSaveData } from '../../costing-configs/data/ICostConfigSaveData';
 
 const { httpGet, httpPost, httpDelete } = getSecureService(appConfig.apiUrl);

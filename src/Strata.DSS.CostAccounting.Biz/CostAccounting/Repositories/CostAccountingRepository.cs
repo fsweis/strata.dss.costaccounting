@@ -20,30 +20,6 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.Repositories
             _dbContextFactory = dbContextFactory;
         }
 
-        public async Task<IEnumerable<CostAccountingModel>> GetAllCostAccountingsAsync(CancellationToken cancellationToken)
-        {
-            var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
-            var entities = await dbContext.CostAccountings.ToListAsync(cancellationToken);
-            return entities.Select(ToModel);
-        }
-
-        public async Task<CostAccountingModel> GetCostAccountingAsync(Guid id, CancellationToken cancellationToken)
-        {
-            var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
-            var entity = await dbContext.CostAccountings.FindAsync(new object[] { id }, cancellationToken);
-
-            return ToModel(entity);
-        }
-
-        public CostAccountingModel ToModel(CostAccountingEntity entity)
-        {
-            return new CostAccountingModel
-            {
-                Id = entity.Id,
-                Name = entity.Name
-            };
-        }
-
         public async Task<IList<Measure>> GetMeasuresAsync(IList<Guid> dataTableGuids, CancellationToken cancellationToken)
         {
             var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);

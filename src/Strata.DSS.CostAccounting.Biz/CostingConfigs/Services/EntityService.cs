@@ -44,7 +44,7 @@ namespace Strata.DSS.CostAccounting.Biz.CostingConfigs.Services
                 }
                 else
                 {
-                    var filteredEntities = await _costingConfigRepository.GetCCELSAsync(costingConfigGuid, cancellationToken);
+                    var filteredEntities = await _costingConfigRepository.GetCostingConfigEntityLevelSecuritiesAsync(costingConfigGuid, cancellationToken);
                     if (filteredEntities.Count() == 0)
                     {
                         var noneEntity = new Entity

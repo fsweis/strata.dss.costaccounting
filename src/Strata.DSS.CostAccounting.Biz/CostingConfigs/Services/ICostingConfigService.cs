@@ -1,4 +1,5 @@
-﻿using Strata.DSS.CostAccounting.Biz.CostingConfigs.Models;
+﻿using Strata.DSS.CostAccounting.Biz.CostAccounting.Models;
+using Strata.DSS.CostAccounting.Biz.CostingConfigs.Models;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -9,6 +10,6 @@ namespace Strata.DSS.CostAccounting.Biz.CostingConfigs.Services
 {
     public interface ICostingConfigService
     {
-        public Task<CostConfigSaveResult> AddNewConfigAsync(CostingConfigSaveData configForm, CancellationToken cancellationToken);
+        public Task<CostingConfigModel> AddNewConfigAsync(CostingConfigSaveData configForm, CancellationToken cancellationToken);
     }
 }
