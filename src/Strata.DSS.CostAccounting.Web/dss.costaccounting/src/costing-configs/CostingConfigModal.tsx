@@ -150,14 +150,15 @@ const CostingConfigModal: React.FC<IModelModalProps> = (props: IModelModalProps)
   const onFormFinish = async (vals: { [name: string]: any }) => {
     const values = vals as IConfigForm;
     //Duplicate name check
-    const dupe = props.costConfigs.find((x) => x.name === values.name);
+    const cleanedName = values.name.replace(/\s+/g, ' ').trim();
+    const dupe = props.costConfigs.find((x) => x.name === cleanedName);
     if (dupe !== undefined) {
       Toast.show({ message: 'Duplicate names are not allowed.', toastType: 'info' });
     } else {
       //Create new cost model
       const newConfig = {
         costingConfigGuid: emptyGuid,
-        name: values.name,
+        name: cleanedName,
         description: values.description,
         isGLCosting: true,
         defaultChargeAllocationMethod: 0,
@@ -240,10 +241,10 @@ const CostingConfigModal: React.FC<IModelModalProps> = (props: IModelModalProps)
         }
       >
         <Form form={form} onFinish={onFormFinish} layout={'vertical'} preserve={true} initialValues={configForm}>
-          <Form.Item label='Name' name='name' rules={[{ required: true, whitespace: true }]}>
+          <Form.Item label='Name' name='name' rules={[{ required: true, whitespace: true, max: 50 }, { pattern: /^[A-Za-z0-9 _-]*$/ }]}>
             <Input />
           </Form.Item>
-          <Form.Item label='Description' name='description'>
+          <Form.Item label='Description' name='description' rules={[{ max: 2000 }]}>
             <InputTextArea />
           </Form.Item>
           <Spacing itemSpacing={16}>
