@@ -69,13 +69,13 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.Repositories
             return _mapper.Map<IEnumerable<CostingConfigEntityLinkage>>(ccels);
         }
 
-        public async Task UpdateCCELinksAsync(List<CostingConfigEntityLinkage> cceLinks, CancellationToken cancellationToken)
+        public async Task UpdateCostingConfigEntityLinkagesAsync(List<CostingConfigEntityLinkage> cceLinks, CancellationToken cancellationToken)
         {
             await using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
             dbContext.CostingConfigEntityLinkages.AddRange(cceLinks);
             await dbContext.SaveChangesAsync(cancellationToken);
         }
-        public async Task DeleteCCELinksAsync(List<CostingConfigEntityLinkage> cceLinks, CancellationToken cancellationToken)
+        public async Task DeleteCostingConfigEntityLinkagesAsync(List<CostingConfigEntityLinkage> cceLinks, CancellationToken cancellationToken)
         {
             await using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
             dbContext.CostingConfigEntityLinkages.RemoveRange(cceLinks);

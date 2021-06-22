@@ -76,7 +76,7 @@ namespace Strata.DSS.CostAccounting.Biz.CostingConfigs.Services
             {
                 if (utilEntityLinkages != null && utilEntityLinkages.Count() > 0)
                 {
-                    await _costingConfigRepository.DeleteCCELinksAsync(utilEntityLinkages.ToList(), cancellationToken);
+                    await _costingConfigRepository.DeleteCostingConfigEntityLinkagesAsync(utilEntityLinkages.ToList(), cancellationToken);
                 }
             }
         }
@@ -99,7 +99,7 @@ namespace Strata.DSS.CostAccounting.Biz.CostingConfigs.Services
             }
             if (newLinks.Count > 0)
             {
-                await _costingConfigRepository.UpdateCCELinksAsync(newLinks, cancellationToken);
+                await _costingConfigRepository.UpdateCostingConfigEntityLinkagesAsync(newLinks, cancellationToken);
             }
         }
         private async Task DeleteEntityLinkagesAsync(IEnumerable<CostingConfigEntityLinkage> links, List<int> entities, CancellationToken cancellationToken)
@@ -115,7 +115,7 @@ namespace Strata.DSS.CostAccounting.Biz.CostingConfigs.Services
             }
             if (deleteLinks.Count > 0)
             {
-                await _costingConfigRepository.DeleteCCELinksAsync(deleteLinks, cancellationToken);
+                await _costingConfigRepository.DeleteCostingConfigEntityLinkagesAsync(deleteLinks, cancellationToken);
             }
         }
 
