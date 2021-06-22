@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Modal from '@strata/tempo/lib/modal';
 import Input from '@strata/tempo/lib/input';
 import Button from '@strata/tempo/lib/button';
@@ -7,7 +7,6 @@ import InputTextArea from '@strata/tempo/lib/inputtextarea';
 import RadioGroup from '@strata/tempo/lib/radiogroup';
 import CheckboxGroup from '@strata/tempo/lib/checkboxgroup';
 import Toast from '@strata/tempo/lib/toast';
-import { useEffect, useState } from 'react';
 import Spacing from '@strata/tempo/lib/spacing';
 import DropDown from '@strata/tempo/lib/dropdown';
 import { usePageLoader } from '@strata/tempo/lib/pageloader';
@@ -42,7 +41,7 @@ interface IConfigForm {
   ytdMonth: number;
   type: number;
   glPayrollEntities: string[];
-  isUtilizingEntities: number;
+  entityType: number;
   utilEntities: string[];
   defaultMethod: number;
   options: number[];
@@ -96,11 +95,11 @@ const CostingConfigModal: React.FC<ICostingConfigModalProps> = (props: ICostingC
           description: '',
           year: year ? year : 0,
           ytdMonth: ytdMonth ? ytdMonth : 0,
-          type: 0,
+          type: CostingTypes.PatientCare,
           glPayrollEntities: fEntities ? fEntities : [],
-          isUtilizingEntities: 0,
+          entityType: EntityTypes.GlPayroll,
           utilEntities: uEntities ? uEntities : [],
-          defaultMethod: 0,
+          defaultMethod: CostingMethods.Simultaneous,
           options: []
         };
         setConfigForm(configForm);
@@ -144,10 +143,9 @@ const CostingConfigModal: React.FC<ICostingConfigModalProps> = (props: ICostingC
   //Form Finish
   const onFormFinish = async (vals: { [name: string]: any }) => {
     const values = vals as IConfigForm;
-    //Duplicate name check
     const cleanedName = values.name.replace(/\s+/g, ' ').trim();
-    const dupe = props.costConfigs.find((x) => x.name === cleanedName);
-    if (dupe !== undefined) {
+    //Duplicate name check
+    if (props.costConfigs.find((x) => x.name.toLowerCase() === cleanedName.toLowerCase()) !== undefined) {
       Toast.show({ message: 'Duplicate names are not allowed.', toastType: 'info' });
     } else {
       //Create new cost model
@@ -163,17 +161,15 @@ const CostingConfigModal: React.FC<ICostingConfigModalProps> = (props: ICostingC
         type: values.type,
         isPayrollCosting: values.type === CostingTypes.PatientCare ? values.options.includes(2) : false,
         isBudgetedAndActualCosting: values.type === CostingTypes.PatientCare ? values.options.includes(1) : false,
-        isUtilizationEntityConfigured: values.isUtilizingEntities === EntityTypes.Specify,
+        isUtilizationEntityConfigured: values.entityType === EntityTypes.Specify,
         createdAt: new Date(),
         modifiedAtUtc: new Date()
       };
 
-      const glPayrollEntities = values.glPayrollEntities.map((x) => +x);
-      const utilEntities = values.type === CostingTypes.PatientCare && values.isUtilizingEntities === EntityTypes.Specify ? values.utilEntities.map((x) => +x) : [];
       const configSaveData: ICostConfigSaveData = {
         costingConfig: newConfig,
-        glPayrollEntities: glPayrollEntities,
-        utilEntities: utilEntities
+        glPayrollEntities: values.glPayrollEntities.map((x) => +x),
+        utilEntities: values.type === CostingTypes.PatientCare && values.entityType === EntityTypes.Specify ? values.utilEntities.map((x) => +x) : []
       };
 
       try {
@@ -267,7 +263,7 @@ const CostingConfigModal: React.FC<ICostingConfigModalProps> = (props: ICostingC
           </Spacing>
           {isCostingEntityLevelSecurityEnabled && (
             <Spacing itemSpacing={16}>
-              <Form.Item label='Utilization Entities' name='isUtilizingEntities' rules={[{ required: true }]}>
+              <Form.Item label='Utilization Entities' name='entityType' rules={[{ required: true }]}>
                 <RadioGroup
                   onChange={handleEntityTypeChange}
                   options={[
