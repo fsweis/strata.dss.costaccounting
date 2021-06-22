@@ -28,11 +28,10 @@ import { CostingMethods } from './enums/CostingMethodEnum';
 import { CostingTypes } from './enums/CostingTypeEnum';
 import { EntityTypes } from './enums/EntityTypeEnum';
 
-interface IModelModalProps {
+interface ICostingConfigModalProps {
   visible: boolean;
   onCancel: () => void;
-  onSave: () => void;
-  onAddConfig: (costingConfig: ICostConfig) => void;
+  onSave: (costingConfig: ICostConfig) => void;
   costConfigs: ICostConfig[];
 }
 
@@ -49,7 +48,7 @@ interface IConfigForm {
   options: number[];
 }
 
-const CostingConfigModal: React.FC<IModelModalProps> = (props: IModelModalProps) => {
+const CostingConfigModal: React.FC<ICostingConfigModalProps> = (props: ICostingConfigModalProps) => {
   const [form] = Form.useForm();
   const [fiscalYears, setFiscalYears] = useState<IFiscalYear[]>([]);
   const [fiscalMonths, setFiscalMonths] = useState<IFiscalMonth[]>([]);
@@ -68,6 +67,7 @@ const CostingConfigModal: React.FC<IModelModalProps> = (props: IModelModalProps)
   useEffect(() => {
     const fetchData = async () => {
       try {
+        setLoading(true);
         const [isClaimsCostingEnabled, isCostingEntityLevelSecurityEnabled] = await Promise.all([
           systemSettingService.getIsClaimsCostingEnabled(),
           systemSettingService.getIsCostingEntityLevelSecurityEnabled()
@@ -108,43 +108,38 @@ const CostingConfigModal: React.FC<IModelModalProps> = (props: IModelModalProps)
         setLoading(false);
       }
     };
-    setLoading(true);
+
     fetchData();
   }, [setLoading, emptyGuid]);
 
   //Set Filtered Entity Trees when entities are loaded
   useEffect(() => {
-    const runEntityTreeChildren = glPayrollEntities.map((entity) => {
-      return { key: entity.entityId.toString(), title: entity.description, value: entity.entityId.toString() };
-    });
-    const rootNode = runEntityTreeChildren.find((x) => x.key === '0');
-    const runEntityTree = [
-      {
-        key: rootNode ? rootNode.key : '0',
-        title: rootNode ? rootNode.title : 'All Entities',
-        value: rootNode ? rootNode.value : '0',
-        children: runEntityTreeChildren.filter((x) => x.key !== '0' && x.title !== '')
-      }
-    ];
-    setEntityTreeData(runEntityTree);
+    const glPayrollEntityTree = getEntityTree(glPayrollEntities);
+    setEntityTreeData(glPayrollEntityTree);
   }, [glPayrollEntities]);
 
   //Set Utilization Entity Trees when entities are loaded
   useEffect(() => {
-    const runUtilEntityTreeChildren = utilEntities.map((entity) => {
+    const utilEntityTree = getEntityTree(utilEntities);
+    setUtilEntityTreeData(utilEntityTree);
+  }, [utilEntities]);
+
+  //Tree Util
+  const getEntityTree = (entities: IEntity[]) => {
+    const entityTreeChildren = entities.map((entity) => {
       return { key: entity.entityId.toString(), title: entity.description, value: entity.entityId.toString() };
     });
-    const rootNode = runUtilEntityTreeChildren.find((x) => x.key === '0');
-    const runUtilEntityTree = [
+    const rootNode = entityTreeChildren.find((x) => x.key === '0');
+    const entityTree = [
       {
         key: rootNode ? rootNode.key : '0',
         title: rootNode ? rootNode.title : 'All Entities',
         value: rootNode ? rootNode.value : '0',
-        children: runUtilEntityTreeChildren.filter((x) => x.key !== '0' && x.title !== '')
+        children: entityTreeChildren.filter((x) => x.key !== '0' && x.title !== '')
       }
     ];
-    setUtilEntityTreeData(runUtilEntityTree);
-  }, [utilEntities]);
+    return entityTree;
+  };
 
   //Form Finish
   const onFormFinish = async (vals: { [name: string]: any }) => {
@@ -189,8 +184,7 @@ const CostingConfigModal: React.FC<IModelModalProps> = (props: IModelModalProps)
         form.resetFields();
         setCostingType(0);
         setEntityUtilType(0);
-        props.onAddConfig(newConfig);
-        props.onSave();
+        props.onSave(newConfig);
       } catch (error) {
         Toast.show({ message: 'Changes not saved. Try again and contact your administrator if the issue continues.', toastType: 'error' });
       } finally {

@@ -26,6 +26,7 @@ const CostingConfigsModal: React.FC<ICostingConfigsModalProps> = (props: ICostin
 
   const handleAddConfig = (newConfig: ICostConfig) => {
     //const newCostConfigs = [...costConfigs, newConfig];
+    setCostingConfigModalVisible(false);
   };
 
   return (
@@ -52,10 +53,7 @@ const CostingConfigsModal: React.FC<ICostingConfigsModalProps> = (props: ICostin
         onCancel={() => {
           setCostingConfigModalVisible(false);
         }}
-        onSave={() => {
-          setCostingConfigModalVisible(false);
-        }}
-        onAddConfig={(costingConfig: ICostConfig) => handleAddConfig(costingConfig)}
+        onSave={(costingConfig: ICostConfig) => handleAddConfig(costingConfig)}
         costConfigs={costConfigs}
       ></CostingConfigModal>
     </>
