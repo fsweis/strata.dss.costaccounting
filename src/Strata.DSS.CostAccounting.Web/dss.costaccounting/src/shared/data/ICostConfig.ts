@@ -1,3 +1,5 @@
+import { CostingType } from '../enums/CostingTypeEnum';
+
 export interface ICostConfig {
   costingConfigGuid: string;
   name: string;
@@ -17,11 +19,6 @@ export interface ICostConfig {
   isEditable: boolean;
   glPayrollEntities: string[];
   utilEntities: string[];
-}
-
-export enum CostingType {
-  PatientCare = 0,
-  Claims = 1
 }
 
 export const newCostConfig = (costConfig: Partial<ICostConfig> = {}): ICostConfig => {

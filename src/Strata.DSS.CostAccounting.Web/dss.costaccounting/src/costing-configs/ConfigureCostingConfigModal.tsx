@@ -18,19 +18,21 @@ import { costConfigService } from '../shared/data/costConfigService';
 import { systemSettingService } from '../shared/data/systemSettingService';
 import { dateService } from '../shared/data/dateService';
 import { RadioChangeEvent } from 'antd/lib/radio/interface';
-import { ICostingType } from './data/ICostingType';
-import { ICostingMethod } from './data/ICostingMethod';
 import { ICostConfigSaveData } from './data/ICostConfigSaveData';
 import TreeDropDown, { ITreeDropDownNode } from '@strata/tempo/lib/treedropdown';
+import { ICostConfig } from '../shared/data/ICostConfig';
 import { getEmptyGuid } from '../shared/Utils';
-import { ICostConfig, CostingType } from '../shared/data/ICostConfig';
+import { Simultaneous_FriendlyName, SingleStepDown_FriendlyName } from './constants/CostingMethodConstants';
+import { PatientCare_FriendlyName, Claims_FriendlyName } from './constants/CostingTypeConstants';
+import { CostingMethods } from './enums/CostingMethodEnum';
+import { CostingType } from '../shared/enums/CostingTypeEnum';
 
 interface IModelModalProps {
   visible: boolean;
-  costingConfigGuid: string;
+  copyCostConfigGuid: string;
+  costConfigs: ICostConfig[];
   onCancel: () => void;
-  onSave: () => void;
-  onAddConfig: (costingConfig: ICostConfig) => void;
+  onSave: (costingConfig: ICostConfig) => void;
 }
 
 interface IConfigForm {
@@ -55,13 +57,12 @@ const ConfigureCostingConfigModal: React.FC<IModelModalProps> = (props: IModelMo
   const { setLoading } = usePageLoader();
   const [costingType, setCostingType] = useState<number>(0);
   const [entityUtilType, setEntityUtilType] = useState<number>(0);
-  const [costingTypes, setCostingTypes] = useState<ICostingType[]>([]);
-  const [costingMethods, setCostingMethods] = useState<ICostingMethod[]>([]);
   const [entityTreeData, setEntityTreeData] = useState<ITreeDropDownNode[]>([]);
   const [utilEntityTreeData, setUtilEntityTreeData] = useState<ITreeDropDownNode[]>([]);
   const [isClaimsCostingEnabled, setIsClaimsCostingEnabled] = useState<boolean>(false);
   const [isCostingEntityLevelSecurityEnabled, setIsCostingEntityLevelSecurityEnabled] = useState<boolean>(false);
   const [configForm, setConfigForm] = useState<IConfigForm>();
+  const emptyGuid = getEmptyGuid();
   const [title, setTitle] = useState<string>('');
 
   //Load initial data
@@ -75,20 +76,17 @@ const ConfigureCostingConfigModal: React.FC<IModelModalProps> = (props: IModelMo
         setIsClaimsCostingEnabled(isClaimsCostingEnabled);
         setIsCostingEntityLevelSecurityEnabled(isCostingEntityLevelSecurityEnabled);
 
-        const [fiscalMonths, fiscalYears, glPayrollEntities, utilEntities, costingTypes, costingMethods] = await Promise.all([
+        const [fiscalMonths, fiscalYears, glPayrollEntities, utilEntities] = await Promise.all([
           dateService.getFiscalMonths(),
           dateService.getFiscalYears(),
-          costConfigService.getGlPayrollEntities(getEmptyGuid()),
-          isCostingEntityLevelSecurityEnabled ? costConfigService.getUtilEntities() : [],
-          costConfigService.getCostingTypes(),
-          costConfigService.getCostingMethods()
+          costConfigService.getGlPayrollEntities(emptyGuid),
+          isCostingEntityLevelSecurityEnabled ? costConfigService.getUtilEntities() : []
         ]);
         setFiscalMonths(fiscalMonths);
         setFiscalYears(fiscalYears);
         setGlPayrollEntities(glPayrollEntities);
         setUtilEntities(utilEntities);
-        setCostingTypes(costingTypes);
-        setCostingMethods(costingMethods);
+
         //set initial form
         const year = fiscalYears.find((x) => x.fiscalYearId === new Date().getFullYear())?.fiscalYearId;
         const ytdMonth = fiscalMonths.find((x) => x.sortOrder === 12)?.fiscalMonthId;
@@ -107,9 +105,9 @@ const ConfigureCostingConfigModal: React.FC<IModelModalProps> = (props: IModelMo
           options: [0, 0]
         };
 
-        if (props.costingConfigGuid !== '') {
+        if (props.copyCostConfigGuid !== '') {
           const fetchModel = async () => {
-            const costModel = await costConfigService.getCostConfigForCopy(props.costingConfigGuid);
+            const costModel = await costConfigService.getCostConfigForCopy(props.copyCostConfigGuid);
             configForm.name = costModel.name + ' - Copy';
             configForm.description = costModel.description;
             configForm.year = costModel.fiscalYearId;
@@ -124,7 +122,6 @@ const ConfigureCostingConfigModal: React.FC<IModelModalProps> = (props: IModelMo
             form.resetFields();
           };
           fetchModel();
-
           setTitle('Copy Model');
         } else {
           setConfigForm(configForm);
@@ -137,7 +134,7 @@ const ConfigureCostingConfigModal: React.FC<IModelModalProps> = (props: IModelMo
     };
     setLoading(true);
     fetchData();
-  }, [setLoading, props.costingConfigGuid]);
+  }, [setLoading, props.copyCostConfigGuid]);
 
   //Set Filtered Entity Trees when entities are loaded
   useEffect(() => {
@@ -177,18 +174,18 @@ const ConfigureCostingConfigModal: React.FC<IModelModalProps> = (props: IModelMo
   const onFormFinish = async (vals: { [name: string]: any }) => {
     const values = vals as IConfigForm;
     const newConfig: ICostConfig = {
-      costingConfigGuid: getEmptyGuid(),
+      costingConfigGuid: emptyGuid,
       name: values.name,
       description: values.description,
       isGLCosting: true,
+      isPayrollCosting: values.type === CostingType.PatientCare ? values.options.includes(2) : false,
+      isBudgetedAndActualCosting: values.type === CostingType.PatientCare ? values.options.includes(1) : false,
+      isUtilizationEntityConfigured: values.isUtilizingEntities === 1,
       defaultChargeAllocationMethod: 0,
       defaultMethod: values.defaultMethod,
       fiscalYearId: values.year,
       fiscalMonthId: values.ytdMonth,
-      type: values.type ? values.type : 0,
-      isPayrollCosting: values.options ? values.options.indexOf(2) >= 0 : false,
-      isBudgetedAndActualCosting: values.options ? values.options.indexOf(1) >= 0 : false,
-      isUtilizationEntityConfigured: values.isUtilizingEntities ? (values.isUtilizingEntities === 1 ? true : false) : false,
+      type: values.type,
       createdAt: new Date(),
       modifiedAtUtc: new Date(),
       lastPublishedUtc: new Date(),
@@ -197,8 +194,8 @@ const ConfigureCostingConfigModal: React.FC<IModelModalProps> = (props: IModelMo
       utilEntities: []
     };
 
-    const glPayrollEntities = values.glPayrollEntities ? values.glPayrollEntities.map((x) => +x) : [];
-    const utilEntities = values.utilEntities ? values.utilEntities.map((x) => +x) : [];
+    const glPayrollEntities = values.glPayrollEntities.map((x) => +x);
+    const utilEntities = values.type === CostingType.PatientCare ? values.utilEntities.map((x) => +x) : [];
     const configSaveData: ICostConfigSaveData = {
       costingConfig: newConfig,
       glPayrollEntities: glPayrollEntities,
@@ -207,19 +204,15 @@ const ConfigureCostingConfigModal: React.FC<IModelModalProps> = (props: IModelMo
 
     try {
       setLoading(true);
-      const saveConfigResult = await costConfigService.addNewConfig(configSaveData);
-
-      if (saveConfigResult.success) {
-        Toast.show({ message: saveConfigResult.message, toastType: 'success' });
-        //reset form
-        form.resetFields();
-        setCostingType(0);
-        setEntityUtilType(0);
-        props.onAddConfig(saveConfigResult.costingConfig);
-        props.onSave();
-      } else {
-        Toast.show({ message: saveConfigResult.message, toastType: 'error' });
-      }
+      const newConfig = await costConfigService.addNewConfig(configSaveData);
+      Toast.show({ message: 'Changes Saved', toastType: 'success' });
+      //reset form
+      form.resetFields();
+      setCostingType(0);
+      setEntityUtilType(0);
+      props.onSave(newConfig);
+    } catch (error) {
+      Toast.show({ message: 'Changes not saved. Try again and contact your administrator if the issue continues.', toastType: 'error' });
     } finally {
       setLoading(false);
     }
@@ -229,6 +222,7 @@ const ConfigureCostingConfigModal: React.FC<IModelModalProps> = (props: IModelMo
     form.resetFields();
     setCostingType(0);
     setEntityUtilType(0);
+    Toast.show({ message: 'Changes Discarded', toastType: 'info' });
     props.onCancel();
   };
 
@@ -285,9 +279,10 @@ const ConfigureCostingConfigModal: React.FC<IModelModalProps> = (props: IModelMo
               <Form.Item label='Type' name='type' rules={[{ required: true }]}>
                 <RadioGroup
                   onChange={handleCostingTypeChange}
-                  options={costingTypes.map((costingType, index) => {
-                    return { value: index, label: costingType.friendlyName };
-                  })}
+                  options={[
+                    { value: CostingType.PatientCare, label: PatientCare_FriendlyName },
+                    { value: CostingType.Claims, label: Claims_FriendlyName }
+                  ]}
                 />
               </Form.Item>
             )}
@@ -317,9 +312,10 @@ const ConfigureCostingConfigModal: React.FC<IModelModalProps> = (props: IModelMo
             <Spacing itemSpacing={16}>
               <Form.Item label='Method' name='defaultMethod' rules={[{ required: true }]}>
                 <RadioGroup
-                  options={costingMethods.map((costingMethod, index) => {
-                    return { value: index, label: costingMethod.friendlyName };
-                  })}
+                  options={[
+                    { value: CostingMethods.Simultaneous, label: Simultaneous_FriendlyName },
+                    { value: CostingMethods.SingleStepDown, label: SingleStepDown_FriendlyName }
+                  ]}
                 />
               </Form.Item>
               <Form.Item label='Additional Data' name='options' rules={[{ required: false }]}>

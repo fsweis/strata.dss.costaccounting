@@ -50,7 +50,7 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
             return Ok(new CostingConfigDto(costingConfig));
         }
 
-        [HttpGet("copy/{id}")]//better naming potentially?
+        [HttpGet("copy/{id}")]//TODO: better naming potentially?
         [ProducesResponseType(200)]
         public async Task<ActionResult<CostingConfigDto>> GetCostingConfigForCopy([FromRoute] Guid id, CancellationToken cancellationToken)
         {
@@ -63,7 +63,7 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
                 UtilEntities = entityLinkages.Where(x => x.IsUtilization == true).Select(x => x.EntityId.ToString()).ToList()
             };
 
-            return Ok(dto);
+            return dto;
         }
 
         [HttpGet("entities")]

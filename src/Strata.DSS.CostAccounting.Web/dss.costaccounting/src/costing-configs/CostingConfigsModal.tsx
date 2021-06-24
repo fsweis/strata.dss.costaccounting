@@ -3,26 +3,29 @@ import Modal from '@strata/tempo/lib/modal';
 import Spacing from '@strata/tempo/lib/spacing';
 import Tooltip from '@strata/tempo/lib/tooltip';
 import React, { useEffect, useState } from 'react';
-import { ICostConfig, CostingType } from '../shared/data/ICostConfig';
+import { ICostConfig } from '../shared/data/ICostConfig';
+import { CostingType } from '../shared/enums/CostingTypeEnum';
 import Input from '@strata/tempo/lib/input';
 import { costConfigService } from '../shared/data/costConfigService';
 import ActionBar from '@strata/tempo/lib/actionbar';
 import DataGrid, { IGlobalFilterValue } from '@strata/tempo/lib/datagrid/DataGrid';
+import ConfigureCostingConfigModal from './ConfigureCostingConfigModal';
+
 export interface ICostingConfigsModalProps {
   visible: boolean;
   onCancel: () => void;
   onChangeConfigs: (costingConfigGuid: string) => void;
-  onCopyConfig: (costingConfigGuid: string) => void;
 }
 
 const CostingConfigsModal: React.FC<ICostingConfigsModalProps> = (props: ICostingConfigsModalProps) => {
   const [costingConfigModalVisible, setCostingConfigModalVisible] = React.useState<boolean>(false);
   const [costConfigs, setCostConfigs] = useState<ICostConfig[]>([]);
+  const [copyCostConfigGuid, setCopyCostConfigGuid] = useState<string>('');
   const [globalFilterValue, setGlobalFilterValue] = useState<IGlobalFilterValue>({ fields: ['name', 'description'], value: '' });
   useEffect(() => {
     const fetchData = async () => {
       const costModels = await costConfigService.getCostConfigs();
-      setCostModels(costModels);
+      setCostConfigs(costModels);
     };
 
     fetchData();
@@ -36,16 +39,19 @@ const CostingConfigsModal: React.FC<ICostingConfigsModalProps> = (props: ICostin
     //const newCostConfigs = [...costConfigs, newConfig];
     setCostingConfigModalVisible(false);
   };
+
   const handleChangeConfigs = (costingConfigGuid: string) => {
     props.onChangeConfigs(costingConfigGuid);
   };
 
   const handleCopy = (costingConfigGuid: string) => {
-    props.onCopyConfig(costingConfigGuid);
+    setCopyCostConfigGuid(costingConfigGuid);
+    setCostingConfigModalVisible(true);
   };
 
   const handleDelete = (costingConfigGuid: string) => {
     costConfigService.deleteCostConfig(costingConfigGuid);
+    //TODO: Toast?
   };
 
   const getCostingTypeName = (type: CostingType) => {
@@ -55,8 +61,8 @@ const CostingConfigsModal: React.FC<ICostingConfigsModalProps> = (props: ICostin
   return (
     <>
       <Modal title='All Models' visible={props.visible} onCancel={handleCancel} footer={null} width='extraLarge'>
-        <ActionBar 
-            filters={<Input search width={200} onChange={(e) => setGlobalFilterValue({ fields: ['name', 'description'], value: e.target.value })} />} 
+        <ActionBar
+          filters={<Input search width={200} onChange={(e) => setGlobalFilterValue({ fields: ['name', 'description'], value: e.target.value })} />}
           actions={
             <>
               <Button
@@ -70,7 +76,7 @@ const CostingConfigsModal: React.FC<ICostingConfigsModalProps> = (props: ICostin
             </>
           }
         />
-        <DataGrid key='allModelsGrid' scrollable dataKey='costingConfigGuid' value={costModels} globalFilterValue={globalFilterValue}>
+        <DataGrid key='allModelsGrid' scrollable dataKey='costingConfigGuid' value={costConfigs} globalFilterValue={globalFilterValue}>
           <DataGrid.RowNumber />
           <DataGrid.Column
             header='Name'
@@ -110,14 +116,15 @@ const CostingConfigsModal: React.FC<ICostingConfigsModalProps> = (props: ICostin
           ></DataGrid.Column>
         </DataGrid>
       </Modal>
-      <CostingConfigModal
+      <ConfigureCostingConfigModal
         visible={costingConfigModalVisible}
         onCancel={() => {
           setCostingConfigModalVisible(false);
         }}
         onSave={handleAddConfig}
+        copyCostConfigGuid={copyCostConfigGuid}
         costConfigs={costConfigs}
-      ></CostingConfigModal>
+      ></ConfigureCostingConfigModal>
     </>
   );
 };
