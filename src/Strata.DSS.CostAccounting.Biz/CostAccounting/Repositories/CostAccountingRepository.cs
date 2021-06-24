@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Strata.DSS.CostAccounting.Biz.CostAccounting.DbContexts;
-using Strata.DSS.CostAccounting.Biz.CostAccounting.Entities;
 using Strata.DSS.CostAccounting.Biz.CostAccounting.Models;
 using Strata.SqlTools.Configuration.Common.AsyncFactory;
 using System;
@@ -62,7 +61,7 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.Repositories
         public async Task<IEnumerable<Entity>> GetEntitiesAsync(CancellationToken cancellationToken)
         {
             await using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
-            var entities = await dbContext.Entities.Where(x => x.Description != "").ToListAsync(cancellationToken);
+            var entities = await dbContext.Entities.Where(x => x.Description != ""  && x.Description!= "Not Specified").OrderBy(x=>x.SortOrder).ToListAsync(cancellationToken);
             return entities;
         }
     }
