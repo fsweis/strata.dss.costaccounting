@@ -89,7 +89,7 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.DbContexts
             {
                 entity.HasKey(e => e.CostingResultID);
                 entity.ToTable("CostingResult", "dss");
-                entity.HasQueryFilter(e => EF.Property<bool>(e, "IsMarkedForDeletion") == false);
+                entity.HasQueryFilter(e => !EF.Property<bool>(e, "IsMarkedForDeletion"));
             });
 
             modelBuilder.Entity<RuleEngineIncludedMeasure>(entity =>

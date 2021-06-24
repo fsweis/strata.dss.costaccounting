@@ -59,28 +59,11 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
 
             var dto = new CostingConfigDto(costingConfig)
             {
-                GlPayrollEntities = entityLinkages.Where(x => x.IsUtilization == false).Select(x => x.EntityId.ToString()).ToList(),
-                UtilEntities = entityLinkages.Where(x => x.IsUtilization == true).Select(x => x.EntityId.ToString()).ToList()
+                GlPayrollEntities = entityLinkages.Where(x => !x.IsUtilization).Select(x => x.EntityId.ToString()).ToList(),
+                UtilEntities = entityLinkages.Where(x => x.IsUtilization).Select(x => x.EntityId.ToString()).ToList()
             };
 
             return dto;
-        }
-
-        [HttpGet("entities")]
-        [ProducesResponseType(200)]
-        public async Task<IEnumerable<Entity>> GetEntities(CancellationToken cancellationToken)
-        {
-            var entities = await _entityService.GetEntities(cancellationToken);
-            return entities;
-        }
-        [HttpGet("filtered-entities/{costingConfigGuid}")]
-        [ProducesResponseType(200)]
-        public async Task<IEnumerable<Entity>> GetFilteredEntities([FromRoute] Guid costingConfigGuid, CancellationToken cancellationToken)
-        {
-            var isCostingEntityLevelSecurityEnabled = await _systemSettingRepository.GetIsCostingEntityLevelSecurityEnabledAsync(cancellationToken);
-
-            var entities = await _entityService.GetFilteredEntities(costingConfigGuid, isCostingEntityLevelSecurityEnabled, cancellationToken);
-            return entities;
         }
 
         [HttpPost("")]
@@ -91,12 +74,30 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
             return costConfig;
         }
 
-        [HttpDelete("{costingConfigId}")]
+        [HttpDelete("{costingConfigGuid}")]
         [ProducesResponseType(200)]
-        public async Task<ActionResult<Guid>> DeleteCostingConfig([FromRoute] Guid costingConfigId, CancellationToken cancellationToken)
+        public async Task<ActionResult<Guid>> DeleteCostingConfig([FromRoute] Guid costingConfigGuid, CancellationToken cancellationToken)
         {
-            var jobGuid = await _costingConfigRepository.DeleteCostingConfigAsync(costingConfigId, cancellationToken);
+            var jobGuid = await _costingConfigRepository.DeleteCostingConfigAsync(costingConfigGuid, cancellationToken);
             return Ok(jobGuid);
+        }
+
+        [HttpGet("entities")]
+        [ProducesResponseType(200)]
+        public async Task<IEnumerable<Entity>> GetEntities(CancellationToken cancellationToken)
+        {
+            var entities = await _entityService.GetEntities(cancellationToken);
+            return entities;
+        }
+
+        [HttpGet("filtered-entities/{costingConfigGuid}")]
+        [ProducesResponseType(200)]
+        public async Task<IEnumerable<Entity>> GetFilteredEntities([FromRoute] Guid costingConfigGuid, CancellationToken cancellationToken)
+        {
+            var isCostingEntityLevelSecurityEnabled = await _systemSettingRepository.GetIsCostingEntityLevelSecurityEnabledAsync(cancellationToken);
+
+            var entities = await _entityService.GetFilteredEntities(costingConfigGuid, isCostingEntityLevelSecurityEnabled, cancellationToken);
+            return entities;
         }
     }
 }
