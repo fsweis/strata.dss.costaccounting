@@ -87,55 +87,57 @@ const ConfigureCostingConfigModal: React.FC<ICostingConfigModalProps> = (props: 
         setFiscalYears(fiscalYears);
         setGlPayrollEntities(glPayrollEntities);
         setUtilEntities(utilEntities);
-
-        //set initial form
-        const year = fiscalYears.find((x) => x.fiscalYearId === new Date().getFullYear())?.fiscalYearId;
-        const ytdMonth = fiscalMonths.find((x) => x.sortOrder === 12)?.fiscalMonthId;
-        const fEntities = glPayrollEntities.map((x) => x.entityId.toString());
-        const uEntities = utilEntities.map((x) => x.entityId.toString());
-        const configForm = {
-          name: '',
-          description: '',
-          year: year ? year : 0,
-          ytdMonth: ytdMonth ? ytdMonth : 0,
-          type: CostingType.PatientCare,
-          glPayrollEntities: fEntities.length > 0 ? fEntities : ['0'],
-          entityType: EntityTypes.GlPayroll,
-          utilEntities: uEntities.length > 0 ? uEntities : ['0'],
-          defaultMethod: CostingMethods.Simultaneous,
-          options: [0, 0]
-        };
-
-        if (props.copyCostConfigGuid !== '') {
-          const fetchModel = async () => {
-            const costModel = await costConfigService.getCostConfigForCopy(props.copyCostConfigGuid);
-            configForm.name = costModel.name + ' - Copy';
-            configForm.description = costModel.description;
-            configForm.year = costModel.fiscalYearId;
-            configForm.type = costModel.type;
-            configForm.ytdMonth = costModel.fiscalMonthId;
-            configForm.options = [costModel.isBudgetedAndActualCosting ? 1 : 0, costModel.isPayrollCosting ? 2 : 0];
-            configForm.glPayrollEntities = costModel.glPayrollEntities;
-            configForm.utilEntities = costModel.utilEntities;
-            configForm.defaultMethod = costModel.defaultMethod;
-
-            setConfigForm(configForm);
-            form.resetFields();
-          };
-          fetchModel();
-          setTitle('Copy Model');
-        } else {
-          setConfigForm(configForm);
-          form.resetFields();
-          setTitle('New Model');
-        }
       } finally {
         setLoading(false);
       }
     };
     setLoading(true);
     fetchData();
-  }, [setLoading, props.copyCostConfigGuid, emptyGuid]);
+  }, [setLoading, emptyGuid]);
+
+  useEffect(() => {
+    //set initial form
+    const year = fiscalYears.find((x) => x.fiscalYearId === new Date().getFullYear())?.fiscalYearId;
+    const ytdMonth = fiscalMonths.find((x) => x.sortOrder === 12)?.fiscalMonthId;
+    const fEntities = glPayrollEntities.map((x) => x.entityId.toString());
+    const uEntities = utilEntities.map((x) => x.entityId.toString());
+    const configForm = {
+      name: '',
+      description: '',
+      year: year ? year : 0,
+      ytdMonth: ytdMonth ? ytdMonth : 0,
+      type: CostingType.PatientCare,
+      glPayrollEntities: fEntities.length > 0 ? fEntities : ['0'],
+      entityType: EntityTypes.GlPayroll,
+      utilEntities: uEntities.length > 0 ? uEntities : ['0'],
+      defaultMethod: CostingMethods.Simultaneous,
+      options: [0, 0]
+    };
+
+    if (props.copyCostConfigGuid !== '') {
+      const fetchModel = async () => {
+        const costModel = await costConfigService.getCostConfigForCopy(props.copyCostConfigGuid);
+        configForm.name = costModel.name + ' - Copy';
+        configForm.description = costModel.description;
+        configForm.year = costModel.fiscalYearId;
+        configForm.type = costModel.type;
+        configForm.ytdMonth = costModel.fiscalMonthId;
+        configForm.options = [costModel.isBudgetedAndActualCosting ? 1 : 0, costModel.isPayrollCosting ? 2 : 0];
+        configForm.glPayrollEntities = costModel.glPayrollEntities;
+        configForm.utilEntities = costModel.utilEntities;
+        configForm.defaultMethod = costModel.defaultMethod;
+
+        setConfigForm(configForm);
+        form.resetFields();
+      };
+      fetchModel();
+      setTitle('Copy Model');
+    } else {
+      setConfigForm(configForm);
+      form.resetFields();
+      setTitle('New Model');
+    }
+  }, [props.copyCostConfigGuid]);
 
   //Set Filtered Entity Trees when entities are loaded
   useEffect(() => {

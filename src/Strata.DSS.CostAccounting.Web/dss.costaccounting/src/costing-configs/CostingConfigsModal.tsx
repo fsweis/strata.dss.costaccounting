@@ -128,6 +128,7 @@ const CostingConfigsModal: React.FC<ICostingConfigsModalProps> = (props: ICostin
         visible={costingConfigModalVisible}
         onCancel={() => {
           setCostingConfigModalVisible(false);
+          setCopyCostConfigGuid('');
         }}
         onSave={handleAddConfig}
         copyCostConfigGuid={copyCostConfigGuid}
