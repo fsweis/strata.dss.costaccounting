@@ -10,6 +10,7 @@ import { costConfigService } from '../shared/data/costConfigService';
 import ActionBar from '@strata/tempo/lib/actionbar';
 import DataGrid, { IGlobalFilterValue } from '@strata/tempo/lib/datagrid/DataGrid';
 import ConfigureCostingConfigModal from './ConfigureCostingConfigModal';
+import Toast from '@strata/tempo/lib/toast';
 
 export interface ICostingConfigsModalProps {
   visible: boolean;
@@ -22,6 +23,7 @@ const CostingConfigsModal: React.FC<ICostingConfigsModalProps> = (props: ICostin
   const [costConfigs, setCostConfigs] = useState<ICostConfig[]>([]);
   const [copyCostConfigGuid, setCopyCostConfigGuid] = useState<string>('');
   const [globalFilterValue, setGlobalFilterValue] = useState<IGlobalFilterValue>({ fields: ['name', 'description'], value: '' });
+
   useEffect(() => {
     const fetchData = async () => {
       const costModels = await costConfigService.getCostConfigs();
@@ -36,7 +38,6 @@ const CostingConfigsModal: React.FC<ICostingConfigsModalProps> = (props: ICostin
   };
 
   const handleAddConfig = (newConfig: ICostConfig) => {
-    //const newCostConfigs = [...costConfigs, newConfig];
     setCostingConfigModalVisible(false);
   };
 
@@ -50,8 +51,15 @@ const CostingConfigsModal: React.FC<ICostingConfigsModalProps> = (props: ICostin
   };
 
   const handleDelete = (costingConfigGuid: string) => {
-    costConfigService.deleteCostConfig(costingConfigGuid);
-    //TODO: Toast?
+    Modal.confirm({
+      title: 'Are you sure you want to delete this Costing Configuration?',
+      okText: 'Yes',
+      cancelText: 'No',
+      onOk() {
+        costConfigService.deleteCostConfig(costingConfigGuid);
+        Toast.show({ message: 'A task to delete a costing configuration has been created.', toastType: 'info' });
+      }
+    });
   };
 
   const getCostingTypeName = (type: CostingType) => {

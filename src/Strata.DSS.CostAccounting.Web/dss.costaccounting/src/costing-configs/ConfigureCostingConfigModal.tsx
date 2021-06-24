@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Modal from '@strata/tempo/lib/modal';
 import Input from '@strata/tempo/lib/input';
 import Button from '@strata/tempo/lib/button';
@@ -7,7 +7,6 @@ import InputTextArea from '@strata/tempo/lib/inputtextarea';
 import RadioGroup from '@strata/tempo/lib/radiogroup';
 import CheckboxGroup from '@strata/tempo/lib/checkboxgroup';
 import Toast from '@strata/tempo/lib/toast';
-import { useEffect, useState } from 'react';
 import Spacing from '@strata/tempo/lib/spacing';
 import DropDown from '@strata/tempo/lib/dropdown';
 import { usePageLoader } from '@strata/tempo/lib/pageloader';
@@ -26,8 +25,9 @@ import { Simultaneous_FriendlyName, SingleStepDown_FriendlyName } from './consta
 import { PatientCare_FriendlyName, Claims_FriendlyName } from './constants/CostingTypeConstants';
 import { CostingMethods } from './enums/CostingMethodEnum';
 import { CostingType } from '../shared/enums/CostingTypeEnum';
+import { EntityTypes } from './enums/EntityTypeEnum';
 
-interface IModelModalProps {
+interface ICostingConfigModalProps {
   visible: boolean;
   copyCostConfigGuid: string;
   costConfigs: ICostConfig[];
@@ -42,13 +42,13 @@ interface IConfigForm {
   ytdMonth: number;
   type: number;
   glPayrollEntities: string[];
-  isUtilizingEntities: number;
+  entityType: number;
   utilEntities: string[];
   defaultMethod: number;
   options: number[];
 }
 
-const ConfigureCostingConfigModal: React.FC<IModelModalProps> = (props: IModelModalProps) => {
+const ConfigureCostingConfigModal: React.FC<ICostingConfigModalProps> = (props: ICostingConfigModalProps) => {
   const [form] = Form.useForm();
   const [fiscalYears, setFiscalYears] = useState<IFiscalYear[]>([]);
   const [fiscalMonths, setFiscalMonths] = useState<IFiscalMonth[]>([]);
@@ -69,6 +69,7 @@ const ConfigureCostingConfigModal: React.FC<IModelModalProps> = (props: IModelMo
   useEffect(() => {
     const fetchData = async () => {
       try {
+        setLoading(true);
         const [isClaimsCostingEnabled, isCostingEntityLevelSecurityEnabled] = await Promise.all([
           systemSettingService.getIsClaimsCostingEnabled(),
           systemSettingService.getIsCostingEntityLevelSecurityEnabled()
@@ -99,9 +100,9 @@ const ConfigureCostingConfigModal: React.FC<IModelModalProps> = (props: IModelMo
           ytdMonth: ytdMonth ? ytdMonth : 0,
           type: CostingType.PatientCare,
           glPayrollEntities: fEntities ? fEntities : [],
-          isUtilizingEntities: 0,
+          entityType: EntityTypes.GlPayroll,
           utilEntities: uEntities ? uEntities : [],
-          defaultMethod: 0,
+          defaultMethod: CostingMethods.Simultaneous,
           options: [0, 0]
         };
 
@@ -134,87 +135,87 @@ const ConfigureCostingConfigModal: React.FC<IModelModalProps> = (props: IModelMo
     };
     setLoading(true);
     fetchData();
-  }, [setLoading, props.copyCostConfigGuid]);
+  }, [setLoading, props.copyCostConfigGuid, emptyGuid]);
 
   //Set Filtered Entity Trees when entities are loaded
   useEffect(() => {
-    const runEntityTreeChildren = glPayrollEntities.map((entity) => {
-      return { key: entity.entityId.toString(), title: entity.description, value: entity.entityId.toString() };
-    });
-    const rootNode = runEntityTreeChildren.find((x) => x.key === '0');
-    const runEntityTree = [
-      {
-        key: rootNode ? rootNode.key : '0',
-        title: rootNode ? rootNode.title : 'All Entities',
-        value: rootNode ? rootNode.value : '0',
-        children: runEntityTreeChildren.filter((x) => x.key !== '0' && x.title !== '')
-      }
-    ];
-    setEntityTreeData(runEntityTree);
+    const glPayrollEntityTree = getEntityTree(glPayrollEntities);
+    setEntityTreeData(glPayrollEntityTree);
   }, [glPayrollEntities]);
 
   //Set Utilization Entity Trees when entities are loaded
   useEffect(() => {
-    const runUtilEntityTreeChildren = utilEntities.map((entity) => {
+    const utilEntityTree = getEntityTree(utilEntities);
+    setUtilEntityTreeData(utilEntityTree);
+  }, [utilEntities]);
+
+  //Tree Util
+  const getEntityTree = (entities: IEntity[]) => {
+    const entityTreeChildren = entities.map((entity) => {
       return { key: entity.entityId.toString(), title: entity.description, value: entity.entityId.toString() };
     });
-    const rootNode = runUtilEntityTreeChildren.find((x) => x.key === '0');
-    const runUtilEntityTree = [
+    const rootNode = entityTreeChildren.find((x) => x.key === '0');
+    const entityTree = [
       {
         key: rootNode ? rootNode.key : '0',
         title: rootNode ? rootNode.title : 'All Entities',
         value: rootNode ? rootNode.value : '0',
-        children: runUtilEntityTreeChildren.filter((x) => x.key !== '0' && x.title !== '')
+        children: entityTreeChildren.filter((x) => x.key !== '0' && x.title !== '')
       }
     ];
-    setUtilEntityTreeData(runUtilEntityTree);
-  }, [utilEntities]);
+    return entityTree;
+  };
 
   //Form Finish
   const onFormFinish = async (vals: { [name: string]: any }) => {
     const values = vals as IConfigForm;
-    const newConfig: ICostConfig = {
-      costingConfigGuid: emptyGuid,
-      name: values.name,
-      description: values.description,
-      isGLCosting: true,
-      isPayrollCosting: values.type === CostingType.PatientCare ? values.options.includes(2) : false,
-      isBudgetedAndActualCosting: values.type === CostingType.PatientCare ? values.options.includes(1) : false,
-      isUtilizationEntityConfigured: values.isUtilizingEntities === 1,
-      defaultChargeAllocationMethod: 0,
-      defaultMethod: values.defaultMethod,
-      fiscalYearId: values.year,
-      fiscalMonthId: values.ytdMonth,
-      type: values.type,
-      createdAt: new Date(),
-      modifiedAtUtc: new Date(),
-      lastPublishedUtc: new Date(),
-      isEditable: true,
-      glPayrollEntities: [],
-      utilEntities: []
-    };
+    const cleanedName = values.name.replace(/\s+/g, ' ').trim();
+    //Duplicate name check
+    if (props.costConfigs.find((x) => x.name.toLowerCase() === cleanedName.toLowerCase()) !== undefined) {
+      Toast.show({ message: 'Duplicate names are not allowed.', toastType: 'info' });
+    } else {
+      //Create new cost model
+      const newConfig: ICostConfig = {
+        costingConfigGuid: emptyGuid,
+        name: cleanedName,
+        description: values.description,
+        isGLCosting: true,
+        defaultChargeAllocationMethod: 0,
+        defaultMethod: values.defaultMethod,
+        fiscalYearId: values.year,
+        fiscalMonthId: values.ytdMonth,
+        type: values.type,
+        isPayrollCosting: values.type === CostingType.PatientCare ? values.options.includes(2) : false,
+        isBudgetedAndActualCosting: values.type === CostingType.PatientCare ? values.options.includes(1) : false,
+        isUtilizationEntityConfigured: values.entityType === EntityTypes.Specify,
+        createdAt: new Date(),
+        modifiedAtUtc: new Date(),
+        lastPublishedUtc: new Date(),
+        isEditable: true,
+        glPayrollEntities: [],
+        utilEntities: []
+      };
 
-    const glPayrollEntities = values.glPayrollEntities.map((x) => +x);
-    const utilEntities = values.type === CostingType.PatientCare ? values.utilEntities.map((x) => +x) : [];
-    const configSaveData: ICostConfigSaveData = {
-      costingConfig: newConfig,
-      glPayrollEntities: glPayrollEntities,
-      utilEntities: utilEntities
-    };
+      const configSaveData: ICostConfigSaveData = {
+        costingConfig: newConfig,
+        glPayrollEntities: values.glPayrollEntities.map((x) => +x),
+        utilEntities: values.type === CostingType.PatientCare && values.entityType === EntityTypes.Specify ? values.utilEntities.map((x) => +x) : []
+      };
 
-    try {
-      setLoading(true);
-      const newConfig = await costConfigService.addNewConfig(configSaveData);
-      Toast.show({ message: 'Changes Saved', toastType: 'success' });
-      //reset form
-      form.resetFields();
-      setCostingType(0);
-      setEntityUtilType(0);
-      props.onSave(newConfig);
-    } catch (error) {
-      Toast.show({ message: 'Changes not saved. Try again and contact your administrator if the issue continues.', toastType: 'error' });
-    } finally {
-      setLoading(false);
+      try {
+        setLoading(true);
+        const newConfig = await costConfigService.addNewConfig(configSaveData);
+        Toast.show({ message: 'Changes Saved', toastType: 'success' });
+        //reset form
+        form.resetFields();
+        setCostingType(0);
+        setEntityUtilType(0);
+        props.onSave(newConfig);
+      } catch (error) {
+        Toast.show({ message: 'Changes not saved. Try again and contact your administrator if the issue continues.', toastType: 'error' });
+      } finally {
+        setLoading(false);
+      }
     }
   };
 
@@ -260,10 +261,10 @@ const ConfigureCostingConfigModal: React.FC<IModelModalProps> = (props: IModelMo
         }
       >
         <Form form={form} onFinish={onFormFinish} layout={'vertical'} preserve={true} initialValues={configForm}>
-          <Form.Item label='Name' name='name' rules={[{ required: true, whitespace: true }]}>
+          <Form.Item label='Name' name='name' rules={[{ required: true, whitespace: true, max: 50 }, { pattern: /^[A-Za-z0-9 _-]*$/ }]}>
             <Input />
           </Form.Item>
-          <Form.Item label='Description' name='description'>
+          <Form.Item label='Description' name='description' rules={[{ max: 2000 }]}>
             <InputTextArea />
           </Form.Item>
           <Spacing itemSpacing={16}>
@@ -292,23 +293,23 @@ const ConfigureCostingConfigModal: React.FC<IModelModalProps> = (props: IModelMo
           </Spacing>
           {isCostingEntityLevelSecurityEnabled && (
             <Spacing itemSpacing={16}>
-              <Form.Item label='Utilization Entities' name='isUtilizingEntities' rules={[{ required: true }]}>
+              <Form.Item label='Utilization Entities' name='entityType' rules={[{ required: true }]}>
                 <RadioGroup
                   onChange={handleEntityTypeChange}
                   options={[
-                    { value: 0, label: 'Same as GL/Payroll' },
-                    { value: 1, label: 'Specify' }
+                    { value: EntityTypes.GlPayroll, label: 'Same as GL/Payroll' },
+                    { value: EntityTypes.Specify, label: 'Specify' }
                   ]}
                 />
               </Form.Item>
-              {entityUtilType === 1 && (
+              {entityUtilType === EntityTypes.Specify && (
                 <Form.Item label='Specifiy Utilization Entities' name='utilEntities' rules={[{ required: true }]}>
                   <TreeDropDown treeData={utilEntityTreeData} selectionMode='multiple' treeDefaultExpandedKeys={['0']} />
                 </Form.Item>
               )}
             </Spacing>
           )}
-          {costingType === 0 && (
+          {costingType === CostingType.PatientCare && (
             <Spacing itemSpacing={16}>
               <Form.Item label='Method' name='defaultMethod' rules={[{ required: true }]}>
                 <RadioGroup
