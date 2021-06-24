@@ -27,20 +27,14 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.Repositories
         {
             await using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
             var systemSetting = await dbContext.SystemSettings.Where(x => x.Name == "Is Claims Costing Enabled").FirstOrDefaultAsync();
-            if(systemSetting != null)
-            {
-                return Convert.ToInt32(systemSetting.Value)==1;
-            }
+            if (Convert.ToInt32(systemSetting?.Value) == 1) { return true; }
             return false;
         }
         public async Task<Boolean> GetIsCostingEntityLevelSecurityEnabledAsync(CancellationToken cancellationToken)
         {
             await using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
             var systemSetting = await dbContext.SystemSettings.Where(x => x.Name == "Is Costing Entity Level Security Enabled").FirstOrDefaultAsync();
-            if (systemSetting != null)
-            {
-                return Convert.ToInt32(systemSetting.Value) == 1;
-            }
+            if (Convert.ToInt32(systemSetting?.Value) == 1) { return true; }
             return false;
         }
 
