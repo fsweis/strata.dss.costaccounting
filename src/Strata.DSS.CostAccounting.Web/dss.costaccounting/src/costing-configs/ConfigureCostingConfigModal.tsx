@@ -99,9 +99,9 @@ const ConfigureCostingConfigModal: React.FC<ICostingConfigModalProps> = (props: 
           year: year ? year : 0,
           ytdMonth: ytdMonth ? ytdMonth : 0,
           type: CostingType.PatientCare,
-          glPayrollEntities: fEntities ? fEntities : [],
+          glPayrollEntities: fEntities.length > 0 ? fEntities : ['0'],
           entityType: EntityTypes.GlPayroll,
-          utilEntities: uEntities ? uEntities : [],
+          utilEntities: uEntities.length > 0 ? uEntities : ['0'],
           defaultMethod: CostingMethods.Simultaneous,
           options: [0, 0]
         };
@@ -154,12 +154,11 @@ const ConfigureCostingConfigModal: React.FC<ICostingConfigModalProps> = (props: 
     const entityTreeChildren = entities.map((entity) => {
       return { key: entity.entityId.toString(), title: entity.description, value: entity.entityId.toString() };
     });
-    const rootNode = entityTreeChildren.find((x) => x.key === '0');
     const entityTree = [
       {
-        key: rootNode ? rootNode.key : '0',
-        title: rootNode ? rootNode.title : 'All Entities',
-        value: rootNode ? rootNode.value : '0',
+        key: '0',
+        title: entities.length > 0 ? 'All Entities' : 'None',
+        value: '0',
         children: entityTreeChildren.filter((x) => x.key !== '0' && x.title !== '')
       }
     ];
