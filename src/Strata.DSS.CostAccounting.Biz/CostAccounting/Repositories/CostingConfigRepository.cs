@@ -30,7 +30,7 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.Repositories
 
             if (!costingConfigs.Any())
             {
-                return null;
+                return new List<CostingConfigModel>();
             }
 
             return _mapper.Map<IEnumerable<CostingConfigModel>>(costingConfigs);
@@ -51,7 +51,7 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.Repositories
             var ccels = await dbContext.CostingConfigEntityLevelSecurities.Where(x => x.CostingConfigGuid == configGuid).ToListAsync(cancellationToken);
             if (!ccels.Any())
             {
-                return null;
+                return new List<CostingConfigEntityLevelSecurity>();
             }
 
             return _mapper.Map<IEnumerable<CostingConfigEntityLevelSecurity>>(ccels);
@@ -63,7 +63,7 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.Repositories
 
             if (!ccels.Any())
             {
-                return null;
+                return new List<CostingConfigEntityLinkage>();
             }
           
             return _mapper.Map<IEnumerable<CostingConfigEntityLinkage>>(ccels);
