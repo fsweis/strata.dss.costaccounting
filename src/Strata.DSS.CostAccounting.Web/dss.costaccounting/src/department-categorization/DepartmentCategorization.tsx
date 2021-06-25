@@ -145,8 +145,8 @@ const DepartmentCategorization: React.FC = () => {
               width={144}
               body={(rowData) => (
                 <>
-                  <Tooltip placement='left' title={rowData.isUsed ? "Can't delete drivers in use" : 'Delete'}>
-                    <Button type='link' icon='Delete' disabled={rowData.isUsed} />
+                  <Tooltip placement='left' title='Delete'>
+                    <Button type='link' icon='Delete' />
                   </Tooltip>
                 </>
               )}
