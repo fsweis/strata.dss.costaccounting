@@ -6,17 +6,14 @@ using Strata.ApiCommunication.Http.MessageHandlers;
 using Strata.CoreLib.Claims.Extensions;
 using Strata.DSS.CostAccounting.Biz.CostAccounting.DbContexts;
 using Strata.DSS.CostAccounting.Biz.CostAccounting.Repositories;
-using Strata.DSS.CostAccounting.Biz.StatisticDrivers.Repositories;
+using Strata.DSS.CostAccounting.Biz.CostingConfigs.Services;using Strata.DSS.CostAccounting.Biz.StatisticDrivers.Repositories;
 using Strata.DSS.CostAccounting.Biz.StatisticDrivers.Services;
 using Strata.Hangfire.Configuration;
 using Strata.SMC.Client;
 using Strata.SqlTools.Configuration.SqlServer;
 using System;
 using System.Threading;
-using System.Threading.Tasks;
-using Strata.DSS.CostAccounting.Biz.CostingConfigs.Services;
-
-// ReSharper disable once CheckNamespace
+using System.Threading.Tasks;
 namespace Microsoft.Extensions.DependencyInjection
 {
     public static class CostAccountingServiceCollectionExtensions
@@ -55,58 +52,17 @@ namespace Microsoft.Extensions.DependencyInjection
             return services;
         }
 
-        private static async Task<string> GetConnectionStringUserPass(
-            IServiceProvider provider,
-            CancellationToken cancellationToken)
+        private static async Task<string> GetConnectionStringUsingIntegratedSecurity(IServiceProvider provider, CancellationToken cancellationToken)
         {
             var claimsAccessor = provider.GetRequiredService<IClaimsPrincipalAccessor>();
             var databaseGuid = claimsAccessor.GetCurrentClaimsPrincipal()?.GetStrataDatabaseGuid();
-
             if (!databaseGuid.HasValue)
             {
-                throw new InvalidOperationException(
-                    $"User must be authenticated an have claim with key: '{Strata.CoreLib.Claims.StrataClaims.DatabaseGuid}'.");
+                throw new InvalidOperationException($"User must be authenticated an have claim with key: '{Strata.CoreLib.Claims.StrataClaims.DatabaseGuid}'.");
             }
-            var smc = provider.GetRequiredService<ISMCServiceClient>();
-            var database = await smc.GetDatabaseAsync(databaseGuid.Value, cancellationToken);
 
-            var configuration = provider.GetRequiredService<IConfiguration>();
-            var username = configuration.GetValue<string>("jazzDb:username");
-            var password = configuration.GetValue<string>("jazzDb:password");
-            if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password))
-            {
-                throw new ArgumentNullException(nameof(username),
-                    "Sql username for jazz database not found in configuration");
-            }
-
-            var connectionStringBuilder = new SqlConnectionStringBuilder
-            {
-                DataSource = database.ServerName,
-                InitialCatalog = database.PhysicalName,
-                UserID = username,
-                Password = password,
-                Encrypt = true,
-                TrustServerCertificate = true,
-                MultiSubnetFailover = false
-            };
-            return connectionStringBuilder.ToString();
-        }
-
-        private static async Task<string> GetConnectionStringUsingIntegratedSecurity(
-            IServiceProvider provider,
-            CancellationToken cancellationToken)
-        {
-            var claimsAccessor = provider.GetRequiredService<IClaimsPrincipalAccessor>();
-            var databaseGuid = claimsAccessor.GetCurrentClaimsPrincipal()?.GetStrataDatabaseGuid();
-
-            if (!databaseGuid.HasValue)
-            {
-                throw new InvalidOperationException(
-                    $"User must be authenticated an have claim with key: '{Strata.CoreLib.Claims.StrataClaims.DatabaseGuid}'.");
-            }
             var smc = provider.GetRequiredService<ISMCServiceClient>();
             var database = await smc.GetDatabaseAsync(databaseGuid.Value, cancellationToken);
-
             var connectionStringBuilder = new SqlConnectionStringBuilder
             {
                 DataSource = database.ServerName,
@@ -116,8 +72,8 @@ namespace Microsoft.Extensions.DependencyInjection
                 TrustServerCertificate = true,
                 MultiSubnetFailover = false
             };
+
             return connectionStringBuilder.ToString();
         }
-
     }
 }

@@ -23,7 +23,6 @@ namespace Strata.DSS.CostAccounting.Api
     public class Startup
     {
         private readonly IConfiguration _configuration;
-        private readonly string _connectionString;
 
         public Startup(IConfiguration configuration)
         {
@@ -33,7 +32,6 @@ namespace Strata.DSS.CostAccounting.Api
         public Startup(IConfiguration configuration, string connectionString)
         {
             _configuration = configuration;
-            _connectionString = connectionString;
         }
 
         // This method gets called by the runtime. Use this method to add services to the container.

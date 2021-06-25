@@ -11,7 +11,6 @@ using System.Threading.Tasks;
 
 namespace Strata.DSS.CostAccounting.Api.Controllers
 {
-
     [ApiController]
     [ApiVersion("1.0")]
     [Route("api/v{api-version:apiVersion}/costing-configs")]
@@ -21,6 +20,7 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
         private readonly ICostAccountingRepository _costAccountingRepository;
         private readonly ICostingConfigService _costingConfigService;
         private readonly ISystemSettingRepository _systemSettingRepository;
+
         public CostingConfigController(ICostingConfigRepository costingConfigRepository, ICostAccountingRepository costAccountingRepository, ICostingConfigService costingConfigService, ISystemSettingRepository systemSettingRepository)
         {
             _costingConfigRepository = costingConfigRepository;
@@ -39,9 +39,9 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
 
         [HttpGet("{id}")]
         [ProducesResponseType(200)]
-        public async Task<CostingConfigModel> GetCostingConfig([FromRoute] Guid id, CancellationToken cancellationToken)
+        public async Task<CostingConfigModel> GetCostingConfig([FromRoute] Guid costingConfigGuid, CancellationToken cancellationToken)
         {
-            var costingConfig = await _costingConfigRepository.GetCostingConfigAsync(id, cancellationToken);
+            var costingConfig = await _costingConfigRepository.GetCostingConfigAsync(costingConfigGuid, cancellationToken);
             return costingConfig;
         }
 
@@ -60,17 +60,17 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
             var isCostingEntityLevelSecurityEnabled = await _systemSettingRepository.GetIsCostingEntityLevelSecurityEnabledAsync(cancellationToken);
 
             var entities = await _costAccountingRepository.GetEntitiesAsync(cancellationToken);
-            
+
             if (isCostingEntityLevelSecurityEnabled)
             {
-                if (costingConfigGuid != null && costingConfigGuid != Guid.Empty)
+                if (costingConfigGuid != Guid.Empty)
                 {
                     var filteredEntities = await _costingConfigRepository.GetCostingConfigEntityLevelSecuritiesAsync(costingConfigGuid, cancellationToken);
-                    if(filteredEntities.Count()>0)
+                    if (filteredEntities.Any())
                     {
                         return entities.Where(x => filteredEntities.Any(y => y.EntityId == x.EntityId)).ToList();
                     }
-                    
+
                 }
                 return new List<Entity>();
             }
@@ -85,6 +85,5 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
             var costConfig = await _costingConfigService.AddNewConfigAsync(costConfigSaveData, cancellationToken);
             return costConfig;
         }
-
     }
 }

@@ -1,6 +1,5 @@
 ﻿using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
-using Moq;
 using Strata.CoreLib.Claims;
 using Strata.DSS.CostAccounting.Biz.CostAccounting.Constants;
 using Strata.DSS.CostAccounting.Biz.CostAccounting.DbContexts;
@@ -8,7 +7,7 @@ using Strata.DSS.CostAccounting.Biz.CostAccounting.Models;
 using Strata.DSS.CostAccounting.Biz.Enums;
 using Strata.DSS.CostAccounting.Biz.StatisticDrivers.Constants;
 using Strata.DSS.CostAccounting.Biz.StatisticDrivers.Models;
-using Strata.DSS.CostAccounting.Client;
+using Strata.SqlTools.Configuration.SqlServer;
 using System;
 using System.Collections.Generic;
 using System.Security.Claims;
@@ -20,6 +19,8 @@ namespace Strata.DSS.CostAccounting.Api.Test
     {
         private const string _aaEmail = "aaTestUser1@example.com";
         private const string _strataId = "10";
+
+        public static string GetConnectionString() => ConnectionStringBuilder.BuildForTest("costaccounting" + Guid.NewGuid());
 
         public static Dictionary<string, string> GetConnectionConfig(string connectionString, bool isStrataUser = true)
         {
@@ -241,15 +242,6 @@ namespace Strata.DSS.CostAccounting.Api.Test
             var principal = new ClaimsPrincipal(identity);
 
             return principal;
-        }
-
-        public static Mock<IStatisticDriversServiceClient> GetStatisticDriversServiceMock(bool accessAllowed)
-        {
-            var mockAaServiceClient = new Mock<IStatisticDriversServiceClient>();
-            //mockAaServiceClient.Setup(a =>
-            //    a.SaveStatisticDrivers($"{_aaEmail}_{_strataId}", It.IsAny<string>(),
-            //        It.IsAny<CancellationToken>())).ReturnsAsync(accessAllowed);
-            return mockAaServiceClient;
         }
     }
 }
