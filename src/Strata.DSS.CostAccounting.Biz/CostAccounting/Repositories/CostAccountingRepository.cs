@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Strata.DSS.CostAccounting.Biz.CostAccounting.DbContexts;
-using Strata.DSS.CostAccounting.Biz.CostAccounting.Entities;
 using Strata.DSS.CostAccounting.Biz.CostAccounting.Models;
 using Strata.SqlTools.Configuration.Common.AsyncFactory;
 using System;
@@ -20,40 +19,16 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.Repositories
             _dbContextFactory = dbContextFactory;
         }
 
-        public async Task<IEnumerable<CostAccountingModel>> GetAllCostAccountingsAsync(CancellationToken cancellationToken)
-        {
-            var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
-            var entities = await dbContext.CostAccountings.ToListAsync(cancellationToken);
-            return entities.Select(ToModel);
-        }
-
-        public async Task<CostAccountingModel> GetCostAccountingAsync(Guid id, CancellationToken cancellationToken)
-        {
-            var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
-            var entity = await dbContext.CostAccountings.FindAsync(new object[] { id }, cancellationToken);
-
-            return ToModel(entity);
-        }
-
-        public CostAccountingModel ToModel(CostAccountingEntity entity)
-        {
-            return new CostAccountingModel
-            {
-                Id = entity.Id,
-                Name = entity.Name
-            };
-        }
-
         public async Task<IList<Measure>> GetMeasuresAsync(IList<Guid> dataTableGuids, CancellationToken cancellationToken)
         {
             var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
             var measures = await dbContext.Measures.Where(m => dataTableGuids.Contains(m.DataTableGuid) && m.MeasureGuid != Guid.Empty).ToListAsync(cancellationToken);
             return measures;
         }
-        public async Task<IList<DataTable>> GetDataTablesAsync(IList<string> globalIDs, CancellationToken cancellationToken)
+        public async Task<IList<DataTable>> GetDataTablesAsync(IList<string> globalIds, CancellationToken cancellationToken)
         {
             var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
-            var dataTables = await dbContext.DataTables.Where(dt => globalIDs.Contains(dt.GlobalID) && dt.GlobalID != "").ToListAsync(cancellationToken);
+            var dataTables = await dbContext.DataTables.Where(dt => globalIds.Contains(dt.GlobalId) && dt.GlobalId != "").ToListAsync(cancellationToken);
             return dataTables;
         }
         public async Task<IList<RuleEngineIncludedMeasure>> GetRuleEngineIncludedMeasuresAsync(CancellationToken cancellationToken)
@@ -70,5 +45,24 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.Repositories
             return ruleSets;
         }
 
+        public async Task<IEnumerable<FiscalMonth>> GetFiscalMonthsAsync(CancellationToken cancellationToken)
+        {
+            await using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
+            var fiscalMonths = await dbContext.FiscalMonths.ToListAsync(cancellationToken);
+            return fiscalMonths;
+        }
+
+        public async Task<IEnumerable<FiscalYear>> GetFiscalYearsAsync(CancellationToken cancellationToken)
+        {
+            await using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
+            var fiscalYears = await dbContext.FiscalYears.ToListAsync(cancellationToken);
+            return fiscalYears;
+        }
+        public async Task<IEnumerable<Entity>> GetEntitiesAsync(CancellationToken cancellationToken)
+        {
+            await using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
+            var entities = await dbContext.Entities.Where(x => x.Description != ""  && x.Description!= "Not Specified").OrderBy(x=>x.SortOrder).ToListAsync(cancellationToken);
+            return entities;
+        }
     }
 }

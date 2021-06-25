@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Strata.DSS.CostAccounting.Biz.CostAccounting.Entities;
 using Strata.DSS.CostAccounting.Biz.CostAccounting.Models;
+using Strata.DSS.CostAccounting.Biz.CostingConfigs.Models;
 using Strata.DSS.CostAccounting.Biz.StatisticDrivers.Models;
 
 namespace Strata.DSS.CostAccounting.Biz.CostAccounting.DbContexts
@@ -10,8 +11,6 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.DbContexts
     // and the following sample: https://git.sdt.local/projects/DOCKER/repos/strata.demos.microservices.reviews/browse
     public class CostAccountingDbContext : DbContext
     {
-        public DbSet<CostAccountingEntity> CostAccountings { get; set; }
-
         public CostAccountingDbContext(DbContextOptions<CostAccountingDbContext> options) : base(options)
         {
         }
@@ -19,6 +18,9 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.DbContexts
         public virtual DbSet<Measure> Measures { get; set; }
         public virtual DbSet<DataTable> DataTables { get; set; }
         public virtual DbSet<RuleSet> RuleSets { get; set; }
+        public virtual DbSet<FiscalMonth> FiscalMonths { get; set; }
+        public virtual DbSet<FiscalYear> FiscalYears { get; set; }
+        public virtual DbSet<Entity> Entities { get; set; }
         public virtual DbSet<CostingConfigEntity> CostingConfigs { get; set; }
         public virtual DbSet<RuleEngineIncludedMeasure> RuleEngineIncludedMeasures { get; set; }
 
@@ -30,6 +32,12 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.DbContexts
         public virtual DbSet<DepartmentReclass> DepartmentReclasses { get; set; }
         public virtual DbSet<AllocationConfig> AllocationConfigs { get; set; }
         public virtual DbSet<AllocationConfigOverride> AllocationConfigOverrides { get; set; }
+
+        public virtual DbSet<SystemSetting> SystemSettings { get; set; }
+
+        public virtual DbSet<CostingConfigEntityLevelSecurity> CostingConfigEntityLevelSecurities { get; set; }
+
+        public virtual DbSet<CostingConfigEntityLinkage> CostingConfigEntityLinkages { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -49,6 +57,26 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.DbContexts
             {
                 entity.HasKey(e => e.RuleSetGuid);
                 entity.ToTable("RuleSet", "dbo");
+            });
+            modelBuilder.Entity<SystemSetting>(entity =>
+            {
+                entity.HasKey(e => e.SystemSettingId);
+                entity.ToTable("SystemSetting", "dss");
+            });
+            modelBuilder.Entity<Entity>(entity =>
+            {
+                entity.HasKey(e => e.EntityId);
+                entity.ToTable("DimEntity", "fw");
+            });
+            modelBuilder.Entity<FiscalMonth>(entity =>
+            {
+                entity.HasKey(e => e.FiscalMonthId);
+                entity.ToTable("DimFiscalMonth", "fw");
+            });
+            modelBuilder.Entity<FiscalYear>(entity =>
+            {
+                entity.HasKey(e => e.FiscalYearId);
+                entity.ToTable("DimFiscalYear", "fw");
             });
 
             modelBuilder.Entity<CostingConfigEntity>(entity =>
@@ -107,8 +135,18 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.DbContexts
 
             modelBuilder.Entity<RuleSet>(entity =>
             {
-                entity.HasKey(e => e.RuleSetID);
+                entity.HasKey(e => e.RuleSetId);
                 entity.ToTable("RuleSet", "dbo");
+            });
+            modelBuilder.Entity<CostingConfigEntityLevelSecurity>(entity =>
+            {
+                entity.HasKey(e => e.CostingConfigEntityLevelSecurityId);
+                entity.ToTable("CostingConfigEntityLevelSecurity", "dss");
+            });
+            modelBuilder.Entity<CostingConfigEntityLinkage>(entity =>
+            {
+                entity.HasKey(e => e.CostingConfigEntityLinkageId);
+                entity.ToTable("CostingConfigEntityLinkage", "dss");
             });
         }
     }
