@@ -7,6 +7,6 @@ namespace Strata.DSS.CostAccounting.Biz.CostingConfigs.Services
 {
     public interface ICostingConfigService
     {
-        public Task<CostingConfigModel> AddNewConfigAsync(CostingConfigSaveData costConfigSaveData, CancellationToken cancellationToken);
+        public Task<CostingConfig> AddNewConfigAsync(CostingConfigSaveData costConfigSaveData, CancellationToken cancellationToken);
     }
 }

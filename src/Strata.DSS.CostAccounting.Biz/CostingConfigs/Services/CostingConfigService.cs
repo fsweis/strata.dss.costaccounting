@@ -22,7 +22,7 @@ namespace Strata.DSS.CostAccounting.Biz.CostingConfigs.Services
             _systemSettingRepository = systemSettingRepository;
         }
 
-        public async Task<CostingConfigModel> AddNewConfigAsync(CostingConfigSaveData costConfigSaveData, CancellationToken cancellationToken)
+        public async Task<CostingConfig> AddNewConfigAsync(CostingConfigSaveData costConfigSaveData, CancellationToken cancellationToken)
         {
             //assign defaults
             costConfigSaveData.CostingConfig.CostingConfigGuid = Guid.NewGuid();

@@ -31,7 +31,7 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
 
         [HttpGet("")]
         [ProducesResponseType(200)]
-        public async Task<IEnumerable<CostingConfigModel>> GetAllCostingConfigs(CancellationToken cancellationToken)
+        public async Task<IEnumerable<CostingConfig>> GetAllCostingConfigs(CancellationToken cancellationToken)
         {
             var costingConfigs = await _costingConfigRepository.GetAllCostingConfigsAsync(cancellationToken);
             return costingConfigs;
@@ -39,7 +39,7 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
 
         [HttpGet("{id}")]
         [ProducesResponseType(200)]
-        public async Task<CostingConfigModel> GetCostingConfig([FromRoute] Guid costingConfigGuid, CancellationToken cancellationToken)
+        public async Task<CostingConfig> GetCostingConfig([FromRoute] Guid costingConfigGuid, CancellationToken cancellationToken)
         {
             var costingConfig = await _costingConfigRepository.GetCostingConfigAsync(costingConfigGuid, cancellationToken);
             return costingConfig;
@@ -80,7 +80,7 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
 
         [HttpPost("")]
         [ProducesResponseType(200)]
-        public async Task<CostingConfigModel> AddNewConfig([FromBody] CostingConfigSaveData costConfigSaveData, CancellationToken cancellationToken)
+        public async Task<CostingConfig> AddNewConfig([FromBody] CostingConfigSaveData costConfigSaveData, CancellationToken cancellationToken)
         {
             var costConfig = await _costingConfigService.AddNewConfigAsync(costConfigSaveData, cancellationToken);
             return costConfig;

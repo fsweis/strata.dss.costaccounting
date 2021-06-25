@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Strata.DSS.CostAccounting.Biz.CostAccounting.DbContexts;
-using Strata.DSS.CostAccounting.Biz.CostAccounting.Entities;
 using Strata.DSS.CostAccounting.Biz.CostAccounting.Models;
 using Strata.DSS.CostAccounting.Biz.CostingConfigs.Models;
 using Strata.SqlTools.Configuration.Common.AsyncFactory;
@@ -24,18 +23,18 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.Repositories
             _dbContextFactory = dbContextFactory;
         }
 
-        public async Task<IEnumerable<CostingConfigModel>> GetAllCostingConfigsAsync(CancellationToken cancellationToken)
+        public async Task<IEnumerable<CostingConfig>> GetAllCostingConfigsAsync(CancellationToken cancellationToken)
         {
             var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
             var costingConfigs = await dbContext.CostingConfigs.ToListAsync(cancellationToken);
-            return _mapper.Map<IEnumerable<CostingConfigModel>>(costingConfigs);
+            return _mapper.Map<IEnumerable<CostingConfig>>(costingConfigs);
         }
 
-        public async Task<CostingConfigModel> GetCostingConfigAsync(Guid costingConfigGuid, CancellationToken cancellationToken)
+        public async Task<CostingConfig> GetCostingConfigAsync(Guid costingConfigGuid, CancellationToken cancellationToken)
         {
             var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
             var entity = await dbContext.CostingConfigs.FirstOrDefaultAsync(cc => cc.CostingConfigGuid == costingConfigGuid, cancellationToken);
-            return _mapper.Map<CostingConfigModel>(entity);
+            return _mapper.Map<CostingConfig>(entity);
         }
 
         public async Task<IEnumerable<CostingConfigEntityLevelSecurity>> GetCostingConfigEntityLevelSecuritiesAsync(Guid costingConfigGuid, CancellationToken cancellationToken)
@@ -66,12 +65,11 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.Repositories
             await dbContext.SaveChangesAsync(cancellationToken);
         }
 
-        public async Task AddNewCostingConfigAsync(CostingConfigModel costingConfigModel, CancellationToken cancellationToken)
+        public async Task AddNewCostingConfigAsync(CostingConfig costingConfig, CancellationToken cancellationToken)
         {
             await using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
 
-            var newConfig = _mapper.Map<CostingConfigEntity>(costingConfigModel);
-            dbContext.CostingConfigs.Add(newConfig);
+            dbContext.CostingConfigs.Add(costingConfig);
 
             await dbContext.SaveChangesAsync(cancellationToken);
         }

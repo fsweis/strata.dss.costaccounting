@@ -3,7 +3,7 @@ using System;
 
 namespace Strata.DSS.CostAccounting.Biz.CostAccounting.Models
 {
-    public class CostingConfigModel
+    public class CostingConfig
     {
         public Guid CostingConfigGuid { get; set; }
         public string Name { get; set; }
