@@ -5,5 +5,5 @@ export interface ICostingDepartmentTypeException {
   departmentId: number;
   costingConfigGuid: string;
   departmentTypeEnum: number;
-  CostingDepartmentType: ICostDepartmentType;
+  costingDepartmentType: ICostDepartmentType;
 }
