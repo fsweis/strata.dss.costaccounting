@@ -209,11 +209,11 @@ const CostingConfigConfigureModal: React.FC<ICostingConfigConfigureModalProps> =
   };
 
   const handleCancel = () => {
-    form.resetFields();
     setCostingType(0);
     setEntityUtilType(0);
     Toast.show({ message: 'Changes Discarded', toastType: 'info' });
     props.onCancel();
+    form.resetFields();
   };
 
   const handleSave = () => {
@@ -261,7 +261,7 @@ const CostingConfigConfigureModal: React.FC<ICostingConfigConfigureModalProps> =
       <Modal
         title={title}
         visible={props.visible}
-        // destroyOnClose
+        destroyOnClose
         onCancel={handleCancel}
         onOk={handleSave}
         okText='Save'
@@ -279,7 +279,7 @@ const CostingConfigConfigureModal: React.FC<ICostingConfigConfigureModalProps> =
           </>
         }
       >
-        <Form form={form} onFinish={onFormFinish} layout={'vertical'} preserve={true} initialValues={costingConfigForm}>
+        <Form form={form} onFinish={onFormFinish} layout={'vertical'} preserve={false} initialValues={costingConfigForm}>
           <Form.Item label='Name' name='name' initialValue={props.costingConfigForm.name} rules={[{ required: true, whitespace: true, max: 50 }, { pattern: /^[A-Za-z0-9 _-]*$/ }]}>
             <Input />
           </Form.Item>
@@ -287,10 +287,10 @@ const CostingConfigConfigureModal: React.FC<ICostingConfigConfigureModalProps> =
             <InputTextArea />
           </Form.Item>
           <Spacing itemSpacing={16}>
-            <Form.Item label='Year' name='year' initialValue={getYearInitialValue} rules={[{ required: true }]}>
+            <Form.Item label='Year' name='year' initialValue={getYearInitialValue()} rules={[{ required: true }]}>
               <DropDown itemValueField='fiscalYearId' itemTextField='name' items={fiscalYears} />
             </Form.Item>
-            <Form.Item label='YTD Month' name='ytdMonth' initialValue={getMonthInitialValue} rules={[{ required: true }]}>
+            <Form.Item label='YTD Month' name='ytdMonth' initialValue={getMonthInitialValue()} rules={[{ required: true }]}>
               <DropDown itemValueField='fiscalMonthId' itemTextField='name' items={fiscalMonths} />
             </Form.Item>
           </Spacing>
@@ -306,13 +306,13 @@ const CostingConfigConfigureModal: React.FC<ICostingConfigConfigureModalProps> =
                 />
               </Form.Item>
             )}
-            <Form.Item label='GL/Payroll Entities' name='glPayrollEntities' initialValue={getGlPayrollEntitiesInitialValue} rules={[{ required: true }]}>
+            <Form.Item label='GL/Payroll Entities' name='glPayrollEntities' initialValue={getGlPayrollEntitiesInitialValue()} rules={[{ required: true }]}>
               <TreeDropDown treeData={entityTreeData} selectionMode='multiple' treeDefaultExpandedKeys={['0']} />
             </Form.Item>
           </Spacing>
           {isCostingEntityLevelSecurityEnabled && (
             <Spacing itemSpacing={16}>
-              <Form.Item label='Utilization Entities' name='entityType' initialValue={getUtilEntitiesInitialValue} rules={[{ required: true }]}>
+              <Form.Item label='Utilization Entities' name='entityType' initialValue={getUtilEntitiesInitialValue()} rules={[{ required: true }]}>
                 <RadioGroup
                   onChange={handleEntityTypeChange}
                   options={[

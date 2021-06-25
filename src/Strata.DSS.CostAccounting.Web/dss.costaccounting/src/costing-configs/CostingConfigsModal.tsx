@@ -54,22 +54,25 @@ const CostingConfigsModal: React.FC<ICostingConfigsModalProps> = (props: ICostin
     //TODO: add to list.
   };
 
-  const handleCopyCostingConfig = (row: any) => {
-    console.log(row);
-    //TODO: Update with row data.
+  const handleCopyCostingConfig = (costingConfig: ICostConfig) => {
+    console.log(costingConfig);
+
     const costingConfigForm: ICostingConfigForm = {
-      name: '',
-      description: '',
-      year: 0,
-      ytdMonth: 0,
-      type: CostingType.PatientCare,
-      glPayrollEntities: [],
-      entityType: EntityType.GlPayroll,
-      utilEntities: [],
-      defaultMethod: CostingMethod.Simultaneous,
-      options: [0, 0], //TODO: UPDATE [costModel.isBudgetedAndActualCosting ? 1 : 0, costModel.isPayrollCosting ? 2 : 0];
+      name: costingConfig.name,
+      description: costingConfig.description,
+      year: costingConfig.fiscalYearId,
+      ytdMonth: costingConfig.fiscalMonthId,
+      type: costingConfig.type,
+      glPayrollEntities: costingConfig.glPayrollEntities,
+      entityType: EntityType.GlPayroll, //TODO: Update this in service
+      utilEntities: costingConfig.utilEntities,
+      defaultMethod: costingConfig.defaultMethod,
+      options: [costingConfig.isBudgetedAndActualCosting ? 1 : 0, costingConfig.isPayrollCosting ? 2 : 0],
       isCopy: true
     };
+
+    console.log(costingConfigForm);
+
     openCostingConfigConfigureModal(true, costingConfigForm);
   };
 
