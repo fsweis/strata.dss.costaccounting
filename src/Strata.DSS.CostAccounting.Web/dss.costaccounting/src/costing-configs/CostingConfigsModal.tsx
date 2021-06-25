@@ -9,8 +9,12 @@ import Input from '@strata/tempo/lib/input';
 import { costConfigService } from '../shared/data/costConfigService';
 import ActionBar from '@strata/tempo/lib/actionbar';
 import DataGrid, { IGlobalFilterValue } from '@strata/tempo/lib/datagrid/DataGrid';
-import ConfigureCostingConfigModal from './ConfigureCostingConfigModal';
+import CostingConfigConfigureModal from './CostingConfigConfigureModal';
 import Toast from '@strata/tempo/lib/toast';
+import { ICostingConfigForm } from './data/ICostingConfigForm';
+import { CostingMethod } from './enums/CostingMethodEnum';
+import { EntityType } from './enums/EntityTypeEnum';
+import { PatientCare_FriendlyName, Claims_FriendlyName } from './constants/CostingTypeConstants';
 
 export interface ICostingConfigsModalProps {
   visible: boolean;
@@ -19,35 +23,54 @@ export interface ICostingConfigsModalProps {
 }
 
 const CostingConfigsModal: React.FC<ICostingConfigsModalProps> = (props: ICostingConfigsModalProps) => {
-  const [costingConfigModalVisible, setCostingConfigModalVisible] = React.useState<boolean>(false);
+  const newCostingConfigForm: ICostingConfigForm = {
+    name: '',
+    description: '',
+    year: 0,
+    ytdMonth: 0,
+    type: CostingType.PatientCare,
+    glPayrollEntities: [],
+    entityType: EntityType.GlPayroll,
+    utilEntities: [],
+    defaultMethod: CostingMethod.Simultaneous,
+    options: [0, 0],
+    isCopy: false
+  };
+
+  const [costingConfigConfigureModalVisible, setCostingConfigConfigureModalVisible] = React.useState<boolean>(false);
   const [costConfigs, setCostConfigs] = useState<ICostConfig[]>([]);
-  const [copyCostConfigGuid, setCopyCostConfigGuid] = useState<string>('');
+  const [costingConfigForm, setCostingConfigForm] = useState<ICostingConfigForm>(newCostingConfigForm);
   const [globalFilterValue, setGlobalFilterValue] = useState<IGlobalFilterValue>({ fields: ['name', 'description'], value: '' });
 
   useEffect(() => {
     const fetchData = async () => {
-      const costModels = await costConfigService.getCostConfigs();
-      setCostConfigs(costModels);
+      setCostConfigs(await costConfigService.getCostConfigs());
     };
-
     fetchData();
   }, []);
 
-  const handleCancel = () => {
-    props.onCancel();
-  };
-
   const handleAddConfig = (newConfig: ICostConfig) => {
-    setCostingConfigModalVisible(false);
+    setCostingConfigConfigureModalVisible(false);
+    //TODO: add to list.
   };
 
-  const handleChangeConfigs = (costingConfigGuid: string) => {
-    props.onChangeConfigs(costingConfigGuid);
-  };
-
-  const handleCopy = (costingConfigGuid: string) => {
-    setCopyCostConfigGuid(costingConfigGuid);
-    setCostingConfigModalVisible(true);
+  const handleCopyCostingConfig = (row: any) => {
+    console.log(row);
+    //TODO: Update with row data.
+    const costingConfigForm: ICostingConfigForm = {
+      name: '',
+      description: '',
+      year: 0,
+      ytdMonth: 0,
+      type: CostingType.PatientCare,
+      glPayrollEntities: [],
+      entityType: EntityType.GlPayroll,
+      utilEntities: [],
+      defaultMethod: CostingMethod.Simultaneous,
+      options: [0, 0], //TODO: UPDATE [costModel.isBudgetedAndActualCosting ? 1 : 0, costModel.isPayrollCosting ? 2 : 0];
+      isCopy: true
+    };
+    openCostingConfigConfigureModal(true, costingConfigForm);
   };
 
   const handleDelete = (costingConfigGuid: string) => {
@@ -62,13 +85,18 @@ const CostingConfigsModal: React.FC<ICostingConfigsModalProps> = (props: ICostin
     });
   };
 
+  const openCostingConfigConfigureModal = (isVisible: boolean, costingConfigForm: ICostingConfigForm) => {
+    setCostingConfigForm(costingConfigForm);
+    setCostingConfigConfigureModalVisible(isVisible);
+  };
+
   const getCostingTypeName = (type: CostingType) => {
-    return type === CostingType.Claims ? 'Claims' : 'Patient Care';
+    return type === CostingType.Claims ? Claims_FriendlyName : PatientCare_FriendlyName;
   };
 
   return (
     <>
-      <Modal title='All Models' visible={props.visible} onCancel={handleCancel} footer={null} width='extraLarge'>
+      <Modal title='All Models' visible={props.visible} onCancel={props.onCancel} footer={null} width='extraLarge'>
         <ActionBar
           filters={<Input search width={200} onChange={(e) => setGlobalFilterValue({ fields: ['name', 'description'], value: e.target.value })} />}
           actions={
@@ -76,7 +104,7 @@ const CostingConfigsModal: React.FC<ICostingConfigsModalProps> = (props: ICostin
               <Button
                 icon='Plus'
                 onClick={() => {
-                  setCostingConfigModalVisible(true);
+                  openCostingConfigConfigureModal(true, newCostingConfigForm);
                 }}
               >
                 Add Model
@@ -93,7 +121,7 @@ const CostingConfigsModal: React.FC<ICostingConfigsModalProps> = (props: ICostin
             body={(rowData) => (
               <>
                 <Spacing vAlign='center'>
-                  <Button type='link' onClick={() => handleChangeConfigs(rowData.costingConfigGuid)}>
+                  <Button type='link' onClick={() => props.onChangeConfigs(rowData.costingConfigGuid)}>
                     {rowData.name}
                   </Button>
                 </Spacing>
@@ -113,7 +141,7 @@ const CostingConfigsModal: React.FC<ICostingConfigsModalProps> = (props: ICostin
               <>
                 <Spacing vAlign='center'>
                   <Tooltip title='Copy'>
-                    <Button type='link' icon='Copy' onClick={() => handleCopy(rowData.costingConfigGuid)}></Button>
+                    <Button type='link' icon='Copy' onClick={() => handleCopyCostingConfig(rowData)}></Button>
                   </Tooltip>
                   <Tooltip title='Delete'>
                     <Button type='link' icon='Delete' disabled={!rowData.isEditable} onClick={() => handleDelete(rowData.costingConfigGuid)}></Button>
@@ -124,17 +152,17 @@ const CostingConfigsModal: React.FC<ICostingConfigsModalProps> = (props: ICostin
           ></DataGrid.Column>
         </DataGrid>
       </Modal>
-      <ConfigureCostingConfigModal
-        visible={costingConfigModalVisible}
+      <CostingConfigConfigureModal
+        visible={costingConfigConfigureModalVisible}
+        costingConfigForm={costingConfigForm}
         onCancel={() => {
-          setCostingConfigModalVisible(false);
-          setCopyCostConfigGuid('');
+          setCostingConfigConfigureModalVisible(false);
         }}
         onSave={handleAddConfig}
-        copyCostConfigGuid={copyCostConfigGuid}
         costConfigs={costConfigs}
-      ></ConfigureCostingConfigModal>
+      ></CostingConfigConfigureModal>
     </>
   );
 };
+
 export default CostingConfigsModal;
