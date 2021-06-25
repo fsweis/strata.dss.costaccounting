@@ -47,7 +47,6 @@ namespace Strata.DSS.CostAccounting.Biz.CostingConfigs.Services
 
         private async Task SaveEntityLinkages(Guid costConfigGuid, bool isUtilizationEntityConfigured, List<int> glPayrollEntityIds, List<int> utilEntityIds, CancellationToken cancellationToken)
         {
-
             var isCostingEntityLevelSecurityEnabled = await _systemSettingRepository.GetIsCostingEntityLevelSecurityEnabledAsync(cancellationToken);
 
             var existingLinkages = await _costingConfigRepository.GetCostingConfigEntityLinkagesAsync(costConfigGuid, cancellationToken);

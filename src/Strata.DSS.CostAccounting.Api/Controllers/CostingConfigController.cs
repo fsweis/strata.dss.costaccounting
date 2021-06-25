@@ -24,6 +24,7 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
         private readonly ICostAccountingRepository _costAccountingRepository;
         private readonly ICostingConfigService _costingConfigService;
         private readonly ISystemSettingRepository _systemSettingRepository;
+
         public CostingConfigController(ICostingConfigRepository costingConfigRepository, ICostAccountingRepository costAccountingRepository, ICostingConfigService costingConfigService, ISystemSettingRepository systemSettingRepository)
         {
             _costingConfigRepository = costingConfigRepository;
@@ -34,43 +35,41 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
 
         [HttpGet("")]
         [ProducesResponseType(200)]
-        public async Task<ActionResult<IEnumerable<CostingConfigDto>>> GetAllCostingConfigs(CancellationToken cancellationToken)
+        public async Task<IEnumerable<CostingConfigDto>> GetAllCostingConfigs(CancellationToken cancellationToken)
         {
             var costingConfigs = await _costingConfigRepository.GetAllCostingConfigsAsync(cancellationToken);
-            var dtos = costingConfigs.Select(x => new CostingConfigDto(x)).ToList();
-            return Ok(dtos);
+            var dtos = costingConfigs.Select(x => new CostingConfigDto(x));
+            return dtos;
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("{costingConfigGuid}")]
         [ProducesResponseType(200)]
-        public async Task<ActionResult<CostingConfigDto>> GetCostingConfig([FromRoute] Guid id, CancellationToken cancellationToken)
+        public async Task<CostingConfigDto> GetCostingConfig([FromRoute] Guid costingConfigGuid, CancellationToken cancellationToken)
         {
-            var costingConfig = await _costingConfigRepository.GetCostingConfigAsync(id, cancellationToken);
-            return Ok(new CostingConfigDto(costingConfig));
+            var costingConfig = await _costingConfigRepository.GetCostingConfigAsync(costingConfigGuid, cancellationToken);
+            return new CostingConfigDto(costingConfig);
         }
 
-        [HttpGet("copy/{id}")]//TODO: better naming potentially?
+        [HttpGet("entity-linkages/{costingConfigGuid}")]
         [ProducesResponseType(200)]
-        public async Task<ActionResult<CostingConfigDto>> GetCostingConfigForCopy([FromRoute] Guid id, CancellationToken cancellationToken)
+        public async Task<IEnumerable<CostingConfigEntityLinkage>> GetCostingConfigEntityLinkages([FromRoute] Guid costingConfigGuid, CancellationToken cancellationToken)
         {
-            var costingConfig = await _costingConfigRepository.GetCostingConfigAsync(id, cancellationToken);
-            var entityLinkages = await _costingConfigRepository.GetCostingConfigEntityLinkagesAsync(id, cancellationToken);
+            var entities = await _costingConfigRepository.GetCostingConfigEntityLinkagesAsync(costingConfigGuid, cancellationToken);
 
-            var dto = new CostingConfigDto(costingConfig)
-            {
-                GlPayrollEntities = entityLinkages.Where(x => !x.IsUtilization).Select(x => x.EntityId.ToString()).ToList(),
-                UtilEntities = entityLinkages.Where(x => x.IsUtilization).Select(x => x.EntityId.ToString()).ToList()
-            };
-
-            return dto;
+            return entities.Select(x =>
+                new CostingConfigEntityLinkage
+                {
+                    EntityId = x.EntityId,
+                    IsUtilization = x.IsUtilization
+                });
         }
 
         [HttpPost("")]
         [ProducesResponseType(200)]
-        public async Task<CostingConfigModel> AddNewConfig([FromBody] CostingConfigSaveData costConfigSaveData, CancellationToken cancellationToken)
+        public async Task<CostingConfigDto> AddNewConfig([FromBody] CostingConfigSaveData costConfigSaveData, CancellationToken cancellationToken)
         {
             var costConfig = await _costingConfigService.AddNewConfigAsync(costConfigSaveData, cancellationToken);
-            return costConfig;
+            return new CostingConfigDto(costConfig);
         }
 
         [HttpDelete("{costingConfigGuid}")]
@@ -96,17 +95,17 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
             var isCostingEntityLevelSecurityEnabled = await _systemSettingRepository.GetIsCostingEntityLevelSecurityEnabledAsync(cancellationToken);
 
             var entities = await _costAccountingRepository.GetEntitiesAsync(cancellationToken);
-            
+
             if (isCostingEntityLevelSecurityEnabled)
             {
                 if (costingConfigGuid != null && costingConfigGuid != Guid.Empty)
                 {
                     var filteredEntities = await _costingConfigRepository.GetCostingConfigEntityLevelSecuritiesAsync(costingConfigGuid, cancellationToken);
-                    if(filteredEntities.Count()>0)
+                    if (filteredEntities.Count() > 0)
                     {
                         return entities.Where(x => filteredEntities.Any(y => y.EntityId == x.EntityId)).ToList();
                     }
-                    
+
                 }
                 return new List<Entity>();
             }

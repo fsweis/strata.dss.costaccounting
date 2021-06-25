@@ -37,7 +37,7 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.Repositories
 
         public async Task<CostingConfigModel> GetCostingConfigAsync(Guid costingConfigGuid, CancellationToken cancellationToken)
         {
-            await using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
+            var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
             var entity = await dbContext.CostingConfigs.FirstOrDefaultAsync(cc => cc.CostingConfigGuid == costingConfigGuid, cancellationToken);
             return _mapper.Map<CostingConfigModel>(entity);
         }

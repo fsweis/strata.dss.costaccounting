@@ -30,6 +30,7 @@ import { EntityType } from './enums/EntityTypeEnum';
 
 interface ICostingConfigConfigureModalProps {
   visible: boolean;
+  title: string;
   costingConfigForm: ICostingConfigForm;
   costConfigs: ICostConfig[];
   onCancel: () => void;
@@ -49,9 +50,7 @@ const CostingConfigConfigureModal: React.FC<ICostingConfigConfigureModalProps> =
   const [utilEntityTreeData, setUtilEntityTreeData] = useState<ITreeDropDownNode[]>([]);
   const [isClaimsCostingEnabled, setIsClaimsCostingEnabled] = useState<boolean>(false);
   const [isCostingEntityLevelSecurityEnabled, setIsCostingEntityLevelSecurityEnabled] = useState<boolean>(false);
-  const [costingConfigForm, setcostingConfigForm] = useState<ICostingConfigForm>();
   const emptyGuid = getEmptyGuid();
-  const [title, setTitle] = useState<string>('');
 
   //Load initial data
   useEffect(() => {
@@ -82,50 +81,6 @@ const CostingConfigConfigureModal: React.FC<ICostingConfigConfigureModalProps> =
     setLoading(true);
     fetchData();
   }, [setLoading, emptyGuid]);
-
-  // useEffect(() => {
-  //   //set initial form
-  //   const year = fiscalYears.find((x) => x.fiscalYearId === new Date().getFullYear())?.fiscalYearId;
-  //   const ytdMonth = fiscalMonths.find((x) => x.sortOrder === 12)?.fiscalMonthId;
-  //   const fEntities = glPayrollEntities.map((x) => x.entityId.toString());
-  //   const uEntities = utilEntities.map((x) => x.entityId.toString());
-  //   const configForm = {
-  //     name: '',
-  //     description: '',
-  //     year: year ? year : 0,
-  //     ytdMonth: ytdMonth ? ytdMonth : 0,
-  //     type: CostingType.PatientCare,
-  //     glPayrollEntities: fEntities.length > 0 ? fEntities : ['0'],
-  //     entityType: EntityType.GlPayroll,
-  //     utilEntities: uEntities.length > 0 ? uEntities : ['0'],
-  //     defaultMethod: CostingMethod.Simultaneous,
-  //     options: [0, 0]
-  //   };
-
-  //   if (props.copyCostConfigGuid !== '') {
-  //     const fetchModel = async () => {
-  //       const costModel = await costConfigService.getCostConfigForCopy(props.copyCostConfigGuid);
-  //       configForm.name = costModel.name + ' - Copy';
-  //       configForm.description = costModel.description;
-  //       configForm.year = costModel.fiscalYearId;
-  //       configForm.type = costModel.type;
-  //       configForm.ytdMonth = costModel.fiscalMonthId;
-  //       configForm.options = [costModel.isBudgetedAndActualCosting ? 1 : 0, costModel.isPayrollCosting ? 2 : 0];
-  //       configForm.glPayrollEntities = costModel.glPayrollEntities;
-  //       configForm.utilEntities = costModel.utilEntities;
-  //       configForm.defaultMethod = costModel.defaultMethod;
-
-  //       setConfigForm(configForm);
-  //       form.resetFields();
-  //     };
-  //     fetchModel();
-  //     setTitle('Copy Model');
-  //   } else {
-  //     setConfigForm(configForm);
-  //     form.resetFields();
-  //     setTitle('New Model');
-  //   }
-  // }, [props.copyCostConfigGuid]);
 
   //Set Filtered Entity Trees when entities are loaded
   useEffect(() => {
@@ -211,9 +166,9 @@ const CostingConfigConfigureModal: React.FC<ICostingConfigConfigureModalProps> =
   const handleCancel = () => {
     setCostingType(0);
     setEntityUtilType(0);
-    Toast.show({ message: 'Changes Discarded', toastType: 'info' });
-    props.onCancel();
     form.resetFields();
+    props.onCancel();
+    Toast.show({ message: 'Changes Discarded', toastType: 'info' });
   };
 
   const handleSave = () => {
@@ -259,7 +214,7 @@ const CostingConfigConfigureModal: React.FC<ICostingConfigConfigureModalProps> =
   return (
     <>
       <Modal
-        title={title}
+        title={props.title}
         visible={props.visible}
         destroyOnClose
         onCancel={handleCancel}
@@ -279,7 +234,7 @@ const CostingConfigConfigureModal: React.FC<ICostingConfigConfigureModalProps> =
           </>
         }
       >
-        <Form form={form} onFinish={onFormFinish} layout={'vertical'} preserve={false} initialValues={costingConfigForm}>
+        <Form form={form} onFinish={onFormFinish} layout={'vertical'} preserve={false}>
           <Form.Item label='Name' name='name' initialValue={props.costingConfigForm.name} rules={[{ required: true, whitespace: true, max: 50 }, { pattern: /^[A-Za-z0-9 _-]*$/ }]}>
             <Input />
           </Form.Item>

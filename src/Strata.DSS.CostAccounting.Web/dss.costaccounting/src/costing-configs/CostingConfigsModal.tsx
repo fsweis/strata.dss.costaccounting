@@ -15,6 +15,7 @@ import { ICostingConfigForm } from './data/ICostingConfigForm';
 import { CostingMethod } from './enums/CostingMethodEnum';
 import { EntityType } from './enums/EntityTypeEnum';
 import { PatientCare_FriendlyName, Claims_FriendlyName } from './constants/CostingTypeConstants';
+import { ICostingConfigEntityLinkage } from './data/ICostingConfigEntityLinkage';
 
 export interface ICostingConfigsModalProps {
   visible: boolean;
@@ -41,6 +42,7 @@ const CostingConfigsModal: React.FC<ICostingConfigsModalProps> = (props: ICostin
   const [costConfigs, setCostConfigs] = useState<ICostConfig[]>([]);
   const [costingConfigForm, setCostingConfigForm] = useState<ICostingConfigForm>(newCostingConfigForm);
   const [globalFilterValue, setGlobalFilterValue] = useState<IGlobalFilterValue>({ fields: ['name', 'description'], value: '' });
+  const [costingConfigConfigureTitle, setcostingConfigConfigureTitle] = useState<string>('');
 
   useEffect(() => {
     const fetchData = async () => {
@@ -55,24 +57,31 @@ const CostingConfigsModal: React.FC<ICostingConfigsModalProps> = (props: ICostin
   };
 
   const handleCopyCostingConfig = (costingConfig: ICostConfig) => {
-    console.log(costingConfig);
+    let glPayrollEntities: string[] = [];
+    let utilEntities: string[] = [];
+
+    const fetchEntities = async (costingConfigGuid: string) => {
+      const entityLinkages: ICostingConfigEntityLinkage[] = await costConfigService.getCostingConfigEntityLinkages(costingConfigGuid);
+      glPayrollEntities = entityLinkages.filter((x) => x.isUtilization === false).map((x) => x.entityId.toString());
+      utilEntities = entityLinkages.filter((x) => x.isUtilization === true).map((x) => x.entityId.toString());
+    };
+
+    fetchEntities(costingConfig.costingConfigGuid);
 
     const costingConfigForm: ICostingConfigForm = {
-      name: costingConfig.name,
+      name: costingConfig.name + ' - Copy',
       description: costingConfig.description,
       year: costingConfig.fiscalYearId,
       ytdMonth: costingConfig.fiscalMonthId,
       type: costingConfig.type,
-      glPayrollEntities: costingConfig.glPayrollEntities,
+      glPayrollEntities: glPayrollEntities,
       entityType: EntityType.GlPayroll, //TODO: Update this in service
-      utilEntities: costingConfig.utilEntities,
+      utilEntities: utilEntities,
       defaultMethod: costingConfig.defaultMethod,
       options: [costingConfig.isBudgetedAndActualCosting ? 1 : 0, costingConfig.isPayrollCosting ? 2 : 0],
       isCopy: true
     };
-
-    console.log(costingConfigForm);
-
+    setcostingConfigConfigureTitle('Copy Model');
     openCostingConfigConfigureModal(true, costingConfigForm);
   };
 
@@ -107,6 +116,7 @@ const CostingConfigsModal: React.FC<ICostingConfigsModalProps> = (props: ICostin
               <Button
                 icon='Plus'
                 onClick={() => {
+                  setcostingConfigConfigureTitle('New Model');
                   openCostingConfigConfigureModal(true, newCostingConfigForm);
                 }}
               >
@@ -162,6 +172,7 @@ const CostingConfigsModal: React.FC<ICostingConfigsModalProps> = (props: ICostin
           setCostingConfigConfigureModalVisible(false);
         }}
         onSave={handleAddConfig}
+        title={costingConfigConfigureTitle}
         costConfigs={costConfigs}
       ></CostingConfigConfigureModal>
     </>

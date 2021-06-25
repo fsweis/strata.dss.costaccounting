@@ -1,5 +1,6 @@
 import { appConfig, getSecureService } from '@strata/core/lib';
 import { ICostConfig } from './ICostConfig';
+import { ICostingConfigEntityLinkage } from '../../costing-configs/data/ICostingConfigEntityLinkage';
 import { IEntity } from '../../costing-configs/data/IEntity';
 import { ICostConfigSaveData } from '../../costing-configs/data/ICostConfigSaveData';
 
@@ -12,6 +13,9 @@ export const costConfigService = {
   getCostConfig: (costingConfigGuid: string): Promise<ICostConfig> => {
     return httpGet<ICostConfig>(`costing-configs/${costingConfigGuid}`);
   },
+  getCostingConfigEntityLinkages: (costingConfigGuid: string): Promise<ICostingConfigEntityLinkage[]> => {
+    return httpGet<ICostingConfigEntityLinkage[]>(`costing-configs/entity-linkages/${costingConfigGuid}`);
+  },
   getUtilEntities: (): Promise<IEntity[]> => {
     return httpGet<IEntity[]>(`costing-configs/entities`);
   },
@@ -20,9 +24,6 @@ export const costConfigService = {
   },
   addNewConfig: (costConfigSaveData: ICostConfigSaveData): Promise<ICostConfig> => {
     return httpPost<ICostConfig>(`costing-configs/`, costConfigSaveData);
-  },
-  getCostConfigForCopy: (costingConfigGuid: string): Promise<ICostConfig> => {
-    return httpGet<ICostConfig>(`costing-configs/copy/${costingConfigGuid}`);
   },
   deleteCostConfig: (costConfigGuid: string): Promise<string> => {
     return httpDelete<string>(`costing-configs/${costConfigGuid}`);
