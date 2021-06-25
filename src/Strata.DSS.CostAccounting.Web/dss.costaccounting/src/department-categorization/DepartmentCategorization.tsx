@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import Header from '@strata/tempo/lib/header';
 import Button from '@strata/tempo/lib/button';
 import Tooltip from '@strata/tempo/lib/tooltip';
@@ -8,16 +8,28 @@ import ActionBar from '@strata/tempo/lib/actionbar';
 import DataGrid from '@strata/tempo/lib/datagrid';
 import DropDown from '@strata/tempo/lib/dropdown';
 import ButtonMenu from '@strata/tempo/lib/buttonmenu';
+import { IDepartmentCategorization } from './data/IDepartmentCategorization';
 import _ from 'lodash';
 
 const DepartmentCategorization: React.FC = () => {
   const [searchValue, setSearchValue] = React.useState(false);
   const [searchLoading, setSearchLoading] = React.useState(false);
-  const [searchItems, setSearchItems] = React.useState([]);
-  const [data, setData] = React.useState([]);
+  const [searchDepartments, setSearchDepartments] = React.useState([]);
+  const [exceptionDepartmentData, setExceptionDepartmentData] = useState<IDepartmentCategorization[]>([]);
+  const [overheadDepartmentData, setOverheadDepartmentData] = useState<IDepartmentCategorization[]>([]);
+  const [revenueDepartmentData, setRevenueDepartmentData] = useState<IDepartmentCategorization[]>([]);
 
   const handleAddRow = () => {
-    //setData((data) => data.concat([{ id: data.length + 1, name: '', exceptionType: '' }]));
+    const newDepartmentCat: IDepartmentCategorization = {
+      costingDepartmentExceptionTypeId: 0,
+      departmentId: 0,
+      departmentTypeEnum: 0,
+      name: '',
+      deptExceptionType: 0,
+      deptExceptionTypeName: ''
+    };
+
+    setExceptionDepartmentData([newDepartmentCat]);
   };
 
   return (
@@ -77,7 +89,7 @@ const DepartmentCategorization: React.FC = () => {
                     onSearch={_.debounce((search) => {
                       setSearchValue(true);
                       setSearchLoading(true);
-                      setSearchItems([]);
+                      setSearchDepartments([]);
 
                       if (search.trim().length === 0) {
                         setSearchValue(false);
@@ -87,7 +99,7 @@ const DepartmentCategorization: React.FC = () => {
                       // start API simulation
                       setTimeout(() => {
                         if ('name'.indexOf(search.toLowerCase()) > -1) {
-                          setSearchItems([]);
+                          setSearchDepartments([]);
                         }
                         setSearchLoading(false);
                       }, 1000);
@@ -98,15 +110,34 @@ const DepartmentCategorization: React.FC = () => {
                       setTimeout(() => {
                         setSearchValue(false);
                         setSearchLoading(false);
-                        setSearchItems([]);
+                        setSearchDepartments([]);
                       });
                     }}
-                    items={searchItems}
+                    items={searchDepartments}
                   ></DropDown>
                 </>
               )}
             />
-            <DataGrid.Column header='Exception Type' filter width={240} />
+            <DataGrid.Column
+              header='Exception Type'
+              filter
+              width={240}
+              body={(rowData) => (
+                <>
+                  <DropDown
+                    width={200}
+                    items={[
+                      { text: 'Revenue to Excluded', value: 1 },
+                      { text: 'Revenue to Overhead', value: 2 },
+                      { text: 'Overhead to Revenue', value: 3 },
+                      { text: 'Overhead to Excluded', value: 4 },
+                      { text: 'Excluded to Overhead', value: 5 },
+                      { text: 'Excluded to Revenue', value: 6 }
+                    ]}
+                  />
+                </>
+              )}
+            />
 
             <DataGrid.EmptyColumn />
             <DataGrid.Column
@@ -123,9 +154,39 @@ const DepartmentCategorization: React.FC = () => {
           </DataGrid>
         </Tabs.TabPane>
         <Tabs.TabPane key='2' tab='Overhead'>
-          <Spacing padding={24}>Content with padding</Spacing>
+          <DataGrid
+            pager={{
+              pageSize: 100,
+              extra: (
+                <>
+                  <Button>Cancel</Button>
+                  <Button type='primary'>Save</Button>
+                </>
+              )
+            }}
+          >
+            <DataGrid.RowNumber />
+            <DataGrid.Column header='Department' filter width={480} />
+            <DataGrid.EmptyColumn />
+          </DataGrid>
         </Tabs.TabPane>
-        <Tabs.TabPane key='3' tab='Revenue'></Tabs.TabPane>
+        <Tabs.TabPane key='3' tab='Revenue'>
+          <DataGrid
+            pager={{
+              pageSize: 100,
+              extra: (
+                <>
+                  <Button>Cancel</Button>
+                  <Button type='primary'>Save</Button>
+                </>
+              )
+            }}
+          >
+            <DataGrid.RowNumber />
+            <DataGrid.Column header='Department' filter width={480} />
+            <DataGrid.EmptyColumn />
+          </DataGrid>
+        </Tabs.TabPane>
       </Tabs>
     </>
   );
