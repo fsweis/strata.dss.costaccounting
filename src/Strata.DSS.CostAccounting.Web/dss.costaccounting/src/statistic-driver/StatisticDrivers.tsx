@@ -5,7 +5,6 @@ import Tooltip from '@strata/tempo/lib/tooltip';
 import Button from '@strata/tempo/lib/button';
 import Toast from '@strata/tempo/lib/toast';
 import ActionBar from '@strata/tempo/lib/actionbar';
-import Spacing from '@strata/tempo/lib/spacing';
 import DropDown from '@strata/tempo/lib/dropdown';
 import Modal from '@strata/tempo/lib/modal';
 import Banner from '@strata/tempo/lib/banner';

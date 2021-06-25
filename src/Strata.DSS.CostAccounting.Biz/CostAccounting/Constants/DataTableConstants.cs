@@ -6,7 +6,7 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.Constants
 {
     public static class DataTableConstants
     {
-        #region GlobalIDs
+        #region GlobalIds
         public const string DSSGL = "DSS GL Sampled";
         public const string PatientBillingLineItemDetail = "DSS Patient Billing Line Item Detail";
         public const string PatientEncounterSummary = "DSS Patient Encounter";
