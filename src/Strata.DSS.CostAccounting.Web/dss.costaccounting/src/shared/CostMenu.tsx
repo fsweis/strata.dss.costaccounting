@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
+import { useCookies } from 'react-cookie';
 import Menu from '@strata/tempo/lib/menu';
 import ButtonMenu from '@strata/tempo/lib/buttonmenu';
 import { ICostConfig, newCostConfig } from './data/ICostConfig';
-
 import CostingConfigsModal from '../costing-configs/CostingConfigsModal';
+
 export interface ICostMenuProps {
   costConfigsFiltered: ICostConfig[];
   costConfigs: ICostConfig[];
@@ -17,6 +18,7 @@ const CostMenu: React.FC<ICostMenuProps> = ({ costConfigsFiltered, costConfigs, 
 
   const history = useHistory();
   const location = useLocation();
+  const [cookies, setCookie] = useCookies(['strata-costaccounting']);
 
   useEffect(() => {
     const splitPath = location.pathname.split('/').filter((p) => p.trim() !== '');
@@ -29,10 +31,27 @@ const CostMenu: React.FC<ICostMenuProps> = ({ costConfigsFiltered, costConfigs, 
       }
     } else {
       if (costConfigsFiltered.length) {
-        setSelectedCostConfigItem(costConfigsFiltered[0]);
+        //check cookie
+        if (cookies.CostingConfigGuid) {
+          const cookieConfig = costConfigsFiltered.find((c) => c.costingConfigGuid === cookies.CostingConfigGuid);
+          if (cookieConfig && cookieConfig !== selectedCostConfigItem) {
+            //found last config in cookie
+            setSelectedCostConfigItem(cookieConfig);
+          } else if (cookieConfig !== selectedCostConfigItem) {
+            //last config in cookie invalid, set default
+            setSelectedCostConfigItem(costConfigsFiltered[0]);
+          }
+        } else {
+          //cookie not found, set default
+          setSelectedCostConfigItem(costConfigsFiltered[0]);
+        }
       }
     }
-  }, [costConfigs, costConfigsFiltered, location, selectedCostConfigItem]);
+  }, [costConfigs, costConfigsFiltered, location, cookies.CostingConfigGuid, selectedCostConfigItem]);
+
+  useEffect(() => {
+    setCookie('CostingConfigGuid', selectedCostConfigItem.costingConfigGuid, { path: '/' });
+  }, [selectedCostConfigItem, setCookie]);
 
   const getActiveUrlKey = () => {
     const currentLocation = '/' + location.pathname.split('/')[1];
