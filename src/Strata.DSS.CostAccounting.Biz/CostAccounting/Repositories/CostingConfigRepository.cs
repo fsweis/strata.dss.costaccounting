@@ -29,7 +29,7 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.Repositories
         {
             var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
 
-            var costingConfigs = await dbContext.CostingConfigs.Include(x => x.CostingResults).ToListAsync(cancellationToken);
+            var costingConfigs = await dbContext.CostingConfigs.Include(x => x.CostingResults).Where(x => x.CostingConfigGuid != Guid.Empty).ToListAsync(cancellationToken);
             costingConfigs.ForEach(x => x.LastPublishedUtc = x.CostingResults.SingleOrDefault(x => !x.IsDraft)?.CreatedAtUtc);
 
             return costingConfigs;

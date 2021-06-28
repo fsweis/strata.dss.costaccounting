@@ -17,7 +17,7 @@ import ManualStatistics from '../manual-statistics/ManualStatistics';
 
 import { Navbar } from '@strata/navbar/lib';
 import CostMenu from './CostMenu';
-import CostConfigProvider from './data/CostingConfigProvider';
+import CostingConfigProvider from './data/CostingConfigProvider';
 import { CostingConfigService } from './data/CostingConfigService';
 import { ICostingConfig } from './data/ICostingConfig';
 import { systemSettingService } from './data/systemSettingService';
@@ -71,7 +71,7 @@ const Navigation: React.FC = () => {
             />
           </Layout.Sider>
           <Layout.Content>
-            <CostConfigProvider costingConfigGuid={costingConfigGuid}>
+            <CostingConfigProvider costingConfigGuid={costingConfigGuid}>
               <Switch>
                 <Route path='/' exact render={() => <Redirect to={`/overview`}></Redirect>} key='default'></Route>
                 <Route path='/overview' component={Overview} key='overview'></Route>
@@ -88,7 +88,7 @@ const Navigation: React.FC = () => {
                 <Route path='/drop-down-configuration' component={DropdownConfiguration} key='drop-down-configuration'></Route>
                 <Route path='/manual-statistics' component={ManualStatistics} key='manual-statistics'></Route>
               </Switch>
-            </CostConfigProvider>
+            </CostingConfigProvider>
           </Layout.Content>
         </Layout>
       </Layout>
