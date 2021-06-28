@@ -13,7 +13,7 @@ using Strata.SMC.Client;
 using Strata.SqlTools.Configuration.SqlServer;
 using System;
 using System.Threading;
-using System.Threading.Tasks;
+using System.Threading.Tasks;
 namespace Microsoft.Extensions.DependencyInjection
 {
     public static class CostAccountingServiceCollectionExtensions
@@ -35,10 +35,10 @@ namespace Microsoft.Extensions.DependencyInjection
             services.TryAddScoped<IClaimsPrincipalAccessor, ClaimsPrincipalAccessor>();
             services.AddAsyncDbContextFactory<CostAccountingDbContext>(options =>
             {
-                options
-                .UseSqlServer()
+                options
+                .UseSqlServer()
 #if DEBUG
-                    .WithConnectionString(GetConnectionStringUsingIntegratedSecurity);
+                    .WithConnectionString(GetConnectionStringUsingIntegratedSecurity);
 #else
                    .WithConnectionString((provider, cancellationToken) => provider.GetConnectionStringFromSmc(cancellationToken));
 #endif
@@ -55,14 +55,14 @@ namespace Microsoft.Extensions.DependencyInjection
         private static async Task<string> GetConnectionStringUsingIntegratedSecurity(IServiceProvider provider, CancellationToken cancellationToken)
         {
             var claimsAccessor = provider.GetRequiredService<IClaimsPrincipalAccessor>();
-            var databaseGuid = claimsAccessor.GetCurrentClaimsPrincipal()?.GetStrataDatabaseGuid();
+            var databaseGuid = claimsAccessor.GetCurrentClaimsPrincipal()?.GetStrataDatabaseGuid();
             if (!databaseGuid.HasValue)
             {
                 throw new InvalidOperationException($"User must be authenticated an have claim with key: '{Strata.CoreLib.Claims.StrataClaims.DatabaseGuid}'.");
             }
 
             var smc = provider.GetRequiredService<ISMCServiceClient>();
-            var database = await smc.GetDatabaseAsync(databaseGuid.Value, cancellationToken);
+            var database = await smc.GetDatabaseAsync(databaseGuid.Value, cancellationToken);
             var connectionStringBuilder = new SqlConnectionStringBuilder
             {
                 DataSource = database.ServerName,

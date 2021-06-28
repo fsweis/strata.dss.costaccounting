@@ -37,12 +37,42 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
             return costingConfigs;
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("{costingConfigGuid}")]
         [ProducesResponseType(200)]
         public async Task<CostingConfig> GetCostingConfig([FromRoute] Guid costingConfigGuid, CancellationToken cancellationToken)
         {
             var costingConfig = await _costingConfigRepository.GetCostingConfigAsync(costingConfigGuid, cancellationToken);
             return costingConfig;
+        }
+
+        [HttpGet("entity-linkages/{costingConfigGuid}")]
+        [ProducesResponseType(200)]
+        public async Task<IEnumerable<CostingConfigEntityLinkage>> GetCostingConfigEntityLinkages([FromRoute] Guid costingConfigGuid, CancellationToken cancellationToken)
+        {
+            var entities = await _costingConfigRepository.GetCostingConfigEntityLinkagesAsync(costingConfigGuid, cancellationToken);
+
+            return entities.Select(x =>
+                new CostingConfigEntityLinkage
+                {
+                    EntityId = x.EntityId,
+                    IsUtilization = x.IsUtilization
+                });
+        }
+
+        [HttpPost("")]
+        [ProducesResponseType(200)]
+        public async Task<CostingConfig> AddNewConfig([FromBody] CostingConfigSaveData costConfigSaveData, CancellationToken cancellationToken)
+        {
+            var costConfig = await _costingConfigService.AddNewConfigAsync(costConfigSaveData, cancellationToken);
+            return costConfig;
+        }
+
+        [HttpDelete("{costingConfigGuid}")]
+        [ProducesResponseType(200)]
+        public async Task<Guid> DeleteCostingConfig([FromRoute] Guid costingConfigGuid, CancellationToken cancellationToken)
+        {
+            var jobGuid = await _costingConfigRepository.DeleteCostingConfigAsync(costingConfigGuid, cancellationToken);
+            return jobGuid;
         }
 
         [HttpGet("entities")]
@@ -76,14 +106,6 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
             }
 
             return entities;
-        }
-
-        [HttpPost("")]
-        [ProducesResponseType(200)]
-        public async Task<CostingConfig> AddNewConfig([FromBody] CostingConfigSaveData costConfigSaveData, CancellationToken cancellationToken)
-        {
-            var costConfig = await _costingConfigService.AddNewConfigAsync(costConfigSaveData, cancellationToken);
-            return costConfig;
         }
     }
 }

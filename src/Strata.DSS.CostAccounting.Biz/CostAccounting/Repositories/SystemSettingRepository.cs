@@ -11,7 +11,6 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.Repositories
     public class SystemSettingRepository : ISystemSettingRepository
     {
         private readonly IAsyncDbContextFactory<CostAccountingDbContext> _dbContextFactory;
-
         public SystemSettingRepository(IAsyncDbContextFactory<CostAccountingDbContext> dbContextFactory)
         {
             _dbContextFactory = dbContextFactory;

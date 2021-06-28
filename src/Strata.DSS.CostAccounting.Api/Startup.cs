@@ -62,6 +62,7 @@ namespace Strata.DSS.CostAccounting.Api
             services.AddStrataAuthentication(_configuration);
             services.AddStrataCors(_configuration);
             services.AddHealthChecks();
+            services.AddJazzHangfireServiceClient();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
