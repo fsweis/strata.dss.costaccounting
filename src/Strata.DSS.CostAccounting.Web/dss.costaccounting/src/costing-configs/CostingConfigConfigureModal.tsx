@@ -205,14 +205,14 @@ const CostingConfigConfigureModal: React.FC<ICostingConfigConfigureModalProps> =
   };
 
   const getGlPayrollEntitiesInitialValue = () => {
-    if (props.costingConfigForm.isCopy) return props.costingConfigForm.glPayrollEntities;
+    if (props.costingConfigForm.isCopy) return props.costingConfigForm.glPayrollEntities.length > 0 ? props.costingConfigForm.glPayrollEntities : ['0'];
 
     const fEntities = glPayrollEntities.map((x) => x.entityId.toString());
     return fEntities.length > 0 ? fEntities : ['0'];
   };
 
   const getUtilizationEntitiesitiesInitialValue = () => {
-    if (props.costingConfigForm.isCopy) return props.costingConfigForm.utilizationEntities;
+    if (props.costingConfigForm.isCopy) return props.costingConfigForm.utilizationEntities.length > 0 ? props.costingConfigForm.utilizationEntities : ['0'];
 
     const uEntities = utilizationEntities.map((x) => x.entityId.toString());
     return uEntities.length > 0 ? uEntities : ['0'];
