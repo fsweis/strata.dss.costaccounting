@@ -18,6 +18,7 @@ const CostMenu: React.FC<ICostMenuProps> = ({ costingConfigsFiltered, costingCon
   const [costingConfigsModalVisible, setCostingConfigsModalVisible] = React.useState<boolean>(false);
   const history = useHistory();
   const location = useLocation();
+  const viewAndManageModels = 'ViewAndManageModels';
 
   useEffect(() => {
     const pathConfigGuid = getPathConfigGuid(location.pathname);
@@ -40,7 +41,7 @@ const CostMenu: React.FC<ICostMenuProps> = ({ costingConfigsFiltered, costingCon
   };
 
   const handleClick = (key: React.Key) => {
-    if (key === '1') {
+    if (key === viewAndManageModels) {
       setCostingConfigsModalVisible(true);
     } else {
       const costingConfigItem = costingConfigs.find((config) => config.costingConfigGuid === key);
@@ -70,7 +71,7 @@ const CostMenu: React.FC<ICostMenuProps> = ({ costingConfigsFiltered, costingCon
                 <ButtonMenu.Item key={item.costingConfigGuid}>{item.name}</ButtonMenu.Item>
               ))}
               <ButtonMenu.Divider />
-              <ButtonMenu.Item key='1'>View & Manage Models</ButtonMenu.Item>
+              <ButtonMenu.Item key={viewAndManageModels}>View & Manage Models</ButtonMenu.Item>
               <ButtonMenu.Divider />
             </ButtonMenu>
           </Menu.Item>
