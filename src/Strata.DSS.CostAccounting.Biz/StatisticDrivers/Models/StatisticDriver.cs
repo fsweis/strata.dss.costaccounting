@@ -1,13 +1,16 @@
 ﻿using Strata.DSS.CostAccounting.Biz.Enums;
 using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace Strata.DSS.CostAccounting.Biz.StatisticDrivers.Models
 {
     public class StatisticDriver
     {
         public Guid DriverConfigGuid { get; set; }
-        public Guid MeasureGuid { get; set; }
+        [Required]
+        public Guid? MeasureGuid { get; set; }
         public Guid DataTableGuid { get; set; }
+        [Required]
         public string Name { get; set; }
         public bool HasRules { get; set; }
         public bool IsInverted { get; set; }

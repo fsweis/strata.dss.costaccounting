@@ -2,6 +2,7 @@
 using Strata.DSS.CostAccounting.Biz.CostAccounting.Models;
 using Strata.DSS.CostAccounting.Biz.CostAccounting.Repositories;
 using Strata.DSS.CostAccounting.Biz.CostingConfigs.Models;
+using Strata.DSS.CostAccounting.Biz.CostingConfigs.Repositories;
 using Strata.DSS.CostAccounting.Biz.Enums;
 using System;
 using System.Collections.Generic;
@@ -102,6 +103,7 @@ namespace Strata.DSS.CostAccounting.Biz.CostingConfigs.Services
                 await _costingConfigRepository.UpdateCostingConfigEntityLinkagesAsync(newLinks, cancellationToken);
             }
         }
+
         private async Task DeleteEntityLinkagesAsync(IEnumerable<CostingConfigEntityLinkage> links, List<int> entities, CancellationToken cancellationToken)
         {
             var deleteLinks = new List<CostingConfigEntityLinkage>();

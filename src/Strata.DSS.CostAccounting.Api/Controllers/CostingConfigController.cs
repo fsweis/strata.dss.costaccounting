@@ -2,6 +2,7 @@
 using Strata.DSS.CostAccounting.Biz.CostAccounting.Models;
 using Strata.DSS.CostAccounting.Biz.CostAccounting.Repositories;
 using Strata.DSS.CostAccounting.Biz.CostingConfigs.Models;
+using Strata.DSS.CostAccounting.Biz.CostingConfigs.Repositories;
 using Strata.DSS.CostAccounting.Biz.CostingConfigs.Services;
 using System;
 using System.Collections.Generic;
@@ -19,14 +20,12 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
         private readonly ICostingConfigRepository _costingConfigRepository;
         private readonly ICostAccountingRepository _costAccountingRepository;
         private readonly ICostingConfigService _costingConfigService;
-        private readonly ISystemSettingRepository _systemSettingRepository;
 
-        public CostingConfigController(ICostingConfigRepository costingConfigRepository, ICostAccountingRepository costAccountingRepository, ICostingConfigService costingConfigService, ISystemSettingRepository systemSettingRepository)
+        public CostingConfigController(ICostingConfigRepository costingConfigRepository, ICostAccountingRepository costAccountingRepository, ICostingConfigService costingConfigService)
         {
             _costingConfigRepository = costingConfigRepository;
             _costAccountingRepository = costAccountingRepository;
             _costingConfigService = costingConfigService;
-            _systemSettingRepository = systemSettingRepository;
         }
 
         [HttpGet("")]
@@ -39,9 +38,14 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
 
         [HttpGet("{costingConfigGuid}")]
         [ProducesResponseType(200)]
-        public async Task<CostingConfig> GetCostingConfig([FromRoute] Guid costingConfigGuid, CancellationToken cancellationToken)
+        [ProducesResponseType(404)]
+        public async Task<ActionResult<CostingConfig>> GetCostingConfig([FromRoute] Guid costingConfigGuid, CancellationToken cancellationToken)
         {
             var costingConfig = await _costingConfigRepository.GetCostingConfigAsync(costingConfigGuid, cancellationToken);
+            if (costingConfig == null)
+            {
+                return NotFound();
+            }
             return costingConfig;
         }
 
@@ -87,25 +91,9 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
         [ProducesResponseType(200)]
         public async Task<IEnumerable<Entity>> GetFilteredEntities([FromRoute] Guid costingConfigGuid, CancellationToken cancellationToken)
         {
-            var isCostingEntityLevelSecurityEnabled = await _systemSettingRepository.GetIsCostingEntityLevelSecurityEnabledAsync(cancellationToken);
+            var filteredEntities = await _costingConfigRepository.GetFilteredEntitiesAsync(costingConfigGuid, cancellationToken);
 
-            var entities = await _costAccountingRepository.GetEntitiesAsync(cancellationToken);
-
-            if (isCostingEntityLevelSecurityEnabled)
-            {
-                if (costingConfigGuid != Guid.Empty)
-                {
-                    var filteredEntities = await _costingConfigRepository.GetCostingConfigEntityLevelSecuritiesAsync(costingConfigGuid, cancellationToken);
-                    if (filteredEntities.Any())
-                    {
-                        return entities.Where(x => filteredEntities.Any(y => y.EntityId == x.EntityId)).ToList();
-                    }
-
-                }
-                return new List<Entity>();
-            }
-
-            return entities;
+            return filteredEntities;
         }
     }
 }

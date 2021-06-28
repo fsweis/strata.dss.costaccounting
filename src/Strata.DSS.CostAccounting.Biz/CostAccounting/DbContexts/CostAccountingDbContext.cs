@@ -83,6 +83,7 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.DbContexts
                 entity.HasKey(e => e.CostingConfigGuid);
                 entity.ToTable("CostingConfig", "dss");
                 entity.Ignore(e => e.LastPublishedUtc);
+                entity.HasMany(e => e.EntityLinkages).WithOne().HasForeignKey(el => el.CostingConfigGuid);
             });
 
             modelBuilder.Entity<CostingResult>(entity =>

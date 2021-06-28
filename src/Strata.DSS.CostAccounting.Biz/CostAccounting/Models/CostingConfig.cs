@@ -1,7 +1,7 @@
-﻿using Strata.DSS.CostAccounting.Biz.Enums;
+﻿using Strata.DSS.CostAccounting.Biz.CostingConfigs.Models;
+using Strata.DSS.CostAccounting.Biz.Enums;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text.Json.Serialization;
 
 namespace Strata.DSS.CostAccounting.Biz.CostAccounting.Models
@@ -29,6 +29,8 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.Models
         public bool IsPendingDelete { get; set; }
         [JsonIgnore]
         public ICollection<CostingResult> CostingResults { get; set; }
+        [JsonIgnore]
+        public ICollection<CostingConfigEntityLinkage> EntityLinkages { get; set; }
         public DateTime? LastPublishedUtc { get; set; }
     }
 }

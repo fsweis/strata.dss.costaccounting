@@ -2,9 +2,10 @@
 using Microsoft.EntityFrameworkCore;
 using Strata.DSS.CostAccounting.Biz.CostAccounting.DbContexts;
 using Strata.DSS.CostAccounting.Biz.CostAccounting.Models;
+using Strata.DSS.CostAccounting.Biz.CostAccounting.Repositories;
+using Strata.DSS.CostAccounting.Biz.CostingConfigs.Models;
 using Strata.Hangfire.Jazz.Client;
 using Strata.Hangfire.Jazz.Client.Models;
-using Strata.DSS.CostAccounting.Biz.CostingConfigs.Models;
 using Strata.SqlTools.Configuration.Common.AsyncFactory;
 using System;
 using System.Collections.Generic;
@@ -12,17 +13,21 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Strata.DSS.CostAccounting.Biz.CostAccounting.Repositories
+namespace Strata.DSS.CostAccounting.Biz.CostingConfigs.Repositories
 {
     public class CostingConfigRepository : ICostingConfigRepository
     {
         private readonly IAsyncDbContextFactory<CostAccountingDbContext> _dbContextFactory;
         private readonly IJazzHangfireServiceClient _hangfireServiceClient;
+        private readonly ICostAccountingRepository _costAccountingRepository;
+        private readonly ISystemSettingRepository _systemSettingRepository;
 
-        public CostingConfigRepository(IAsyncDbContextFactory<CostAccountingDbContext> dbContextFactory, IJazzHangfireServiceClient hangfireServiceClient)
+        public CostingConfigRepository(IAsyncDbContextFactory<CostAccountingDbContext> dbContextFactory, IJazzHangfireServiceClient hangfireServiceClient, ICostAccountingRepository costAccountingRepository, ISystemSettingRepository systemSettingRepository)
         {
             _dbContextFactory = dbContextFactory;
             _hangfireServiceClient = hangfireServiceClient;
+            _costAccountingRepository = costAccountingRepository;
+            _systemSettingRepository = systemSettingRepository;
         }
 
         public async Task<IEnumerable<CostingConfig>> GetAllCostingConfigsAsync(CancellationToken cancellationToken)
@@ -51,11 +56,34 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.Repositories
             return entities;
         }
 
-        public async Task<IEnumerable<CostingConfigEntityLevelSecurity>> GetCostingConfigEntityLevelSecuritiesAsync(Guid costingConfigGuid, CancellationToken cancellationToken)
+        public async Task<IEnumerable<Entity>> GetFilteredEntitiesAsync(Guid costingConfigGuid, CancellationToken cancellationToken)
         {
-            await using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
-            var costingConfigEntityLevelSecurities = await dbContext.CostingConfigEntityLevelSecurities.Where(x => x.CostingConfigGuid == costingConfigGuid).ToListAsync(cancellationToken);
-            return costingConfigEntityLevelSecurities;
+            var isCostingEntityLevelSecurityEnabled = await _systemSettingRepository.GetIsCostingEntityLevelSecurityEnabledAsync(cancellationToken);
+
+            var entities = await _costAccountingRepository.GetEntitiesAsync(cancellationToken);
+
+            if (isCostingEntityLevelSecurityEnabled)
+            {
+                if (costingConfigGuid != Guid.Empty)
+                {
+                    await using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
+                    var costingConfigEntityLevelSecurities = await dbContext.CostingConfigEntityLevelSecurities.Where(x => x.CostingConfigGuid == costingConfigGuid).ToListAsync(cancellationToken);
+                    if (costingConfigEntityLevelSecurities.Any())
+                    {
+                        return entities.Where(x => costingConfigEntityLevelSecurities.Any(y => y.EntityId == x.EntityId));
+                    }
+                    else
+                    {
+                        return new List<Entity>();
+                    }
+                }
+                else
+                {
+                    return new List<Entity>();
+                }
+            }
+
+            return entities;
         }
 
         public async Task UpdateCostingConfigEntityLinkagesAsync(List<CostingConfigEntityLinkage> cceLinks, CancellationToken cancellationToken)
