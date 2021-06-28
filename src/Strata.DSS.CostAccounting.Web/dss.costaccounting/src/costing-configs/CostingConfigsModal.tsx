@@ -49,7 +49,7 @@ const CostingConfigsModal: React.FC<ICostingConfigsModalProps> = (props: ICostin
     const fetchEntities = async (costingConfigGuid: string) => {
       const entityLinkages: ICostingConfigEntityLinkage[] = await CostingConfigService.getCostingConfigEntityLinkages(costingConfigGuid);
       const glPayrollEntities: string[] = entityLinkages.filter((x) => x.isUtilization === false).map((x) => x.entityId.toString());
-      const utilEntities: string[] = entityLinkages.filter((x) => x.isUtilization === true).map((x) => x.entityId.toString());
+      const utilizationEntities: string[] = entityLinkages.filter((x) => x.isUtilization === true).map((x) => x.entityId.toString());
 
       const costingConfigForm: ICostingConfigForm = {
         name: costingConfig.name + ' - Copy',
@@ -58,8 +58,8 @@ const CostingConfigsModal: React.FC<ICostingConfigsModalProps> = (props: ICostin
         ytdMonth: costingConfig.fiscalMonthId,
         type: costingConfig.type,
         glPayrollEntities: glPayrollEntities,
-        entityType: EntityType.GlPayroll,
-        utilEntities: utilEntities,
+        entityType: costingConfig.isUtilizationEntityConfigured ? EntityType.Specify : EntityType.GlPayroll,
+        utilizationEntities: utilizationEntities,
         defaultMethod: costingConfig.defaultMethod,
         options: [
           costingConfig.isBudgetedAndActualCosting ? CostingOption.BudgetedAndActualCosting : CostingOption.NotSpecified,
