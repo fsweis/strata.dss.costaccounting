@@ -53,36 +53,35 @@ const CostingConfigsModal: React.FC<ICostingConfigsModalProps> = (props: ICostin
 
   const handleAddConfig = (newConfig: ICostConfig) => {
     setCostingConfigConfigureModalVisible(false);
-    //TODO: add to list.
+    const updatedCostConfigs = [...costConfigs, newConfig];
+    setCostConfigs(updatedCostConfigs);
   };
 
   const handleCopyCostingConfig = (costingConfig: ICostConfig) => {
-    let glPayrollEntities: string[] = [];
-    let utilEntities: string[] = [];
-
     const fetchEntities = async (costingConfigGuid: string) => {
       const entityLinkages: ICostingConfigEntityLinkage[] = await costConfigService.getCostingConfigEntityLinkages(costingConfigGuid);
-      glPayrollEntities = entityLinkages.filter((x) => x.isUtilization === false).map((x) => x.entityId.toString());
-      utilEntities = entityLinkages.filter((x) => x.isUtilization === true).map((x) => x.entityId.toString());
+      const glPayrollEntities: string[] = entityLinkages.filter((x) => x.isUtilization === false).map((x) => x.entityId.toString());
+      const utilEntities: string[] = entityLinkages.filter((x) => x.isUtilization === true).map((x) => x.entityId.toString());
+
+      const costingConfigForm: ICostingConfigForm = {
+        name: costingConfig.name + ' - Copy',
+        description: costingConfig.description,
+        year: costingConfig.fiscalYearId,
+        ytdMonth: costingConfig.fiscalMonthId,
+        type: costingConfig.type,
+        glPayrollEntities: glPayrollEntities,
+        entityType: EntityType.GlPayroll,
+        utilEntities: utilEntities,
+        defaultMethod: costingConfig.defaultMethod,
+        options: [costingConfig.isBudgetedAndActualCosting ? 1 : 0, costingConfig.isPayrollCosting ? 2 : 0],
+        isCopy: true
+      };
+
+      setcostingConfigConfigureTitle('Copy Model');
+      openCostingConfigConfigureModal(true, costingConfigForm);
     };
 
     fetchEntities(costingConfig.costingConfigGuid);
-
-    const costingConfigForm: ICostingConfigForm = {
-      name: costingConfig.name + ' - Copy',
-      description: costingConfig.description,
-      year: costingConfig.fiscalYearId,
-      ytdMonth: costingConfig.fiscalMonthId,
-      type: costingConfig.type,
-      glPayrollEntities: glPayrollEntities,
-      entityType: EntityType.GlPayroll, //TODO: Update this in service
-      utilEntities: utilEntities,
-      defaultMethod: costingConfig.defaultMethod,
-      options: [costingConfig.isBudgetedAndActualCosting ? 1 : 0, costingConfig.isPayrollCosting ? 2 : 0],
-      isCopy: true
-    };
-    setcostingConfigConfigureTitle('Copy Model');
-    openCostingConfigConfigureModal(true, costingConfigForm);
   };
 
   const handleDelete = (costingConfigGuid: string) => {

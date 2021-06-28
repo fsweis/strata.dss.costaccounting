@@ -154,7 +154,7 @@ const CostingConfigConfigureModal: React.FC<ICostingConfigConfigureModalProps> =
         form.resetFields();
         setCostingType(0);
         setEntityUtilType(0);
-        //props.onSave(newConfig);
+        props.onSave(newConfig);
       } catch (error) {
         Toast.show({ message: 'Changes not saved. Try again and contact your administrator if the issue continues.', toastType: 'error' });
       } finally {
