@@ -35,19 +35,18 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
 
         [HttpGet("")]
         [ProducesResponseType(200)]
-        public async Task<IEnumerable<CostingConfigDto>> GetAllCostingConfigs(CancellationToken cancellationToken)
+        public async Task<IEnumerable<CostingConfigModel>> GetAllCostingConfigs(CancellationToken cancellationToken)
         {
             var costingConfigs = await _costingConfigRepository.GetAllCostingConfigsAsync(cancellationToken);
-            var dtos = costingConfigs.Select(x => new CostingConfigDto(x));
-            return dtos;
+            return costingConfigs;
         }
 
         [HttpGet("{costingConfigGuid}")]
         [ProducesResponseType(200)]
-        public async Task<CostingConfigDto> GetCostingConfig([FromRoute] Guid costingConfigGuid, CancellationToken cancellationToken)
+        public async Task<CostingConfigModel> GetCostingConfig([FromRoute] Guid costingConfigGuid, CancellationToken cancellationToken)
         {
             var costingConfig = await _costingConfigRepository.GetCostingConfigAsync(costingConfigGuid, cancellationToken);
-            return new CostingConfigDto(costingConfig);
+            return costingConfig;
         }
 
         [HttpGet("entity-linkages/{costingConfigGuid}")]
@@ -66,10 +65,10 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
 
         [HttpPost("")]
         [ProducesResponseType(200)]
-        public async Task<CostingConfigDto> AddNewConfig([FromBody] CostingConfigSaveData costConfigSaveData, CancellationToken cancellationToken)
+        public async Task<CostingConfigModel> AddNewConfig([FromBody] CostingConfigSaveData costConfigSaveData, CancellationToken cancellationToken)
         {
             var costConfig = await _costingConfigService.AddNewConfigAsync(costConfigSaveData, cancellationToken);
-            return new CostingConfigDto(costConfig);
+            return costConfig;
         }
 
         [HttpDelete("{costingConfigGuid}")]
