@@ -45,16 +45,19 @@ const CostMenu: React.FC<ICostMenuProps> = ({ costingConfigsFiltered, costingCon
     } else {
       const costingConfigItem = costingConfigs.find((config) => config.costingConfigGuid === key);
       if (costingConfigItem) {
-        const currentLocation = location.pathname.split('/')[1];
-        history.push(`/${currentLocation}/${costingConfigItem.costingConfigGuid}`);
+        changeConfigs(costingConfigItem.costingConfigGuid);
       }
     }
   };
 
   const handleChangeConfigs = (costingConfigGuid: string) => {
+    changeConfigs(costingConfigGuid);
+    setCostingConfigsModalVisible(false);
+  };
+
+  const changeConfigs = (costingConfigGuid: string) => {
     const currentLocation = location.pathname.split('/')[1];
     history.push(`/${currentLocation}/${costingConfigGuid}`);
-    setCostingConfigsModalVisible(false);
   };
 
   return (
