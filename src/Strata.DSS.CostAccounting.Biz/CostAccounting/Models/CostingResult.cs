@@ -1,15 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace Strata.DSS.CostAccounting.Biz.CostAccounting.Entities
+namespace Strata.DSS.CostAccounting.Biz.CostAccounting.Models
 {
-    public class CostingResultEntity
+    public class CostingResult
     {
         public int CostingResultID { get; set; }
         public DateTime CreatedAtUtc { get; set; }
         public bool IsDraft { get; set; }
         public bool IsMarkedForDeletion { get; set; }
-        public CostingConfigEntity CostingConfig { get; set; }
+        public CostingConfig CostingConfig { get; set; }
     }
 }

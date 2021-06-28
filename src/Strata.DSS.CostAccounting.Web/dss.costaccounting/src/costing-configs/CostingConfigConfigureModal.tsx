@@ -78,7 +78,7 @@ const CostingConfigConfigureModal: React.FC<ICostingConfigConfigureModalProps> =
         setLoading(false);
       }
     };
-    setLoading(true);
+
     fetchData();
   }, [setLoading, emptyGuid]);
 

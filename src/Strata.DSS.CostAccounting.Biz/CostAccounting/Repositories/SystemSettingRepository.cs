@@ -1,9 +1,5 @@
-﻿using AutoMapper;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Strata.DSS.CostAccounting.Biz.CostAccounting.DbContexts;
-using Strata.DSS.CostAccounting.Biz.CostAccounting.Entities;
-using Strata.DSS.CostAccounting.Biz.CostAccounting.Models;
-using Strata.DSS.CostAccounting.Biz.CostingConfigs.Models;
 using Strata.SqlTools.Configuration.Common.AsyncFactory;
 using System;
 using System.Collections.Generic;
@@ -13,13 +9,11 @@ using System.Threading.Tasks;
 
 namespace Strata.DSS.CostAccounting.Biz.CostAccounting.Repositories
 {
-    public class SystemSettingRepository: ISystemSettingRepository
+    public class SystemSettingRepository : ISystemSettingRepository
     {
-        private readonly IMapper _mapper;
         private readonly IAsyncDbContextFactory<CostAccountingDbContext> _dbContextFactory;
-        public SystemSettingRepository(IMapper mapper, IAsyncDbContextFactory<CostAccountingDbContext> dbContextFactory)
+        public SystemSettingRepository(IAsyncDbContextFactory<CostAccountingDbContext> dbContextFactory)
         {
-            _mapper = mapper;
             _dbContextFactory = dbContextFactory;
         }
 

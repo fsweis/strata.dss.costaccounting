@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Strata.DSS.CostAccounting.Biz.CostAccounting.Entities;
 using Strata.DSS.CostAccounting.Biz.CostAccounting.Models;
 using Strata.DSS.CostAccounting.Biz.CostingConfigs.Models;
 using Strata.DSS.CostAccounting.Biz.StatisticDrivers.Models;
@@ -21,8 +20,8 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.DbContexts
         public virtual DbSet<FiscalMonth> FiscalMonths { get; set; }
         public virtual DbSet<FiscalYear> FiscalYears { get; set; }
         public virtual DbSet<Entity> Entities { get; set; }
-        public virtual DbSet<CostingConfigEntity> CostingConfigs { get; set; }
-        public virtual DbSet<CostingResultEntity> CostingResults { get; set; }
+        public virtual DbSet<CostingConfig> CostingConfigs { get; set; }
+        public virtual DbSet<CostingResult> CostingResults { get; set; }
         public virtual DbSet<RuleEngineIncludedMeasure> RuleEngineIncludedMeasures { get; set; }
         public virtual DbSet<DriverConfig> DriverConfigs { get; set; }
         public virtual DbSet<DriverConfigView> DriverConfigViews { get; set; }
@@ -79,13 +78,14 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.DbContexts
                 entity.ToTable("DimFiscalYear", "fw");
             });
 
-            modelBuilder.Entity<CostingConfigEntity>(entity =>
+            modelBuilder.Entity<CostingConfig>(entity =>
             {
                 entity.HasKey(e => e.CostingConfigGuid);
                 entity.ToTable("CostingConfig", "dss");
+                entity.Ignore(e => e.LastPublishedUtc);
             });
 
-            modelBuilder.Entity<CostingResultEntity>(entity =>
+            modelBuilder.Entity<CostingResult>(entity =>
             {
                 entity.HasKey(e => e.CostingResultID);
                 entity.ToTable("CostingResult", "dss");
