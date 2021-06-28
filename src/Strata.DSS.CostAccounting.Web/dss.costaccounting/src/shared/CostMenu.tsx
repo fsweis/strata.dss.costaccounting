@@ -4,6 +4,7 @@ import Menu from '@strata/tempo/lib/menu';
 import ButtonMenu from '@strata/tempo/lib/buttonmenu';
 import { ICostingConfig, newCostConfig } from './data/ICostingConfig';
 import CostingConfigsModal from '../costing-configs/CostingConfigsModal';
+import { getPathConfigGuid } from './Utils';
 
 export interface ICostMenuProps {
   costingConfigsFiltered: ICostingConfig[];
@@ -19,10 +20,9 @@ const CostMenu: React.FC<ICostMenuProps> = ({ costingConfigsFiltered, costingCon
   const location = useLocation();
 
   useEffect(() => {
-    const splitPath = location.pathname.split('/').filter((p) => p.trim() !== '');
-    // TODO: better solution than this
-    if (splitPath.length > 1) {
-      const pathConfigGuid = splitPath[1];
+    const pathConfigGuid = getPathConfigGuid(location.pathname);
+
+    if (pathConfigGuid !== '') {
       const config = costingConfigs.find((c) => c.costingConfigGuid === pathConfigGuid);
       if (config && config !== selectedCostingConfigItem) {
         setSelectedCostingConfigItem(config);

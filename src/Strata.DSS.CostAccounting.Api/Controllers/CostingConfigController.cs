@@ -46,7 +46,7 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
             return costingConfig;
         }
 
-        [HttpGet("entity-linkages/{costingConfigGuid}")]
+        [HttpGet("{costingConfigGuid}/entity-linkages")]
         [ProducesResponseType(200)]
         public async Task<IEnumerable<CostingConfigEntityLinkage>> GetCostingConfigEntityLinkages([FromRoute] Guid costingConfigGuid, CancellationToken cancellationToken)
         {
