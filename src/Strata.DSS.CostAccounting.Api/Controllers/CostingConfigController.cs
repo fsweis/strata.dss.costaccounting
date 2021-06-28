@@ -84,7 +84,7 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
             return entities;
         }
 
-        [HttpGet("filtered-entities/{costingConfigGuid}")]
+        [HttpGet("{costingConfigGuid}/filtered-entities")]
         [ProducesResponseType(200)]
         public async Task<IEnumerable<Entity>> GetFilteredEntities([FromRoute] Guid costingConfigGuid, CancellationToken cancellationToken)
         {
