@@ -45,7 +45,7 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
             return costingConfig;
         }
 
-        [HttpGet("entity-linkages/{costingConfigGuid}")]
+        [HttpGet("{costingConfigGuid}/entity-linkages")]
         [ProducesResponseType(200)]
         public async Task<IEnumerable<CostingConfigEntityLinkage>> GetCostingConfigEntityLinkages([FromRoute] Guid costingConfigGuid, CancellationToken cancellationToken)
         {
@@ -83,7 +83,7 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
             return entities;
         }
 
-        [HttpGet("filtered-entities/{costingConfigGuid}")]
+        [HttpGet("{costingConfigGuid}/filtered-entities")]
         [ProducesResponseType(200)]
         public async Task<IEnumerable<Entity>> GetFilteredEntities([FromRoute] Guid costingConfigGuid, CancellationToken cancellationToken)
         {

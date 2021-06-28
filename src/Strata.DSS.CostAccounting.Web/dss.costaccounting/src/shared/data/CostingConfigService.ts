@@ -14,13 +14,13 @@ export const CostingConfigService = {
     return httpGet<ICostingConfig>(`costing-configs/${costingConfigGuid}`);
   },
   getCostingConfigEntityLinkages: (costingConfigGuid: string): Promise<ICostingConfigEntityLinkage[]> => {
-    return httpGet<ICostingConfigEntityLinkage[]>(`costing-configs/entity-linkages/${costingConfigGuid}`);
+    return httpGet<ICostingConfigEntityLinkage[]>(`costing-configs/${costingConfigGuid}/entity-linkages`);
   },
   getUtilEntities: (): Promise<IEntity[]> => {
     return httpGet<IEntity[]>(`costing-configs/entities`);
   },
   getGlPayrollEntities: (costingConfigGuid: string): Promise<IEntity[]> => {
-    return httpGet<IEntity[]>(`costing-configs/filtered-entities/${costingConfigGuid}`);
+    return httpGet<IEntity[]>(`costing-configs/${costingConfigGuid}/filtered-entities`);
   },
   addNewCostingConfig: (costConfigSaveData: ICostingConfigSaveData): Promise<ICostingConfig> => {
     return httpPost<ICostingConfig>(`costing-configs/`, costConfigSaveData);

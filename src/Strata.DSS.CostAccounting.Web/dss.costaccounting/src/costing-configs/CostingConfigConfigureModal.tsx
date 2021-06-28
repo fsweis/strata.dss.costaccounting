@@ -194,14 +194,14 @@ const CostingConfigConfigureModal: React.FC<ICostingConfigConfigureModalProps> =
     if (props.costingConfigForm.isCopy) return props.costingConfigForm.year;
 
     const year = fiscalYears.find((x) => x.fiscalYearId === new Date().getFullYear())?.fiscalYearId;
-    return year ? year : 0;
+    return year ? year : fiscalYears[fiscalYears.length - 1];
   };
 
   const getMonthInitialValue = () => {
     if (props.costingConfigForm.isCopy) return props.costingConfigForm.ytdMonth;
 
     const ytdMonth = fiscalMonths.find((x) => x.sortOrder === 12)?.fiscalMonthId;
-    return ytdMonth ? ytdMonth : 0;
+    return ytdMonth ? ytdMonth : fiscalMonths[fiscalMonths.length - 1];
   };
 
   const getGlPayrollEntitiesInitialValue = () => {

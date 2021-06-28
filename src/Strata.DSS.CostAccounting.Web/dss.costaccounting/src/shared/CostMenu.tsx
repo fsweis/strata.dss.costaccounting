@@ -4,6 +4,7 @@ import Menu from '@strata/tempo/lib/menu';
 import ButtonMenu from '@strata/tempo/lib/buttonmenu';
 import { ICostingConfig, newCostConfig } from './data/ICostingConfig';
 import CostingConfigsModal from '../costing-configs/CostingConfigsModal';
+import { getPathConfigGuid } from './Utils';
 
 export interface ICostMenuProps {
   costingConfigsFiltered: ICostingConfig[];
@@ -17,12 +18,12 @@ const CostMenu: React.FC<ICostMenuProps> = ({ costingConfigsFiltered, costingCon
   const [costingConfigsModalVisible, setCostingConfigsModalVisible] = React.useState<boolean>(false);
   const history = useHistory();
   const location = useLocation();
+  const viewAndManageModels = 'ViewAndManageModels';
 
   useEffect(() => {
-    const splitPath = location.pathname.split('/').filter((p) => p.trim() !== '');
-    // TODO: better solution than this
-    if (splitPath.length > 1) {
-      const pathConfigGuid = splitPath[1];
+    const pathConfigGuid = getPathConfigGuid(location.pathname);
+
+    if (pathConfigGuid !== '') {
       const config = costingConfigs.find((c) => c.costingConfigGuid === pathConfigGuid);
       if (config && config !== selectedCostingConfigItem) {
         setSelectedCostingConfigItem(config);
@@ -40,21 +41,24 @@ const CostMenu: React.FC<ICostMenuProps> = ({ costingConfigsFiltered, costingCon
   };
 
   const handleClick = (key: React.Key) => {
-    if (key === '1') {
+    if (key === viewAndManageModels) {
       setCostingConfigsModalVisible(true);
     } else {
       const costingConfigItem = costingConfigs.find((config) => config.costingConfigGuid === key);
       if (costingConfigItem) {
-        const currentLocation = location.pathname.split('/')[1];
-        history.push(`/${currentLocation}/${costingConfigItem.costingConfigGuid}`);
+        changeConfigs(costingConfigItem.costingConfigGuid);
       }
     }
   };
 
   const handleChangeConfigs = (costingConfigGuid: string) => {
+    changeConfigs(costingConfigGuid);
+    setCostingConfigsModalVisible(false);
+  };
+
+  const changeConfigs = (costingConfigGuid: string) => {
     const currentLocation = location.pathname.split('/')[1];
     history.push(`/${currentLocation}/${costingConfigGuid}`);
-    setCostingConfigsModalVisible(false);
   };
 
   return (
@@ -67,7 +71,7 @@ const CostMenu: React.FC<ICostMenuProps> = ({ costingConfigsFiltered, costingCon
                 <ButtonMenu.Item key={item.costingConfigGuid}>{item.name}</ButtonMenu.Item>
               ))}
               <ButtonMenu.Divider />
-              <ButtonMenu.Item key='1'>View & Manage Models</ButtonMenu.Item>
+              <ButtonMenu.Item key={viewAndManageModels}>View & Manage Models</ButtonMenu.Item>
               <ButtonMenu.Divider />
             </ButtonMenu>
           </Menu.Item>

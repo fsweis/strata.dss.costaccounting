@@ -21,6 +21,7 @@ import CostingConfigProvider from './data/CostingConfigProvider';
 import { CostingConfigService } from './data/CostingConfigService';
 import { ICostingConfig } from './data/ICostingConfig';
 import { systemSettingService } from './data/systemSettingService';
+import { getPathConfigGuid } from './Utils';
 const Navigation: React.FC = () => {
   const [costingConfigGuid, setCostingConfigGuid] = React.useState<string>('');
   const [costingConfigsFiltered, setCostingConfigsFiltered] = React.useState<ICostingConfig[]>([]);
@@ -42,10 +43,9 @@ const Navigation: React.FC = () => {
     fetchData();
   }, []);
   useEffect(() => {
-    const splitPath = location.pathname.split('/').filter((p) => p.trim() !== '');
-    // TODO: better solution than this
-    if (splitPath.length > 1) {
-      const pathConfigGuid = splitPath[1];
+    const pathConfigGuid = getPathConfigGuid(location.pathname);
+
+    if (pathConfigGuid !== '') {
       if (pathConfigGuid !== costingConfigGuid) {
         setCostingConfigGuid(pathConfigGuid);
       }
