@@ -57,7 +57,7 @@ namespace Strata.DSS.CostAccounting.Biz.StatisticDrivers.Repositories
                 var driver = await dbContext.DriverConfigs.Where(dc => dc.DriverConfigGuid == statDriver.DriverConfigGuid).FirstOrDefaultAsync();
                 if (driver != null)
                 {
-                    driver.MeasureGuid = statDriver.MeasureGuid != null ? statDriver.MeasureGuid.Value : Guid.Empty;
+                    driver.MeasureGuid = statDriver.MeasureGuid;
                     driver.IsInverted = statDriver.IsInverted;
                     driver.Name = statDriver.Name;
                 }
@@ -68,7 +68,7 @@ namespace Strata.DSS.CostAccounting.Biz.StatisticDrivers.Repositories
                 var driverConfig = new DriverConfig()
                 {
                     DriverConfigGuid = Guid.NewGuid(),
-                    MeasureGuid = newStatDriver.MeasureGuid != null ? newStatDriver.MeasureGuid.Value : Guid.Empty,
+                    MeasureGuid = newStatDriver.MeasureGuid,
                     IsInverted = newStatDriver.IsInverted,
                     Name = newStatDriver.Name,
                     CostingType = newStatDriver.CostingType

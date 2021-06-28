@@ -1,4 +1,5 @@
-﻿using Strata.DSS.CostAccounting.Biz.Enums;
+﻿using Strata.DSS.CostAccounting.Biz.Attributes;
+using Strata.DSS.CostAccounting.Biz.Enums;
 using System;
 using System.ComponentModel.DataAnnotations;
 
@@ -7,8 +8,8 @@ namespace Strata.DSS.CostAccounting.Biz.StatisticDrivers.Models
     public class StatisticDriver
     {
         public Guid DriverConfigGuid { get; set; }
-        [Required]
-        public Guid? MeasureGuid { get; set; }
+        [NotEmpty]
+        public Guid MeasureGuid { get; set; }
         public Guid DataTableGuid { get; set; }
         [Required]
         public string Name { get; set; }
