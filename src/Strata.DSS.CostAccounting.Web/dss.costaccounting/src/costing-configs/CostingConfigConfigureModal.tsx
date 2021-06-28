@@ -27,6 +27,7 @@ import { PatientCare_FriendlyName, Claims_FriendlyName } from './constants/Costi
 import { CostingMethod } from './enums/CostingMethodEnum';
 import { CostingType } from '../shared/enums/CostingTypeEnum';
 import { EntityType } from './enums/EntityTypeEnum';
+import { CostingOption } from './enums/CostingOptionEnum';
 
 interface ICostingConfigConfigureModalProps {
   visible: boolean;
@@ -118,14 +119,22 @@ const CostingConfigConfigureModal: React.FC<ICostingConfigConfigureModalProps> =
     if (props.costingConfigs.find((x) => x.name.toLowerCase() === cleanedName.toLowerCase()) !== undefined) {
       Toast.show({ message: 'Duplicate names are not allowed.', toastType: 'info' });
     } else {
+      let isPayrollCosting = false;
+      let isBudgetedAndActualCosting = false;
+
+      if (costingType === CostingType.PatientCare) {
+        isBudgetedAndActualCosting = values.options[0] === CostingOption.BudgetedAndActualCosting ? true : false;
+        isPayrollCosting = values.options[1] === CostingOption.PayrollCosting ? true : false;
+      }
+
       //Create new cost model
       const newConfig: ICostingConfig = {
         costingConfigGuid: emptyGuid,
         name: cleanedName,
         description: values.description,
         isGLCosting: true,
-        isPayrollCosting: values.type === CostingType.PatientCare ? values.options.includes(2) : false,
-        isBudgetedAndActualCosting: values.type === CostingType.PatientCare ? values.options.includes(1) : false,
+        isPayrollCosting: isPayrollCosting,
+        isBudgetedAndActualCosting: isBudgetedAndActualCosting,
         isUtilizationEntityConfigured: values.entityType === EntityType.Specify,
         defaultChargeAllocationMethod: 0,
         defaultMethod: values.defaultMethod,
@@ -294,8 +303,8 @@ const CostingConfigConfigureModal: React.FC<ICostingConfigConfigureModalProps> =
               <Form.Item label='Additional Data' name='options' initialValue={props.costingConfigForm.options} rules={[{ required: false }]}>
                 <CheckboxGroup
                   options={[
-                    { value: 1, label: 'Include Budget' },
-                    { value: 2, label: 'Include Payroll' }
+                    { value: CostingOption.BudgetedAndActualCosting, label: 'Include Budget' },
+                    { value: CostingOption.PayrollCosting, label: 'Include Payroll' }
                   ]}
                 />
               </Form.Item>
