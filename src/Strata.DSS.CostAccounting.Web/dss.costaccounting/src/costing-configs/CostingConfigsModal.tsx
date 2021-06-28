@@ -11,11 +11,11 @@ import ActionBar from '@strata/tempo/lib/actionbar';
 import DataGrid, { IGlobalFilterValue } from '@strata/tempo/lib/datagrid/DataGrid';
 import CostingConfigConfigureModal from './CostingConfigConfigureModal';
 import Toast from '@strata/tempo/lib/toast';
-import { ICostingConfigForm } from './data/ICostingConfigForm';
-import { CostingMethod } from './enums/CostingMethodEnum';
+import { ICostingConfigForm, getNewCostingConfigForm } from './data/ICostingConfigForm';
 import { EntityType } from './enums/EntityTypeEnum';
 import { PatientCare_FriendlyName, Claims_FriendlyName } from './constants/CostingTypeConstants';
 import { ICostingConfigEntityLinkage } from './data/ICostingConfigEntityLinkage';
+import { CostingOption } from './enums/CostingOptionEnum';
 
 export interface ICostingConfigsModalProps {
   visible: boolean;
@@ -24,19 +24,7 @@ export interface ICostingConfigsModalProps {
 }
 
 const CostingConfigsModal: React.FC<ICostingConfigsModalProps> = (props: ICostingConfigsModalProps) => {
-  const newCostingConfigForm: ICostingConfigForm = {
-    name: '',
-    description: '',
-    year: 0,
-    ytdMonth: 0,
-    type: CostingType.PatientCare,
-    glPayrollEntities: [],
-    entityType: EntityType.GlPayroll,
-    utilEntities: [],
-    defaultMethod: CostingMethod.Simultaneous,
-    options: [0, 0],
-    isCopy: false
-  };
+  const newCostingConfigForm: ICostingConfigForm = getNewCostingConfigForm();
 
   const [costingConfigConfigureModalVisible, setCostingConfigConfigureModalVisible] = React.useState<boolean>(false);
   const [costingConfigs, setCostingConfigs] = useState<ICostingConfig[]>([]);
@@ -73,7 +61,10 @@ const CostingConfigsModal: React.FC<ICostingConfigsModalProps> = (props: ICostin
         entityType: EntityType.GlPayroll,
         utilEntities: utilEntities,
         defaultMethod: costingConfig.defaultMethod,
-        options: [costingConfig.isBudgetedAndActualCosting ? 1 : 0, costingConfig.isPayrollCosting ? 2 : 0],
+        options: [
+          costingConfig.isBudgetedAndActualCosting ? CostingOption.BudgetedAndActualCosting : CostingOption.NotSpecified,
+          costingConfig.isPayrollCosting ? CostingOption.PayrollCosting : CostingOption.NotSpecified
+        ],
         isCopy: true
       };
 
