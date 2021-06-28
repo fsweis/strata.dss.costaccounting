@@ -13,14 +13,14 @@ import { usePageLoader } from '@strata/tempo/lib/pageloader';
 import { IFiscalYear } from '../shared/data/IFiscalYear';
 import { IFiscalMonth } from '../shared/data/IFiscalMonth';
 import { IEntity } from './data/IEntity';
-import { costConfigService } from '../shared/data/costConfigService';
+import { CostingConfigService } from '../shared/data/CostingConfigService';
 import { systemSettingService } from '../shared/data/systemSettingService';
 import { dateService } from '../shared/data/dateService';
 import { RadioChangeEvent } from 'antd/lib/radio/interface';
-import { ICostConfigSaveData } from './data/ICostConfigSaveData';
+import { ICostingConfigSaveData } from './data/ICostingConfigSaveData';
 import { ICostingConfigForm } from './data/ICostingConfigForm';
 import TreeDropDown, { ITreeDropDownNode } from '@strata/tempo/lib/treedropdown';
-import { ICostConfig } from '../shared/data/ICostConfig';
+import { ICostingConfig } from '../shared/data/ICostingConfig';
 import { getEmptyGuid } from '../shared/Utils';
 import { Simultaneous_FriendlyName, SingleStepDown_FriendlyName } from './constants/CostingMethodConstants';
 import { PatientCare_FriendlyName, Claims_FriendlyName } from './constants/CostingTypeConstants';
@@ -32,9 +32,9 @@ interface ICostingConfigConfigureModalProps {
   visible: boolean;
   title: string;
   costingConfigForm: ICostingConfigForm;
-  costConfigs: ICostConfig[];
+  costingConfigs: ICostingConfig[];
   onCancel: () => void;
-  onSave: (costingConfig: ICostConfig) => void;
+  onSave: (costingConfig: ICostingConfig) => void;
 }
 
 const CostingConfigConfigureModal: React.FC<ICostingConfigConfigureModalProps> = (props: ICostingConfigConfigureModalProps) => {
@@ -67,8 +67,8 @@ const CostingConfigConfigureModal: React.FC<ICostingConfigConfigureModalProps> =
         const [fiscalMonths, fiscalYears, glPayrollEntities, utilEntities] = await Promise.all([
           dateService.getFiscalMonths(),
           dateService.getFiscalYears(),
-          costConfigService.getGlPayrollEntities(emptyGuid),
-          isCostingEntityLevelSecurityEnabled ? costConfigService.getUtilEntities() : []
+          CostingConfigService.getGlPayrollEntities(emptyGuid),
+          isCostingEntityLevelSecurityEnabled ? CostingConfigService.getUtilEntities() : []
         ]);
         setFiscalMonths(fiscalMonths);
         setFiscalYears(fiscalYears);
@@ -115,32 +115,30 @@ const CostingConfigConfigureModal: React.FC<ICostingConfigConfigureModalProps> =
     const values = vals as ICostingConfigForm;
     const cleanedName = values.name.replace(/\s+/g, ' ').trim();
     //Duplicate name check
-    if (props.costConfigs.find((x) => x.name.toLowerCase() === cleanedName.toLowerCase()) !== undefined) {
+    if (props.costingConfigs.find((x) => x.name.toLowerCase() === cleanedName.toLowerCase()) !== undefined) {
       Toast.show({ message: 'Duplicate names are not allowed.', toastType: 'info' });
     } else {
       //Create new cost model
-      const newConfig: ICostConfig = {
+      const newConfig: ICostingConfig = {
         costingConfigGuid: emptyGuid,
         name: cleanedName,
         description: values.description,
         isGLCosting: true,
+        isPayrollCosting: values.type === CostingType.PatientCare ? values.options.includes(2) : false,
+        isBudgetedAndActualCosting: values.type === CostingType.PatientCare ? values.options.includes(1) : false,
+        isUtilizationEntityConfigured: values.entityType === EntityType.Specify,
         defaultChargeAllocationMethod: 0,
         defaultMethod: values.defaultMethod,
         fiscalYearId: values.year,
         fiscalMonthId: values.ytdMonth,
         type: values.type,
-        isPayrollCosting: values.type === CostingType.PatientCare ? values.options.includes(2) : false,
-        isBudgetedAndActualCosting: values.type === CostingType.PatientCare ? values.options.includes(1) : false,
-        isUtilizationEntityConfigured: values.entityType === EntityType.Specify,
         createdAt: new Date(),
         modifiedAtUtc: new Date(),
         lastPublishedUtc: new Date(),
-        isEditable: true,
-        glPayrollEntities: [],
-        utilEntities: []
+        isEditable: true
       };
 
-      const configSaveData: ICostConfigSaveData = {
+      const configSaveData: ICostingConfigSaveData = {
         costingConfig: newConfig,
         glPayrollEntities: values.glPayrollEntities.map((x) => +x),
         utilEntities: values.type === CostingType.PatientCare && values.entityType === EntityType.Specify ? values.utilEntities.map((x) => +x) : []
@@ -148,7 +146,7 @@ const CostingConfigConfigureModal: React.FC<ICostingConfigConfigureModalProps> =
 
       try {
         setLoading(true);
-        const newConfig = await costConfigService.addNewConfig(configSaveData);
+        const newConfig = await CostingConfigService.addNewCostingConfig(configSaveData);
         Toast.show({ message: 'Changes Saved', toastType: 'success' });
         //reset form
         form.resetFields();

@@ -1,17 +1,17 @@
 import { appConfig, getSecureService } from '@strata/core/lib';
-import { ICostConfig } from './ICostConfig';
+import { ICostingConfig } from './ICostingConfig';
 import { ICostingConfigEntityLinkage } from '../../costing-configs/data/ICostingConfigEntityLinkage';
 import { IEntity } from '../../costing-configs/data/IEntity';
-import { ICostConfigSaveData } from '../../costing-configs/data/ICostConfigSaveData';
+import { ICostingConfigSaveData } from '../../costing-configs/data/ICostingConfigSaveData';
 
 const { httpGet, httpPost, httpDelete } = getSecureService(appConfig.apiUrl);
 
-export const costConfigService = {
-  getCostConfigs: (): Promise<ICostConfig[]> => {
-    return httpGet<ICostConfig[]>(`costing-configs`);
+export const CostingConfigService = {
+  getCostingConfigs: (): Promise<ICostingConfig[]> => {
+    return httpGet<ICostingConfig[]>(`costing-configs`);
   },
-  getCostConfig: (costingConfigGuid: string): Promise<ICostConfig> => {
-    return httpGet<ICostConfig>(`costing-configs/${costingConfigGuid}`);
+  getCostingConfig: (costingConfigGuid: string): Promise<ICostingConfig> => {
+    return httpGet<ICostingConfig>(`costing-configs/${costingConfigGuid}`);
   },
   getCostingConfigEntityLinkages: (costingConfigGuid: string): Promise<ICostingConfigEntityLinkage[]> => {
     return httpGet<ICostingConfigEntityLinkage[]>(`costing-configs/entity-linkages/${costingConfigGuid}`);
@@ -22,10 +22,10 @@ export const costConfigService = {
   getGlPayrollEntities: (costingConfigGuid: string): Promise<IEntity[]> => {
     return httpGet<IEntity[]>(`costing-configs/filtered-entities/${costingConfigGuid}`);
   },
-  addNewConfig: (costConfigSaveData: ICostConfigSaveData): Promise<ICostConfig> => {
-    return httpPost<ICostConfig>(`costing-configs/`, costConfigSaveData);
+  addNewCostingConfig: (costConfigSaveData: ICostingConfigSaveData): Promise<ICostingConfig> => {
+    return httpPost<ICostingConfig>(`costing-configs/`, costConfigSaveData);
   },
-  deleteCostConfig: (costConfigGuid: string): Promise<string> => {
-    return httpDelete<string>(`costing-configs/${costConfigGuid}`);
+  deleteCostingConfig: (costingConfigGuid: string): Promise<string> => {
+    return httpDelete<string>(`costing-configs/${costingConfigGuid}`);
   }
 };

@@ -3,10 +3,10 @@ import Modal from '@strata/tempo/lib/modal';
 import Spacing from '@strata/tempo/lib/spacing';
 import Tooltip from '@strata/tempo/lib/tooltip';
 import React, { useEffect, useState } from 'react';
-import { ICostConfig } from '../shared/data/ICostConfig';
+import { ICostingConfig } from '../shared/data/ICostingConfig';
 import { CostingType } from '../shared/enums/CostingTypeEnum';
 import Input from '@strata/tempo/lib/input';
-import { costConfigService } from '../shared/data/costConfigService';
+import { CostingConfigService } from '../shared/data/CostingConfigService';
 import ActionBar from '@strata/tempo/lib/actionbar';
 import DataGrid, { IGlobalFilterValue } from '@strata/tempo/lib/datagrid/DataGrid';
 import CostingConfigConfigureModal from './CostingConfigConfigureModal';
@@ -39,27 +39,27 @@ const CostingConfigsModal: React.FC<ICostingConfigsModalProps> = (props: ICostin
   };
 
   const [costingConfigConfigureModalVisible, setCostingConfigConfigureModalVisible] = React.useState<boolean>(false);
-  const [costConfigs, setCostConfigs] = useState<ICostConfig[]>([]);
+  const [costingConfigs, setCostingConfigs] = useState<ICostingConfig[]>([]);
   const [costingConfigForm, setCostingConfigForm] = useState<ICostingConfigForm>(newCostingConfigForm);
   const [globalFilterValue, setGlobalFilterValue] = useState<IGlobalFilterValue>({ fields: ['name', 'description'], value: '' });
   const [costingConfigConfigureTitle, setcostingConfigConfigureTitle] = useState<string>('');
 
   useEffect(() => {
     const fetchData = async () => {
-      setCostConfigs(await costConfigService.getCostConfigs());
+      setCostingConfigs(await CostingConfigService.getCostingConfigs());
     };
     fetchData();
   }, []);
 
-  const handleAddConfig = (newConfig: ICostConfig) => {
+  const handleAddConfig = (newConfig: ICostingConfig) => {
     setCostingConfigConfigureModalVisible(false);
-    const updatedCostConfigs = [...costConfigs, newConfig];
-    setCostConfigs(updatedCostConfigs);
+    const updatedCostConfigs = [...costingConfigs, newConfig];
+    setCostingConfigs(updatedCostConfigs);
   };
 
-  const handleCopyCostingConfig = (costingConfig: ICostConfig) => {
+  const handleCopyCostingConfig = (costingConfig: ICostingConfig) => {
     const fetchEntities = async (costingConfigGuid: string) => {
-      const entityLinkages: ICostingConfigEntityLinkage[] = await costConfigService.getCostingConfigEntityLinkages(costingConfigGuid);
+      const entityLinkages: ICostingConfigEntityLinkage[] = await CostingConfigService.getCostingConfigEntityLinkages(costingConfigGuid);
       const glPayrollEntities: string[] = entityLinkages.filter((x) => x.isUtilization === false).map((x) => x.entityId.toString());
       const utilEntities: string[] = entityLinkages.filter((x) => x.isUtilization === true).map((x) => x.entityId.toString());
 
@@ -90,7 +90,7 @@ const CostingConfigsModal: React.FC<ICostingConfigsModalProps> = (props: ICostin
       okText: 'Yes',
       cancelText: 'No',
       onOk() {
-        costConfigService.deleteCostConfig(costingConfigGuid);
+        CostingConfigService.deleteCostingConfig(costingConfigGuid);
         Toast.show({ message: 'A task to delete a costing configuration has been created.', toastType: 'info' });
       }
     });
@@ -124,7 +124,7 @@ const CostingConfigsModal: React.FC<ICostingConfigsModalProps> = (props: ICostin
             </>
           }
         />
-        <DataGrid key='allModelsGrid' scrollable dataKey='costingConfigGuid' value={costConfigs} globalFilterValue={globalFilterValue}>
+        <DataGrid key='allModelsGrid' scrollable dataKey='costingConfigGuid' value={costingConfigs} globalFilterValue={globalFilterValue}>
           <DataGrid.RowNumber />
           <DataGrid.Column
             header='Name'
@@ -172,7 +172,7 @@ const CostingConfigsModal: React.FC<ICostingConfigsModalProps> = (props: ICostin
         }}
         onSave={handleAddConfig}
         title={costingConfigConfigureTitle}
-        costConfigs={costConfigs}
+        costingConfigs={costingConfigs}
       ></CostingConfigConfigureModal>
     </>
   );

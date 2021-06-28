@@ -18,10 +18,12 @@ namespace Strata.DSS.CostAccounting.Api.DTOs
             IsGLCosting = costingConfig.IsGLCosting;
             IsPayrollCosting = costingConfig.IsPayrollCosting;
             IsBudgetedAndActualCosting = costingConfig.IsBudgetedAndActualCosting;
+            IsUtilizationEntityConfigured = costingConfig.IsUtilizationEntityConfigured;
             DefaultChargeAllocationMethod = costingConfig.DefaultChargeAllocationMethod;
             DefaultMethod = costingConfig.DefaultMethod;
             FiscalYearId = costingConfig.FiscalYearId;
             FiscalMonthId = costingConfig.FiscalMonthId;
+            Type = (int)costingConfig.Type;
             CreatedAt = costingConfig.CreatedAt;
             ModifiedAtUtc = costingConfig.ModifiedAtUtc;
             LastPublishedUtc = costingConfig.LastPublishedUtc;

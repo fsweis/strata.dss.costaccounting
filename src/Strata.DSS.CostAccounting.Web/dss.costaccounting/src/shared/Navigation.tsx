@@ -17,26 +17,26 @@ import ManualStatistics from '../manual-statistics/ManualStatistics';
 
 import { Navbar } from '@strata/navbar/lib';
 import CostMenu from './CostMenu';
-import CostConfigProvider from './data/CostConfigProvider';
-import { costConfigService } from './data/costConfigService';
-import { ICostConfig } from './data/ICostConfig';
+import CostConfigProvider from './data/CostingConfigProvider';
+import { CostingConfigService } from './data/CostingConfigService';
+import { ICostingConfig } from './data/ICostingConfig';
 import { systemSettingService } from './data/systemSettingService';
 const Navigation: React.FC = () => {
-  const [costConfigGuid, setCostConfigGuid] = React.useState<string>('');
-  const [costConfigsFiltered, setCostConfigsFiltered] = React.useState<ICostConfig[]>([]);
-  const [costConfigs, setCostConfigs] = React.useState<ICostConfig[]>([]);
+  const [costingConfigGuid, setCostingConfigGuid] = React.useState<string>('');
+  const [costingConfigsFiltered, setCostingConfigsFiltered] = React.useState<ICostingConfig[]>([]);
+  const [costingConfigs, setCostingConfigs] = React.useState<ICostingConfig[]>([]);
 
   const location = useLocation();
   const history = useHistory();
   useEffect(() => {
     const fetchData = async () => {
-      const [costingConfigurations, currentFiscalYear] = await Promise.all([costConfigService.getCostConfigs(), systemSettingService.getCurrentFiscalYear()]);
-      setCostConfigs(costingConfigurations);
+      const [costingConfigurations, currentFiscalYear] = await Promise.all([CostingConfigService.getCostingConfigs(), systemSettingService.getCurrentFiscalYear()]);
+      setCostingConfigs(costingConfigurations);
       if (costingConfigurations.length > 0) {
         const previousFiscalYear = currentFiscalYear - 1;
         const sorted = costingConfigurations.filter((c) => currentFiscalYear === c.fiscalYearId || previousFiscalYear === c.fiscalYearId).sort((a, b) => a.name.localeCompare(b.name));
-        setCostConfigsFiltered(sorted);
-        setCostConfigGuid(sorted[0].costingConfigGuid);
+        setCostingConfigsFiltered(sorted);
+        setCostingConfigGuid(sorted[0].costingConfigGuid);
       }
     };
     fetchData();
@@ -46,15 +46,15 @@ const Navigation: React.FC = () => {
     // TODO: better solution than this
     if (splitPath.length > 1) {
       const pathConfigGuid = splitPath[1];
-      if (pathConfigGuid !== costConfigGuid) {
-        setCostConfigGuid(pathConfigGuid);
+      if (pathConfigGuid !== costingConfigGuid) {
+        setCostingConfigGuid(pathConfigGuid);
       }
     } else {
       // TODO: something here to redirect path without guid to path with guid?
       // This doesn't work but leaving so you know not to try it
       // history.push(`${splitPath[0]}/${costConfigGuid}`);
     }
-  }, [costConfigGuid, history, location]);
+  }, [costingConfigGuid, history, location]);
   return (
     <>
       <Layout>
@@ -64,14 +64,14 @@ const Navigation: React.FC = () => {
         <Layout>
           <Layout.Sider collapsible>
             <CostMenu
-              costConfigsFiltered={costConfigsFiltered}
-              costConfigs={costConfigs}
-              setCostConfigs={(costConfigs: ICostConfig[]) => setCostConfigs(costConfigs)}
-              setCostConfigsFiltered={(costConfigs: ICostConfig[]) => setCostConfigsFiltered(costConfigs)}
+              costingConfigsFiltered={costingConfigsFiltered}
+              costingConfigs={costingConfigs}
+              setCostingConfigs={(costConfigs: ICostingConfig[]) => setCostingConfigs(costConfigs)}
+              setCostingConfigsFiltered={(costConfigs: ICostingConfig[]) => setCostingConfigsFiltered(costConfigs)}
             />
           </Layout.Sider>
           <Layout.Content>
-            <CostConfigProvider costingConfigGuid={costConfigGuid}>
+            <CostConfigProvider costingConfigGuid={costingConfigGuid}>
               <Switch>
                 <Route path='/' exact render={() => <Redirect to={`/overview`}></Redirect>} key='default'></Route>
                 <Route path='/overview' component={Overview} key='overview'></Route>

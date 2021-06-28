@@ -1,6 +1,6 @@
 import { CostingType } from '../enums/CostingTypeEnum';
 
-export interface ICostConfig {
+export interface ICostingConfig {
   costingConfigGuid: string;
   name: string;
   description: string;
@@ -17,11 +17,9 @@ export interface ICostConfig {
   modifiedAtUtc: Date;
   lastPublishedUtc: Date;
   isEditable: boolean;
-  glPayrollEntities: string[];
-  utilEntities: string[];
 }
 
-export const newCostConfig = (costConfig: Partial<ICostConfig> = {}): ICostConfig => {
+export const newCostConfig = (costConfig: Partial<ICostingConfig> = {}): ICostingConfig => {
   return {
     ...{
       costingConfigGuid: '',
@@ -39,9 +37,7 @@ export const newCostConfig = (costConfig: Partial<ICostConfig> = {}): ICostConfi
       createdAt: new Date(),
       modifiedAtUtc: new Date(),
       lastPublishedUtc: new Date(),
-      isEditable: true,
-      glPayrollEntities: [],
-      utilEntities: []
+      isEditable: true
     },
     ...costConfig
   };
