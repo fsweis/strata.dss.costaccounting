@@ -1,6 +1,6 @@
 ﻿namespace Strata.DSS.CostAccounting.Biz.Enums
 {
-    public enum SqlDataType
+    public enum SqlDataType2
     {
         Unknown = 0,
         Image = 34,
