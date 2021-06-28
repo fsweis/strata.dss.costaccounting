@@ -1,4 +1,5 @@
-﻿using Strata.DSS.CostAccounting.Biz.CostAccounting.Entities;
+﻿using Newtonsoft.Json;
+using Strata.DSS.CostAccounting.Biz.CostAccounting.Entities;
 using Strata.DSS.CostAccounting.Biz.Enums;
 using System;
 using System.Collections.Generic;
@@ -27,6 +28,5 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.Models
         public DateTime ModifiedAtUtc { get; set; }
         public bool IsPendingDelete { get; set; }
         public DateTime? LastPublishedUtc { get; set; }
-        public IEnumerable<CostingResultEntity> CostingResults { get; set; }
     }
 }
