@@ -51,6 +51,9 @@ const CostingConfigConfigureModal: React.FC<ICostingConfigConfigureModalProps> =
   const [isCostingEntityLevelSecurityEnabled, setIsCostingEntityLevelSecurityEnabled] = useState<boolean>(false);
   const emptyGuid = getEmptyGuid();
 
+  const [costingType, setCostingType] = useState<CostingType>(props.costingConfigForm.type);
+  const [entityType, setEntityType] = useState<EntityType>(props.costingConfigForm.entityType);
+
   //Load initial data
   useEffect(() => {
     const fetchData = async () => {
@@ -80,6 +83,14 @@ const CostingConfigConfigureModal: React.FC<ICostingConfigConfigureModalProps> =
 
     fetchData();
   }, [setLoading, emptyGuid]);
+
+  useEffect(() => {
+    setCostingType(props.costingConfigForm.type);
+  }, [props.costingConfigForm.type]);
+
+  useEffect(() => {
+    setEntityType(props.costingConfigForm.entityType);
+  }, [props.costingConfigForm.entityType]);
 
   //Set Filtered Entity Trees when entities are loaded
   useEffect(() => {
@@ -177,7 +188,11 @@ const CostingConfigConfigureModal: React.FC<ICostingConfigConfigureModalProps> =
   };
 
   const handleCostingTypeChange = (e: RadioChangeEvent) => {
-    props.costingConfigForm.type = e.target.value;
+    setCostingType(e.target.value);
+  };
+
+  const handleEntityTypeChange = (e: RadioChangeEvent) => {
+    setEntityType(e.target.value);
   };
 
   const getYearInitialValue = () => {
@@ -270,20 +285,21 @@ const CostingConfigConfigureModal: React.FC<ICostingConfigConfigureModalProps> =
             <Spacing itemSpacing={16}>
               <Form.Item label='Utilization Entities' name='entityType' initialValue={props.costingConfigForm.entityType} rules={[{ required: true }]}>
                 <RadioGroup
+                  onChange={handleEntityTypeChange}
                   options={[
                     { value: EntityType.GlPayroll, label: 'Same as GL/Payroll' },
                     { value: EntityType.Specify, label: 'Specify' }
                   ]}
                 />
               </Form.Item>
-              {props.costingConfigForm.entityType === EntityType.Specify && (
+              {entityType === EntityType.Specify && (
                 <Form.Item label='Specifiy Utilization Entities' name='utilizationEntities' initialValue={getUtilizationEntitiesitiesInitialValue()} rules={[{ required: true }]}>
                   <TreeDropDown treeData={utilizationEntityTreeData} selectionMode='multiple' treeDefaultExpandedKeys={['0']} />
                 </Form.Item>
               )}
             </Spacing>
           )}
-          {props.costingConfigForm.type === CostingType.PatientCare && (
+          {costingType === CostingType.PatientCare && (
             <Spacing itemSpacing={16}>
               <Form.Item label='Method' name='defaultMethod' initialValue={props.costingConfigForm.defaultMethod} rules={[{ required: true }]}>
                 <RadioGroup
