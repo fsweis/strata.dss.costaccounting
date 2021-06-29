@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Strata.DSS.CostAccounting.Biz.CostAccounting.Constants;
 using Strata.DSS.CostAccounting.Biz.CostAccounting.Repositories;
 using System.Threading;
 using System.Threading.Tasks;
@@ -11,6 +12,7 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
     public class SystemSettingController : ControllerBase
     {
         private readonly ISystemSettingRepository _systemSettingRepository;
+
         public SystemSettingController(ISystemSettingRepository systemSettingRepository)
         {
             _systemSettingRepository = systemSettingRepository;
@@ -20,14 +22,14 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
         [ProducesResponseType(200)]
         public async Task<bool> GetIsClaimsCostingEnabled(CancellationToken cancellationToken)
         {
-            return await _systemSettingRepository.GetIsClaimsCostingEnabledAsync(cancellationToken);
+            return await _systemSettingRepository.GetBoolSystemSettingByNameAsync(SystemSettingConstants.ClaimsCostingSystemSettingName, cancellationToken);
         }
 
         [HttpGet("entity-security")]
         [ProducesResponseType(200)]
         public async Task<bool> GetIsCostingEntityLevelSecurityEnabled(CancellationToken cancellationToken)
         {
-            return await _systemSettingRepository.GetIsCostingEntityLevelSecurityEnabledAsync(cancellationToken);
+            return await _systemSettingRepository.GetBoolSystemSettingByNameAsync(SystemSettingConstants.EntityLevelSecuritySystemSettingName, cancellationToken);
         }
 
         [HttpGet("fiscal-year")]

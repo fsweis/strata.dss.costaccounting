@@ -3,7 +3,6 @@ using Strata.DSS.CostAccounting.Biz.CostAccounting.Models;
 using Strata.DSS.CostAccounting.Biz.CostAccounting.Repositories;
 using Strata.DSS.CostAccounting.Biz.CostingConfigs.Models;
 using Strata.DSS.CostAccounting.Biz.CostingConfigs.Repositories;
-using Strata.DSS.CostAccounting.Biz.CostingConfigs.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,13 +18,11 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
     {
         private readonly ICostingConfigRepository _costingConfigRepository;
         private readonly ICostAccountingRepository _costAccountingRepository;
-        private readonly ICostingConfigService _costingConfigService;
 
-        public CostingConfigController(ICostingConfigRepository costingConfigRepository, ICostAccountingRepository costAccountingRepository, ICostingConfigService costingConfigService)
+        public CostingConfigController(ICostingConfigRepository costingConfigRepository, ICostAccountingRepository costAccountingRepository)
         {
             _costingConfigRepository = costingConfigRepository;
             _costAccountingRepository = costAccountingRepository;
-            _costingConfigService = costingConfigService;
         }
 
         [HttpGet("")]
@@ -67,7 +64,7 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
         [ProducesResponseType(200)]
         public async Task<CostingConfig> AddNewConfig([FromBody] CostingConfigSaveData costConfigSaveData, CancellationToken cancellationToken)
         {
-            var costConfig = await _costingConfigService.AddNewConfigAsync(costConfigSaveData, cancellationToken);
+            var costConfig = await _costingConfigRepository.AddNewConfigAsync(costConfigSaveData, cancellationToken);
             return costConfig;
         }
 

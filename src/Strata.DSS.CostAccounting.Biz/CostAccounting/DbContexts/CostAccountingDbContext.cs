@@ -57,21 +57,25 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.DbContexts
                 entity.HasKey(e => e.RuleSetGuid);
                 entity.ToTable("RuleSet", "dbo");
             });
+
             modelBuilder.Entity<SystemSetting>(entity =>
             {
                 entity.HasKey(e => e.SystemSettingId);
                 entity.ToTable("SystemSetting", "dss");
             });
+
             modelBuilder.Entity<Entity>(entity =>
             {
                 entity.HasKey(e => e.EntityId);
                 entity.ToTable("DimEntity", "fw");
             });
+
             modelBuilder.Entity<FiscalMonth>(entity =>
             {
                 entity.HasKey(e => e.FiscalMonthId);
                 entity.ToTable("DimFiscalMonth", "fw");
             });
+
             modelBuilder.Entity<FiscalYear>(entity =>
             {
                 entity.HasKey(e => e.FiscalYearId);
@@ -146,11 +150,13 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.DbContexts
                 entity.HasKey(e => e.RuleSetId);
                 entity.ToTable("RuleSet", "dbo");
             });
+
             modelBuilder.Entity<CostingConfigEntityLevelSecurity>(entity =>
             {
                 entity.HasKey(e => e.CostingConfigEntityLevelSecurityId);
                 entity.ToTable("CostingConfigEntityLevelSecurity", "dss");
             });
+
             modelBuilder.Entity<CostingConfigEntityLinkage>(entity =>
             {
                 entity.HasKey(e => e.CostingConfigEntityLinkageId);
@@ -159,4 +165,3 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.DbContexts
         }
     }
 }
-

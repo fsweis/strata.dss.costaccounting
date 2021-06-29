@@ -6,8 +6,7 @@ using Strata.ApiCommunication.Http.MessageHandlers;
 using Strata.CoreLib.Claims.Extensions;
 using Strata.DSS.CostAccounting.Biz.CostAccounting.DbContexts;
 using Strata.DSS.CostAccounting.Biz.CostAccounting.Repositories;
-using Strata.DSS.CostAccounting.Biz.CostingConfigs.Repositories;
-using Strata.DSS.CostAccounting.Biz.CostingConfigs.Services;using Strata.DSS.CostAccounting.Biz.StatisticDrivers.Repositories;
+using Strata.DSS.CostAccounting.Biz.CostingConfigs.Repositories;using Strata.DSS.CostAccounting.Biz.StatisticDrivers.Repositories;
 using Strata.DSS.CostAccounting.Biz.StatisticDrivers.Services;
 using Strata.Hangfire.Configuration;
 using Strata.SMC.Client;
@@ -29,7 +28,6 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddScoped<IStatisticDriversService, StatisticDriversService>();
             services.AddScoped<IDataSourceService, DataSourceService>();
             services.AddScoped<IDataSourceLinkService, DataSourceLinkService>();
-            services.AddScoped<ICostingConfigService, CostingConfigService>();
 
             services.AddCachedSmcServiceClient();
             services.AddHttpContextAccessor();

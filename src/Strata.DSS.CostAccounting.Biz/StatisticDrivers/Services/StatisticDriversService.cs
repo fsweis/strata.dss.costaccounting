@@ -46,16 +46,5 @@ namespace Strata.DSS.CostAccounting.Biz.StatisticDrivers.Services
             }
             return statisticDrivers.OrderBy(x => x.Name).ToList();
         }
-
-        public bool ValidateStatisticDrivers(IEnumerable<StatisticDriver> statDrivers)
-        {
-            foreach (var statDriver in statDrivers)
-            {
-                if (string.IsNullOrEmpty(statDriver.Name)) { return false; }
-                if (statDriver.MeasureGuid == Guid.Empty) { return false; }
-            }
-
-            return true;
-        }
     }
 }

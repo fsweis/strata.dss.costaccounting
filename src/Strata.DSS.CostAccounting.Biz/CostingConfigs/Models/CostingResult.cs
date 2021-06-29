@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Strata.DSS.CostAccounting.Biz.CostAccounting.Models
+namespace Strata.DSS.CostAccounting.Biz.CostingConfigs.Models
 {
     public class CostingResult
     {

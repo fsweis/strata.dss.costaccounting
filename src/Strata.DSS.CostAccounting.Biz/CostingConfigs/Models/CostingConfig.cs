@@ -1,10 +1,8 @@
-﻿using Strata.DSS.CostAccounting.Biz.CostingConfigs.Models;
-using Strata.DSS.CostAccounting.Biz.Enums;
+﻿using Strata.DSS.CostAccounting.Biz.Enums;
 using System;
-using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Text.Json.Serialization;
-
-namespace Strata.DSS.CostAccounting.Biz.CostAccounting.Models
+namespace Strata.DSS.CostAccounting.Biz.CostingConfigs.Models
 {
     public class CostingConfig
     {
@@ -26,7 +24,7 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.Models
         public byte FiscalMonthId { get; set; }
         public bool IsUtilizationEntityConfigured { get; set; }
         public DateTime ModifiedAtUtc { get; set; }
-        public bool IsPendingDelete { get; set; }
+        public bool IsPendingDelete { get; set; }
         [JsonIgnore]
         public ICollection<CostingResult> CostingResults { get; set; }
         [JsonIgnore]
