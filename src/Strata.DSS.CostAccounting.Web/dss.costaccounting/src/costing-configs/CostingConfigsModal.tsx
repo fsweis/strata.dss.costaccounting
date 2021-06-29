@@ -119,19 +119,19 @@ const CostingConfigsModal: React.FC<ICostingConfigsModalProps> = (props: ICostin
           <DataGrid.RowNumber />
           <DataGrid.Column
             header='Name'
-            width={320}
+            width={315}
             sortable
+            field='name'
+            align='left'
             body={(rowData) => (
               <>
-                <Spacing vAlign='center'>
-                  <Button type='link' onClick={() => props.onChangeConfigs(rowData.costingConfigGuid)}>
-                    {rowData.name}
-                  </Button>
-                </Spacing>
+                <Button type='link' onClick={() => props.onChangeConfigs(rowData.costingConfigGuid)}>
+                  {rowData.name}
+                </Button>
               </>
             )}
           ></DataGrid.Column>
-          <DataGrid.Column header='Description' field='description' collapseLongText width={280} sortable />
+          <DataGrid.Column header='Description' field='description' collapseLongText width={275} sortable />
           <DataGrid.Column header='Type' field='type' width={120} body={(rowData) => getCostingTypeName(rowData.type)} sortable />
           <DataGrid.Column header='Fiscal Year' field='fiscalYearId' width={104} sortable />
           <DataGrid.DateColumn header='Last Edit' field='modifiedAtUtc' sortable width={128} />
@@ -139,17 +139,14 @@ const CostingConfigsModal: React.FC<ICostingConfigsModalProps> = (props: ICostin
           <DataGrid.Column
             align='right'
             width={80}
-            sortable
             body={(rowData) => (
               <>
-                <Spacing vAlign='center'>
-                  <Tooltip title='Copy'>
-                    <Button type='link' icon='Copy' onClick={() => handleCopyCostingConfig(rowData)}></Button>
-                  </Tooltip>
-                  <Tooltip title='Delete'>
-                    <Button type='link' icon='Delete' disabled={!rowData.isEditable} onClick={() => handleDelete(rowData.costingConfigGuid)}></Button>
-                  </Tooltip>
-                </Spacing>
+                <Tooltip title='Copy'>
+                  <Button type='link' icon='Copy' onClick={() => handleCopyCostingConfig(rowData)}></Button>
+                </Tooltip>
+                <Tooltip title='Delete'>
+                  <Button type='link' icon='Delete' disabled={!rowData.isEditable} onClick={() => handleDelete(rowData.costingConfigGuid)}></Button>
+                </Tooltip>
               </>
             )}
           ></DataGrid.Column>
