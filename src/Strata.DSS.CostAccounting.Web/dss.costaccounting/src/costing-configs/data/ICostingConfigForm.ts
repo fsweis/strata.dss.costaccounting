@@ -11,7 +11,7 @@ export interface ICostingConfigForm {
   type: CostingType;
   glPayrollEntities: string[];
   entityType: number;
-  utilEntities: string[];
+  utilizationEntities: string[];
   defaultMethod: number;
   options: number[];
   isCopy: boolean;
@@ -26,7 +26,7 @@ export const getNewCostingConfigForm = (): ICostingConfigForm => {
     type: CostingType.PatientCare,
     glPayrollEntities: [],
     entityType: EntityType.GlPayroll,
-    utilEntities: [],
+    utilizationEntities: [],
     defaultMethod: CostingMethod.Simultaneous,
     options: [CostingOption.NotSpecified, CostingOption.NotSpecified],
     isCopy: false

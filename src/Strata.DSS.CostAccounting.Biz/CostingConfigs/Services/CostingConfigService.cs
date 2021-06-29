@@ -38,7 +38,7 @@ namespace Strata.DSS.CostAccounting.Biz.CostingConfigs.Services
             }
 
             //handle add/delete linkages for existing and new configs
-            await SaveEntityLinkages(costConfigSaveData.CostingConfig.CostingConfigGuid, costConfigSaveData.CostingConfig.IsUtilizationEntityConfigured, costConfigSaveData.GlPayrollEntities, costConfigSaveData.UtilEntities, cancellationToken);
+            await SaveEntityLinkages(costConfigSaveData.CostingConfig.CostingConfigGuid, costConfigSaveData.CostingConfig.IsUtilizationEntityConfigured, costConfigSaveData.GlPayrollEntities, costConfigSaveData.UtilizationEntities, cancellationToken);
             //save the config
             await _costingConfigRepository.AddNewCostingConfigAsync(costConfigSaveData.CostingConfig, cancellationToken);
 
