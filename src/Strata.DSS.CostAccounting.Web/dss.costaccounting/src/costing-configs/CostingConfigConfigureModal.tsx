@@ -131,7 +131,7 @@ const CostingConfigConfigureModal: React.FC<ICostingConfigConfigureModalProps> =
       let isPayrollCosting = false;
       let isBudgetedAndActualCosting = false;
 
-      if (values.type === CostingType.PatientCare) {
+      if (costingType === CostingType.PatientCare) {
         isBudgetedAndActualCosting = values.options[0] === CostingOption.BudgetedAndActualCosting ? true : false;
         isPayrollCosting = values.options[1] === CostingOption.PayrollCosting ? true : false;
       }
@@ -144,12 +144,12 @@ const CostingConfigConfigureModal: React.FC<ICostingConfigConfigureModalProps> =
         isGLCosting: true,
         isPayrollCosting: isPayrollCosting,
         isBudgetedAndActualCosting: isBudgetedAndActualCosting,
-        isUtilizationEntityConfigured: values.entityType === EntityType.Specify,
+        isUtilizationEntityConfigured: entityType === EntityType.Specify,
         defaultChargeAllocationMethod: 0,
         defaultMethod: values.defaultMethod,
         fiscalYearId: values.year,
         fiscalMonthId: values.ytdMonth,
-        type: values.type,
+        type: costingType,
         createdAt: new Date(),
         modifiedAtUtc: new Date(),
         lastPublishedUtc: new Date(),
@@ -159,7 +159,7 @@ const CostingConfigConfigureModal: React.FC<ICostingConfigConfigureModalProps> =
       const configSaveData: ICostingConfigSaveData = {
         costingConfig: newConfig,
         glPayrollEntities: values.glPayrollEntities.map((x) => +x),
-        utilizationEntities: values.entityType === EntityType.Specify ? values.utilizationEntities.map((x) => +x) : []
+        utilizationEntities: entityType === EntityType.Specify ? values.utilizationEntities.map((x) => +x) : []
       };
 
       try {
