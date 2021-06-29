@@ -159,7 +159,7 @@ const CostingConfigConfigureModal: React.FC<ICostingConfigConfigureModalProps> =
       const configSaveData: ICostingConfigSaveData = {
         costingConfig: newConfig,
         glPayrollEntities: values.glPayrollEntities.map((x) => +x),
-        utilizationEntities: values.type === CostingType.PatientCare && values.entityType === EntityType.Specify ? values.utilizationEntities.map((x) => +x) : []
+        utilizationEntities: values.entityType === EntityType.Specify ? values.utilizationEntities.map((x) => +x) : []
       };
 
       try {
