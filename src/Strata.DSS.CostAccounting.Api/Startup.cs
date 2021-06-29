@@ -59,7 +59,6 @@ namespace Strata.DSS.CostAccounting.Api
             {
                 options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
                 options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
-                options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
             })
             .SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
 
