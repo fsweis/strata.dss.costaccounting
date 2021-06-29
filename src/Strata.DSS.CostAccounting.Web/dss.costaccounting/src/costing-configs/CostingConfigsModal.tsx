@@ -115,7 +115,7 @@ const CostingConfigsModal: React.FC<ICostingConfigsModalProps> = (props: ICostin
             </>
           }
         />
-        <DataGrid key='allModelsGrid' scrollable dataKey='costingConfigGuid' value={costingConfigs} globalFilterValue={globalFilterValue}>
+        <DataGrid key='allModelsGrid' pager={{ pageSize: 25 }} scrollable dataKey='costingConfigGuid' value={costingConfigs} globalFilterValue={globalFilterValue}>
           <DataGrid.RowNumber />
           <DataGrid.Column
             header='Name'
