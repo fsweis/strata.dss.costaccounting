@@ -185,7 +185,7 @@ namespace Strata.DSS.CostAccounting.Biz.CostingConfigs.Repositories
 
             //handle add/delete linkages for existing and new configs
             await SaveEntityLinkages(costConfigSaveData.CostingConfig.CostingConfigGuid, costConfigSaveData.CostingConfig.IsUtilizationEntityConfigured,
-                costConfigSaveData.GlPayrollEntities, costConfigSaveData.UtilEntities, cancellationToken);
+                costConfigSaveData.GlPayrollEntities, costConfigSaveData.UtilizationEntities, cancellationToken);
 
             //save the config
             await AddNewCostingConfigAsync(costConfigSaveData.CostingConfig, cancellationToken);
@@ -194,7 +194,7 @@ namespace Strata.DSS.CostAccounting.Biz.CostingConfigs.Repositories
         }
 
         private async Task SaveEntityLinkages(Guid costConfigGuid, bool isUtilizationEntityConfigured, List<int> glPayrollEntityIds,
-            List<int> utilEntityIds, CancellationToken cancellationToken)
+            List<int> utilizationEntityIds, CancellationToken cancellationToken)
         {
             var isCostingEntityLevelSecurityEnabled =
                 await _systemSettingRepository.GetBoolSystemSettingByNameAsync(SystemSettingConstants.EntityLevelSecuritySystemSettingName, cancellationToken);
@@ -214,11 +214,11 @@ namespace Strata.DSS.CostAccounting.Biz.CostingConfigs.Repositories
             if (isCostingEntityLevelSecurityEnabled && isUtilizationEntityConfigured)
             {
                 //save any new util links
-                await AddEntityLinkagesAsync(costConfigGuid, utilEntityLinkages, utilEntityIds, cancellationToken);
+                await AddEntityLinkagesAsync(costConfigGuid, utilEntityLinkages, utilizationEntityIds, cancellationToken);
                 //now, delete any old util links
                 if (utilEntityLinkages != null && utilEntityLinkages.Any())
                 {
-                    await DeleteEntityLinkagesAsync(utilEntityLinkages, utilEntityIds, cancellationToken);
+                    await DeleteEntityLinkagesAsync(utilEntityLinkages, utilizationEntityIds, cancellationToken);
                 }
             }
             else
