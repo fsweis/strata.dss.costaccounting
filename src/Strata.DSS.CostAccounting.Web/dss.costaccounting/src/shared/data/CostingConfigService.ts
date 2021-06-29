@@ -16,7 +16,7 @@ export const CostingConfigService = {
   getCostingConfigEntityLinkages: (costingConfigGuid: string): Promise<ICostingConfigEntityLinkage[]> => {
     return httpGet<ICostingConfigEntityLinkage[]>(`costing-configs/${costingConfigGuid}/entity-linkages`);
   },
-  getUtilEntities: (): Promise<IEntity[]> => {
+  getUtilizationEntities: (): Promise<IEntity[]> => {
     return httpGet<IEntity[]>(`costing-configs/entities`);
   },
   getGlPayrollEntities: (costingConfigGuid: string): Promise<IEntity[]> => {

@@ -23,6 +23,7 @@ import { IDataSource } from '../shared/data/IDataSource';
 import PatientDriverTreeModal from './PatientDriverTreeModal';
 import useStatDriverRulesEditWindow from './data/useStatDriverRulesEditWindow';
 import { CostingConfigContext } from '../shared/data/CostingConfigContext';
+import { CostingType } from '../shared/enums/CostingTypeEnum';
 
 const StatisticDrivers: React.FC = () => {
   const [statDrivers, setStatDrivers] = useState<IStatisticDriver[]>([]);
@@ -41,7 +42,7 @@ const StatisticDrivers: React.FC = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        if (costingConfig && costingConfig.type) {
+        if (costingConfig && costingConfig.type !== undefined) {
           const [dataSources, dataSourceLinks, statisticDrivers] = await Promise.all([
             statisticDriverService.getDataSources(costingConfig.type),
             statisticDriverService.getDataSourceLinks(costingConfig.type),
@@ -90,7 +91,7 @@ const StatisticDrivers: React.FC = () => {
       isInverted: false,
       isUsed: false,
       name: '',
-      costingType: costingConfig?.type ?? 0
+      costingType: costingConfig?.type ?? CostingType.PatientCare
     };
 
     if (tempStatDrivers !== undefined) {
@@ -113,7 +114,7 @@ const StatisticDrivers: React.FC = () => {
       const statDriverSaveData: IStatisticDriverSaveData = {
         updatedStatDrivers: updatedStatDrivers,
         deletedStatDrivers: deletedDriverGuids,
-        costingType: costingConfig?.type ?? 0
+        costingType: costingConfig?.type ?? CostingType.PatientCare
       };
 
       // Don't actually save if there are no changes
