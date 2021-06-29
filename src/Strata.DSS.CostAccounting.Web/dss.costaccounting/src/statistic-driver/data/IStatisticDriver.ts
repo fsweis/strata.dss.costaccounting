@@ -1,3 +1,5 @@
+import { CostingType } from '../../shared/enums/CostingTypeEnum';
+
 export interface IStatisticDriver {
   driverConfigGuid: string;
   dataTableGuid: string;
@@ -6,5 +8,5 @@ export interface IStatisticDriver {
   isUsed: boolean;
   measureGuid: string;
   name: string;
-  costingType: number;
+  costingType: CostingType;
 }
