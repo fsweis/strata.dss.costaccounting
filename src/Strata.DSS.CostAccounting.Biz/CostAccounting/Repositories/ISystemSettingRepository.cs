@@ -5,8 +5,7 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.Repositories
 {
     public interface ISystemSettingRepository
     {
-        public Task<bool> GetBoolSystemSettingByNameAsync(string name, CancellationToken cancellationToken);
-
-        public Task<int> GetCurrentFiscalYearAsync(CancellationToken cancellationToken);
+        public Task<bool> GetBooleanSystemSettingByNameAsync(string name, CancellationToken cancellationToken);
+        public Task<int> GetIntegerSystemSettingByNameAsync(string name, CancellationToken cancellationToken);
     }
 }

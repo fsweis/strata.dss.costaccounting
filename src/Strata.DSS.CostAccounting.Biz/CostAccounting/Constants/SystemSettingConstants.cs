@@ -4,5 +4,6 @@
     {
         public const string ClaimsCostingSystemSettingName = "Is Claims Costing Enabled";
         public const string EntityLevelSecuritySystemSettingName = "Is Costing Entity Level Security Enabled";
+        public const string CurrentFiscalYearSystemSettingName = "Current FiscalYear";
     }
 }

@@ -10,6 +10,7 @@ using Strata.DSS.CostAccounting.Biz.CostingConfigs.Repositories;using Strata.DS
 using Strata.DSS.CostAccounting.Biz.StatisticDrivers.Services;
 using Strata.Hangfire.Configuration;
 using Strata.SMC.Client;
+using Strata.SqlTools.Configuration.Common.AsyncFactory;
 using Strata.SqlTools.Configuration.SqlServer;
 using System;
 using System.Threading;
@@ -41,6 +42,14 @@ namespace Microsoft.Extensions.DependencyInjection
 #else
                    .WithConnectionString((provider, cancellationToken) => provider.GetConnectionStringFromSmc(cancellationToken));
 #endif
+            });
+
+            services.AddScoped(provider =>
+            {
+                var factory = provider.GetRequiredService<IAsyncDbContextFactory<CostAccountingDbContext>>();
+
+                //we should think about making a repository factory classes and getting the repositories in the controllers
+                return factory.CreateDbContextAsync(default).GetAwaiter().GetResult();
             });
 
             services.ConfigureHangfireOptionsFromAws(options =>

@@ -4,11 +4,11 @@ using Strata.DSS.CostAccounting.Biz.CostAccounting.Constants;
 using Strata.DSS.CostAccounting.Biz.CostAccounting.DbContexts;
 using Strata.DSS.CostAccounting.Biz.CostAccounting.Models;
 using Strata.DSS.CostAccounting.Biz.CostAccounting.Repositories;
+using Strata.DSS.CostAccounting.Biz.CostingConfigs.Entities;
 using Strata.DSS.CostAccounting.Biz.CostingConfigs.Models;
 using Strata.DSS.CostAccounting.Biz.Enums;
 using Strata.Hangfire.Jazz.Client;
 using Strata.Hangfire.Jazz.Client.Models;
-using Strata.SqlTools.Configuration.Common.AsyncFactory;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,15 +19,15 @@ namespace Strata.DSS.CostAccounting.Biz.CostingConfigs.Repositories
 {
     public class CostingConfigRepository : ICostingConfigRepository
     {
-        private readonly IAsyncDbContextFactory<CostAccountingDbContext> _dbContextFactory;
+        private readonly CostAccountingDbContext _dbContext;
         private readonly IJazzHangfireServiceClient _hangfireServiceClient;
         private readonly ICostAccountingRepository _costAccountingRepository;
         private readonly ISystemSettingRepository _systemSettingRepository;
 
-        public CostingConfigRepository(IAsyncDbContextFactory<CostAccountingDbContext> dbContextFactory, IJazzHangfireServiceClient hangfireServiceClient,
+        public CostingConfigRepository(CostAccountingDbContext dbContext, IJazzHangfireServiceClient hangfireServiceClient,
             ICostAccountingRepository costAccountingRepository, ISystemSettingRepository systemSettingRepository)
         {
-            _dbContextFactory = dbContextFactory;
+            _dbContext = dbContext;
             _hangfireServiceClient = hangfireServiceClient;
             _costAccountingRepository = costAccountingRepository;
             _systemSettingRepository = systemSettingRepository;
@@ -35,26 +35,25 @@ namespace Strata.DSS.CostAccounting.Biz.CostingConfigs.Repositories
 
         public async Task<IEnumerable<CostingConfig>> GetAllCostingConfigsAsync(CancellationToken cancellationToken)
         {
-            var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
+            var costingConfigs = await _dbContext.CostingConfigs
+                .Include(x => x.CostingResults)
+                .Where(x => x.CostingConfigGuid != Guid.Empty)
+                .OrderBy(c => c.Name)
+                .ToListAsync(cancellationToken);
 
-            var costingConfigs = await dbContext.CostingConfigs.Include(x => x.CostingResults).Where(x => x.CostingConfigGuid != Guid.Empty).ToListAsync(cancellationToken);
-            costingConfigs.ForEach(x => x.LastPublishedUtc = x.CostingResults.SingleOrDefault(x => !x.IsDraft)?.CreatedAtUtc);
-
-            return costingConfigs;
+            return costingConfigs.Select(ToModel);
         }
 
         public async Task<CostingConfig> GetCostingConfigAsync(Guid costingConfigGuid, CancellationToken cancellationToken)
         {
-            var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
-            var entity = await dbContext.CostingConfigs.FirstOrDefaultAsync(cc => cc.CostingConfigGuid == costingConfigGuid, cancellationToken);
-            return entity;
+            var entity = await _dbContext.CostingConfigs.FirstOrDefaultAsync(cc => cc.CostingConfigGuid == costingConfigGuid, cancellationToken);
+
+            return ToModel(entity);
         }
 
         public async Task<IEnumerable<CostingConfigEntityLinkage>> GetCostingConfigEntityLinkagesAsync(Guid costingConfigGuid, CancellationToken cancellationToken)
         {
-            await using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
-
-            var entities = await dbContext.CostingConfigEntityLinkages.Where(x => x.CostingConfigGuid == costingConfigGuid).ToListAsync(cancellationToken);
+            var entities = await _dbContext.CostingConfigEntityLinkages.Where(x => x.CostingConfigGuid == costingConfigGuid).ToListAsync(cancellationToken);
 
             return entities;
         }
@@ -62,7 +61,7 @@ namespace Strata.DSS.CostAccounting.Biz.CostingConfigs.Repositories
         public async Task<IEnumerable<Entity>> GetFilteredEntitiesAsync(Guid costingConfigGuid, CancellationToken cancellationToken)
         {
             var isCostingEntityLevelSecurityEnabled =
-                await _systemSettingRepository.GetBoolSystemSettingByNameAsync(SystemSettingConstants.EntityLevelSecuritySystemSettingName, cancellationToken);
+                await _systemSettingRepository.GetBooleanSystemSettingByNameAsync(SystemSettingConstants.EntityLevelSecuritySystemSettingName, cancellationToken);
 
             var entities = await _costAccountingRepository.GetEntitiesAsync(cancellationToken);
 
@@ -70,9 +69,8 @@ namespace Strata.DSS.CostAccounting.Biz.CostingConfigs.Repositories
             {
                 if (costingConfigGuid != Guid.Empty)
                 {
-                    await using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
                     var costingConfigEntityLevelSecurities =
-                        await dbContext.CostingConfigEntityLevelSecurities.Where(x => x.CostingConfigGuid == costingConfigGuid).ToListAsync(cancellationToken);
+                        await _dbContext.CostingConfigEntityLevelSecurities.Where(x => x.CostingConfigGuid == costingConfigGuid).ToListAsync(cancellationToken);
                     if (costingConfigEntityLevelSecurities.Any())
                     {
                         return entities.Where(x => costingConfigEntityLevelSecurities.Any(y => y.EntityId == x.EntityId));
@@ -92,10 +90,10 @@ namespace Strata.DSS.CostAccounting.Biz.CostingConfigs.Repositories
         }
 
         private async Task AddEntityLinkagesAsync(Guid costConfigGuid, IEnumerable<CostingConfigEntityLinkage> costingConfigEntityLinkages,
-                                                  List<int> entities, CancellationToken cancellationToken)
+                                                  List<int> entityIds, bool isUtilization, CancellationToken cancellationToken)
         {
             var newLinks = new List<CostingConfigEntityLinkage>();
-            foreach (var id in entities.Where(e => e != 0)) //we don't want to save the 'Not Specified' entity, so filter out EntityId = 0
+            foreach (var id in entityIds.Where(e => e != 0)) //we don't want to save the 'Not Specified' entity, so filter out EntityId = 0
             {
                 var existingLink = costingConfigEntityLinkages?.FirstOrDefault(e => e.EntityId == id);
                 if (existingLink == null) //new link
@@ -104,7 +102,7 @@ namespace Strata.DSS.CostAccounting.Biz.CostingConfigs.Repositories
                     {
                         EntityId = id,
                         CostingConfigGuid = costConfigGuid,
-                        IsUtilization = false
+                        IsUtilization = isUtilization
                     };
                     newLinks.Add(ccel);
                 }
@@ -117,9 +115,8 @@ namespace Strata.DSS.CostAccounting.Biz.CostingConfigs.Repositories
 
         private async Task UpdateCostingConfigEntityLinkagesAsync(IEnumerable<CostingConfigEntityLinkage> costingConfigEntityLinkages, CancellationToken cancellationToken)
         {
-            await using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
-            dbContext.CostingConfigEntityLinkages.AddRange(costingConfigEntityLinkages);
-            await dbContext.SaveChangesAsync(cancellationToken);
+            _dbContext.CostingConfigEntityLinkages.AddRange(costingConfigEntityLinkages);
+            await _dbContext.SaveChangesAsync(cancellationToken);
         }
 
         private async Task DeleteEntityLinkagesAsync(IEnumerable<CostingConfigEntityLinkage> links, List<int> entities, CancellationToken cancellationToken)
@@ -141,18 +138,16 @@ namespace Strata.DSS.CostAccounting.Biz.CostingConfigs.Repositories
 
         public async Task DeleteCostingConfigEntityLinkagesAsync(IEnumerable<CostingConfigEntityLinkage> costingConfigEntityLinkages, CancellationToken cancellationToken)
         {
-            await using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
-            dbContext.CostingConfigEntityLinkages.RemoveRange(costingConfigEntityLinkages);
-            await dbContext.SaveChangesAsync(cancellationToken);
+            _dbContext.CostingConfigEntityLinkages.RemoveRange(costingConfigEntityLinkages);
+
+            await _dbContext.SaveChangesAsync(cancellationToken);
         }
 
         private async Task AddNewCostingConfigAsync(CostingConfig costingConfig, CancellationToken cancellationToken)
         {
-            await using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
+            _dbContext.CostingConfigs.Add(ToEntity(costingConfig));
 
-            dbContext.CostingConfigs.Add(costingConfig);
-
-            await dbContext.SaveChangesAsync(cancellationToken);
+            await _dbContext.SaveChangesAsync(cancellationToken);
         }
 
         public async Task<Guid> DeleteCostingConfigAsync(Guid costingConfigGuid, CancellationToken cancellationToken)
@@ -170,64 +165,81 @@ namespace Strata.DSS.CostAccounting.Biz.CostingConfigs.Repositories
 
         public async Task<CostingConfig> AddNewConfigAsync(CostingConfigSaveData costConfigSaveData, CancellationToken cancellationToken)
         {
-            //assign defaults
-            costConfigSaveData.CostingConfig.CostingConfigGuid = Guid.NewGuid();
-            costConfigSaveData.CostingConfig.IsEditable = true;
-            costConfigSaveData.CostingConfig.CubePartitionName = "";
+            var costingConfig = costConfigSaveData.CostingConfig;
+            costingConfig.CostingConfigGuid = Guid.NewGuid();
+            costingConfig.IsEditable = true;
+            costingConfig.CubePartitionName = "";
             //these are well known datatable guids
-            costConfigSaveData.CostingConfig.GLDataTableGuid = DataTableConstants.DSSGLGuid;
-            costConfigSaveData.CostingConfig.PayrollDataTableGuid = DataTableConstants.PayrollSampledGuid;
-            if (costConfigSaveData.CostingConfig.Type == CostingType.Claims)
+            costingConfig.GLDataTableGuid = DataTableConstants.DSSGLGuid;
+            costingConfig.PayrollDataTableGuid = DataTableConstants.PayrollSampledGuid;
+            if (costingConfig.Type == CostingType.Claims)
             {
-                costConfigSaveData.CostingConfig.IsPayrollCosting = false;
-                costConfigSaveData.CostingConfig.IsGLCosting = false;
+                costingConfig.IsPayrollCosting = false;
+                costingConfig.IsGLCosting = false;
             }
 
             //handle add/delete linkages for existing and new configs
-            await SaveEntityLinkages(costConfigSaveData.CostingConfig.CostingConfigGuid, costConfigSaveData.CostingConfig.IsUtilizationEntityConfigured,
-                costConfigSaveData.GlPayrollEntities, costConfigSaveData.UtilizationEntities, cancellationToken);
+            await SaveEntityLinkages(costConfigSaveData, cancellationToken);
 
             //save the config
-            await AddNewCostingConfigAsync(costConfigSaveData.CostingConfig, cancellationToken);
+            await AddNewCostingConfigAsync(costingConfig, cancellationToken);
 
             return costConfigSaveData.CostingConfig;
         }
 
-        private async Task SaveEntityLinkages(Guid costConfigGuid, bool isUtilizationEntityConfigured, List<int> glPayrollEntityIds,
-            List<int> utilizationEntityIds, CancellationToken cancellationToken)
+        private async Task SaveEntityLinkages(CostingConfigSaveData costingConfigSaveData, CancellationToken cancellationToken)
         {
             var isCostingEntityLevelSecurityEnabled =
-                await _systemSettingRepository.GetBoolSystemSettingByNameAsync(SystemSettingConstants.EntityLevelSecuritySystemSettingName, cancellationToken);
+                await _systemSettingRepository.GetBooleanSystemSettingByNameAsync(SystemSettingConstants.EntityLevelSecuritySystemSettingName, cancellationToken);
 
-            var existingLinkages = await GetCostingConfigEntityLinkagesAsync(costConfigGuid, cancellationToken);
-            var utilEntityLinkages = existingLinkages?.Where(l => l.IsUtilization);
+            var costingConfig = costingConfigSaveData.CostingConfig;
+
+            var existingLinkages = await GetCostingConfigEntityLinkagesAsync(costingConfig.CostingConfigGuid, cancellationToken);
+            var utilizationEntityLinkages = existingLinkages?.Where(l => l.IsUtilization);
             var glPayrollEntityLinkages = existingLinkages?.Where(l => !l.IsUtilization);
 
             //save any new gl/payroll links
-            await AddEntityLinkagesAsync(costConfigGuid, glPayrollEntityLinkages, glPayrollEntityIds, cancellationToken);
+            await AddEntityLinkagesAsync(costingConfig.CostingConfigGuid, glPayrollEntityLinkages, costingConfigSaveData.GlPayrollEntityIds, false, cancellationToken);
             //now, delete any old gl/payroll links
             if (glPayrollEntityLinkages != null && glPayrollEntityLinkages.Any())
             {
-                await DeleteEntityLinkagesAsync(glPayrollEntityLinkages, glPayrollEntityIds, cancellationToken);
+                await DeleteEntityLinkagesAsync(glPayrollEntityLinkages, costingConfigSaveData.GlPayrollEntityIds, cancellationToken);
             }
             //handle utilization entities
-            if (isCostingEntityLevelSecurityEnabled && isUtilizationEntityConfigured)
+            if (isCostingEntityLevelSecurityEnabled && costingConfig.IsUtilizationEntityConfigured)
             {
-                //save any new util links
-                await AddEntityLinkagesAsync(costConfigGuid, utilEntityLinkages, utilizationEntityIds, cancellationToken);
-                //now, delete any old util links
-                if (utilEntityLinkages != null && utilEntityLinkages.Any())
+                //save any new utilization links
+                await AddEntityLinkagesAsync(costingConfig.CostingConfigGuid, utilizationEntityLinkages, costingConfigSaveData.UtilizationEntityIds, true, cancellationToken);
+                //now, delete any old utilization links
+                if (utilizationEntityLinkages != null && utilizationEntityLinkages.Any())
                 {
-                    await DeleteEntityLinkagesAsync(utilEntityLinkages, utilizationEntityIds, cancellationToken);
+                    await DeleteEntityLinkagesAsync(utilizationEntityLinkages, costingConfigSaveData.UtilizationEntityIds, cancellationToken);
                 }
             }
             else
             {
-                if (utilEntityLinkages != null && utilEntityLinkages.Any())
+                if (utilizationEntityLinkages != null && utilizationEntityLinkages.Any())
                 {
-                    await DeleteCostingConfigEntityLinkagesAsync(utilEntityLinkages.ToList(), cancellationToken);
+                    await DeleteCostingConfigEntityLinkagesAsync(utilizationEntityLinkages.ToList(), cancellationToken);
                 }
             }
+        }
+
+        private static CostingConfig ToModel(CostingConfigEntity costingConfigEntity)
+        {
+            var config = new CostingConfig();
+            config.LastPublishedUtc = costingConfigEntity.CostingResults.SingleOrDefault(x => !x.IsDraft)?.CreatedAtUtc;
+            //todo rest of stuff maybe bring back auto mapper
+
+            return config;
+        }
+
+        private static CostingConfigEntity ToEntity(CostingConfig costingConfig)
+        {
+            var costingConfigEntity = new CostingConfigEntity();
+            //todo rest of stuff maybe bring back auto mapper
+
+            return costingConfigEntity;
         }
     }
 }

@@ -22,21 +22,21 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
         [ProducesResponseType(200)]
         public async Task<bool> GetIsClaimsCostingEnabled(CancellationToken cancellationToken)
         {
-            return await _systemSettingRepository.GetBoolSystemSettingByNameAsync(SystemSettingConstants.ClaimsCostingSystemSettingName, cancellationToken);
+            return await _systemSettingRepository.GetBooleanSystemSettingByNameAsync(SystemSettingConstants.ClaimsCostingSystemSettingName, cancellationToken);
         }
 
         [HttpGet("entity-security")]
         [ProducesResponseType(200)]
         public async Task<bool> GetIsCostingEntityLevelSecurityEnabled(CancellationToken cancellationToken)
         {
-            return await _systemSettingRepository.GetBoolSystemSettingByNameAsync(SystemSettingConstants.EntityLevelSecuritySystemSettingName, cancellationToken);
+            return await _systemSettingRepository.GetBooleanSystemSettingByNameAsync(SystemSettingConstants.EntityLevelSecuritySystemSettingName, cancellationToken);
         }
 
         [HttpGet("fiscal-year")]
         [ProducesResponseType(200)]
         public async Task<int> GetCurrentFiscalYear(CancellationToken cancellationToken)
         {
-            return await _systemSettingRepository.GetCurrentFiscalYearAsync(cancellationToken);
+            return await _systemSettingRepository.GetIntegerSystemSettingByNameAsync(SystemSettingConstants.CurrentFiscalYearSystemSettingName, cancellationToken);
         }
     }
 }

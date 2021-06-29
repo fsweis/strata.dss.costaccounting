@@ -19,8 +19,8 @@ namespace Strata.DSS.CostAccounting.Biz.StatisticDrivers.Services
         public DataSourceLinkService(ICostAccountingRepository costaccountingRepository)
         {
             _costAccountingRepository = costaccountingRepository;
-
         }
+
         public async Task<IList<DataSourceLink>> GetDataSourceLinks(CostingType costingType, CancellationToken cancellationToken)
         {
             var measures = await _costAccountingRepository.GetMeasuresAsync(StatisticDriverDataSourceUtil.GetDataTableGuids(costingType == CostingType.Claims), cancellationToken);

@@ -16,7 +16,7 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.Repositories
             _dbContextFactory = dbContextFactory;
         }
 
-        public async Task<bool> GetBoolSystemSettingByNameAsync(string name, CancellationToken cancellationToken)
+        public async Task<bool> GetBooleanSystemSettingByNameAsync(string name, CancellationToken cancellationToken)
         {
             await using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
             var systemSetting = await dbContext.SystemSettings.Where(x => x.Name == name).FirstOrDefaultAsync();
@@ -25,15 +25,16 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.Repositories
             return false;
         }
 
-        public async Task<int> GetCurrentFiscalYearAsync(CancellationToken cancellationToken)
+        public async Task<int> GetIntegerSystemSettingByNameAsync(string name, CancellationToken cancellationToken)
         {
             await using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
-            var systemSetting = await dbContext.SystemSettings.Where(x => x.Name == "Current FiscalYear").FirstOrDefaultAsync();
+            var systemSetting = await dbContext.SystemSettings.Where(x => x.Name == name).FirstOrDefaultAsync();
             if (systemSetting != null)
             {
                 return Convert.ToInt32(systemSetting.Value);
             }
-            return DateTime.Now.Year;
+
+            return 0;
         }
     }
 }
