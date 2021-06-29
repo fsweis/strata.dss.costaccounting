@@ -133,7 +133,7 @@ const CostingConfigsModal: React.FC<ICostingConfigsModalProps> = (props: ICostin
           ></DataGrid.Column>
           <DataGrid.Column header='Description' field='description' collapseLongText width={275} sortable />
           <DataGrid.Column header='Type' field='type' width={120} body={(rowData) => getCostingTypeName(rowData.type)} sortable />
-          <DataGrid.Column header='Fiscal Year' field='fiscalYearId' width={104} sortable />
+          <DataGrid.Column header='Fiscal Year' align='right' field='fiscalYearId' width={104} sortable />
           <DataGrid.DateColumn header='Last Edit' field='modifiedAtUtc' sortable width={128} />
           <DataGrid.DateColumn header='Last Published' field='lastPublishedUtc' sortable width={128} />
           <DataGrid.Column
