@@ -45,13 +45,14 @@ const CostingConfigConfigureModal: React.FC<ICostingConfigConfigureModalProps> =
   const [utilizationEntities, setUtililizationEntities] = useState<IEntity[]>([]);
   const [glPayrollEntities, setGlPayrollEntities] = useState<IEntity[]>([]);
   const { setLoading } = usePageLoader();
-  const [costingType, setCostingType] = useState<number>(0);
-  const [entityUtilType, setEntityUtilType] = useState<number>(0);
   const [entityTreeData, setEntityTreeData] = useState<ITreeDropDownNode[]>([]);
   const [utilizationEntityTreeData, setUtilizationEntityTreeData] = useState<ITreeDropDownNode[]>([]);
   const [isClaimsCostingEnabled, setIsClaimsCostingEnabled] = useState<boolean>(false);
   const [isCostingEntityLevelSecurityEnabled, setIsCostingEntityLevelSecurityEnabled] = useState<boolean>(false);
   const emptyGuid = getEmptyGuid();
+
+  const [costingType, setCostingType] = useState<CostingType>(props.costingConfigForm.type);
+  const [entityType, setEntityType] = useState<EntityType>(props.costingConfigForm.entityType);
 
   //Load initial data
   useEffect(() => {
@@ -82,6 +83,14 @@ const CostingConfigConfigureModal: React.FC<ICostingConfigConfigureModalProps> =
 
     fetchData();
   }, [setLoading, emptyGuid]);
+
+  useEffect(() => {
+    setCostingType(props.costingConfigForm.type);
+  }, [props.costingConfigForm.type]);
+
+  useEffect(() => {
+    setEntityType(props.costingConfigForm.entityType);
+  }, [props.costingConfigForm.entityType]);
 
   //Set Filtered Entity Trees when entities are loaded
   useEffect(() => {
@@ -135,12 +144,12 @@ const CostingConfigConfigureModal: React.FC<ICostingConfigConfigureModalProps> =
         isGLCosting: true,
         isPayrollCosting: isPayrollCosting,
         isBudgetedAndActualCosting: isBudgetedAndActualCosting,
-        isUtilizationEntityConfigured: values.entityType === EntityType.Specify,
+        isUtilizationEntityConfigured: entityType === EntityType.Specify,
         defaultChargeAllocationMethod: 0,
         defaultMethod: values.defaultMethod,
         fiscalYearId: values.year,
         fiscalMonthId: values.ytdMonth,
-        type: values.type,
+        type: costingType,
         createdAt: new Date(),
         modifiedAtUtc: new Date(),
         lastPublishedUtc: new Date(),
@@ -150,7 +159,7 @@ const CostingConfigConfigureModal: React.FC<ICostingConfigConfigureModalProps> =
       const configSaveData: ICostingConfigSaveData = {
         costingConfig: newConfig,
         glPayrollEntities: values.glPayrollEntities.map((x) => +x),
-        utilizationEntities: values.type === CostingType.PatientCare && values.entityType === EntityType.Specify ? values.utilizationEntities.map((x) => +x) : []
+        utilizationEntities: entityType === EntityType.Specify ? values.utilizationEntities.map((x) => +x) : []
       };
 
       try {
@@ -159,8 +168,6 @@ const CostingConfigConfigureModal: React.FC<ICostingConfigConfigureModalProps> =
         Toast.show({ message: 'Changes Saved', toastType: 'success' });
         //reset form
         form.resetFields();
-        setCostingType(0);
-        setEntityUtilType(0);
         props.onSave(newConfig);
       } catch (error) {
         Toast.show({ message: 'Changes not saved. Try again and contact your administrator if the issue continues.', toastType: 'error' });
@@ -171,8 +178,6 @@ const CostingConfigConfigureModal: React.FC<ICostingConfigConfigureModalProps> =
   };
 
   const handleCancel = () => {
-    setCostingType(0);
-    setEntityUtilType(0);
     form.resetFields();
     props.onCancel();
     Toast.show({ message: 'Changes Discarded', toastType: 'info' });
@@ -182,12 +187,12 @@ const CostingConfigConfigureModal: React.FC<ICostingConfigConfigureModalProps> =
     form.submit();
   };
 
-  const handleEntityTypeChange = (e: RadioChangeEvent) => {
-    setEntityUtilType(e.target.value);
-  };
-
   const handleCostingTypeChange = (e: RadioChangeEvent) => {
     setCostingType(e.target.value);
+  };
+
+  const handleEntityTypeChange = (e: RadioChangeEvent) => {
+    setEntityType(e.target.value);
   };
 
   const getYearInitialValue = () => {
@@ -287,7 +292,7 @@ const CostingConfigConfigureModal: React.FC<ICostingConfigConfigureModalProps> =
                   ]}
                 />
               </Form.Item>
-              {entityUtilType === EntityType.Specify && (
+              {entityType === EntityType.Specify && (
                 <Form.Item label='Specifiy Utilization Entities' name='utilizationEntities' initialValue={getUtilizationEntitiesitiesInitialValue()} rules={[{ required: true }]}>
                   <TreeDropDown treeData={utilizationEntityTreeData} selectionMode='multiple' treeDefaultExpandedKeys={['0']} />
                 </Form.Item>
