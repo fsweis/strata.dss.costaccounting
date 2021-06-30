@@ -6,7 +6,7 @@ import { ICostingConfigSaveData } from '../../costing-configs/data/ICostingConfi
 
 const { httpGet, httpPost } = getSecureService(appConfig.apiUrl);
 
-export const CostingConfigService = {
+export const costingConfigService = {
   getCostingConfigs: (): Promise<ICostingConfig[]> => {
     return httpGet<ICostingConfig[]>(`costing-configs`);
   },
