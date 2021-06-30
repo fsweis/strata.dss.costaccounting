@@ -3,6 +3,7 @@ using Strata.DSS.CostAccounting.Biz.CostAccounting.Models;
 using Strata.DSS.CostAccounting.Biz.CostAccounting.Repositories;
 using Strata.DSS.CostAccounting.Biz.CostingConfigs.Models;
 using Strata.DSS.CostAccounting.Biz.CostingConfigs.Repositories;
+using Strata.DSS.CostAccounting.Biz.CostingConfigs.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,11 +17,13 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
     [Route("api/v{api-version:apiVersion}/costing-configs")]
     public class CostingConfigController : ControllerBase
     {
+        private readonly ICostingConfigService _costingConfigService;
         private readonly ICostingConfigRepository _costingConfigRepository;
         private readonly ICostAccountingRepository _costAccountingRepository;
 
-        public CostingConfigController(ICostingConfigRepository costingConfigRepository, ICostAccountingRepository costAccountingRepository)
+        public CostingConfigController(ICostingConfigService costingConfigService, ICostingConfigRepository costingConfigRepository, ICostAccountingRepository costAccountingRepository)
         {
+            _costingConfigService = costingConfigService;
             _costingConfigRepository = costingConfigRepository;
             _costAccountingRepository = costAccountingRepository;
         }
@@ -62,9 +65,9 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
 
         [HttpPost("")]
         [ProducesResponseType(200)]
-        public async Task<CostingConfig> AddNewConfig([FromBody] CostingConfigSaveData costConfigSaveData, CancellationToken cancellationToken)
+        public async Task<CostingConfig> AddNewConfig([FromBody] CostingConfigSaveData costingConfigSaveData, CancellationToken cancellationToken)
         {
-            var costConfig = await _costingConfigRepository.AddNewConfigAsync(costConfigSaveData, cancellationToken);
+            var costConfig = await _costingConfigService.AddNewCostingConfigAsync(costingConfigSaveData, cancellationToken);
             return costConfig;
         }
 

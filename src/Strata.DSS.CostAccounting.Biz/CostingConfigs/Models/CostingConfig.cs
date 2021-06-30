@@ -1,5 +1,6 @@
 ﻿using Strata.DSS.CostAccounting.Biz.Enums;
 using System;
+using System.Collections.Generic;
 
 namespace Strata.DSS.CostAccounting.Biz.CostingConfigs.Models
 {
@@ -24,6 +25,8 @@ namespace Strata.DSS.CostAccounting.Biz.CostingConfigs.Models
         public bool IsUtilizationEntityConfigured { get; set; }
         public DateTime ModifiedAtUtc { get; set; }
         public bool IsPendingDelete { get; set; }
+        public ICollection<CostingResult> CostingResults { get; set; }
+        public ICollection<CostingConfigEntityLinkage> EntityLinkages { get; set; }
         public DateTime? LastPublishedUtc { get; set; }
     }
 }
