@@ -16,6 +16,6 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.Repositories
         public Task UpdateCostingConfigEntityLinkagesAsync(List<CostingConfigEntityLinkage> cceLinks, CancellationToken cancellationToken);
         public Task DeleteCostingConfigEntityLinkagesAsync(List<CostingConfigEntityLinkage> cceLinks, CancellationToken cancellationToken);
         public Task AddNewCostingConfigAsync(CostingConfig costingConfigModel, CancellationToken cancellationToken);
-        public Task<Guid> DeleteCostingConfigAsync(Guid costingConfigGuid, CancellationToken cancellationToken);
+        public Task<Guid> CreateDeleteCostingConfigTaskAsync(Guid costingConfigGuid, CancellationToken cancellationToken);
     }
 }
