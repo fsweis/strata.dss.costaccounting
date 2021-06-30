@@ -296,7 +296,7 @@ const DepartmentCategorization: React.FC = () => {
                 <>
                   <DropDown
                     width={200}
-                    items={renderExceptionTypeSwitch(rowData.costingDepartmentTypeException.deptExceptionTypeName)}
+                    items={renderExceptionTypeSwitch(rowData.costingDepartmentTypeException.costingDepartmentType)}
                     value={rowData.costingDepartmentTypeException.deptExceptionTypeName}
                   />
                 </>
