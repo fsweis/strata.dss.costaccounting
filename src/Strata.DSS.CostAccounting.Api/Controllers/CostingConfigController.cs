@@ -6,7 +6,6 @@ using Strata.DSS.CostAccounting.Biz.CostingConfigs.Repositories;
 using Strata.DSS.CostAccounting.Biz.CostingConfigs.Services;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -54,13 +53,7 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
         public async Task<IEnumerable<CostingConfigEntityLinkage>> GetCostingConfigEntityLinkages([FromRoute] Guid costingConfigGuid, CancellationToken cancellationToken)
         {
             var entities = await _costingConfigRepository.GetCostingConfigEntityLinkagesAsync(costingConfigGuid, cancellationToken);
-
-            return entities.Select(x =>
-                new CostingConfigEntityLinkage
-                {
-                    EntityId = x.EntityId,
-                    IsUtilization = x.IsUtilization
-                });
+            return entities;
         }
 
         [HttpPost("")]
@@ -92,7 +85,6 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
         public async Task<IEnumerable<Entity>> GetFilteredEntities([FromRoute] Guid costingConfigGuid, CancellationToken cancellationToken)
         {
             var filteredEntities = await _costingConfigRepository.GetFilteredEntitiesAsync(costingConfigGuid, cancellationToken);
-
             return filteredEntities;
         }
     }
