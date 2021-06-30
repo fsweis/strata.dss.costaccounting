@@ -1,11 +1,8 @@
-﻿
-using AutoMapper;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Strata.DSS.CostAccounting.Biz.CostAccounting.Constants;
 using Strata.DSS.CostAccounting.Biz.CostAccounting.DbContexts;
 using Strata.DSS.CostAccounting.Biz.CostAccounting.Models;
 using Strata.DSS.CostAccounting.Biz.CostAccounting.Repositories;
-using Strata.DSS.CostAccounting.Biz.CostingConfigs.Entities;
 using Strata.DSS.CostAccounting.Biz.CostingConfigs.Models;
 using Strata.Hangfire.Jazz.Client;
 using Strata.Hangfire.Jazz.Client.Models;
@@ -20,16 +17,14 @@ namespace Strata.DSS.CostAccounting.Biz.CostingConfigs.Repositories
     public class CostingConfigRepository : ICostingConfigRepository
     {
         private readonly CostAccountingDbContext _dbContext;
-        private readonly IMapper _mapper;
         private readonly IJazzHangfireServiceClient _hangfireServiceClient;
         private readonly ICostAccountingRepository _costAccountingRepository;
         private readonly ISystemSettingRepository _systemSettingRepository;
 
-        public CostingConfigRepository(CostAccountingDbContext dbContext, IMapper mapper, IJazzHangfireServiceClient hangfireServiceClient,
+        public CostingConfigRepository(CostAccountingDbContext dbContext, IJazzHangfireServiceClient hangfireServiceClient,
             ICostAccountingRepository costAccountingRepository, ISystemSettingRepository systemSettingRepository)
         {
             _dbContext = dbContext;
-            _mapper = mapper;
             _hangfireServiceClient = hangfireServiceClient;
             _costAccountingRepository = costAccountingRepository;
             _systemSettingRepository = systemSettingRepository;
@@ -38,19 +33,21 @@ namespace Strata.DSS.CostAccounting.Biz.CostingConfigs.Repositories
         public async Task<IEnumerable<CostingConfig>> GetAllCostingConfigsAsync(CancellationToken cancellationToken)
         {
             var costingConfigs = await _dbContext.CostingConfigs
-            .Include(x => x.CostingResults)
+            .Include(x => x.CostingResults.Where(r => !r.IsMarkedForDeletion && !r.IsDraft))
             .Where(x => x.CostingConfigGuid != Guid.Empty)
             .OrderBy(c => c.Name)
             .ToListAsync(cancellationToken);
 
-            return _mapper.Map<IEnumerable<CostingConfig>>(costingConfigs);
+            costingConfigs.ForEach(x => x.LastPublishedUtc = x.CostingResults.SingleOrDefault()?.CreatedAtUtc);
+
+            return costingConfigs;
         }
 
         public async Task<CostingConfig> GetCostingConfigAsync(Guid costingConfigGuid, CancellationToken cancellationToken)
         {
-            var costingConfigEntity = await _dbContext.CostingConfigs.FirstOrDefaultAsync(cc => cc.CostingConfigGuid == costingConfigGuid, cancellationToken);
+            var costingConfig = await _dbContext.CostingConfigs.FirstOrDefaultAsync(cc => cc.CostingConfigGuid == costingConfigGuid, cancellationToken);
 
-            return _mapper.Map<CostingConfig>(costingConfigEntity);
+            return costingConfig;
         }
 
         public async Task<IEnumerable<CostingConfigEntityLinkage>> GetCostingConfigEntityLinkagesAsync(Guid costingConfigGuid, CancellationToken cancellationToken)
@@ -93,8 +90,7 @@ namespace Strata.DSS.CostAccounting.Biz.CostingConfigs.Repositories
 
         public async Task AddNewCostingConfigAsync(CostingConfig costingConfig, CancellationToken cancellationToken)
         {
-            var costingConfigEntity = _mapper.Map<CostingConfigEntity>(costingConfig);
-            _dbContext.CostingConfigs.Add(costingConfigEntity);
+            _dbContext.CostingConfigs.Add(costingConfig);
 
             await _dbContext.SaveChangesAsync(cancellationToken);
         }

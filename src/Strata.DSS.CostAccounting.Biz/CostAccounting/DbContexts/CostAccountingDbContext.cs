@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Strata.DSS.CostAccounting.Biz.CostAccounting.Models;
-using Strata.DSS.CostAccounting.Biz.CostingConfigs.Entities;
 using Strata.DSS.CostAccounting.Biz.CostingConfigs.Models;
 using Strata.DSS.CostAccounting.Biz.StatisticDrivers.Models;
 
@@ -21,7 +20,7 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.DbContexts
         public virtual DbSet<FiscalMonth> FiscalMonths { get; set; }
         public virtual DbSet<FiscalYear> FiscalYears { get; set; }
         public virtual DbSet<Entity> Entities { get; set; }
-        public virtual DbSet<CostingConfigEntity> CostingConfigs { get; set; }
+        public virtual DbSet<CostingConfig> CostingConfigs { get; set; }
         public virtual DbSet<CostingResult> CostingResults { get; set; }
         public virtual DbSet<RuleEngineIncludedMeasure> RuleEngineIncludedMeasures { get; set; }
         public virtual DbSet<DriverConfig> DriverConfigs { get; set; }
@@ -38,6 +37,11 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.DbContexts
         public virtual DbSet<CostingConfigEntityLevelSecurity> CostingConfigEntityLevelSecurities { get; set; }
 
         public virtual DbSet<CostingConfigEntityLinkage> CostingConfigEntityLinkages { get; set; }
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            optionsBuilder.UseLazyLoadingProxies();
+        }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -83,12 +87,13 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.DbContexts
                 entity.ToTable("DimFiscalYear", "fw");
             });
 
-            modelBuilder.Entity<CostingConfigEntity>(entity =>
+            modelBuilder.Entity<CostingConfig>(entity =>
             {
                 entity.HasKey(e => e.CostingConfigGuid);
                 entity.ToTable("CostingConfig", "dss");
                 entity.HasMany(e => e.CostingResults).WithOne().HasForeignKey(el => el.CostingConfigGuid);
                 entity.HasMany(e => e.EntityLinkages).WithOne().HasForeignKey(el => el.CostingConfigGuid);
+                entity.Ignore(e => e.LastPublishedUtc);
             });
 
             modelBuilder.Entity<CostingResult>(entity =>
