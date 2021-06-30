@@ -2,12 +2,11 @@ import { ICostingDepartmentTypeException } from './ICostingDepartmentTypeExcepti
 
 export interface IDepartment {
   departmentId: number;
-  departmentCode: number;
+  departmentCode: string;
   departmentType: string;
-  departmentTypeId: number;
+  description: string;
   name: string;
-  deptExceptionType: number;
   isHealthPlanAdmin: number;
   isClaimsCosting: number;
-  costingDepartmentTypeException: ICostingDepartmentTypeException;
+  costingDepartmentTypeException: ICostingDepartmentTypeException | null;
 }

@@ -9,27 +9,192 @@ import DataGrid from '@strata/tempo/lib/datagrid';
 import DropDown from '@strata/tempo/lib/dropdown';
 import ButtonMenu from '@strata/tempo/lib/buttonmenu';
 import { IDepartmentCategorization } from './data/IDepartmentCategorization';
+import { ICostingDepartmentTypeException } from './data/ICostingDepartmentTypeException';
+import { CostConfigContext } from '../shared/data/CostConfigContext';
 import _ from 'lodash';
+import { IDepartment } from './data/IDepartment';
 
 const DepartmentCategorization: React.FC = () => {
   const [searchValue, setSearchValue] = React.useState(false);
   const [searchLoading, setSearchLoading] = React.useState(false);
-  const [searchDepartments, setSearchDepartments] = React.useState([]);
-  const [exceptionDepartmentData, setExceptionDepartmentData] = useState<IDepartmentCategorization[]>([]);
+  const [departments, setDepartments] = useState<IDepartment[]>([]);
+  const [gridLoading, setGridLoading] = useState<boolean>(false);
+  const [deletedExceptions, setDeletedExceptions] = useState<number[]>([]);
+  const [exceptionDepartmentData, setExceptionDepartmentData] = useState<IDepartment[]>([]);
   const [overheadDepartmentData, setOverheadDepartmentData] = useState<IDepartmentCategorization[]>([]);
   const [revenueDepartmentData, setRevenueDepartmentData] = useState<IDepartmentCategorization[]>([]);
+  const { costConfig } = useContext(CostConfigContext);
 
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const departmentArray: IDepartment[] = [
+          {
+            departmentId: 20929,
+            departmentCode: 'Commercial',
+            description: 'Line of Business for Claims Costing',
+            name: 'Commercial - Line of Business for Claims Costing',
+            isClaimsCosting: 0,
+            isHealthPlanAdmin: 0,
+            departmentType: 'Revenue',
+            costingDepartmentTypeException: null
+          },
+          {
+            departmentId: 20841,
+            departmentCode: '59 - 0101',
+            description: 'FAMILY PRACTICE',
+            name: '59 - 0101 - FAMILY PRACTICE',
+            isClaimsCosting: 0,
+            isHealthPlanAdmin: 0,
+            departmentType: 'Revenue',
+            costingDepartmentTypeException: {
+              costingDepartmentExceptionTypeId: 665,
+              departmentId: 20841,
+              costingConfigGuid: '862a9552-8c68-4bae-b3fa-74454e7a9ecb',
+              departmentTypeEnum: 1,
+              costingDepartmentType: 'Revenue',
+              deptExceptionTypeName: 'Revenue to Overhead',
+              deptExceptionType: 1
+            }
+          },
+          {
+            departmentId: 50256,
+            departmentCode: '08_10__20CAJS10___',
+            description: '08_10__20 CLMS ADJ LN 20A S10___',
+            name: '08_10__20CAJS10___ - 08_10__20 CLMS ADJ LN 20A S10___',
+            isClaimsCosting: 0,
+            isHealthPlanAdmin: 0,
+            departmentType: 'Overhead',
+            costingDepartmentTypeException: {
+              costingDepartmentExceptionTypeId: 18326,
+              departmentId: 50256,
+              costingConfigGuid: '862a9552-8c68-4bae-b3fa-74454e7a9ecb',
+              departmentTypeEnum: 2,
+              costingDepartmentType: 'Overhead',
+              deptExceptionTypeName: 'Overhead to Excluded',
+              deptExceptionType: 3
+            }
+          },
+          {
+            departmentId: 50256,
+            departmentCode: '08_10__20CAJS10___',
+            description: '08_10__20 CLMS ADJ LN 20A S10___',
+            name: '08_10__20CAJS10___ - 08_10__20 CLMS ADJ LN 20A S10___',
+            isClaimsCosting: 0,
+            isHealthPlanAdmin: 0,
+            departmentType: 'Overhead',
+            costingDepartmentTypeException: {
+              costingDepartmentExceptionTypeId: 18326,
+              departmentId: 50256,
+              costingConfigGuid: '862a9552-8c68-4bae-b3fa-74454e7a9ecb',
+              departmentTypeEnum: 2,
+              costingDepartmentType: 'Overhead',
+              deptExceptionTypeName: 'Overhead to Excluded',
+              deptExceptionType: 3
+            }
+          },
+          {
+            departmentId: 1749,
+            departmentCode: '8106006581',
+            description: 'Aloha Dental Facility Maintenance-Dental',
+            name: '08106006581 - Aloha Dental Facility Maintenance-Dental',
+            isClaimsCosting: 0,
+            isHealthPlanAdmin: 0,
+            departmentType: 'Overhead',
+            costingDepartmentTypeException: {
+              costingDepartmentExceptionTypeId: 19810,
+              departmentId: 1749,
+              costingConfigGuid: '862a9552-8c68-4bae-b3fa-74454e7a9ecb',
+              departmentTypeEnum: 2,
+              costingDepartmentType: 'Overhead',
+              deptExceptionTypeName: 'Overhead to Revenue',
+              deptExceptionType: 2
+            }
+          }
+        ];
+        const exceptions: IDepartmentCategorization[] = [
+          {
+            departmentId: 20841,
+            departmentTypeEnum: 0,
+            costingDepartmentExceptionTypeId: 665,
+            deptExceptionTypeName: 'Revenue to Overhead',
+            deptExceptionType: 1,
+            name: '59 - 0101 - FAMILY PRACTICE'
+          }
+        ];
+
+        setDepartments(departmentArray);
+        setExceptionDepartmentData(departmentArray.filter((dept) => dept.costingDepartmentTypeException !== null));
+      } finally {
+        setGridLoading(false);
+      }
+    };
+    setGridLoading(true);
+    fetchData();
+  }, [costConfig]);
   const handleAddRow = () => {
-    const newDepartmentCat: IDepartmentCategorization = {
-      costingDepartmentExceptionTypeId: 0,
+    const newDepartment: IDepartment = {
       departmentId: 0,
-      departmentTypeEnum: 0,
+      departmentCode: '',
+      description: '',
       name: '',
-      deptExceptionType: 0,
-      deptExceptionTypeName: ''
+      isClaimsCosting: 0,
+      isHealthPlanAdmin: 0,
+      departmentType: '',
+      costingDepartmentTypeException: {
+        costingDepartmentExceptionTypeId: 0,
+        departmentId: 0,
+        costingConfigGuid: '',
+        departmentTypeEnum: 0,
+        costingDepartmentType: '',
+        deptExceptionTypeName: '',
+        deptExceptionType: 0
+      }
     };
 
-    setExceptionDepartmentData([newDepartmentCat]);
+    if (exceptionDepartmentData !== undefined) {
+      const updatedDepartExceptions = [newDepartment].concat(exceptionDepartmentData);
+      setExceptionDepartmentData(updatedDepartExceptions);
+    }
+  };
+
+  const handleDelete = (costingDepartmentExceptionTypeId: number) => {
+    const exceptionsToDelete = [costingDepartmentExceptionTypeId].concat(deletedExceptions);
+    setDeletedExceptions(exceptionsToDelete);
+
+    const updatedExceptionList = exceptionDepartmentData.filter(
+      (except) => except.costingDepartmentTypeException !== null && except.costingDepartmentTypeException.costingDepartmentExceptionTypeId !== costingDepartmentExceptionTypeId
+    );
+
+    setExceptionDepartmentData(updatedExceptionList);
+  };
+
+  const renderExceptionTypeSwitch = (exceptionType: string) => {
+    switch (exceptionType) {
+      case 'Revenue':
+        return [
+          { text: 'Revenue to Excluded', value: 1 },
+          { text: 'Revenue to Overhead', value: 2 },
+          { text: 'Overhead to Excluded', value: 4 },
+          { text: 'Excluded to Overhead', value: 5 }
+        ];
+      case 'Overhead':
+        return [
+          { text: 'Revenue to Excluded', value: 1 },
+          { text: 'Overhead to Revenue', value: 3 },
+          { text: 'Overhead to Excluded', value: 4 },
+          { text: 'Excluded to Revenue', value: 6 }
+        ];
+      default:
+        return [
+          { text: 'Revenue to Excluded', value: 1 },
+          { text: 'Revenue to Overhead', value: 2 },
+          { text: 'Overhead to Revenue', value: 3 },
+          { text: 'Overhead to Excluded', value: 4 },
+          { text: 'Excluded to Overhead', value: 5 },
+          { text: 'Excluded to Revenue', value: 6 }
+        ];
+    }
   };
 
   return (
@@ -66,6 +231,8 @@ const DepartmentCategorization: React.FC = () => {
             }
           />
           <DataGrid
+            dataKey='costingDepartmentExceptionTypeId'
+            value={exceptionDepartmentData}
             pager={{
               pageSize: 100,
               extra: (
@@ -89,7 +256,7 @@ const DepartmentCategorization: React.FC = () => {
                     onSearch={_.debounce((search) => {
                       setSearchValue(true);
                       setSearchLoading(true);
-                      setSearchDepartments([]);
+                      //setSearchDepartments([]);
 
                       if (search.trim().length === 0) {
                         setSearchValue(false);
@@ -99,7 +266,7 @@ const DepartmentCategorization: React.FC = () => {
                       // start API simulation
                       setTimeout(() => {
                         if ('name'.indexOf(search.toLowerCase()) > -1) {
-                          setSearchDepartments([]);
+                          //setSearchDepartments([]);
                         }
                         setSearchLoading(false);
                       }, 1000);
@@ -110,10 +277,13 @@ const DepartmentCategorization: React.FC = () => {
                       setTimeout(() => {
                         setSearchValue(false);
                         setSearchLoading(false);
-                        setSearchDepartments([]);
+                        //setSearchDepartments([]);
                       });
                     }}
-                    items={searchDepartments}
+                    items={departments}
+                    itemTextField='name'
+                    itemValueField='departmentId'
+                    value={rowData.name}
                   ></DropDown>
                 </>
               )}
@@ -126,14 +296,8 @@ const DepartmentCategorization: React.FC = () => {
                 <>
                   <DropDown
                     width={200}
-                    items={[
-                      { text: 'Revenue to Excluded', value: 1 },
-                      { text: 'Revenue to Overhead', value: 2 },
-                      { text: 'Overhead to Revenue', value: 3 },
-                      { text: 'Overhead to Excluded', value: 4 },
-                      { text: 'Excluded to Overhead', value: 5 },
-                      { text: 'Excluded to Revenue', value: 6 }
-                    ]}
+                    items={renderExceptionTypeSwitch(rowData.costingDepartmentTypeException.deptExceptionTypeName)}
+                    value={rowData.costingDepartmentTypeException.deptExceptionTypeName}
                   />
                 </>
               )}
@@ -146,7 +310,7 @@ const DepartmentCategorization: React.FC = () => {
               body={(rowData) => (
                 <>
                   <Tooltip placement='left' title='Delete'>
-                    <Button type='link' icon='Delete' />
+                    <Button type='link' icon='Delete' onClick={() => handleDelete(rowData.costingDepartmentTypeException.costingDepartmentExceptionTypeId)} />
                   </Tooltip>
                 </>
               )}
