@@ -10,12 +10,10 @@ using Strata.ApiLib.Core.Cors.Extensions;
 using Strata.ApiLib.Core.ExceptionHandling.DependencyInjection.Bootstrappers;
 using Strata.ApiLib.Core.Logging.Bootstrappers;
 using Strata.ApiLib.Core.StrataAuthentication.Bootstrappers;
-using Strata.CS;
 using Strata.SwaggerExtensions;
 using System.Diagnostics.CodeAnalysis;
 using System.Net.Mime;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 
 namespace Strata.DSS.CostAccounting.Api
 {
@@ -56,7 +54,6 @@ namespace Strata.DSS.CostAccounting.Api
             })
             .SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
 
-            services.AddAutoMapper(typeof(CostAccountingProfile));
             services.AddCostAccountingServices(_configuration);
             services.AddRouting();
             services.AddSwagger(_configuration);
