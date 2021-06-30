@@ -68,11 +68,11 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
             return costConfig;
         }
 
-        [HttpDelete("{costingConfigGuid}")]
-        [ProducesResponseType(200)]
-        public async Task<Guid> DeleteCostingConfig([FromRoute] Guid costingConfigGuid, CancellationToken cancellationToken)
+        [HttpPost("")]
+        [ProducesResponseType(202)]
+        public async Task<Guid> CreateDeleteCostingConfigTask([FromBody] Guid costingConfigGuid, CancellationToken cancellationToken)
         {
-            var jobGuid = await _costingConfigRepository.DeleteCostingConfigAsync(costingConfigGuid, cancellationToken);
+            var jobGuid = await _costingConfigRepository.CreateDeleteCostingConfigTaskAsync(costingConfigGuid, cancellationToken);
             return jobGuid;
         }
 

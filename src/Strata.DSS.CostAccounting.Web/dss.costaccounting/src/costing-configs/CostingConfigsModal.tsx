@@ -91,7 +91,7 @@ const CostingConfigsModal: React.FC<ICostingConfigsModalProps> = (props: ICostin
       okText: 'Yes',
       cancelText: 'No',
       onOk() {
-        CostingConfigService.deleteCostingConfig(costingConfigGuid);
+        CostingConfigService.createDeleteCostingConfigTask(costingConfigGuid);
         Toast.show({ message: 'A task to delete a costing configuration has been created.', toastType: 'info' });
       }
     });
