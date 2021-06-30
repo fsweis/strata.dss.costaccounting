@@ -44,6 +44,11 @@ const CostingConfigsModal: React.FC<ICostingConfigsModalProps> = (props: ICostin
     props.onCancel();
   };
 
+  const handleChangeConfig = (costingConfigGuid: string) => {
+    setGlobalFilterValue({ fields: ['name', 'description'], value: '' });
+    props.onChangeConfigs(costingConfigGuid);
+  };
+
   const handleAddConfig = (newConfig: ICostingConfig) => {
     setCostingConfigConfigureModalVisible(false);
     const updatedCostConfigs = [...costingConfigs, newConfig];
@@ -130,7 +135,7 @@ const CostingConfigsModal: React.FC<ICostingConfigsModalProps> = (props: ICostin
             align='left'
             body={(rowData) => (
               <>
-                <Button type='link' onClick={() => props.onChangeConfigs(rowData.costingConfigGuid)}>
+                <Button type='link' onClick={() => handleChangeConfig(rowData.costingConfigGuid)}>
                   {rowData.name}
                 </Button>
               </>
