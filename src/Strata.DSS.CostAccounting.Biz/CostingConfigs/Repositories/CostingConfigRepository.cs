@@ -95,7 +95,7 @@ namespace Strata.DSS.CostAccounting.Biz.CostingConfigs.Repositories
             await _dbContext.SaveChangesAsync(cancellationToken);
         }
 
-        public async Task<Guid> DeleteCostingConfigAsync(Guid costingConfigGuid, CancellationToken cancellationToken)
+        public async Task<Guid> CreateDeleteCostingConfigTaskAsync(Guid costingConfigGuid, CancellationToken cancellationToken)
         {
             var job = new EnqueueJobDto
             {

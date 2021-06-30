@@ -44,6 +44,11 @@ const CostingConfigsModal: React.FC<ICostingConfigsModalProps> = (props: ICostin
     props.onCancel();
   };
 
+  const handleChangeConfig = (costingConfigGuid: string) => {
+    setGlobalFilterValue({ fields: ['name', 'description'], value: '' });
+    props.onChangeConfigs(costingConfigGuid);
+  };
+
   const handleAddConfig = (newConfig: ICostingConfig) => {
     setCostingConfigConfigureModalVisible(false);
     const updatedCostConfigs = [...costingConfigs, newConfig];
@@ -86,7 +91,7 @@ const CostingConfigsModal: React.FC<ICostingConfigsModalProps> = (props: ICostin
       okText: 'Yes',
       cancelText: 'No',
       onOk() {
-        CostingConfigService.deleteCostingConfig(costingConfigGuid);
+        CostingConfigService.createDeleteCostingConfigTask(costingConfigGuid);
         Toast.show({ message: 'A task to delete a costing configuration has been created.', toastType: 'info' });
       }
     });
@@ -103,7 +108,7 @@ const CostingConfigsModal: React.FC<ICostingConfigsModalProps> = (props: ICostin
 
   return (
     <>
-      <Modal title='All Models' visible={props.visible} onCancel={handleCancel} footer={null} width='extraLarge'>
+      <Modal title='All Models' visible={props.visible} onCancel={handleCancel} footer={null} width='extraLarge' removeBodyPadding>
         <ActionBar
           filters={<Input search width={200} onChange={(e) => setGlobalFilterValue({ fields: ['name', 'description'], value: e.target.value })} />}
           actions={
@@ -120,7 +125,7 @@ const CostingConfigsModal: React.FC<ICostingConfigsModalProps> = (props: ICostin
             </>
           }
         />
-        <DataGrid key='allModelsGrid' pager={{ pageSize: 25 }} scrollable dataKey='costingConfigGuid' value={costingConfigs} globalFilterValue={globalFilterValue}>
+        <DataGrid key='allModelsGrid' pager={{ pageSize: 10 }} dataKey='costingConfigGuid' value={costingConfigs} globalFilterValue={globalFilterValue}>
           <DataGrid.RowNumber />
           <DataGrid.Column
             header='Name'
@@ -130,7 +135,7 @@ const CostingConfigsModal: React.FC<ICostingConfigsModalProps> = (props: ICostin
             align='left'
             body={(rowData) => (
               <>
-                <Button type='link' onClick={() => props.onChangeConfigs(rowData.costingConfigGuid)}>
+                <Button type='link' onClick={() => handleChangeConfig(rowData.costingConfigGuid)}>
                   {rowData.name}
                 </Button>
               </>
