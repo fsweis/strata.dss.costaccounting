@@ -2,8 +2,6 @@
 using Strata.DSS.CostAccounting.Biz.CostAccounting.Repositories;
 using Strata.DSS.CostAccounting.Biz.CostingConfigs.Models;
 using Strata.DSS.CostAccounting.Biz.CostingConfigs.Repositories;
-using Strata.DSS.CostAccounting.Biz.Enums;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -11,6 +9,9 @@ using System.Threading.Tasks;
 
 namespace Strata.DSS.CostAccounting.Biz.CostingConfigs.Services
 {
+    /// <summary>
+    /// Service that maps CostingConfigSaveData to CostingConfig model
+    /// </summary>
     public class CostingConfigService : ICostingConfigService
     {
         private readonly ICostingConfigRepository _costingConfigRepository;
@@ -25,17 +26,6 @@ namespace Strata.DSS.CostAccounting.Biz.CostingConfigs.Services
         public async Task<CostingConfig> AddNewCostingConfigAsync(CostingConfigSaveData costingConfigSaveData, CancellationToken cancellationToken)
         {
             var costingConfig = costingConfigSaveData.CostingConfig;
-            costingConfig.CostingConfigGuid = Guid.NewGuid();
-            costingConfig.IsEditable = true;
-            costingConfig.CubePartitionName = "";
-            //these are well known datatable guids
-            costingConfig.GLDataTableGuid = DataTableConstants.DSSGLGuid;
-            costingConfig.PayrollDataTableGuid = DataTableConstants.PayrollSampledGuid;
-            if (costingConfig.Type == CostingType.Claims)
-            {
-                costingConfig.IsPayrollCosting = false;
-                costingConfig.IsGLCosting = false;
-            }
 
             await SetEntityLinkages(costingConfigSaveData, costingConfig, cancellationToken);
 
@@ -48,32 +38,34 @@ namespace Strata.DSS.CostAccounting.Biz.CostingConfigs.Services
         {
             var isEntityLevelSecurityEnabled = await _systemSettingRepository.GetBooleanSystemSettingByNameAsync(SystemSettingConstants.EntityLevelSecuritySystemSettingName, cancellationToken);
 
-            if (isEntityLevelSecurityEnabled)
+            if (!isEntityLevelSecurityEnabled)
             {
-                costingConfig.EntityLinkages = new List<CostingConfigEntityLinkage>();
+                return;
+            }
 
-                foreach (var glPayrollEntityId in costingConfigSaveData.GlPayrollEntityIds.Where(e => e != 0))
-                {
-                    var glPayrollEnitityLinkage = new CostingConfigEntityLinkage();
-                    glPayrollEnitityLinkage.CostingConfigGuid = costingConfig.CostingConfigGuid;
-                    glPayrollEnitityLinkage.EntityId = glPayrollEntityId;
-                    glPayrollEnitityLinkage.IsUtilization = false;
+            costingConfig.EntityLinkages = new List<CostingConfigEntityLinkage>();
 
-                    costingConfig.EntityLinkages.Add(glPayrollEnitityLinkage);
-                }
+            foreach (var glPayrollEntityId in costingConfigSaveData.GlPayrollEntityIds.Where(e => e != 0))
+            {
+                var glPayrollEnitityLinkage = new CostingConfigEntityLinkage();
+                glPayrollEnitityLinkage.EntityId = glPayrollEntityId;
+                glPayrollEnitityLinkage.IsUtilization = false;
 
-                if (costingConfig.IsUtilizationEntityConfigured)
-                {
-                    foreach (var utilizationEntityId in costingConfigSaveData.UtilizationEntityIds.Where(e => e != 0))
-                    {
-                        var utilizationEntityLinkage = new CostingConfigEntityLinkage();
-                        utilizationEntityLinkage.CostingConfigGuid = costingConfig.CostingConfigGuid;
-                        utilizationEntityLinkage.EntityId = utilizationEntityId;
-                        utilizationEntityLinkage.IsUtilization = true;
+                costingConfig.EntityLinkages.Add(glPayrollEnitityLinkage);
+            }
 
-                        costingConfig.EntityLinkages.Add(utilizationEntityLinkage);
-                    }
-                }
+            if (!costingConfig.IsUtilizationEntityConfigured)
+            {
+                return;
+            }
+
+            foreach (var utilizationEntityId in costingConfigSaveData.UtilizationEntityIds.Where(e => e != 0))
+            {
+                var utilizationEntityLinkage = new CostingConfigEntityLinkage();
+                utilizationEntityLinkage.EntityId = utilizationEntityId;
+                utilizationEntityLinkage.IsUtilization = true;
+
+                costingConfig.EntityLinkages.Add(utilizationEntityLinkage);
             }
         }
     }

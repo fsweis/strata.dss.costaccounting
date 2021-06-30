@@ -141,7 +141,7 @@ const CostingConfigConfigureModal: React.FC<ICostingConfigConfigureModalProps> =
         costingConfigGuid: emptyGuid,
         name: cleanedName,
         description: values.description,
-        isGLCosting: true,
+        isGLCosting: costingType === CostingType.PatientCare,
         isPayrollCosting: isPayrollCosting,
         isBudgetedAndActualCosting: isBudgetedAndActualCosting,
         isUtilizationEntityConfigured: entityType === EntityType.Specify,
