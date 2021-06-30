@@ -67,8 +67,8 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
         [ProducesResponseType(200)]
         public async Task<CostingConfig> AddNewConfig([FromBody] CostingConfigSaveData costingConfigSaveData, CancellationToken cancellationToken)
         {
-            var costConfig = await _costingConfigService.AddNewCostingConfigAsync(costingConfigSaveData, cancellationToken);
-            return costConfig;
+            var costingConfig = await _costingConfigService.AddNewCostingConfigAsync(costingConfigSaveData, cancellationToken);
+            return costingConfig;
         }
 
         [HttpDelete("{costingConfigGuid}")]
