@@ -86,11 +86,8 @@ const CostingConfigConfigureModal: React.FC<ICostingConfigConfigureModalProps> =
 
   useEffect(() => {
     setCostingType(props.costingConfigForm.type);
-  }, [props.costingConfigForm.type]);
-
-  useEffect(() => {
     setEntityType(props.costingConfigForm.entityType);
-  }, [props.costingConfigForm.entityType]);
+  }, [props.costingConfigForm]);
 
   //Set Filtered Entity Trees when entities are loaded
   useEffect(() => {
@@ -166,6 +163,7 @@ const CostingConfigConfigureModal: React.FC<ICostingConfigConfigureModalProps> =
         setLoading(true);
         const newConfig = await CostingConfigService.addNewCostingConfig(configSaveData);
         Toast.show({ message: 'Changes Saved', toastType: 'success' });
+
         //reset form
         form.resetFields();
         props.onSave(newConfig);
@@ -293,7 +291,7 @@ const CostingConfigConfigureModal: React.FC<ICostingConfigConfigureModalProps> =
                 />
               </Form.Item>
               {entityType === EntityType.Specify && (
-                <Form.Item label='Specifiy Utilization Entities' name='utilizationEntities' initialValue={getUtilizationEntitiesitiesInitialValue()} rules={[{ required: true }]}>
+                <Form.Item label='Specify Utilization Entities' name='utilizationEntities' initialValue={getUtilizationEntitiesitiesInitialValue()} rules={[{ required: true }]}>
                   <TreeDropDown treeData={utilizationEntityTreeData} selectionMode='multiple' treeDefaultExpandedKeys={['0']} />
                 </Form.Item>
               )}

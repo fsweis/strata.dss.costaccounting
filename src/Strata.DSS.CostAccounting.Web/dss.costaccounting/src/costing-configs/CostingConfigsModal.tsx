@@ -39,6 +39,11 @@ const CostingConfigsModal: React.FC<ICostingConfigsModalProps> = (props: ICostin
     fetchData();
   }, []);
 
+  const handleCancel = () => {
+    setGlobalFilterValue({ fields: ['name', 'description'], value: '' });
+    props.onCancel();
+  };
+
   const handleAddConfig = (newConfig: ICostingConfig) => {
     setCostingConfigConfigureModalVisible(false);
     const updatedCostConfigs = [...costingConfigs, newConfig];
@@ -98,7 +103,7 @@ const CostingConfigsModal: React.FC<ICostingConfigsModalProps> = (props: ICostin
 
   return (
     <>
-      <Modal title='All Models' visible={props.visible} onCancel={props.onCancel} footer={null} width='extraLarge'>
+      <Modal title='All Models' visible={props.visible} onCancel={handleCancel} footer={null} width='extraLarge'>
         <ActionBar
           filters={<Input search width={200} onChange={(e) => setGlobalFilterValue({ fields: ['name', 'description'], value: e.target.value })} />}
           actions={
