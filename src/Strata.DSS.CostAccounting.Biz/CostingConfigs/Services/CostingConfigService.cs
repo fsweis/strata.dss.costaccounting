@@ -4,6 +4,8 @@ using Strata.DSS.CostAccounting.Biz.CostingConfigs.Models;
 using Strata.DSS.CostAccounting.Biz.CostingConfigs.Repositories;
 using Strata.DSS.CostAccounting.Biz.Enums;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -48,7 +50,9 @@ namespace Strata.DSS.CostAccounting.Biz.CostingConfigs.Services
 
             if (isEntityLevelSecurityEnabled)
             {
-                foreach (var glPayrollEntityId in costingConfigSaveData.GlPayrollEntityIds)
+                costingConfig.EntityLinkages = new List<CostingConfigEntityLinkage>();
+
+                foreach (var glPayrollEntityId in costingConfigSaveData.GlPayrollEntityIds.Where(e => e != 0))
                 {
                     var glPayrollEnitityLinkage = new CostingConfigEntityLinkage();
                     glPayrollEnitityLinkage.CostingConfigGuid = costingConfig.CostingConfigGuid;
@@ -60,7 +64,7 @@ namespace Strata.DSS.CostAccounting.Biz.CostingConfigs.Services
 
                 if (costingConfig.IsUtilizationEntityConfigured)
                 {
-                    foreach (var utilizationEntityId in costingConfigSaveData.UtilizationEntityIds)
+                    foreach (var utilizationEntityId in costingConfigSaveData.UtilizationEntityIds.Where(e => e != 0))
                     {
                         var utilizationEntityLinkage = new CostingConfigEntityLinkage();
                         utilizationEntityLinkage.CostingConfigGuid = costingConfig.CostingConfigGuid;
