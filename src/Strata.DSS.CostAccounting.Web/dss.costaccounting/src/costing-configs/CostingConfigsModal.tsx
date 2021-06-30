@@ -103,7 +103,7 @@ const CostingConfigsModal: React.FC<ICostingConfigsModalProps> = (props: ICostin
 
   return (
     <>
-      <Modal title='All Models' visible={props.visible} onCancel={handleCancel} footer={null} width='extraLarge'>
+      <Modal title='All Models' visible={props.visible} onCancel={handleCancel} footer={null} width='extraLarge' removeBodyPadding>
         <ActionBar
           filters={<Input search width={200} onChange={(e) => setGlobalFilterValue({ fields: ['name', 'description'], value: e.target.value })} />}
           actions={
@@ -120,7 +120,7 @@ const CostingConfigsModal: React.FC<ICostingConfigsModalProps> = (props: ICostin
             </>
           }
         />
-        <DataGrid key='allModelsGrid' pager={{ pageSize: 25 }} scrollable dataKey='costingConfigGuid' value={costingConfigs} globalFilterValue={globalFilterValue}>
+        <DataGrid key='allModelsGrid' pager={{ pageSize: 10 }} dataKey='costingConfigGuid' value={costingConfigs} globalFilterValue={globalFilterValue}>
           <DataGrid.RowNumber />
           <DataGrid.Column
             header='Name'
