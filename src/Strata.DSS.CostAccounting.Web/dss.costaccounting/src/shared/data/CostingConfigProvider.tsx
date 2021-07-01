@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { useEffect } from 'react';
-import { CostingConfigService } from './CostingConfigService';
+import { costingConfigService } from './costingConfigService';
 import { ICostingConfig } from './ICostingConfig';
 import { CostingConfigContext } from './CostingConfigContext';
 
@@ -14,7 +14,7 @@ const CostingConfigProvider: React.FC<ICostingConfigProviderProps> = ({ costingC
 
   useEffect(() => {
     const fetchData = async () => {
-      const costingConfig = await CostingConfigService.getCostingConfig(costingConfigGuid);
+      const costingConfig = await costingConfigService.getCostingConfig(costingConfigGuid);
       setConfig(costingConfig);
     };
     fetchData();
