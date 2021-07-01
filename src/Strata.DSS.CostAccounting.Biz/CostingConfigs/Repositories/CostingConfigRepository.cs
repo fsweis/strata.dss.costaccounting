@@ -38,7 +38,10 @@ namespace Strata.DSS.CostAccounting.Biz.CostingConfigs.Repositories
             .OrderBy(c => c.Name)
             .ToListAsync(cancellationToken);
 
-            costingConfigs.ForEach(x => x.LastPublishedUtc = x.CostingResults.SingleOrDefault()?.CreatedAtUtc);
+            foreach (var costingConfig in costingConfigs)
+            {
+                costingConfig.LastPublishedUtc = costingConfig.CostingResults.SingleOrDefault()?.CreatedAtUtc;
+            }
 
             return costingConfigs;
         }
