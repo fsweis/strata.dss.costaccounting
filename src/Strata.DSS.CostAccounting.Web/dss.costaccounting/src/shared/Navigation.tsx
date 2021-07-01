@@ -18,7 +18,7 @@ import ManualStatistics from '../manual-statistics/ManualStatistics';
 import { Navbar } from '@strata/navbar/lib';
 import CostMenu from './CostMenu';
 import CostingConfigProvider from './data/CostingConfigProvider';
-import { CostingConfigService } from './data/CostingConfigService';
+import { costingConfigService } from './data/costingConfigService';
 import { ICostingConfig } from './data/ICostingConfig';
 import { systemSettingService } from './data/systemSettingService';
 import { getPathConfigGuid } from './Utils';
@@ -31,7 +31,7 @@ const Navigation: React.FC = () => {
   const history = useHistory();
   useEffect(() => {
     const fetchData = async () => {
-      const [costingConfigurations, currentFiscalYear] = await Promise.all([CostingConfigService.getCostingConfigs(), systemSettingService.getCurrentFiscalYear()]);
+      const [costingConfigurations, currentFiscalYear] = await Promise.all([costingConfigService.getCostingConfigs(), systemSettingService.getCurrentFiscalYear()]);
       setCostingConfigs(costingConfigurations);
       if (costingConfigurations.length > 0) {
         const previousFiscalYear = currentFiscalYear - 1;

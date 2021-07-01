@@ -13,12 +13,12 @@ import { usePageLoader } from '@strata/tempo/lib/pageloader';
 import { IFiscalYear } from '../shared/data/IFiscalYear';
 import { IFiscalMonth } from '../shared/data/IFiscalMonth';
 import { IEntity } from './data/IEntity';
-import { CostingConfigService } from '../shared/data/CostingConfigService';
+import { costingConfigService } from '../shared/data/costingConfigService';
 import { systemSettingService } from '../shared/data/systemSettingService';
 import { dateService } from '../shared/data/dateService';
 import { RadioChangeEvent } from 'antd/lib/radio/interface';
 import { ICostingConfigSaveData } from './data/ICostingConfigSaveData';
-import { ICostingConfigForm } from './data/ICostingConfigForm';
+import { getNewCostingConfigForm, ICostingConfigForm } from './data/ICostingConfigForm';
 import TreeDropDown, { ITreeDropDownNode } from '@strata/tempo/lib/treedropdown';
 import { ICostingConfig } from '../shared/data/ICostingConfig';
 import { getEmptyGuid } from '../shared/Utils';
@@ -28,11 +28,12 @@ import { CostingMethod } from './enums/CostingMethodEnum';
 import { CostingType } from '../shared/enums/CostingTypeEnum';
 import { EntityType } from './enums/EntityTypeEnum';
 import { CostingOption } from './enums/CostingOptionEnum';
+import { ICostingConfigEntityLinkage } from './data/ICostingConfigEntityLinkage';
 
 interface ICostingConfigConfigureModalProps {
   visible: boolean;
-  title: string;
-  costingConfigForm: ICostingConfigForm;
+  isCopy: boolean;
+  costingConfig: ICostingConfig;
   costingConfigs: ICostingConfig[];
   onCancel: () => void;
   onSave: (costingConfig: ICostingConfig) => void;
@@ -51,8 +52,10 @@ const CostingConfigConfigureModal: React.FC<ICostingConfigConfigureModalProps> =
   const [isCostingEntityLevelSecurityEnabled, setIsCostingEntityLevelSecurityEnabled] = useState<boolean>(false);
   const emptyGuid = getEmptyGuid();
 
-  const [costingType, setCostingType] = useState<CostingType>(props.costingConfigForm.type);
-  const [entityType, setEntityType] = useState<EntityType>(props.costingConfigForm.entityType);
+  const [costingConfigForm, setCostingConfigForm] = useState<ICostingConfigForm>(getNewCostingConfigForm);
+  const [costingType, setCostingType] = useState<CostingType>(props.costingConfig.type);
+  const [entityType, setEntityType] = useState<EntityType>(EntityType.GlPayroll);
+  const [title, setTitle] = useState<string>('');
 
   //Load initial data
   useEffect(() => {
@@ -69,8 +72,8 @@ const CostingConfigConfigureModal: React.FC<ICostingConfigConfigureModalProps> =
         const [fiscalMonths, fiscalYears, glPayrollEntities, utilizationEntities] = await Promise.all([
           dateService.getFiscalMonths(),
           dateService.getFiscalYears(),
-          CostingConfigService.getGlPayrollEntities(emptyGuid),
-          isCostingEntityLevelSecurityEnabled ? CostingConfigService.getUtilizationEntities() : []
+          costingConfigService.getGlPayrollEntities(emptyGuid),
+          isCostingEntityLevelSecurityEnabled ? costingConfigService.getUtilizationEntities() : []
         ]);
         setFiscalMonths(fiscalMonths);
         setFiscalYears(fiscalYears);
@@ -85,9 +88,60 @@ const CostingConfigConfigureModal: React.FC<ICostingConfigConfigureModalProps> =
   }, [setLoading, emptyGuid]);
 
   useEffect(() => {
-    setCostingType(props.costingConfigForm.type);
-    setEntityType(props.costingConfigForm.entityType);
-  }, [props.costingConfigForm]);
+    const costingConfigForm: ICostingConfigForm = {
+      ...props.costingConfig,
+      glPayrollEntities: [],
+      entityType: props.costingConfig.isUtilizationEntityConfigured ? EntityType.Specify : EntityType.GlPayroll,
+      utilizationEntities: [],
+      options: [CostingOption.NotSpecified, CostingOption.NotSpecified],
+      isCopy: props.isCopy
+    };
+
+    setCostingType(costingConfigForm.type);
+    setEntityType(costingConfigForm.entityType);
+
+    if (!costingConfigForm.isCopy) {
+      setTitle('New Model');
+
+      if (fiscalYears && fiscalYears.length > 0) {
+        const fiscalYearId = fiscalYears.find((x) => x.fiscalYearId === new Date().getFullYear())?.fiscalYearId;
+        costingConfigForm.fiscalYearId = fiscalYearId ? fiscalYearId : fiscalYears[fiscalYears.length - 1].fiscalYearId;
+      }
+
+      if (fiscalMonths && fiscalMonths.length > 0) {
+        const fiscalMonthId = fiscalMonths.find((x) => x.sortOrder === 12)?.fiscalMonthId;
+        costingConfigForm.fiscalMonthId = fiscalMonthId ? fiscalMonthId : fiscalMonths[fiscalMonths.length - 1].fiscalMonthId;
+      }
+
+      const fEntities = glPayrollEntities.map((x) => x.entityId.toString());
+      const uEntities = utilizationEntities.map((x) => x.entityId.toString());
+      costingConfigForm.glPayrollEntities = fEntities.length > 0 ? fEntities : ['0'];
+      costingConfigForm.utilizationEntities = uEntities.length > 0 ? uEntities : ['0'];
+
+      setCostingConfigForm(costingConfigForm);
+      form.resetFields();
+    } else {
+      setTitle('Copy Model');
+      costingConfigForm.options = [
+        props.costingConfig.isBudgetedAndActualCosting ? CostingOption.BudgetedAndActualCosting : CostingOption.NotSpecified,
+        props.costingConfig.isPayrollCosting ? CostingOption.PayrollCosting : CostingOption.NotSpecified
+      ];
+
+      const getCostingConfigEntitiesForCopy = async (costingConfigGuid: string) => {
+        const entityLinkages: ICostingConfigEntityLinkage[] = await costingConfigService.getCostingConfigEntityLinkages(costingConfigGuid);
+        const glPayrollEntities: string[] = entityLinkages.filter((x) => x.isUtilization === false).map((x) => x.entityId.toString());
+        const utilizationEntities: string[] = entityLinkages.filter((x) => x.isUtilization === true).map((x) => x.entityId.toString());
+
+        costingConfigForm.glPayrollEntities = glPayrollEntities.length > 0 ? glPayrollEntities : ['0'];
+        costingConfigForm.utilizationEntities = utilizationEntities.length > 0 ? utilizationEntities : ['0'];
+
+        setCostingConfigForm(costingConfigForm);
+        form.resetFields();
+      };
+
+      getCostingConfigEntitiesForCopy(props.costingConfig.costingConfigGuid);
+    }
+  }, [props.costingConfig]);
 
   //Set Filtered Entity Trees when entities are loaded
   useEffect(() => {
@@ -144,8 +198,8 @@ const CostingConfigConfigureModal: React.FC<ICostingConfigConfigureModalProps> =
         isUtilizationEntityConfigured: entityType === EntityType.Specify,
         defaultChargeAllocationMethod: 0,
         defaultMethod: values.defaultMethod,
-        fiscalYearId: values.year,
-        fiscalMonthId: values.ytdMonth,
+        fiscalYearId: values.fiscalYearId,
+        fiscalMonthId: values.fiscalMonthId,
         type: costingType,
         createdAt: new Date(),
         modifiedAtUtc: new Date(),
@@ -161,7 +215,7 @@ const CostingConfigConfigureModal: React.FC<ICostingConfigConfigureModalProps> =
 
       try {
         setLoading(true);
-        const newConfig = await CostingConfigService.addNewCostingConfig(configSaveData);
+        const newConfig = await costingConfigService.addNewCostingConfig(configSaveData);
         Toast.show({ message: 'Changes Saved', toastType: 'success' });
 
         //reset form
@@ -193,42 +247,10 @@ const CostingConfigConfigureModal: React.FC<ICostingConfigConfigureModalProps> =
     setEntityType(e.target.value);
   };
 
-  const getYearInitialValue = () => {
-    if (props.costingConfigForm.isCopy) return props.costingConfigForm.year;
-
-    const year = fiscalYears.find((x) => x.fiscalYearId === new Date().getFullYear())?.fiscalYearId;
-    return year ? year : fiscalYears[fiscalYears.length - 1];
-  };
-
-  const getMonthInitialValue = () => {
-    if (props.costingConfigForm.isCopy) return props.costingConfigForm.ytdMonth;
-
-    const ytdMonth = fiscalMonths.find((x) => x.sortOrder === 12)?.fiscalMonthId;
-    return ytdMonth ? ytdMonth : fiscalMonths[fiscalMonths.length - 1];
-  };
-
-  const getGlPayrollEntitiesInitialValue = () => {
-    if (props.costingConfigForm.isCopy) {
-      return props.costingConfigForm.glPayrollEntities.length > 0 ? props.costingConfigForm.glPayrollEntities : ['0'];
-    }
-
-    const fEntities = glPayrollEntities.map((x) => x.entityId.toString());
-    return fEntities.length > 0 ? fEntities : ['0'];
-  };
-
-  const getUtilizationEntitiesitiesInitialValue = () => {
-    if (props.costingConfigForm.isCopy) {
-      return props.costingConfigForm.utilizationEntities.length > 0 ? props.costingConfigForm.utilizationEntities : ['0'];
-    }
-
-    const uEntities = utilizationEntities.map((x) => x.entityId.toString());
-    return uEntities.length > 0 ? uEntities : ['0'];
-  };
-
   return (
     <>
       <Modal
-        title={props.title}
+        title={title}
         visible={props.visible}
         destroyOnClose
         onCancel={handleCancel}
@@ -249,23 +271,23 @@ const CostingConfigConfigureModal: React.FC<ICostingConfigConfigureModalProps> =
         }
       >
         <Form form={form} onFinish={onFormFinish} layout={'vertical'} preserve={false}>
-          <Form.Item label='Name' name='name' initialValue={props.costingConfigForm.name} rules={[{ required: true, whitespace: true, max: 50 }, { pattern: /^[A-Za-z0-9 _-]*$/ }]}>
+          <Form.Item label='Name' name='name' initialValue={costingConfigForm.name} rules={[{ required: true, whitespace: true, max: 50 }, { pattern: /^[A-Za-z0-9 _-]*$/ }]}>
             <Input />
           </Form.Item>
-          <Form.Item label='Description' name='description' initialValue={props.costingConfigForm.description} rules={[{ max: 2000 }]}>
+          <Form.Item label='Description' name='description' initialValue={costingConfigForm.description} rules={[{ max: 2000 }]}>
             <InputTextArea />
           </Form.Item>
           <Spacing itemSpacing={16}>
-            <Form.Item label='Year' name='year' initialValue={getYearInitialValue()} rules={[{ required: true }]}>
+            <Form.Item label='Year' name='year' initialValue={costingConfigForm.fiscalYearId} rules={[{ required: true }]}>
               <DropDown itemValueField='fiscalYearId' itemTextField='name' items={fiscalYears} />
             </Form.Item>
-            <Form.Item label='YTD Month' name='ytdMonth' initialValue={getMonthInitialValue()} rules={[{ required: true }]}>
+            <Form.Item label='YTD Month' name='ytdMonth' initialValue={costingConfigForm.fiscalMonthId} rules={[{ required: true }]}>
               <DropDown itemValueField='fiscalMonthId' itemTextField='name' items={fiscalMonths} />
             </Form.Item>
           </Spacing>
           <Spacing itemSpacing={16}>
             {isClaimsCostingEnabled && (
-              <Form.Item label='Type' name='type' initialValue={props.costingConfigForm.type} rules={[{ required: true }]}>
+              <Form.Item label='Type' name='type' initialValue={costingConfigForm.type} rules={[{ required: true }]}>
                 <RadioGroup
                   onChange={handleCostingTypeChange}
                   options={[
@@ -275,13 +297,13 @@ const CostingConfigConfigureModal: React.FC<ICostingConfigConfigureModalProps> =
                 />
               </Form.Item>
             )}
-            <Form.Item label='GL/Payroll Entities' name='glPayrollEntities' initialValue={getGlPayrollEntitiesInitialValue()} rules={[{ required: true }]}>
+            <Form.Item label='GL/Payroll Entities' name='glPayrollEntities' initialValue={costingConfigForm.glPayrollEntities} rules={[{ required: true }]}>
               <TreeDropDown treeData={entityTreeData} selectionMode='multiple' treeDefaultExpandedKeys={['0']} />
             </Form.Item>
           </Spacing>
           {isCostingEntityLevelSecurityEnabled && (
             <Spacing itemSpacing={16}>
-              <Form.Item label='Utilization Entities' name='entityType' initialValue={props.costingConfigForm.entityType} rules={[{ required: true }]}>
+              <Form.Item label='Utilization Entities' name='entityType' initialValue={costingConfigForm.entityType} rules={[{ required: true }]}>
                 <RadioGroup
                   onChange={handleEntityTypeChange}
                   options={[
@@ -291,7 +313,7 @@ const CostingConfigConfigureModal: React.FC<ICostingConfigConfigureModalProps> =
                 />
               </Form.Item>
               {entityType === EntityType.Specify && (
-                <Form.Item label='Specify Utilization Entities' name='utilizationEntities' initialValue={getUtilizationEntitiesitiesInitialValue()} rules={[{ required: true }]}>
+                <Form.Item label='Specify Utilization Entities' name='utilizationEntities' initialValue={costingConfigForm.utilizationEntities} rules={[{ required: true }]}>
                   <TreeDropDown treeData={utilizationEntityTreeData} selectionMode='multiple' treeDefaultExpandedKeys={['0']} />
                 </Form.Item>
               )}
@@ -299,7 +321,7 @@ const CostingConfigConfigureModal: React.FC<ICostingConfigConfigureModalProps> =
           )}
           {costingType === CostingType.PatientCare && (
             <Spacing itemSpacing={16}>
-              <Form.Item label='Method' name='defaultMethod' initialValue={props.costingConfigForm.defaultMethod} rules={[{ required: true }]}>
+              <Form.Item label='Method' name='defaultMethod' initialValue={costingConfigForm.defaultMethod} rules={[{ required: true }]}>
                 <RadioGroup
                   options={[
                     { value: CostingMethod.Simultaneous, label: Simultaneous_FriendlyName },
@@ -307,7 +329,7 @@ const CostingConfigConfigureModal: React.FC<ICostingConfigConfigureModalProps> =
                   ]}
                 />
               </Form.Item>
-              <Form.Item label='Additional Data' name='options' initialValue={props.costingConfigForm.options} rules={[{ required: false }]}>
+              <Form.Item label='Additional Data' name='options' initialValue={costingConfigForm.options} rules={[{ required: false }]}>
                 <CheckboxGroup
                   options={[
                     { value: CostingOption.BudgetedAndActualCosting, label: 'Include Budget' },

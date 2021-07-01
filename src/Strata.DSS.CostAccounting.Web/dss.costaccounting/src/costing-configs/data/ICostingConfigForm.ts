@@ -6,8 +6,8 @@ import { EntityType } from '../enums/EntityTypeEnum';
 export interface ICostingConfigForm {
   name: string;
   description: string;
-  year: number;
-  ytdMonth: number;
+  fiscalYearId: number;
+  fiscalMonthId: number;
   type: CostingType;
   glPayrollEntities: string[];
   entityType: number;
@@ -21,8 +21,8 @@ export const getNewCostingConfigForm = (): ICostingConfigForm => {
   return {
     name: '',
     description: '',
-    year: 0,
-    ytdMonth: 0,
+    fiscalYearId: 0,
+    fiscalMonthId: 0,
     type: CostingType.PatientCare,
     glPayrollEntities: [],
     entityType: EntityType.GlPayroll,
