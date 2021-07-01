@@ -3,9 +3,9 @@ import { ICostingConfig } from './ICostingConfig';
 import { ICostingConfigEntityLinkage } from '../../costing-configs/data/ICostingConfigEntityLinkage';
 import { IEntity } from '../../costing-configs/data/IEntity';
 
-const { httpGet, httpPost } = getSecureService(appConfig.apiUrl);
+const { httpGet, httpPost, httpDelete } = getSecureService(appConfig.apiUrl);
 
-export const CostingConfigService = {
+export const costingConfigService = {
   getCostingConfigs: (): Promise<ICostingConfig[]> => {
     return httpGet<ICostingConfig[]>(`costing-configs`);
   },
@@ -25,6 +25,6 @@ export const CostingConfigService = {
     return httpPost<ICostingConfig>(`costing-configs/`, costConfig);
   },
   createDeleteCostingConfigTask: (costingConfigGuid: string): Promise<string> => {
-    return httpPost<string>(`costing-configs`, costingConfigGuid);
+    return httpDelete<string>(`costing-configs/${costingConfigGuid}`);
   }
 };
