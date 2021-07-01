@@ -34,7 +34,7 @@ namespace Strata.DSS.CostAccounting.Biz.StatisticDrivers.Repositories
             return drivers;
         }
 
-        public async Task<List<Guid>> GetUsedDriverConfigs(CancellationToken cancellationToken)
+        public List<Guid> GetUsedDriverConfigs(CancellationToken cancellationToken)
         {
             var driverConfigGuids = _dbContext.AccountReclasses.Select(x => x.DriverConfigGuid)
                                            .Union(_dbContext.PayCodeJobCodeReclasses.Select(x => x.DriverConfigGuid))

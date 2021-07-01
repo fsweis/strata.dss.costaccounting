@@ -3,7 +3,6 @@ using Strata.DSS.CostAccounting.Biz.CostAccounting.Repositories;
 using Strata.DSS.CostAccounting.Biz.Enums;
 using Strata.DSS.CostAccounting.Biz.StatisticDrivers.Models;
 using Strata.DSS.CostAccounting.Biz.StatisticDrivers.Repositories;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -26,7 +25,7 @@ namespace Strata.DSS.CostAccounting.Biz.StatisticDrivers.Services
         {
             var driverConfigs = await _statisticDriversRepository.GetDriverConfigsAsync(costingType, cancellationToken);
             var ruleSets = await _costAccountingRepository.GetRuleSetsAsync(cancellationToken);
-            var usedDriverConfigGuids = await _statisticDriversRepository.GetUsedDriverConfigs(cancellationToken);
+            var usedDriverConfigGuids = _statisticDriversRepository.GetUsedDriverConfigs(cancellationToken);
             var statisticDrivers = new List<StatisticDriver>();
             var summaryGuid = costingType == CostingType.PatientCare ? DataTableConstants.PatientEncounterSummaryGuid : DataTableConstants.PatientClaimSummaryGuid;
             var detailDataTableGuid = costingType == CostingType.PatientCare ? DataTableConstants.PatientBillingLineItemDetailGuid : DataTableConstants.PatientClaimChargeLineItemDetailGuid;
