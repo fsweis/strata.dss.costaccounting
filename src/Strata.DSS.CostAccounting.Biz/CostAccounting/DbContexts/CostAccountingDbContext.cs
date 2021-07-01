@@ -38,11 +38,6 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.DbContexts
 
         public virtual DbSet<CostingConfigEntityLinkage> CostingConfigEntityLinkages { get; set; }
 
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            optionsBuilder.UseLazyLoadingProxies();
-        }
-
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Measure>(entity =>

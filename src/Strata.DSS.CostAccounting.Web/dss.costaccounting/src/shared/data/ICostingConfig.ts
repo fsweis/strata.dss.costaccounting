@@ -1,4 +1,5 @@
 import { CostingType } from '../enums/CostingTypeEnum';
+import { ICostingConfigEntityLinkage } from '../../costing-configs/data/ICostingConfigEntityLinkage';
 
 export interface ICostingConfig {
   costingConfigGuid: string;
@@ -17,6 +18,7 @@ export interface ICostingConfig {
   modifiedAtUtc: Date;
   lastPublishedUtc: Date;
   isEditable: boolean;
+  entityLinkages: ICostingConfigEntityLinkage[];
 }
 
 export const newCostConfig = (costConfig: Partial<ICostingConfig> = {}): ICostingConfig => {
@@ -37,7 +39,8 @@ export const newCostConfig = (costConfig: Partial<ICostingConfig> = {}): ICostin
       createdAt: new Date(),
       modifiedAtUtc: new Date(),
       lastPublishedUtc: new Date(),
-      isEditable: true
+      isEditable: true,
+      entityLinkages: []
     },
     ...costConfig
   };

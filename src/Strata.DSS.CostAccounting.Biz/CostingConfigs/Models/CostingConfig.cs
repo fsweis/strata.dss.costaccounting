@@ -29,7 +29,6 @@ namespace Strata.DSS.CostAccounting.Biz.CostingConfigs.Models
         public bool IsPendingDelete { get; set; }
         [JsonIgnore]
         public virtual ICollection<CostingResult> CostingResults { get; set; }
-        [JsonIgnore]
         public virtual ICollection<CostingConfigEntityLinkage> EntityLinkages { get; set; }
         public DateTime? LastPublishedUtc { get; set; }
     }

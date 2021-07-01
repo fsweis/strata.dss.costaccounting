@@ -88,11 +88,13 @@ namespace Strata.DSS.CostAccounting.Biz.CostingConfigs.Repositories
             return entities;
         }
 
-        public async Task AddNewCostingConfigAsync(CostingConfig costingConfig, CancellationToken cancellationToken)
+        public async Task<CostingConfig> AddNewCostingConfigAsync(CostingConfig costingConfig, CancellationToken cancellationToken)
         {
             _dbContext.CostingConfigs.Add(costingConfig);
 
             await _dbContext.SaveChangesAsync(cancellationToken);
+
+            return costingConfig;
         }
 
         public async Task<Guid> CreateDeleteCostingConfigTaskAsync(Guid costingConfigGuid, CancellationToken cancellationToken)

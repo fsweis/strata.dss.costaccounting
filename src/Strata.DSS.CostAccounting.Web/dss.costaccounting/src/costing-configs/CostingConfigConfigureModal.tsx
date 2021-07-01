@@ -17,7 +17,6 @@ import { CostingConfigService } from '../shared/data/CostingConfigService';
 import { systemSettingService } from '../shared/data/systemSettingService';
 import { dateService } from '../shared/data/dateService';
 import { RadioChangeEvent } from 'antd/lib/radio/interface';
-import { ICostingConfigSaveData } from './data/ICostingConfigSaveData';
 import { ICostingConfigForm } from './data/ICostingConfigForm';
 import TreeDropDown, { ITreeDropDownNode } from '@strata/tempo/lib/treedropdown';
 import { ICostingConfig } from '../shared/data/ICostingConfig';
@@ -129,9 +128,13 @@ const CostingConfigConfigureModal: React.FC<ICostingConfigConfigureModalProps> =
       let isBudgetedAndActualCosting = false;
 
       if (costingType === CostingType.PatientCare) {
-        isBudgetedAndActualCosting = values.options[0] === CostingOption.BudgetedAndActualCosting ? true : false;
-        isPayrollCosting = values.options[1] === CostingOption.PayrollCosting ? true : false;
+        isBudgetedAndActualCosting = values.options[0] === CostingOption.BudgetedAndActualCosting;
+        isPayrollCosting = values.options[1] === CostingOption.PayrollCosting;
       }
+
+      const glPayrollEntityLinkages = values.glPayrollEntities.filter((x) => x !== '0').map((x) => ({ entityId: parseInt(x), isUtilization: false }));
+      const utilizationEntityLinkages = entityType === EntityType.Specify ? values.utilizationEntities.filter((x) => x !== '0').map((x) => ({ entityId: parseInt(x), isUtilization: true })) : [];
+      const entityLinkages = [...glPayrollEntityLinkages, ...utilizationEntityLinkages];
 
       //Create new cost model
       const newConfig: ICostingConfig = {
@@ -150,23 +153,18 @@ const CostingConfigConfigureModal: React.FC<ICostingConfigConfigureModalProps> =
         createdAt: new Date(),
         modifiedAtUtc: new Date(),
         lastPublishedUtc: new Date(),
-        isEditable: true
-      };
-
-      const configSaveData: ICostingConfigSaveData = {
-        costingConfig: newConfig,
-        glPayrollEntityIds: values.glPayrollEntities.map((x) => +x),
-        utilizationEntityIds: entityType === EntityType.Specify ? values.utilizationEntities.map((x) => +x) : []
+        isEditable: true,
+        entityLinkages: entityLinkages
       };
 
       try {
         setLoading(true);
-        const newConfig = await CostingConfigService.addNewCostingConfig(configSaveData);
+        const savedConfig = await CostingConfigService.addNewCostingConfig(newConfig);
         Toast.show({ message: 'Changes Saved', toastType: 'success' });
 
         //reset form
         form.resetFields();
-        props.onSave(newConfig);
+        props.onSave(savedConfig);
       } catch (error) {
         Toast.show({ message: 'Changes not saved. Try again and contact your administrator if the issue continues.', toastType: 'error' });
       } finally {

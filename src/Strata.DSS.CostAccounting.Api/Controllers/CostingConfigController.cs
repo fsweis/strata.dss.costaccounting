@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Strata.DSS.CostAccounting.Api.Dtos;
 using Strata.DSS.CostAccounting.Biz.CostAccounting.Models;
 using Strata.DSS.CostAccounting.Biz.CostAccounting.Repositories;
 using Strata.DSS.CostAccounting.Biz.CostingConfigs.Models;
 using Strata.DSS.CostAccounting.Biz.CostingConfigs.Repositories;
-using Strata.DSS.CostAccounting.Biz.CostingConfigs.Services;
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -16,13 +16,11 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
     [Route("api/v{api-version:apiVersion}/costing-configs")]
     public class CostingConfigController : ControllerBase
     {
-        private readonly ICostingConfigService _costingConfigService;
         private readonly ICostingConfigRepository _costingConfigRepository;
         private readonly ICostAccountingRepository _costAccountingRepository;
 
-        public CostingConfigController(ICostingConfigService costingConfigService, ICostingConfigRepository costingConfigRepository, ICostAccountingRepository costAccountingRepository)
+        public CostingConfigController(ICostingConfigRepository costingConfigRepository, ICostAccountingRepository costAccountingRepository)
         {
-            _costingConfigService = costingConfigService;
             _costingConfigRepository = costingConfigRepository;
             _costAccountingRepository = costAccountingRepository;
         }
@@ -58,18 +56,18 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
 
         [HttpPost("")]
         [ProducesResponseType(200)]
-        public async Task<CostingConfig> AddNewConfig([FromBody] CostingConfigSaveData costingConfigSaveData, CancellationToken cancellationToken)
+        public async Task<CostingConfig> AddNewConfig([FromBody] CostingConfig costingConfig, CancellationToken cancellationToken)
         {
-            var costingConfig = await _costingConfigService.AddNewCostingConfigAsync(costingConfigSaveData, cancellationToken);
+            costingConfig = await _costingConfigRepository.AddNewCostingConfigAsync(costingConfig, cancellationToken);
             return costingConfig;
         }
 
-        [HttpPost("")]
+        [HttpPost("{costingConfigGuid}")]
         [ProducesResponseType(202)]
-        public async Task<Guid> CreateDeleteCostingConfigTask([FromBody] Guid costingConfigGuid, CancellationToken cancellationToken)
+        public async Task<ActionResult<CreatedJobDto>> CreateDeleteCostingConfigTask(Guid costingConfigGuid, CancellationToken cancellationToken)
         {
-            var jobGuid = await _costingConfigRepository.CreateDeleteCostingConfigTaskAsync(costingConfigGuid, cancellationToken);
-            return jobGuid;
+            var jobId = await _costingConfigRepository.CreateDeleteCostingConfigTaskAsync(costingConfigGuid, cancellationToken);
+            return Accepted(new CreatedJobDto { JobId = jobId });
         }
 
         [HttpGet("entities")]
