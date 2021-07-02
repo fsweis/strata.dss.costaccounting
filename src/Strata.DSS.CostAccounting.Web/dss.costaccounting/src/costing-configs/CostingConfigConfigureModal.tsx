@@ -126,6 +126,8 @@ const CostingConfigConfigureModal: React.FC<ICostingConfigConfigureModalProps> =
         props.costingConfig.isPayrollCosting ? CostingOption.PayrollCosting : CostingOption.NotSpecified
       ];
 
+      costingConfigForm.name = costingConfigForm.name + ' - Copy';
+
       const getCostingConfigEntitiesForCopy = async (costingConfigGuid: string) => {
         const entityLinkages: ICostingConfigEntityLinkage[] = await costingConfigService.getCostingConfigEntityLinkages(costingConfigGuid);
         const glPayrollEntities: string[] = entityLinkages.filter((x) => x.isUtilization === false).map((x) => x.entityId.toString());
@@ -276,10 +278,10 @@ const CostingConfigConfigureModal: React.FC<ICostingConfigConfigureModalProps> =
             <InputTextArea />
           </Form.Item>
           <Spacing itemSpacing={16}>
-            <Form.Item label='Year' name='year' initialValue={costingConfigForm.fiscalYearId} rules={[{ required: true }]}>
+            <Form.Item label='Year' name='fiscalYearId' initialValue={costingConfigForm.fiscalYearId} rules={[{ required: true }]}>
               <DropDown itemValueField='fiscalYearId' itemTextField='name' items={fiscalYears} />
             </Form.Item>
-            <Form.Item label='YTD Month' name='ytdMonth' initialValue={costingConfigForm.fiscalMonthId} rules={[{ required: true }]}>
+            <Form.Item label='YTD Month' name='fiscalMonthId' initialValue={costingConfigForm.fiscalMonthId} rules={[{ required: true }]}>
               <DropDown itemValueField='fiscalMonthId' itemTextField='name' items={fiscalMonths} />
             </Form.Item>
           </Spacing>
