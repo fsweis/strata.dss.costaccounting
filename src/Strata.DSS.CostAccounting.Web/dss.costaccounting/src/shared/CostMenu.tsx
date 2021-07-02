@@ -56,6 +56,13 @@ const CostMenu: React.FC<ICostMenuProps> = ({ costingConfigsFiltered, costingCon
     setCostingConfigsModalVisible(false);
   };
 
+  const handleDeleteConfig = (costingConfigGuid: string) => {
+    const updatedFilteredCostingConfigs = costingConfigsFiltered.filter((x) => x.costingConfigGuid !== costingConfigGuid);
+    const updatedCostingConfigs = costingConfigs.filter((x) => x.costingConfigGuid !== costingConfigGuid);
+    setCostingConfigsFiltered(updatedFilteredCostingConfigs);
+    setCostingConfigs(updatedCostingConfigs);
+  };
+
   const changeConfigs = (costingConfigGuid: string) => {
     const currentLocation = location.pathname.split('/')[1];
     history.push(`/${currentLocation}/${costingConfigGuid}`);
@@ -129,6 +136,7 @@ const CostMenu: React.FC<ICostMenuProps> = ({ costingConfigsFiltered, costingCon
       <CostingConfigsModal
         onCancel={() => setCostingConfigsModalVisible(false)}
         onChangeConfigs={(costingConfigGuid: string) => handleChangeConfigs(costingConfigGuid)}
+        onDeleteConfig={(costingConfigGuid: string) => handleDeleteConfig(costingConfigGuid)}
         visible={costingConfigsModalVisible}
       ></CostingConfigsModal>
     </>
