@@ -93,6 +93,11 @@ namespace Strata.DSS.CostAccounting.Biz.CostingConfigs.Repositories
 
         public async Task<CostingConfig> AddNewCostingConfigAsync(CostingConfig costingConfig, CancellationToken cancellationToken)
         {
+            foreach (var entityLinkage in costingConfig.EntityLinkages.Where(e => e.EntityId == 0).ToList())
+            {
+                costingConfig.EntityLinkages.Remove(entityLinkage);
+            }
+
             _dbContext.CostingConfigs.Add(costingConfig);
 
             await _dbContext.SaveChangesAsync(cancellationToken);
