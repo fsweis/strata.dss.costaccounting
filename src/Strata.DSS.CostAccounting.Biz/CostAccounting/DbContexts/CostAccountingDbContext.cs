@@ -93,7 +93,7 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.DbContexts
 
             modelBuilder.Entity<CostingResult>(entity =>
             {
-                entity.HasKey(e => e.CostingResultID);
+                entity.HasKey(e => e.CostingResultId);
                 entity.ToTable("CostingResult", "dss");
                 entity.HasQueryFilter(e => !EF.Property<bool>(e, "IsMarkedForDeletion"));
             });
