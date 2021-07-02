@@ -16,6 +16,7 @@ export interface ICostingConfigsModalProps {
   visible: boolean;
   onCancel: () => void;
   onChangeConfigs: (costingConfigGuid: string) => void;
+  onDeleteConfig: (costingConfigGuid: string) => void;
 }
 
 const CostingConfigsModal: React.FC<ICostingConfigsModalProps> = (props: ICostingConfigsModalProps) => {
@@ -52,6 +53,9 @@ const CostingConfigsModal: React.FC<ICostingConfigsModalProps> = (props: ICostin
     const createDeleteCostingConfigTask = async (costingConfigGuid: string) => {
       await costingConfigService.createDeleteCostingConfigTask(costingConfigGuid);
       Toast.show({ message: 'A task to delete a costing configuration has been created.', toastType: 'info' });
+      const updatedCostConfigs = costingConfigs.filter((x) => x.costingConfigGuid !== costingConfigGuid);
+      setCostingConfigs(updatedCostConfigs);
+      props.onDeleteConfig(costingConfigGuid);
     };
 
     Modal.confirm({
