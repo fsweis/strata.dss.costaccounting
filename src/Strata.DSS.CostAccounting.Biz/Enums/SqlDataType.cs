@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Strata.DSS.CostAccounting.Biz.Enums
+﻿namespace Strata.DSS.CostAccounting.Biz.Enums
 {
-    public enum SQLDataType
+    public enum SqlDataType
     {
         Unknown = 0,
         Image = 34,

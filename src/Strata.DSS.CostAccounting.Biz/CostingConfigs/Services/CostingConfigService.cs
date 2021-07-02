@@ -1,14 +1,13 @@
-﻿using Strata.DSS.CostAccounting.Biz.CostAccounting.Repositories;
-using System;
-using System.Linq;
-using System.Collections.Generic;
-
-using System.Threading.Tasks;
-using Strata.DSS.CostAccounting.Biz.CostAccounting.Constants;
-using Strata.DSS.CostAccounting.Biz.Enums;
-using Strata.DSS.CostAccounting.Biz.CostingConfigs.Models;
-using System.Threading;
+﻿using Strata.DSS.CostAccounting.Biz.CostAccounting.Constants;
 using Strata.DSS.CostAccounting.Biz.CostAccounting.Models;
+using Strata.DSS.CostAccounting.Biz.CostAccounting.Repositories;
+using Strata.DSS.CostAccounting.Biz.CostingConfigs.Models;
+using Strata.DSS.CostAccounting.Biz.Enums;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Strata.DSS.CostAccounting.Biz.CostingConfigs.Services
 {
@@ -16,6 +15,7 @@ namespace Strata.DSS.CostAccounting.Biz.CostingConfigs.Services
     {
         private readonly ICostingConfigRepository _costingConfigRepository;
         private readonly ISystemSettingRepository _systemSettingRepository;
+
         public CostingConfigService(ICostingConfigRepository costingConfigRepository, ISystemSettingRepository systemSettingRepository)
         {
             _costingConfigRepository = costingConfigRepository;
@@ -56,7 +56,7 @@ namespace Strata.DSS.CostAccounting.Biz.CostingConfigs.Services
             //save any new gl/payroll links
             await AddEntityLinkagesAsync(costConfigGuid, glPayrollEntityLinkages, glPayrollEntityIds, cancellationToken);
             //now, delete any old gl/payroll links
-            if (glPayrollEntityLinkages != null && glPayrollEntityLinkages.Count() > 0)
+            if (glPayrollEntityLinkages != null && glPayrollEntityLinkages.Any())
             {
                 await DeleteEntityLinkagesAsync(glPayrollEntityLinkages, glPayrollEntityIds, cancellationToken);
             }
@@ -66,19 +66,20 @@ namespace Strata.DSS.CostAccounting.Biz.CostingConfigs.Services
                 //save any new util links
                 await AddEntityLinkagesAsync(costConfigGuid, utilEntityLinkages, utilEntityIds, cancellationToken);
                 //now, delete any old util links
-                if (utilEntityLinkages != null && utilEntityLinkages.Count() > 0)
+                if (utilEntityLinkages != null && utilEntityLinkages.Any())
                 {
                     await DeleteEntityLinkagesAsync(utilEntityLinkages, utilEntityIds, cancellationToken);
                 }
             }
             else
             {
-                if (utilEntityLinkages != null && utilEntityLinkages.Count() > 0)
+                if (utilEntityLinkages != null && utilEntityLinkages.Any())
                 {
                     await _costingConfigRepository.DeleteCostingConfigEntityLinkagesAsync(utilEntityLinkages.ToList(), cancellationToken);
                 }
             }
         }
+
         private async Task AddEntityLinkagesAsync(Guid costConfigGuid, IEnumerable<CostingConfigEntityLinkage> links, List<int> entities, CancellationToken cancellationToken)
         {
             var newLinks = new List<CostingConfigEntityLinkage>();
@@ -117,7 +118,5 @@ namespace Strata.DSS.CostAccounting.Biz.CostingConfigs.Services
                 await _costingConfigRepository.DeleteCostingConfigEntityLinkagesAsync(deleteLinks, cancellationToken);
             }
         }
-
     }
-
 }

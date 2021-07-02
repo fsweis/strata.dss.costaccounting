@@ -11,7 +11,6 @@ using System.Threading.Tasks;
 
 namespace Strata.DSS.CostAccounting.Api.Controllers
 {
-
     [ApiController]
     [ApiVersion("1.0")]
     [Route("api/v{api-version:apiVersion}/costing-configs")]
@@ -94,10 +93,10 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
 
             if (isCostingEntityLevelSecurityEnabled)
             {
-                if (costingConfigGuid != null && costingConfigGuid != Guid.Empty)
+                if (costingConfigGuid != Guid.Empty)
                 {
                     var filteredEntities = await _costingConfigRepository.GetCostingConfigEntityLevelSecuritiesAsync(costingConfigGuid, cancellationToken);
-                    if (filteredEntities.Count() > 0)
+                    if (filteredEntities.Any())
                     {
                         return entities.Where(x => filteredEntities.Any(y => y.EntityId == x.EntityId)).ToList();
                     }

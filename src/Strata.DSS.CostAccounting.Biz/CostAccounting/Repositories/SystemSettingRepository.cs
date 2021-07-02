@@ -2,7 +2,6 @@
 using Strata.DSS.CostAccounting.Biz.CostAccounting.DbContexts;
 using Strata.SqlTools.Configuration.Common.AsyncFactory;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -17,14 +16,15 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.Repositories
             _dbContextFactory = dbContextFactory;
         }
 
-        public async Task<Boolean> GetIsClaimsCostingEnabledAsync(CancellationToken cancellationToken)
+        public async Task<bool> GetIsClaimsCostingEnabledAsync(CancellationToken cancellationToken)
         {
             await using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
             var systemSetting = await dbContext.SystemSettings.Where(x => x.Name == "Is Claims Costing Enabled").FirstOrDefaultAsync();
             if (Convert.ToInt32(systemSetting?.Value) == 1) { return true; }
             return false;
         }
-        public async Task<Boolean> GetIsCostingEntityLevelSecurityEnabledAsync(CancellationToken cancellationToken)
+
+        public async Task<bool> GetIsCostingEntityLevelSecurityEnabledAsync(CancellationToken cancellationToken)
         {
             await using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
             var systemSetting = await dbContext.SystemSettings.Where(x => x.Name == "Is Costing Entity Level Security Enabled").FirstOrDefaultAsync();
@@ -32,7 +32,7 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.Repositories
             return false;
         }
 
-        public async Task<Int32> GetCurrentFiscalYearAsync(CancellationToken cancellationToken)
+        public async Task<int> GetCurrentFiscalYearAsync(CancellationToken cancellationToken)
         {
             await using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
             var systemSetting = await dbContext.SystemSettings.Where(x => x.Name == "Current FiscalYear").FirstOrDefaultAsync();
@@ -44,4 +44,3 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.Repositories
         }
     }
 }
-
