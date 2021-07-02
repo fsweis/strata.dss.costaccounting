@@ -22,7 +22,8 @@ import cloneDeep from 'lodash/cloneDeep';
 import { IDataSource } from '../shared/data/IDataSource';
 import PatientDriverTreeModal from './PatientDriverTreeModal';
 import useStatDriverRulesEditWindow from './data/useStatDriverRulesEditWindow';
-import { CostConfigContext } from '../shared/data/CostConfigContext';
+import { CostingConfigContext } from '../shared/data/CostingConfigContext';
+import { CostingType } from '../shared/enums/CostingTypeEnum';
 
 const StatisticDrivers: React.FC = () => {
   const [statDrivers, setStatDrivers] = useState<IStatisticDriver[]>([]);
@@ -36,16 +37,16 @@ const StatisticDrivers: React.FC = () => {
   const { setLoading } = usePageLoader();
   const [gridLoading, setGridLoading] = useState<boolean>(false);
   const emptyGuid = getEmptyGuid();
-  const { costConfig } = useContext(CostConfigContext);
+  const { costingConfig } = useContext(CostingConfigContext);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        if (costConfig && costConfig.type) {
+        if (costingConfig && costingConfig.type !== undefined) {
           const [dataSources, dataSourceLinks, statisticDrivers] = await Promise.all([
-            statisticDriverService.getDataSources(costConfig.type),
-            statisticDriverService.getDataSourceLinks(costConfig.type),
-            statisticDriverService.getStatisticDrivers(costConfig.type)
+            statisticDriverService.getDataSources(costingConfig.type),
+            statisticDriverService.getDataSourceLinks(costingConfig.type),
+            statisticDriverService.getStatisticDrivers(costingConfig.type)
           ]);
           setDataSources(dataSources);
           setDataSourceLinks(dataSourceLinks);
@@ -58,7 +59,7 @@ const StatisticDrivers: React.FC = () => {
     };
     setGridLoading(true);
     fetchData();
-  }, [costConfig]);
+  }, [costingConfig]);
 
   const handleCancel = () => {
     if (updatedDriverGuids.length > 0 || deletedDriverGuids.length > 0 || tempStatDrivers.some((d) => d.driverConfigGuid === emptyGuid)) {
@@ -90,7 +91,7 @@ const StatisticDrivers: React.FC = () => {
       isInverted: false,
       isUsed: false,
       name: '',
-      costingType: costConfig?.type ?? 0
+      costingType: costingConfig?.type ?? CostingType.PatientCare
     };
 
     if (tempStatDrivers !== undefined) {
@@ -113,7 +114,7 @@ const StatisticDrivers: React.FC = () => {
       const statDriverSaveData: IStatisticDriverSaveData = {
         updatedStatDrivers: updatedStatDrivers,
         deletedStatDrivers: deletedDriverGuids,
-        costingType: costConfig?.type ?? 0
+        costingType: costingConfig?.type ?? CostingType.PatientCare
       };
 
       // Don't actually save if there are no changes
@@ -430,7 +431,7 @@ const StatisticDrivers: React.FC = () => {
           body={(rowData) => (
             <>
               <Tooltip title={rowData.driverConfigGuid === emptyGuid ? 'Save driver to add rules' : ''}>
-                <Button type='link' onClick={() => handleRulesClick(costConfig?.costingConfigGuid ?? '', rowData.driverConfigGuid)} disabled={rowData.driverConfigGuid === emptyGuid}>
+                <Button type='link' onClick={() => handleRulesClick(costingConfig?.costingConfigGuid ?? '', rowData.driverConfigGuid)} disabled={rowData.driverConfigGuid === emptyGuid}>
                   {rowData.hasRules ? 'Edit Rules' : 'Add Rules'}
                 </Button>
               </Tooltip>

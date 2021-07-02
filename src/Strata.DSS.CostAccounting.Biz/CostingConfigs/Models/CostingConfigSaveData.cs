@@ -7,8 +7,8 @@ namespace Strata.DSS.CostAccounting.Biz.CostingConfigs.Models
 {
     public class CostingConfigSaveData
     {
-        public CostingConfigModel CostingConfig { get; set; }
+        public CostingConfig CostingConfig { get; set; }
         public List<int> GlPayrollEntities { get; set; }
-        public List<int> UtilEntities { get; set; }
+        public List<int> UtilizationEntities { get; set; }
     }
 }

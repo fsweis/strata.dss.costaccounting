@@ -10,7 +10,6 @@ using Strata.ApiLib.Core.Cors.Extensions;
 using Strata.ApiLib.Core.ExceptionHandling.DependencyInjection.Bootstrappers;
 using Strata.ApiLib.Core.Logging.Bootstrappers;
 using Strata.ApiLib.Core.StrataAuthentication.Bootstrappers;
-using Strata.CS;
 using Strata.SwaggerExtensions;
 using System.Diagnostics.CodeAnalysis;
 using System.Net.Mime;
@@ -60,17 +59,16 @@ namespace Strata.DSS.CostAccounting.Api
             {
                 options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
                 options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
-                options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
             })
             .SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
 
-            services.AddAutoMapper(typeof(CostAccountingProfile));
             services.AddCostAccountingServices(_configuration);
             services.AddRouting();
             services.AddSwagger(_configuration);
             services.AddStrataAuthentication(_configuration);
             services.AddStrataCors(_configuration);
             services.AddHealthChecks();
+            services.AddJazzHangfireServiceClient();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

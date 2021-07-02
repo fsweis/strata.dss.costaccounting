@@ -22,7 +22,7 @@ namespace Strata.DSS.CostAccounting.Biz.CostingConfigs.Services
             _systemSettingRepository = systemSettingRepository;
         }
 
-        public async Task<CostingConfigModel> AddNewConfigAsync(CostingConfigSaveData costConfigSaveData, CancellationToken cancellationToken)
+        public async Task<CostingConfig> AddNewConfigAsync(CostingConfigSaveData costConfigSaveData, CancellationToken cancellationToken)
         {
             //assign defaults
             costConfigSaveData.CostingConfig.CostingConfigGuid = Guid.NewGuid();
@@ -38,7 +38,7 @@ namespace Strata.DSS.CostAccounting.Biz.CostingConfigs.Services
             }
 
             //handle add/delete linkages for existing and new configs
-            await SaveEntityLinkages(costConfigSaveData.CostingConfig.CostingConfigGuid, costConfigSaveData.CostingConfig.IsUtilizationEntityConfigured, costConfigSaveData.GlPayrollEntities, costConfigSaveData.UtilEntities, cancellationToken);
+            await SaveEntityLinkages(costConfigSaveData.CostingConfig.CostingConfigGuid, costConfigSaveData.CostingConfig.IsUtilizationEntityConfigured, costConfigSaveData.GlPayrollEntities, costConfigSaveData.UtilizationEntities, cancellationToken);
             //save the config
             await _costingConfigRepository.AddNewCostingConfigAsync(costConfigSaveData.CostingConfig, cancellationToken);
 
@@ -47,7 +47,6 @@ namespace Strata.DSS.CostAccounting.Biz.CostingConfigs.Services
 
         private async Task SaveEntityLinkages(Guid costConfigGuid, bool isUtilizationEntityConfigured, List<int> glPayrollEntityIds, List<int> utilEntityIds, CancellationToken cancellationToken)
         {
-
             var isCostingEntityLevelSecurityEnabled = await _systemSettingRepository.GetIsCostingEntityLevelSecurityEnabledAsync(cancellationToken);
 
             var existingLinkages = await _costingConfigRepository.GetCostingConfigEntityLinkagesAsync(costConfigGuid, cancellationToken);
