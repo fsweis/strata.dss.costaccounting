@@ -21,8 +21,8 @@ export const costingConfigService = {
   getGlPayrollEntities: (costingConfigGuid: string): Promise<IEntity[]> => {
     return httpGet<IEntity[]>(`costing-configs/${costingConfigGuid}/filtered-entities`);
   },
-  addNewCostingConfig: (costConfig: ICostingConfig): Promise<ICostingConfig> => {
-    return httpPost<ICostingConfig>(`costing-configs/`, costConfig);
+  addNewCostingConfig: (costingConfig: ICostingConfig): Promise<ICostingConfig> => {
+    return httpPost<ICostingConfig>(`costing-configs/`, costingConfig);
   },
   createDeleteCostingConfigTask: (costingConfigGuid: string): Promise<string> => {
     return httpDelete<string>(`costing-configs/${costingConfigGuid}`);
