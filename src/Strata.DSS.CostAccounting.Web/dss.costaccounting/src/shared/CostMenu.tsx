@@ -31,28 +31,28 @@ const CostMenu: React.FC<ICostMenuProps> = ({ costingConfigsFiltered, costingCon
         setSelectedCostingConfigItem(config);
       }
     } else {
-      if (costConfigsFiltered.length) {
+      if (costingConfigsFiltered.length) {
         //check cookie
         if (cookies.CostingConfigGuid) {
-          const cookieConfig = costConfigsFiltered.find((c) => c.costingConfigGuid === cookies.CostingConfigGuid);
-          if (cookieConfig && cookieConfig !== selectedCostConfigItem) {
+          const cookieConfig = costingConfigsFiltered.find((c) => c.costingConfigGuid === cookies.CostingConfigGuid);
+          if (cookieConfig && cookieConfig !== selectedCostingConfigItem) {
             //found last config in cookie
-            setSelectedCostConfigItem(cookieConfig);
-          } else if (cookieConfig !== selectedCostConfigItem) {
+            setSelectedCostingConfigItem(cookieConfig);
+          } else if (cookieConfig !== selectedCostingConfigItem) {
             //last config in cookie invalid, set default
-            setSelectedCostConfigItem(costConfigsFiltered[0]);
+            setSelectedCostingConfigItem(costingConfigsFiltered[0]);
           }
         } else {
           //cookie not found, set default
-          setSelectedCostConfigItem(costConfigsFiltered[0]);
+          setSelectedCostingConfigItem(costingConfigsFiltered[0]);
         }
       }
     }
-  }, [costConfigs, costConfigsFiltered, location, cookies.CostingConfigGuid, selectedCostConfigItem]);
+  }, [costingConfigs, costingConfigsFiltered, location, cookies.CostingConfigGuid, selectedCostingConfigItem]);
 
   useEffect(() => {
-    setCookie('CostingConfigGuid', selectedCostConfigItem.costingConfigGuid, { path: '/' });
-  }, [selectedCostConfigItem, setCookie]);
+    setCookie('CostingConfigGuid', selectedCostingConfigItem.costingConfigGuid, { path: '/' });
+  }, [selectedCostingConfigItem, setCookie]);
 
   const getActiveUrlKey = () => {
     const currentLocation = '/' + location.pathname.split('/')[1];
