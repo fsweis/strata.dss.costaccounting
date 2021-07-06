@@ -1,16 +1,20 @@
-﻿using System;
-using System.Diagnostics.CodeAnalysis;
-using Microsoft.AspNetCore;
+﻿using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Serilog;
 using Strata.Configuration.Client.DependencyInjection;
 using Strata.Logging.DependencyInjection;
+using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Strata.DSS.CostAccounting.Api
 {
     [ExcludeFromCodeCoverage]
     public class Program
     {
+        protected Program()
+        {
+        }
+
         public static void Main(string[] args)
         {
             try

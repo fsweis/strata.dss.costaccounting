@@ -15,6 +15,7 @@ namespace Strata.DSS.CostAccounting.Api.Test
         [OneTimeSetUp]
         public void OneTimeSetUp()
         {
+            ConnectionString = TestData.GetConnectionString();
             ConnectionConfig = TestData.GetConnectionConfig(ConnectionString);
         }
     }

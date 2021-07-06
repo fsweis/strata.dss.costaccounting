@@ -9,7 +9,7 @@ namespace Strata.DSS.CostAccounting.Api.Test
     public class TestStartup : Startup
     {
         private IConfiguration _config;
-        public TestStartup(IConfiguration configuration) : base(configuration, configuration["connectionString"])
+        public TestStartup(IConfiguration configuration) : base(configuration)
         {
             _config = configuration;
         }
