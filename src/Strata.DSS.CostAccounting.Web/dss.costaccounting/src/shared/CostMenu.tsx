@@ -25,10 +25,15 @@ const CostMenu: React.FC<ICostMenuProps> = ({ costingConfigsFiltered, costingCon
   useEffect(() => {
     const pathConfigGuid = getPathConfigGuid(location.pathname);
 
+    const updateCostingConfig = (config: ICostingConfig) => {
+      setSelectedCostingConfigItem(config);
+      setCookie('CostingConfigGuid', config.costingConfigGuid, { path: '/' });
+    };
+
     if (pathConfigGuid !== '') {
       const config = costingConfigs.find((c) => c.costingConfigGuid === pathConfigGuid);
       if (config && config !== selectedCostingConfigItem) {
-        setSelectedCostingConfigItem(config);
+        updateCostingConfig(config);
       }
     } else {
       if (costingConfigsFiltered.length) {
@@ -37,22 +42,18 @@ const CostMenu: React.FC<ICostMenuProps> = ({ costingConfigsFiltered, costingCon
           const cookieConfig = costingConfigsFiltered.find((c) => c.costingConfigGuid === cookies.CostingConfigGuid);
           if (cookieConfig && cookieConfig !== selectedCostingConfigItem) {
             //found last config in cookie
-            setSelectedCostingConfigItem(cookieConfig);
+            updateCostingConfig(cookieConfig);
           } else if (cookieConfig !== selectedCostingConfigItem) {
             //last config in cookie invalid, set default
-            setSelectedCostingConfigItem(costingConfigsFiltered[0]);
+            updateCostingConfig(costingConfigsFiltered[0]);
           }
         } else {
           //cookie not found, set default
-          setSelectedCostingConfigItem(costingConfigsFiltered[0]);
+          updateCostingConfig(costingConfigsFiltered[0]);
         }
       }
     }
-  }, [costingConfigs, costingConfigsFiltered, location, cookies.CostingConfigGuid, selectedCostingConfigItem]);
-
-  useEffect(() => {
-    setCookie('CostingConfigGuid', selectedCostingConfigItem.costingConfigGuid, { path: '/' });
-  }, [selectedCostingConfigItem, setCookie]);
+  }, [costingConfigs, costingConfigsFiltered, location, cookies.CostingConfigGuid, selectedCostingConfigItem, setCookie]);
 
   const getActiveUrlKey = () => {
     const currentLocation = '/' + location.pathname.split('/')[1];
