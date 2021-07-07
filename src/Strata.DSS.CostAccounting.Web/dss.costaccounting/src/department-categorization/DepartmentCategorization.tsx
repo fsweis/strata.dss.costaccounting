@@ -12,6 +12,7 @@ import Text from '@strata/tempo/lib/text';
 import { ICellEditorArgs } from '@strata/tempo/lib/datacolumn';
 import { IDepartmentCategorization } from './data/IDepartmentCategorization';
 import { ICostingDepartmentExceptionType } from './data/ICostingDepartmentExceptionType';
+import { ICostingDepartmentTypeException } from './data/ICostingDepartmentTypeException';
 import { CostConfigContext } from '../shared/data/CostConfigContext';
 import _ from 'lodash';
 import { IDepartment } from './data/IDepartment';
@@ -212,7 +213,7 @@ const DepartmentCategorization: React.FC = () => {
     return false;
   };
 
-  const filterExceptionTypes = (cellValue: string, filterValue: string) => {
+  const filterExceptionTypes = (cellValue: ICostingDepartmentTypeException, filterValue: string) => {
     if (typeof filterValue === 'string' && filterValue.trim() !== '' && filterValue.trim() !== '-') {
       filterValue = filterValue.toLowerCase().trim();
     } else {
@@ -221,11 +222,8 @@ const DepartmentCategorization: React.FC = () => {
     if (cellValue === undefined || cellValue === null) {
       return false;
     }
-    const target = exceptionTypes.find((exc) => exc.text.toLowerCase().indexOf(filterValue) > -1);
-    if (target !== undefined) {
-      return target.text === cellValue;
-    }
-    return false;
+    const matchTypes = exceptionTypes.filter((exc) => exc.text.toLowerCase().includes(filterValue.toLowerCase())).map((e) => e.text);
+    return matchTypes.includes(cellValue.deptExceptionTypeName);
   };
 
   const setExceptionTypeOptions = (exceptionType: string) => {
@@ -278,6 +276,21 @@ const DepartmentCategorization: React.FC = () => {
 
   const handleExceptionTypeChange = (selectedExceptionTypeValue: DropDownValue, department: IDepartment) => {
     const selectedValue = exceptionDepartmentData.find((d) => d === department);
+
+    if (selectedValue !== undefined) {
+      selectedValue.costingDepartmentTypeException = {
+        costingDepartmentExceptionTypeId: 0,
+        departmentId: department.departmentId,
+        costingConfigGuid: selectedValue.costingDepartmentTypeException ? selectedValue.costingDepartmentTypeException.costingConfigGuid : '',
+        departmentTypeEnum: 0,
+        costingDepartmentType: selectedExceptionTypeValue.toString(),
+        deptExceptionTypeName: selectedExceptionTypeValue.toString(),
+        deptExceptionType: 2
+      };
+
+      const updatedExceptionDepartments = [selectedValue].concat(exceptionDepartmentData.filter((d) => d.departmentId !== department.departmentId));
+      setExceptionDepartmentData(updatedExceptionDepartments);
+    }
 
     //create switch on value and set the
     //costingDepartmentType: 'Overhead',
@@ -350,7 +363,6 @@ const DepartmentCategorization: React.FC = () => {
                   <DropDown //TODo change this to a server side search
                     onChange={(value) => handleDepartmentChange(value, rowData.departmentId)}
                     width={480}
-                    //defaultValue={rowData.departmentId}
                     value={rowData.departmentId}
                     itemValueField='departmentId'
                     itemTextField='name'
@@ -360,6 +372,7 @@ const DepartmentCategorization: React.FC = () => {
               )}
             />
             <DataGrid.DropDownColumn
+              field='costingDepartmentTypeException'
               header='Exception Type'
               filter
               filterMatchMode='custom'
@@ -371,6 +384,8 @@ const DepartmentCategorization: React.FC = () => {
                     width={200}
                     onChange={(value) => handleExceptionTypeChange(value, rowData)}
                     items={exceptionTypes}
+                    itemValueField='text'
+                    itemTextField='text'
                     value={rowData.costingDepartmentTypeException?.deptExceptionTypeName || ''}
                   />
                 </>
