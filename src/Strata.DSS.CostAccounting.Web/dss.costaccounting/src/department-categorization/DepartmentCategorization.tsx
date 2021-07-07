@@ -6,23 +6,30 @@ import Tabs from '@strata/tempo/lib/tabs';
 import Spacing from '@strata/tempo/lib/spacing';
 import ActionBar from '@strata/tempo/lib/actionbar';
 import DataGrid from '@strata/tempo/lib/datagrid';
-import DropDown from '@strata/tempo/lib/dropdown';
+import DropDown, { DropDownValue } from '@strata/tempo/lib/dropdown';
 import ButtonMenu from '@strata/tempo/lib/buttonmenu';
+import Text from '@strata/tempo/lib/text';
+import { ICellEditorArgs } from '@strata/tempo/lib/datacolumn';
 import { IDepartmentCategorization } from './data/IDepartmentCategorization';
-import { ICostingDepartmentTypeException } from './data/ICostingDepartmentTypeException';
+import { ICostingDepartmentExceptionType } from './data/ICostingDepartmentExceptionType';
 import { CostConfigContext } from '../shared/data/CostConfigContext';
 import _ from 'lodash';
 import { IDepartment } from './data/IDepartment';
+import { updateNamedImports } from 'typescript';
 
 const DepartmentCategorization: React.FC = () => {
   const [searchValue, setSearchValue] = React.useState(false);
   const [searchLoading, setSearchLoading] = React.useState(false);
   const [departments, setDepartments] = useState<IDepartment[]>([]);
+  const [selectedDepartment, setSelectedDepartment] = useState<IDepartment>();
   const [gridLoading, setGridLoading] = useState<boolean>(false);
   const [deletedExceptions, setDeletedExceptions] = useState<number[]>([]);
   const [exceptionDepartmentData, setExceptionDepartmentData] = useState<IDepartment[]>([]);
-  const [overheadDepartmentData, setOverheadDepartmentData] = useState<IDepartmentCategorization[]>([]);
-  const [revenueDepartmentData, setRevenueDepartmentData] = useState<IDepartmentCategorization[]>([]);
+  const [exceptionTypes, setExceptionTypes] = useState<ICostingDepartmentExceptionType[]>([]);
+  const [selectedExceptionTypes, setSelectedExceptionType] = useState<ICostingDepartmentExceptionType>();
+  const [overheadDepartmentData, setOverheadDepartmentData] = useState<IDepartment[]>([]);
+  const [revenueDepartmentData, setRevenueDepartmentData] = useState<IDepartment[]>([]);
+  const gridRef = React.useRef<DataGrid>(null);
   const { costConfig } = useContext(CostConfigContext);
 
   useEffect(() => {
@@ -58,22 +65,14 @@ const DepartmentCategorization: React.FC = () => {
             }
           },
           {
-            departmentId: 50256,
-            departmentCode: '08_10__20CAJS10___',
-            description: '08_10__20 CLMS ADJ LN 20A S10___',
-            name: '08_10__20CAJS10___ - 08_10__20 CLMS ADJ LN 20A S10___',
+            departmentId: 50208,
+            departmentCode: '08_12__F03MBS12_LFF__',
+            description: 'FAMILY PRACTICE',
+            name: '08_12__F03MBS12_LFF__ - 08_12__1403 MED BLDG S12_LIC FEE 1n1o7__',
             isClaimsCosting: 0,
             isHealthPlanAdmin: 0,
             departmentType: 'Overhead',
-            costingDepartmentTypeException: {
-              costingDepartmentExceptionTypeId: 18326,
-              departmentId: 50256,
-              costingConfigGuid: '862a9552-8c68-4bae-b3fa-74454e7a9ecb',
-              departmentTypeEnum: 2,
-              costingDepartmentType: 'Overhead',
-              deptExceptionTypeName: 'Overhead to Excluded',
-              deptExceptionType: 3
-            }
+            costingDepartmentTypeException: null
           },
           {
             departmentId: 50256,
@@ -112,19 +111,41 @@ const DepartmentCategorization: React.FC = () => {
             }
           }
         ];
-        const exceptions: IDepartmentCategorization[] = [
-          {
-            departmentId: 20841,
-            departmentTypeEnum: 0,
-            costingDepartmentExceptionTypeId: 665,
-            deptExceptionTypeName: 'Revenue to Overhead',
-            deptExceptionType: 1,
-            name: '59 - 0101 - FAMILY PRACTICE'
-          }
-        ];
 
         setDepartments(departmentArray);
-        setExceptionDepartmentData(departmentArray.filter((dept) => dept.costingDepartmentTypeException !== null));
+        setExceptionDepartmentData(departmentArray.filter((dept) => dept.costingDepartmentTypeException !== undefined && dept.costingDepartmentTypeException !== null));
+        const overheadDepartments = departmentArray.filter((dept) => dept.departmentType === 'Overhead');
+        const overriddenFromOverheadDepartments = departmentArray.filter(
+          (dept) =>
+            dept.departmentType === 'Overhead' &&
+            dept.costingDepartmentTypeException !== null &&
+            dept.costingDepartmentTypeException !== undefined &&
+            !dept.costingDepartmentTypeException.deptExceptionTypeName.includes('to Overhead')
+        );
+        const overriddenToOverheadDepartments = departmentArray.filter(
+          (dept) => dept.departmentType !== 'Overhead' && dept.costingDepartmentTypeException !== null && dept.costingDepartmentTypeException.deptExceptionTypeName.includes('to Overhead')
+        );
+        const overheadDepartmentsToDisplay = overheadDepartments.filter((dept) => !overriddenFromOverheadDepartments.includes(dept)).concat(overriddenToOverheadDepartments);
+        setOverheadDepartmentData(overheadDepartmentsToDisplay);
+
+        const revenueDepartments = departmentArray.filter((dept) => dept.departmentType === 'Revenue');
+        const overriddenFromRevenueDepartments = departmentArray.filter(
+          (dept) =>
+            dept.departmentType === 'Revenue' &&
+            dept.costingDepartmentTypeException !== null &&
+            dept.costingDepartmentTypeException !== undefined &&
+            !dept.costingDepartmentTypeException.deptExceptionTypeName.includes('to Revenue')
+        );
+        const overriddenToRevenueDepartments = departmentArray.filter(
+          (dept) =>
+            dept.departmentType !== 'Revenue' &&
+            dept.costingDepartmentTypeException !== null &&
+            dept.costingDepartmentTypeException !== undefined &&
+            dept.costingDepartmentTypeException.deptExceptionTypeName.includes('to Revenue')
+        );
+        const revenueDepartmentsToDisplay = revenueDepartments.filter((dept) => !overriddenFromRevenueDepartments.includes(dept)).concat(overriddenToRevenueDepartments);
+        setRevenueDepartmentData(revenueDepartmentsToDisplay);
+        setExceptionTypeOptions('');
       } finally {
         setGridLoading(false);
       }
@@ -169,24 +190,65 @@ const DepartmentCategorization: React.FC = () => {
     setExceptionDepartmentData(updatedExceptionList);
   };
 
-  const renderExceptionTypeSwitch = (exceptionType: string) => {
+  const filterDepartments = (cellValue: number, filterValue: string) => {
+    console.log('Filter value ' + filterValue);
+    console.log('Cell value ' + cellValue);
+    if (typeof filterValue === 'string' && filterValue.trim() !== '' && filterValue.trim() !== '-') {
+      filterValue = filterValue.toLowerCase().trim();
+    } else {
+      return true;
+    }
+    if (cellValue === undefined || cellValue === null) {
+      return false;
+    }
+
+    const department = exceptionDepartmentData.find((dept) => dept.departmentId === cellValue);
+
+    if (department !== undefined) {
+      console.log('Department Id and name ' + department?.departmentId, department?.name);
+      console.log('Is filterValue found in Department Name? ' + (department.name.indexOf(filterValue) > -1));
+      return department.name.toLowerCase().indexOf(filterValue.toLowerCase()) > -1;
+    }
+    return false;
+  };
+
+  const filterExceptionTypes = (cellValue: string, filterValue: string) => {
+    if (typeof filterValue === 'string' && filterValue.trim() !== '' && filterValue.trim() !== '-') {
+      filterValue = filterValue.toLowerCase().trim();
+    } else {
+      return true;
+    }
+    if (cellValue === undefined || cellValue === null) {
+      return false;
+    }
+    const target = exceptionTypes.find((exc) => exc.text.toLowerCase().indexOf(filterValue) > -1);
+    if (target !== undefined) {
+      return target.text === cellValue;
+    }
+    return false;
+  };
+
+  const setExceptionTypeOptions = (exceptionType: string) => {
+    let items: ICostingDepartmentExceptionType[];
     switch (exceptionType) {
       case 'Revenue':
-        return [
+        items = [
           { text: 'Revenue to Excluded', value: 1 },
           { text: 'Revenue to Overhead', value: 2 },
           { text: 'Overhead to Excluded', value: 4 },
           { text: 'Excluded to Overhead', value: 5 }
         ];
+        break;
       case 'Overhead':
-        return [
+        items = [
           { text: 'Revenue to Excluded', value: 1 },
           { text: 'Overhead to Revenue', value: 3 },
           { text: 'Overhead to Excluded', value: 4 },
           { text: 'Excluded to Revenue', value: 6 }
         ];
+        break;
       default:
-        return [
+        items = [
           { text: 'Revenue to Excluded', value: 1 },
           { text: 'Revenue to Overhead', value: 2 },
           { text: 'Overhead to Revenue', value: 3 },
@@ -194,7 +256,33 @@ const DepartmentCategorization: React.FC = () => {
           { text: 'Excluded to Overhead', value: 5 },
           { text: 'Excluded to Revenue', value: 6 }
         ];
+        break;
     }
+    setExceptionTypes(items);
+  };
+
+  const handleDepartmentChange = (newValue: DropDownValue, currentValue: number) => {
+    //TODO: CAN DUPLICATE EXCEPTIONS BE SAVED?
+    let selectedValue = exceptionDepartmentData.find((d) => d.departmentId === newValue);
+
+    if (selectedValue === undefined) {
+      selectedValue = departments.find((d) => d.departmentId === newValue);
+      if (selectedValue !== undefined) {
+        const updatedExceptionDepartments = [selectedValue].concat(exceptionDepartmentData).filter((d) => d.departmentId !== currentValue);
+        setExceptionDepartmentData(updatedExceptionDepartments);
+      }
+    }
+
+    setExceptionTypeOptions(selectedValue?.costingDepartmentTypeException?.costingDepartmentType || '');
+  };
+
+  const handleExceptionTypeChange = (selectedExceptionTypeValue: DropDownValue, department: IDepartment) => {
+    const selectedValue = exceptionDepartmentData.find((d) => d === department);
+
+    //create switch on value and set the
+    //costingDepartmentType: 'Overhead',
+    // deptExceptionTypeName: 'Overhead to Revenue',
+    //deptExceptionType: 2
   };
 
   return (
@@ -231,8 +319,11 @@ const DepartmentCategorization: React.FC = () => {
             }
           />
           <DataGrid
+            key='DepartmentExceptionGrid'
+            ref={gridRef}
             dataKey='costingDepartmentExceptionTypeId'
             value={exceptionDepartmentData}
+            loading={gridLoading}
             pager={{
               pageSize: 100,
               extra: (
@@ -244,60 +335,43 @@ const DepartmentCategorization: React.FC = () => {
             }}
           >
             <DataGrid.RowNumber />
-            <DataGrid.Column
+            <DataGrid.DropDownColumn
+              field='departmentId'
               header='Department'
               filter
+              filterMatchMode='custom'
+              filterFunction={filterDepartments}
               width={480}
+              itemValueField='departmentId'
+              itemTextField='name'
+              items={departments}
               body={(rowData) => (
                 <>
-                  <DropDown
-                    width={400}
-                    showSearch
-                    onSearch={_.debounce((search) => {
-                      setSearchValue(true);
-                      setSearchLoading(true);
-                      //setSearchDepartments([]);
-
-                      if (search.trim().length === 0) {
-                        setSearchValue(false);
-                        setSearchLoading(false);
-                        return;
-                      }
-                      // start API simulation
-                      setTimeout(() => {
-                        if ('name'.indexOf(search.toLowerCase()) > -1) {
-                          //setSearchDepartments([]);
-                        }
-                        setSearchLoading(false);
-                      }, 1000);
-                      // end API simulation
-                    }, 500)}
-                    onChange={() => {
-                      // reset search when an option is selected
-                      setTimeout(() => {
-                        setSearchValue(false);
-                        setSearchLoading(false);
-                        //setSearchDepartments([]);
-                      });
-                    }}
-                    items={departments}
-                    itemTextField='name'
+                  <DropDown //TODo change this to a server side search
+                    onChange={(value) => handleDepartmentChange(value, rowData.departmentId)}
+                    width={480}
+                    //defaultValue={rowData.departmentId}
+                    value={rowData.departmentId}
                     itemValueField='departmentId'
-                    value={rowData.name}
-                  ></DropDown>
+                    itemTextField='name'
+                    items={departments}
+                  />
                 </>
               )}
             />
-            <DataGrid.Column
+            <DataGrid.DropDownColumn
               header='Exception Type'
               filter
+              filterMatchMode='custom'
+              filterFunction={filterExceptionTypes}
               width={240}
               body={(rowData) => (
                 <>
                   <DropDown
                     width={200}
-                    items={renderExceptionTypeSwitch(rowData.costingDepartmentTypeException.costingDepartmentType)}
-                    value={rowData.costingDepartmentTypeException.deptExceptionTypeName}
+                    onChange={(value) => handleExceptionTypeChange(value, rowData)}
+                    items={exceptionTypes}
+                    value={rowData.costingDepartmentTypeException?.deptExceptionTypeName || ''}
                   />
                 </>
               )}
@@ -319,6 +393,7 @@ const DepartmentCategorization: React.FC = () => {
         </Tabs.TabPane>
         <Tabs.TabPane key='2' tab='Overhead'>
           <DataGrid
+            value={overheadDepartmentData}
             pager={{
               pageSize: 100,
               extra: (
@@ -330,12 +405,13 @@ const DepartmentCategorization: React.FC = () => {
             }}
           >
             <DataGrid.RowNumber />
-            <DataGrid.Column header='Department' filter width={480} />
+            <DataGrid.Column header='Department' field='name' filter width={480} />
             <DataGrid.EmptyColumn />
           </DataGrid>
         </Tabs.TabPane>
         <Tabs.TabPane key='3' tab='Revenue'>
           <DataGrid
+            value={revenueDepartmentData}
             pager={{
               pageSize: 100,
               extra: (
@@ -347,7 +423,7 @@ const DepartmentCategorization: React.FC = () => {
             }}
           >
             <DataGrid.RowNumber />
-            <DataGrid.Column header='Department' filter width={480} />
+            <DataGrid.Column header='Department' field='name' filter width={480} />
             <DataGrid.EmptyColumn />
           </DataGrid>
         </Tabs.TabPane>
