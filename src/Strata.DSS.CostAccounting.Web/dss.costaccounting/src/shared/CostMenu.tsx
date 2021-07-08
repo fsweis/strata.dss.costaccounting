@@ -30,6 +30,14 @@ const CostMenu: React.FC<ICostMenuProps> = ({ costingConfigsFiltered, costingCon
       setCookie('CostingConfigGuid', config.costingConfigGuid, { path: '/' });
     };
 
+    const getDefaultConfig = () => {
+      //get last modified config
+      const arraySort = [...costingConfigsFiltered].sort((a: ICostingConfig, b: ICostingConfig) => {
+        return new Date(b.modifiedAtUtc).getTime() - new Date(a.modifiedAtUtc).getTime();
+      });
+      return arraySort[0];
+    };
+
     if (pathConfigGuid !== '') {
       const config = costingConfigs.find((c) => c.costingConfigGuid === pathConfigGuid);
       if (config && config !== selectedCostingConfigItem) {
@@ -37,10 +45,6 @@ const CostMenu: React.FC<ICostMenuProps> = ({ costingConfigsFiltered, costingCon
       }
     } else {
       if (costingConfigsFiltered.length) {
-        //sort by last modified
-        costingConfigsFiltered.sort((a: ICostingConfig, b: ICostingConfig) => {
-          return a.modifiedAtUtc.getTime() - b.modifiedAtUtc.getTime();
-        });
         //check cookie
         if (cookies.CostingConfigGuid) {
           const cookieConfig = costingConfigsFiltered.find((c) => c.costingConfigGuid === cookies.CostingConfigGuid);
@@ -49,11 +53,11 @@ const CostMenu: React.FC<ICostMenuProps> = ({ costingConfigsFiltered, costingCon
             updateCostingConfig(cookieConfig);
           } else if (cookieConfig !== selectedCostingConfigItem) {
             //last config in cookie invalid, set default
-            updateCostingConfig(costingConfigsFiltered[0]);
+            updateCostingConfig(getDefaultConfig());
           }
         } else {
           //cookie not found, set default
-          updateCostingConfig(costingConfigsFiltered[0]);
+          updateCostingConfig(getDefaultConfig());
         }
       }
     }
