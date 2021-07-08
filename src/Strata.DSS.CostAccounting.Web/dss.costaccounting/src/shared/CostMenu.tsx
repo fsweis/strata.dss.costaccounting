@@ -37,6 +37,10 @@ const CostMenu: React.FC<ICostMenuProps> = ({ costingConfigsFiltered, costingCon
       }
     } else {
       if (costingConfigsFiltered.length) {
+        //sort by last modified
+        costingConfigsFiltered.sort((a: ICostingConfig, b: ICostingConfig) => {
+          return a.modifiedAtUtc.getTime() - b.modifiedAtUtc.getTime();
+        });
         //check cookie
         if (cookies.CostingConfigGuid) {
           const cookieConfig = costingConfigsFiltered.find((c) => c.costingConfigGuid === cookies.CostingConfigGuid);
