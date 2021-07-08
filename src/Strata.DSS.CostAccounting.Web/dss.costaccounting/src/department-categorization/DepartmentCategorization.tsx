@@ -3,13 +3,10 @@ import Header from '@strata/tempo/lib/header';
 import Button from '@strata/tempo/lib/button';
 import Tooltip from '@strata/tempo/lib/tooltip';
 import Tabs from '@strata/tempo/lib/tabs';
-import Spacing from '@strata/tempo/lib/spacing';
 import ActionBar from '@strata/tempo/lib/actionbar';
 import DataGrid from '@strata/tempo/lib/datagrid';
 import DropDown, { DropDownValue } from '@strata/tempo/lib/dropdown';
 import ButtonMenu from '@strata/tempo/lib/buttonmenu';
-import Text from '@strata/tempo/lib/text';
-import { ICellEditorArgs } from '@strata/tempo/lib/datacolumn';
 import { IDepartmentCategorization } from './data/IDepartmentCategorization';
 import { ICostingDepartmentExceptionType } from './data/ICostingDepartmentExceptionType';
 import { ICostingDepartmentTypeException } from './data/ICostingDepartmentTypeException';
@@ -26,7 +23,6 @@ const DepartmentCategorization: React.FC = () => {
   const [gridLoading, setGridLoading] = useState<boolean>(false);
   const [deletedExceptions, setDeletedExceptions] = useState<number[]>([]);
   const [exceptionDepartmentData, setExceptionDepartmentData] = useState<IDepartment[]>([]);
-  const [exceptionTypes, setExceptionTypes] = useState<ICostingDepartmentExceptionType[]>([]);
   const [selectedExceptionTypes, setSelectedExceptionType] = useState<ICostingDepartmentExceptionType>();
   const [overheadDepartmentData, setOverheadDepartmentData] = useState<IDepartment[]>([]);
   const [revenueDepartmentData, setRevenueDepartmentData] = useState<IDepartment[]>([]);
@@ -146,7 +142,7 @@ const DepartmentCategorization: React.FC = () => {
         );
         const revenueDepartmentsToDisplay = revenueDepartments.filter((dept) => !overriddenFromRevenueDepartments.includes(dept)).concat(overriddenToRevenueDepartments);
         setRevenueDepartmentData(revenueDepartmentsToDisplay);
-        setExceptionTypeOptions('');
+        //   setExceptionTypeOptions('');
       } finally {
         setGridLoading(false);
       }
@@ -192,8 +188,7 @@ const DepartmentCategorization: React.FC = () => {
   };
 
   const filterDepartments = (cellValue: number, filterValue: string) => {
-    console.log('Filter value ' + filterValue);
-    console.log('Cell value ' + cellValue);
+    console.log('Filter value ' + filterValue, 'Cell value ' + cellValue);
     if (typeof filterValue === 'string' && filterValue.trim() !== '' && filterValue.trim() !== '-') {
       filterValue = filterValue.toLowerCase().trim();
     } else {
@@ -206,8 +201,7 @@ const DepartmentCategorization: React.FC = () => {
     const department = exceptionDepartmentData.find((dept) => dept.departmentId === cellValue);
 
     if (department !== undefined) {
-      console.log('Department Id and name ' + department?.departmentId, department?.name);
-      console.log('Is filterValue found in Department Name? ' + (department.name.indexOf(filterValue) > -1));
+      console.log('Department Id and name:' + department?.departmentId, department?.name, 'found?:' + (department.name.indexOf(filterValue) > -1));
       return department.name.toLowerCase().indexOf(filterValue.toLowerCase()) > -1;
     }
     return false;
@@ -222,12 +216,12 @@ const DepartmentCategorization: React.FC = () => {
     if (cellValue === undefined || cellValue === null) {
       return false;
     }
-    const matchTypes = exceptionTypes.filter((exc) => exc.text.toLowerCase().includes(filterValue.toLowerCase())).map((e) => e.text);
-    return matchTypes.includes(cellValue.deptExceptionTypeName);
+    return cellValue.deptExceptionTypeName.toLowerCase().indexOf(filterValue.toLowerCase()) > -1;
   };
 
-  const setExceptionTypeOptions = (exceptionType: string) => {
+  const getExceptionTypeOptions = (exceptionType: string) => {
     let items: ICostingDepartmentExceptionType[];
+    console.log('gettypes:', exceptionType);
     switch (exceptionType) {
       case 'Revenue':
         items = [
@@ -256,7 +250,7 @@ const DepartmentCategorization: React.FC = () => {
         ];
         break;
     }
-    setExceptionTypes(items);
+    return items;
   };
 
   const handleDepartmentChange = (newValue: DropDownValue, currentValue: number) => {
@@ -271,24 +265,31 @@ const DepartmentCategorization: React.FC = () => {
       }
     }
 
-    setExceptionTypeOptions(selectedValue?.costingDepartmentTypeException?.costingDepartmentType || '');
+    //setExceptionTypeOptions(selectedValue?.costingDepartmentTypeException?.costingDepartmentType || '');
   };
 
-  const handleExceptionTypeChange = (selectedExceptionTypeValue: DropDownValue, department: IDepartment) => {
-    const selectedValue = exceptionDepartmentData.find((d) => d === department);
-
-    if (selectedValue !== undefined) {
-      selectedValue.costingDepartmentTypeException = {
-        costingDepartmentExceptionTypeId: 0,
+  const handleExceptionTypeChange = (selectedExceptionTypeValue: number, department: IDepartment) => {
+    console.log(selectedExceptionTypeValue);
+    const exceptionType = department.costingDepartmentTypeException ? department.costingDepartmentTypeException.costingDepartmentType : '';
+    const exceptionOptions = getExceptionTypeOptions(exceptionType);
+    const exceptionItem = exceptionOptions.find((x) => x.value === selectedExceptionTypeValue);
+    if (department !== undefined) {
+      const costingDepartmentTypeException = {
+        costingDepartmentExceptionTypeId: department.costingDepartmentTypeException ? department.costingDepartmentTypeException.costingDepartmentExceptionTypeId : 0,
         departmentId: department.departmentId,
-        costingConfigGuid: selectedValue.costingDepartmentTypeException ? selectedValue.costingDepartmentTypeException.costingConfigGuid : '',
-        departmentTypeEnum: 0,
-        costingDepartmentType: selectedExceptionTypeValue.toString(),
-        deptExceptionTypeName: selectedExceptionTypeValue.toString(),
-        deptExceptionType: 2
+        costingConfigGuid: department.costingDepartmentTypeException ? department.costingDepartmentTypeException.costingConfigGuid : '',
+        departmentTypeEnum: department.costingDepartmentTypeException ? department.costingDepartmentTypeException.departmentTypeEnum : 0,
+        costingDepartmentType: department.costingDepartmentTypeException ? department.costingDepartmentTypeException.costingDepartmentType : '',
+        deptExceptionTypeName: exceptionItem ? exceptionItem.text : '',
+        deptExceptionType: selectedExceptionTypeValue
       };
 
-      const updatedExceptionDepartments = [selectedValue].concat(exceptionDepartmentData.filter((d) => d.departmentId !== department.departmentId));
+      const updatedExceptionDepartments = exceptionDepartmentData.map((exception) => {
+        if (exception.departmentId === department.departmentId) {
+          return { ...exception, costingDepartmentTypeException: costingDepartmentTypeException };
+        }
+        return exception;
+      });
       setExceptionDepartmentData(updatedExceptionDepartments);
     }
 
@@ -382,9 +383,9 @@ const DepartmentCategorization: React.FC = () => {
                 <>
                   <DropDown
                     width={200}
-                    onChange={(value) => handleExceptionTypeChange(value, rowData)}
-                    items={exceptionTypes}
-                    itemValueField='text'
+                    onChange={(value) => handleExceptionTypeChange(+value, rowData)}
+                    items={getExceptionTypeOptions(rowData.costingDepartmentTypeException?.costingDepartmentType)}
+                    itemValueField='value'
                     itemTextField='text'
                     value={rowData.costingDepartmentTypeException?.deptExceptionTypeName || ''}
                   />
