@@ -5,15 +5,14 @@ import { useEffect } from 'react';
 import { useState } from 'react';
 import { ICostComponent, newCostComponent } from './data/ICostComponent';
 import { ICostComponentSaveData } from './data/ICostComponentSaveData';
-import DrawerPicker from '../shared/DrawerPicker';
 import DataGrid from '@strata/tempo/lib/datagrid';
 import DropDown from '@strata/tempo/lib/dropdown';
 import Tooltip from '@strata/tempo/lib/tooltip';
-import { IDrawerPickerType } from '../shared/enums/IDrawerPickerType';
 import { cloneDeep } from 'lodash';
 import Modal from '@strata/tempo/lib/modal';
 import Toast from '@strata/tempo/lib/toast';
 import * as CostComponentMappingsConstants from './constants/CostComponentMappingsConstants';
+import Drawer from '@strata/tempo/lib/drawer';
 
 const CostComponentsMappings: React.FC = () => {
   const [loading, setLoading] = React.useState(false);
@@ -25,8 +24,6 @@ const CostComponentsMappings: React.FC = () => {
 
   const [drawerVisible, setDrawerVisible] = React.useState<boolean>(false);
   const [drawerTitle, setDrawerTitle] = React.useState<string>('');
-  const [drawerType, setDrawerDataType] = React.useState<IDrawerPickerType>(IDrawerPickerType.Account);
-  const [drawerSelectedData, setDrawerSelectedData] = React.useState([]);
 
   useEffect(() => {
     console.log('use dat effect');
@@ -178,30 +175,29 @@ const CostComponentsMappings: React.FC = () => {
   };
 
   const handleCellClick = (cellArgs: any) => {
+    let title = '';
     if (cellArgs.field === CostComponentMappingsConstants.Accounts_FieldName) {
-      toggleDrawer(true, CostComponentMappingsConstants.Accounts_FriendlyName, IDrawerPickerType.Account, cellArgs.rowData.accounts);
+      title = CostComponentMappingsConstants.Accounts_FriendlyName;
     } else if (cellArgs.field === CostComponentMappingsConstants.JobCodes_FieldName) {
-      toggleDrawer(true, CostComponentMappingsConstants.JobCodes_FriendlyName, IDrawerPickerType.JobCode, cellArgs.rowData.jobCodes);
+      title = CostComponentMappingsConstants.JobCodes_FriendlyName;
     } else if (cellArgs.field === CostComponentMappingsConstants.PayCodes_FieldName) {
-      toggleDrawer(true, CostComponentMappingsConstants.PayCodes_FriendlyName, IDrawerPickerType.PayCode, cellArgs.rowData.payCodes);
+      title = CostComponentMappingsConstants.PayCodes_FriendlyName;
+    } else {
+      return;
     }
+
+    //TODO: depending on what platform builds out update this
+    setDrawerTitle(title);
+    setDrawerVisible(true);
   };
 
   const handleDrawerCancel = () => {
     setDrawerVisible(false);
   };
 
-  //this will need to be updated to save to the correct item.
-  const handleDrawerSelect = (selectedData: string[]) => {
+  const handleDrawerSelect = () => {
     console.log('boom drawer select happened.');
-    //TODO: probably pass in type here to know what to update?
-  };
-
-  const toggleDrawer = (visible: boolean, title: string, drawerType: IDrawerPickerType, selectedData: []) => {
-    setDrawerVisible(visible);
-    setDrawerTitle(title);
-    setDrawerDataType(drawerType);
-    setDrawerSelectedData(selectedData);
+    //TODO: wait for platform to determine how logic will operate here.
   };
 
   return (
@@ -276,14 +272,21 @@ const CostComponentsMappings: React.FC = () => {
         />
       </DataGrid>
 
-      <DrawerPicker
-        visible={drawerVisible}
+      <Drawer
         title={drawerTitle}
-        type={drawerType}
-        selectedValues={drawerSelectedData}
-        onCancel={handleDrawerCancel}
-        onSelect={(selectedValues) => handleDrawerSelect(selectedValues)}
-      ></DrawerPicker>
+        visible={drawerVisible}
+        width={400}
+        footer={
+          <>
+            <Button onClick={handleDrawerCancel}>Cancel</Button>
+            <Button type='primary' onClick={handleDrawerSelect}>
+              Select
+            </Button>
+          </>
+        }
+      >
+        stuff goes in here. Wait for Platform team to build it out.
+      </Drawer>
     </>
   );
 };

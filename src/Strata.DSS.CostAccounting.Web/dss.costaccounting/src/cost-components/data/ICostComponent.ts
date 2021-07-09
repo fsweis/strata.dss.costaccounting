@@ -1,11 +1,11 @@
-import { IDrawerAssignment } from '../../shared/data/IDrawerAssignment';
+import { ICostComponentAssignment } from './ICostComponentAssignment';
 
 export interface ICostComponent {
   costComponentGuid: string;
   name: string;
-  accounts: IDrawerAssignment[];
-  jobCodes: IDrawerAssignment[];
-  payCodes: IDrawerAssignment[];
+  accounts: ICostComponentAssignment[];
+  jobCodes: ICostComponentAssignment[];
+  payCodes: ICostComponentAssignment[];
   rollup: string;
   usingCompensation: boolean;
 }
