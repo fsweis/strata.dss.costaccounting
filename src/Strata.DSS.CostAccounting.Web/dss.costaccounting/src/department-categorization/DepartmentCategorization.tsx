@@ -36,35 +36,16 @@ const DepartmentCategorization: React.FC = () => {
         const departmentArray = await departmentCategorizationService.getDepartmentExceptions();
         setDepartments(departmentArray);
         setExceptionDepartmentData(departmentArray.filter((dept) => dept.costingDepartmentTypeException !== undefined && dept.costingDepartmentTypeException !== null));
+
         const overheadDepartments = departmentArray.filter((dept) => dept.departmentType === 'Overhead');
-        const overriddenFromOverheadDepartments = departmentArray.filter(
-          (dept) =>
-            dept.departmentType === 'Overhead' &&
-            dept.costingDepartmentTypeException !== null &&
-            dept.costingDepartmentTypeException !== undefined &&
-            !dept.costingDepartmentTypeException.deptExceptionTypeName.includes('to Overhead')
-        );
-        const overriddenToOverheadDepartments = departmentArray.filter(
-          (dept) => dept.departmentType !== 'Overhead' && dept.costingDepartmentTypeException !== null && dept.costingDepartmentTypeException.deptExceptionTypeName.includes('to Overhead')
-        );
+        const overriddenFromOverheadDepartments = filterDeptArray(departmentArray, 'Overhead', true);
+        const overriddenToOverheadDepartments = filterDeptArray(departmentArray, 'Overhead', false);
         const overheadDepartmentsToDisplay = overheadDepartments.filter((dept) => !overriddenFromOverheadDepartments.includes(dept)).concat(overriddenToOverheadDepartments);
         setOverheadDepartmentData(overheadDepartmentsToDisplay);
 
         const revenueDepartments = departmentArray.filter((dept) => dept.departmentType === 'Revenue');
-        const overriddenFromRevenueDepartments = departmentArray.filter(
-          (dept) =>
-            dept.departmentType === 'Revenue' &&
-            dept.costingDepartmentTypeException !== null &&
-            dept.costingDepartmentTypeException !== undefined &&
-            !dept.costingDepartmentTypeException.deptExceptionTypeName.includes('to Revenue')
-        );
-        const overriddenToRevenueDepartments = departmentArray.filter(
-          (dept) =>
-            dept.departmentType !== 'Revenue' &&
-            dept.costingDepartmentTypeException !== null &&
-            dept.costingDepartmentTypeException !== undefined &&
-            dept.costingDepartmentTypeException.deptExceptionTypeName.includes('to Revenue')
-        );
+        const overriddenFromRevenueDepartments = filterDeptArray(departmentArray, 'Revenue', true);
+        const overriddenToRevenueDepartments = filterDeptArray(departmentArray, 'Revenue', false);
         const revenueDepartmentsToDisplay = revenueDepartments.filter((dept) => !overriddenFromRevenueDepartments.includes(dept)).concat(overriddenToRevenueDepartments);
         setRevenueDepartmentData(revenueDepartmentsToDisplay);
       } finally {
@@ -74,6 +55,26 @@ const DepartmentCategorization: React.FC = () => {
     setGridLoading(true);
     fetchData();
   }, [costConfig]);
+
+  const filterDeptArray = (departmentArray: IDepartment[], deptType: string, overridden: boolean) => {
+    if (overridden) {
+      return departmentArray.filter(
+        (dept) =>
+          dept.departmentType === deptType &&
+          dept.costingDepartmentTypeException !== null &&
+          dept.costingDepartmentTypeException !== undefined &&
+          !dept.costingDepartmentTypeException.deptExceptionTypeName.includes('to ' + deptType)
+      );
+    } else {
+      return departmentArray.filter(
+        (dept) =>
+          dept.departmentType !== deptType &&
+          dept.costingDepartmentTypeException !== null &&
+          dept.costingDepartmentTypeException !== undefined &&
+          dept.costingDepartmentTypeException.deptExceptionTypeName.includes('to ' + deptType)
+      );
+    }
+  };
 
   const handleAddRow = () => {
     const newDept: IDepartment = newDepartment();
@@ -128,7 +129,6 @@ const DepartmentCategorization: React.FC = () => {
 
   const getExceptionTypeOptions = (exceptionType: string) => {
     let items: ICostingDepartmentExceptionType[];
-    console.log('gettypes:', exceptionType);
     switch (exceptionType) {
       case 'Revenue':
         items = [
