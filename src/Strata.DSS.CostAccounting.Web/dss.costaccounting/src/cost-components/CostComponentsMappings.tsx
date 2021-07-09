@@ -13,8 +13,13 @@ import Modal from '@strata/tempo/lib/modal';
 import Toast from '@strata/tempo/lib/toast';
 import * as CostComponentMappingsConstants from './constants/CostComponentMappingsConstants';
 import Drawer from '@strata/tempo/lib/drawer';
+import { ICostingConfig } from '../shared/data/ICostingConfig';
 
-const CostComponentsMappings: React.FC = () => {
+export interface ICostComponentsMappingsProps {
+  costingConfig: ICostingConfig | undefined;
+}
+
+const CostComponentsMappings: React.FC<ICostComponentsMappingsProps> = (props: ICostComponentsMappingsProps) => {
   const [loading, setLoading] = React.useState(false);
   const gridRef = React.useRef<DataGrid>(null);
   const [costComponents, setCostComponents] = useState<ICostComponent[]>([]); //Used for initial load and reset(cancel)
@@ -42,7 +47,7 @@ const CostComponentsMappings: React.FC = () => {
     };
 
     fetchData();
-  }, [setLoading]);
+  }, [setLoading, props.costingConfig]);
 
   const handleSave = async () => {
     if (await validateCostComponent()) {

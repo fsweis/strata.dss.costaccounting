@@ -4,8 +4,12 @@ import CostComponentsMappings from './CostComponentsMappings';
 import ButtonMenu from '@strata/tempo/lib/buttonmenu';
 import Button from '@strata/tempo/lib/button';
 import Tabs from '@strata/tempo/lib/tabs';
+import { useContext } from 'react';
+import { CostingConfigContext } from '../shared/data/CostingConfigContext';
 
 const CostComponents: React.FC = () => {
+  const { costingConfig } = useContext(CostingConfigContext);
+
   return (
     <>
       <Header
@@ -27,7 +31,7 @@ const CostComponents: React.FC = () => {
       />
       <Tabs defaultActiveKey='1'>
         <Tabs.TabPane key='1' tab='Mappings'>
-          <CostComponentsMappings></CostComponentsMappings>
+          <CostComponentsMappings costingConfig={costingConfig}></CostComponentsMappings>
         </Tabs.TabPane>
         <Tabs.TabPane key='2' tab='Account Overrides'></Tabs.TabPane>
         <Tabs.TabPane key='3' tab='Payroll Overrides'></Tabs.TabPane>
