@@ -39,6 +39,9 @@ const CostComponentsMappings: React.FC<ICostComponentsMappingsProps> = (props: I
           { costComponentGuid: '123', name: 'CostComponent Numero Uno', accounts: [], jobCodes: [], payCodes: [], rollup: '', usingCompensation: false },
           { costComponentGuid: '456', name: 'Get Kate a passport', accounts: [], jobCodes: [], payCodes: [], rollup: '', usingCompensation: true }
         ];
+        //const costComponents = await CostComponentService.getCostComponentMappings();
+        //TODO: implement this once the api is built out.
+
         setCostComponents(costComponents);
         setGridCostComponents(cloneDeep(costComponents));
       } finally {
