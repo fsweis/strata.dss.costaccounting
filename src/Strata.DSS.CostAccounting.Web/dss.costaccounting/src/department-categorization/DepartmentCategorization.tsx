@@ -11,6 +11,8 @@ import { IDepartmentCategorization } from './data/IDepartmentCategorization';
 import { ICostingDepartmentExceptionType } from './data/ICostingDepartmentExceptionType';
 import { ICostingDepartmentTypeException } from './data/ICostingDepartmentTypeException';
 import { departmentCategorizationService } from './data/departmentCategorizationService';
+import { R2O, R2E, O2E, O2R, E2O, E2R } from './constants/ExceptionTypeConstants';
+import { ExceptionTypeEnums } from './enums/ExceptionTypeEnums';
 import { CostConfigContext } from '../shared/data/CostConfigContext';
 import _ from 'lodash';
 import { IDepartment, newDepartment } from './data/IDepartment';
@@ -132,28 +134,28 @@ const DepartmentCategorization: React.FC = () => {
     switch (exceptionType) {
       case 'Revenue':
         items = [
-          { text: 'Revenue to Excluded', value: 1 },
-          { text: 'Revenue to Overhead', value: 2 },
-          { text: 'Overhead to Excluded', value: 4 },
-          { text: 'Excluded to Overhead', value: 5 }
+          { text: R2E, value: ExceptionTypeEnums.R2E },
+          { text: R2O, value: ExceptionTypeEnums.R2O },
+          { text: O2E, value: ExceptionTypeEnums.O2E },
+          { text: E2O, value: ExceptionTypeEnums.E2O }
         ];
         break;
       case 'Overhead':
         items = [
-          { text: 'Revenue to Excluded', value: 1 },
-          { text: 'Overhead to Revenue', value: 3 },
-          { text: 'Overhead to Excluded', value: 4 },
-          { text: 'Excluded to Revenue', value: 6 }
+          { text: R2E, value: ExceptionTypeEnums.R2E },
+          { text: O2R, value: ExceptionTypeEnums.O2R },
+          { text: O2E, value: ExceptionTypeEnums.O2E },
+          { text: E2R, value: ExceptionTypeEnums.E2R }
         ];
         break;
       default:
         items = [
-          { text: 'Revenue to Excluded', value: 1 },
-          { text: 'Revenue to Overhead', value: 2 },
-          { text: 'Overhead to Revenue', value: 3 },
-          { text: 'Overhead to Excluded', value: 4 },
-          { text: 'Excluded to Overhead', value: 5 },
-          { text: 'Excluded to Revenue', value: 6 }
+          { text: R2E, value: ExceptionTypeEnums.R2E },
+          { text: R2O, value: ExceptionTypeEnums.R2O },
+          { text: O2R, value: ExceptionTypeEnums.O2R },
+          { text: O2E, value: ExceptionTypeEnums.O2E },
+          { text: E2O, value: ExceptionTypeEnums.E2O },
+          { text: E2R, value: ExceptionTypeEnums.E2R }
         ];
         break;
     }

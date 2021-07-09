@@ -1,4 +1,6 @@
 import { IDepartment } from './IDepartment';
+import { R2O, R2E, O2E, O2R, E2O, E2R } from '../constants/ExceptionTypeConstants';
+import { ExceptionTypeEnums } from '../enums/ExceptionTypeEnums';
 
 const mockData: IDepartment[] = [
   {
@@ -23,8 +25,8 @@ const mockData: IDepartment[] = [
       costingConfigGuid: '862a9552-8c68-4bae-b3fa-74454e7a9ecb',
       departmentTypeEnum: 1,
       costingDepartmentType: 'Revenue',
-      deptExceptionTypeName: 'Revenue to Overhead',
-      deptExceptionType: 1
+      deptExceptionTypeName: R2O,
+      deptExceptionType: ExceptionTypeEnums.R2O
     }
   },
   {
@@ -50,8 +52,8 @@ const mockData: IDepartment[] = [
       costingConfigGuid: '862a9552-8c68-4bae-b3fa-74454e7a9ecb',
       departmentTypeEnum: 2,
       costingDepartmentType: 'Overhead',
-      deptExceptionTypeName: 'Overhead to Excluded',
-      deptExceptionType: 3
+      deptExceptionTypeName: O2E,
+      deptExceptionType: ExceptionTypeEnums.O2E
     }
   },
   {
@@ -67,8 +69,8 @@ const mockData: IDepartment[] = [
       costingConfigGuid: '862a9552-8c68-4bae-b3fa-74454e7a9ecb',
       departmentTypeEnum: 2,
       costingDepartmentType: 'Overhead',
-      deptExceptionTypeName: 'Overhead to Revenue',
-      deptExceptionType: 2
+      deptExceptionTypeName: O2R,
+      deptExceptionType: ExceptionTypeEnums.O2R
     }
   }
 ];
