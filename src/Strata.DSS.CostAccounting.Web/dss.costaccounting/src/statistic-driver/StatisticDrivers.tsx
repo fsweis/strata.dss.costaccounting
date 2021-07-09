@@ -259,6 +259,7 @@ const StatisticDrivers: React.FC = () => {
   const handleDelete = (driverConfigGuid: string, isNew: boolean) => {
     if (tempStatDrivers !== undefined) {
       if (isNew) {
+        //TODO: fix this bug. If multiple new stat driver rows are added this deletes everyone.
         const newUpdatedDriverGuids = updatedDriverGuids.filter((guid) => guid !== driverConfigGuid);
         setUpdatedDriverGuids(newUpdatedDriverGuids);
       } else {
