@@ -10,9 +10,10 @@ import ButtonMenu from '@strata/tempo/lib/buttonmenu';
 import { IDepartmentCategorization } from './data/IDepartmentCategorization';
 import { ICostingDepartmentExceptionType } from './data/ICostingDepartmentExceptionType';
 import { ICostingDepartmentTypeException } from './data/ICostingDepartmentTypeException';
+import { departmentCategorizationService } from './data/departmentCategorizationService';
 import { CostConfigContext } from '../shared/data/CostConfigContext';
 import _ from 'lodash';
-import { IDepartment } from './data/IDepartment';
+import { IDepartment, newDepartment } from './data/IDepartment';
 import { updateNamedImports } from 'typescript';
 
 const DepartmentCategorization: React.FC = () => {
@@ -32,83 +33,7 @@ const DepartmentCategorization: React.FC = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const departmentArray: IDepartment[] = [
-          {
-            departmentId: 20929,
-            departmentCode: 'Commercial',
-            description: 'Line of Business for Claims Costing',
-            name: 'Commercial - Line of Business for Claims Costing',
-            isClaimsCosting: 0,
-            isHealthPlanAdmin: 0,
-            departmentType: 'Revenue',
-            costingDepartmentTypeException: null
-          },
-          {
-            departmentId: 20841,
-            departmentCode: '59 - 0101',
-            description: 'FAMILY PRACTICE',
-            name: '59 - 0101 - FAMILY PRACTICE',
-            isClaimsCosting: 0,
-            isHealthPlanAdmin: 0,
-            departmentType: 'Revenue',
-            costingDepartmentTypeException: {
-              costingDepartmentExceptionTypeId: 665,
-              departmentId: 20841,
-              costingConfigGuid: '862a9552-8c68-4bae-b3fa-74454e7a9ecb',
-              departmentTypeEnum: 1,
-              costingDepartmentType: 'Revenue',
-              deptExceptionTypeName: 'Revenue to Overhead',
-              deptExceptionType: 1
-            }
-          },
-          {
-            departmentId: 50208,
-            departmentCode: '08_12__F03MBS12_LFF__',
-            description: 'FAMILY PRACTICE',
-            name: '08_12__F03MBS12_LFF__ - 08_12__1403 MED BLDG S12_LIC FEE 1n1o7__',
-            isClaimsCosting: 0,
-            isHealthPlanAdmin: 0,
-            departmentType: 'Overhead',
-            costingDepartmentTypeException: null
-          },
-          {
-            departmentId: 50256,
-            departmentCode: '08_10__20CAJS10___',
-            description: '08_10__20 CLMS ADJ LN 20A S10___',
-            name: '08_10__20CAJS10___ - 08_10__20 CLMS ADJ LN 20A S10___',
-            isClaimsCosting: 0,
-            isHealthPlanAdmin: 0,
-            departmentType: 'Overhead',
-            costingDepartmentTypeException: {
-              costingDepartmentExceptionTypeId: 18326,
-              departmentId: 50256,
-              costingConfigGuid: '862a9552-8c68-4bae-b3fa-74454e7a9ecb',
-              departmentTypeEnum: 2,
-              costingDepartmentType: 'Overhead',
-              deptExceptionTypeName: 'Overhead to Excluded',
-              deptExceptionType: 3
-            }
-          },
-          {
-            departmentId: 1749,
-            departmentCode: '8106006581',
-            description: 'Aloha Dental Facility Maintenance-Dental',
-            name: '08106006581 - Aloha Dental Facility Maintenance-Dental',
-            isClaimsCosting: 0,
-            isHealthPlanAdmin: 0,
-            departmentType: 'Overhead',
-            costingDepartmentTypeException: {
-              costingDepartmentExceptionTypeId: 19810,
-              departmentId: 1749,
-              costingConfigGuid: '862a9552-8c68-4bae-b3fa-74454e7a9ecb',
-              departmentTypeEnum: 2,
-              costingDepartmentType: 'Overhead',
-              deptExceptionTypeName: 'Overhead to Revenue',
-              deptExceptionType: 2
-            }
-          }
-        ];
-
+        const departmentArray = await departmentCategorizationService.getDepartmentExceptions();
         setDepartments(departmentArray);
         setExceptionDepartmentData(departmentArray.filter((dept) => dept.costingDepartmentTypeException !== undefined && dept.costingDepartmentTypeException !== null));
         const overheadDepartments = departmentArray.filter((dept) => dept.departmentType === 'Overhead');
@@ -142,7 +67,6 @@ const DepartmentCategorization: React.FC = () => {
         );
         const revenueDepartmentsToDisplay = revenueDepartments.filter((dept) => !overriddenFromRevenueDepartments.includes(dept)).concat(overriddenToRevenueDepartments);
         setRevenueDepartmentData(revenueDepartmentsToDisplay);
-        //   setExceptionTypeOptions('');
       } finally {
         setGridLoading(false);
       }
@@ -150,28 +74,11 @@ const DepartmentCategorization: React.FC = () => {
     setGridLoading(true);
     fetchData();
   }, [costConfig]);
-  const handleAddRow = () => {
-    const newDepartment: IDepartment = {
-      departmentId: 0,
-      departmentCode: '',
-      description: '',
-      name: '',
-      isClaimsCosting: 0,
-      isHealthPlanAdmin: 0,
-      departmentType: '',
-      costingDepartmentTypeException: {
-        costingDepartmentExceptionTypeId: 0,
-        departmentId: 0,
-        costingConfigGuid: '',
-        departmentTypeEnum: 0,
-        costingDepartmentType: '',
-        deptExceptionTypeName: '',
-        deptExceptionType: 0
-      }
-    };
 
+  const handleAddRow = () => {
+    const newDept: IDepartment = newDepartment();
     if (exceptionDepartmentData !== undefined) {
-      const updatedDepartExceptions = [newDepartment].concat(exceptionDepartmentData);
+      const updatedDepartExceptions = [newDept].concat(exceptionDepartmentData);
       setExceptionDepartmentData(updatedDepartExceptions);
     }
   };
