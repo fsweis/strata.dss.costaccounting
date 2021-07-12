@@ -1,13 +1,12 @@
 ﻿using Strata.DSS.CostAccounting.Biz.CostAccounting.Constants;
 using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace Strata.DSS.CostAccounting.Biz.Utilities
 {
     public static class StatisticDriverDataSourceUtil
     {
-        public static List<Guid> GetDataTableGuids(Boolean isClaims)
+        public static List<Guid> GetDataTableGuids(bool isClaims)
         {
             var dataTableGuids = new List<Guid>();
             dataTableGuids.Add(DataTableConstants.DSSGLGuid);

@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Strata.DSS.CostAccounting.Biz.CostAccounting.Constants;
 using Strata.DSS.CostAccounting.Biz.CostAccounting.Repositories;
-using System;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -9,9 +9,10 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
     [ApiController]
     [ApiVersion("1.0")]
     [Route("api/v{api-version:apiVersion}/system-setting")]
-    public class SystemSettingController: ControllerBase
+    public class SystemSettingController : ControllerBase
     {
         private readonly ISystemSettingRepository _systemSettingRepository;
+
         public SystemSettingController(ISystemSettingRepository systemSettingRepository)
         {
             _systemSettingRepository = systemSettingRepository;
@@ -19,23 +20,23 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
 
         [HttpGet("claims")]
         [ProducesResponseType(200)]
-        public async Task<Boolean> GetIsClaimsCostingEnabled(CancellationToken cancellationToken)
+        public async Task<bool> GetIsClaimsCostingEnabled(CancellationToken cancellationToken)
         {
-            return await _systemSettingRepository.GetIsClaimsCostingEnabledAsync(cancellationToken);
+            return await _systemSettingRepository.GetBooleanSystemSettingByNameAsync(SystemSettingConstants.ClaimsCostingSystemSettingName, cancellationToken);
         }
 
         [HttpGet("entity-security")]
         [ProducesResponseType(200)]
-        public async Task<Boolean> GetIsCostingEntityLevelSecurityEnabled(CancellationToken cancellationToken)
+        public async Task<bool> GetIsCostingEntityLevelSecurityEnabled(CancellationToken cancellationToken)
         {
-            return await _systemSettingRepository.GetIsCostingEntityLevelSecurityEnabledAsync(cancellationToken);
+            return await _systemSettingRepository.GetBooleanSystemSettingByNameAsync(SystemSettingConstants.EntityLevelSecuritySystemSettingName, cancellationToken);
         }
+
         [HttpGet("fiscal-year")]
         [ProducesResponseType(200)]
-        public async Task<Int32> GetCurrentFiscalYear(CancellationToken cancellationToken)
+        public async Task<int> GetCurrentFiscalYear(CancellationToken cancellationToken)
         {
-            return await _systemSettingRepository.GetCurrentFiscalYearAsync(cancellationToken);
+            return await _systemSettingRepository.GetIntegerSystemSettingByNameAsync(SystemSettingConstants.CurrentFiscalYearSystemSettingName, cancellationToken);
         }
     }
 }
-

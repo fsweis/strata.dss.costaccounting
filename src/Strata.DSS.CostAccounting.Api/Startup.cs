@@ -14,7 +14,6 @@ using Strata.SwaggerExtensions;
 using System.Diagnostics.CodeAnalysis;
 using System.Net.Mime;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 
 namespace Strata.DSS.CostAccounting.Api
 {

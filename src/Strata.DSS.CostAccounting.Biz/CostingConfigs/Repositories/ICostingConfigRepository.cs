@@ -5,17 +5,15 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Strata.DSS.CostAccounting.Biz.CostAccounting.Repositories
+namespace Strata.DSS.CostAccounting.Biz.CostingConfigs.Repositories
 {
     public interface ICostingConfigRepository
     {
         public Task<IEnumerable<CostingConfig>> GetAllCostingConfigsAsync(CancellationToken cancellationToken);
         public Task<CostingConfig> GetCostingConfigAsync(Guid costingConfigGuid, CancellationToken cancellationToken);
-        public Task<IEnumerable<CostingConfigEntityLevelSecurity>> GetCostingConfigEntityLevelSecuritiesAsync(Guid costingConfigGuid, CancellationToken cancellationToken);
+        public Task<IEnumerable<Entity>> GetFilteredEntitiesAsync(Guid costingConfigGuid, CancellationToken cancellationToken);
         public Task<IEnumerable<CostingConfigEntityLinkage>> GetCostingConfigEntityLinkagesAsync(Guid costingConfigGuid, CancellationToken cancellationToken);
-        public Task UpdateCostingConfigEntityLinkagesAsync(List<CostingConfigEntityLinkage> cceLinks, CancellationToken cancellationToken);
-        public Task DeleteCostingConfigEntityLinkagesAsync(List<CostingConfigEntityLinkage> cceLinks, CancellationToken cancellationToken);
-        public Task AddNewCostingConfigAsync(CostingConfig costingConfigModel, CancellationToken cancellationToken);
+        public Task<CostingConfig> AddNewCostingConfigAsync(CostingConfig costingConfig, CancellationToken cancellationToken);
         public Task<Guid> CreateDeleteCostingConfigTaskAsync(Guid costingConfigGuid, CancellationToken cancellationToken);
     }
 }

@@ -8,13 +8,8 @@ using System.Linq;
 
 namespace Strata.DSS.CostAccounting.Biz.StatisticDrivers.Services
 {
-
     public class DataSourceService : IDataSourceService
     {
-        public DataSourceService()
-        {
-        }
-
         public IList<DataTable> GetDataSources(CostingType costingType)
         {
             var dataSources = new List<DataTable>();
@@ -47,6 +42,7 @@ namespace Strata.DSS.CostAccounting.Biz.StatisticDrivers.Services
                 var claimStatisticDriverDataTable = new DataTable() { DataTableGuid = DataTableConstants.ClaimStatisticDriverGuid, GlobalId = DataTableConstants.ClaimStatisticDriver, FriendlyName = SDDataTableConstants.ClaimStatDriver_FriendlyName };
                 dataSources.Add(claimStatisticDriverDataTable);
             }
+
             return dataSources.OrderBy(x => x.FriendlyName).ToList();
         }
     }

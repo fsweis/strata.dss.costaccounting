@@ -8,6 +8,7 @@ using Strata.DSS.CostAccounting.Biz.StatisticDrivers.Repositories;
 using Strata.DSS.CostAccounting.Biz.StatisticDrivers.Services;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -47,6 +48,7 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
             {
                 throw new ApiException("Error calling GetStatisticDrivers", e);
             }
+
             return statisticDrivers;
         }
 
@@ -72,6 +74,7 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
             {
                 throw new ApiException("Error calling GetDataSourceLinks", e);
             }
+
             return dataSourceLinks;
         }
 
@@ -80,22 +83,16 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<IEnumerable<StatisticDriver>>> SaveStatisticDrivers([FromBody] StatisticDriverSaveData statisticDriverSaveData, CancellationToken cancellationToken)
         {
-            if (_statisticDriversService.ValidateStatisticDrivers(statisticDriverSaveData.UpdatedStatDrivers))
+            if (statisticDriverSaveData.UpdatedStatDrivers.Any())
             {
-                if (statisticDriverSaveData.UpdatedStatDrivers.Count > 0)
-                {
-                    await _statisticDriversRepository.UpdateStatisticDriversAsync(statisticDriverSaveData.UpdatedStatDrivers, cancellationToken);
-                }
-            }
-            else
-            {
-                return StatusCode(StatusCodes.Status400BadRequest);
+                await _statisticDriversRepository.UpdateStatisticDriversAsync(statisticDriverSaveData.UpdatedStatDrivers, cancellationToken);
             }
 
-            if (statisticDriverSaveData.DeletedStatDrivers.Count > 0)
+            if (statisticDriverSaveData.DeletedStatDrivers.Any())
             {
                 await _statisticDriversRepository.DeleteStatisticDriversAsync(statisticDriverSaveData.DeletedStatDrivers, cancellationToken);
             }
+
             var statDrivers = await _statisticDriversService.LoadStatisticDrivers(statisticDriverSaveData.CostingType, cancellationToken);
 
             return Ok(statDrivers);
