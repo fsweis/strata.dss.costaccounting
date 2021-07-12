@@ -1,6 +1,11 @@
-export const Accounts_FriendlyName = 'Accounts';
-export const Accounts_FieldName = 'accounts';
-export const JobCodes_FriendlyName = 'Job Codes';
-export const JobCodes_FieldName = 'jobCodes';
-export const PayCodes_FriendlyName = 'Pay Codes';
-export const PayCodes_FieldName = 'payCodes';
+export enum MappingFriendlyNameEnums {
+  Accounts = 'Accounts',
+  JobCodes = 'Job Codes',
+  PayCodes = 'Pay Codes'
+}
+
+export enum MappingFieldNameEnums {
+  Accounts = 'accounts',
+  JobCodes = 'jobcodes',
+  PayCodes = 'paycodes'
+}

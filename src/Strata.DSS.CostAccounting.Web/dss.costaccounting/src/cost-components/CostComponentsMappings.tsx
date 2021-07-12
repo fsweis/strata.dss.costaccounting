@@ -11,7 +11,7 @@ import Tooltip from '@strata/tempo/lib/tooltip';
 import { cloneDeep } from 'lodash';
 import Modal from '@strata/tempo/lib/modal';
 import Toast from '@strata/tempo/lib/toast';
-import * as CostComponentMappingsConstants from './constants/CostComponentMappingsConstants';
+import { MappingFieldNameEnums, MappingFriendlyNameEnums } from './constants/CostComponentMappingsConstants';
 import Drawer from '@strata/tempo/lib/drawer';
 import { ICostingConfig } from '../shared/data/ICostingConfig';
 import RouteConfirm from '@strata/tempo/lib/routeconfirm';
@@ -186,12 +186,12 @@ const CostComponentsMappings: React.FC<ICostComponentsMappingsProps> = (props: I
 
   const handleCellClick = (cellArgs: any) => {
     let title = '';
-    if (cellArgs.field === CostComponentMappingsConstants.Accounts_FieldName) {
-      title = CostComponentMappingsConstants.Accounts_FriendlyName;
-    } else if (cellArgs.field === CostComponentMappingsConstants.JobCodes_FieldName) {
-      title = CostComponentMappingsConstants.JobCodes_FriendlyName;
-    } else if (cellArgs.field === CostComponentMappingsConstants.PayCodes_FieldName) {
-      title = CostComponentMappingsConstants.PayCodes_FriendlyName;
+    if (cellArgs.field === MappingFieldNameEnums.Accounts) {
+      title = MappingFriendlyNameEnums.Accounts;
+    } else if (cellArgs.field === MappingFriendlyNameEnums.JobCodes) {
+      title = MappingFriendlyNameEnums.JobCodes;
+    } else if (cellArgs.field === MappingFieldNameEnums.PayCodes) {
+      title = MappingFriendlyNameEnums.PayCodes;
     } else {
       return;
     }
