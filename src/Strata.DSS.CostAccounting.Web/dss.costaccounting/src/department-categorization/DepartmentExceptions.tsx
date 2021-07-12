@@ -7,8 +7,8 @@ import DropDown, { DropDownValue } from '@strata/tempo/lib/dropdown';
 import { ICostingDepartmentExceptionType } from './data/ICostingDepartmentExceptionType';
 import { ICostingDepartmentTypeException } from './data/ICostingDepartmentTypeException';
 import { IDepartment, newDepartment } from './data/IDepartment';
-import { R2O, R2E, O2E, O2R, E2O, E2R } from './constants/ExceptionTypeConstants';
-import { ExceptionTypeEnums } from './enums/ExceptionTypeEnums';
+import { ExceptionNameEnum } from './enums/ExceptionNameEnum';
+import { ExceptionTypeEnum } from './enums/ExceptionTypeEnum';
 export interface IDepartmentExceptionsProps {
   departments: IDepartment[];
   gridLoading: boolean;
@@ -80,28 +80,28 @@ const DepartmentExceptions: React.FC<IDepartmentExceptionsProps> = (props: IDepa
     switch (exceptionType) {
       case 'Revenue':
         items = [
-          { text: R2E, value: ExceptionTypeEnums.R2E },
-          { text: R2O, value: ExceptionTypeEnums.R2O },
-          { text: O2E, value: ExceptionTypeEnums.O2E },
-          { text: E2O, value: ExceptionTypeEnums.E2O }
+          { text: ExceptionNameEnum.RevenueToExcluded, value: ExceptionTypeEnum.RevenueToExcluded },
+          { text: ExceptionNameEnum.RevenueToOverhead, value: ExceptionTypeEnum.RevenueToOverhead },
+          { text: ExceptionNameEnum.OverheadToExcluded, value: ExceptionTypeEnum.OverheadToExcluded },
+          { text: ExceptionNameEnum.ExcludedToOverhead, value: ExceptionTypeEnum.ExcludedToOverhead }
         ];
         break;
       case 'Overhead':
         items = [
-          { text: R2E, value: ExceptionTypeEnums.R2E },
-          { text: O2R, value: ExceptionTypeEnums.O2R },
-          { text: O2E, value: ExceptionTypeEnums.O2E },
-          { text: E2R, value: ExceptionTypeEnums.E2R }
+          { text: ExceptionNameEnum.RevenueToExcluded, value: ExceptionTypeEnum.RevenueToExcluded },
+          { text: ExceptionNameEnum.OverheadToRevenue, value: ExceptionTypeEnum.OverheadToRevenue },
+          { text: ExceptionNameEnum.OverheadToExcluded, value: ExceptionTypeEnum.OverheadToExcluded },
+          { text: ExceptionNameEnum.ExcludedToRevenue, value: ExceptionTypeEnum.ExcludedToRevenue }
         ];
         break;
       default:
         items = [
-          { text: R2E, value: ExceptionTypeEnums.R2E },
-          { text: R2O, value: ExceptionTypeEnums.R2O },
-          { text: O2R, value: ExceptionTypeEnums.O2R },
-          { text: O2E, value: ExceptionTypeEnums.O2E },
-          { text: E2O, value: ExceptionTypeEnums.E2O },
-          { text: E2R, value: ExceptionTypeEnums.E2R }
+          { text: ExceptionNameEnum.RevenueToExcluded, value: ExceptionTypeEnum.RevenueToExcluded },
+          { text: ExceptionNameEnum.RevenueToOverhead, value: ExceptionTypeEnum.RevenueToOverhead },
+          { text: ExceptionNameEnum.OverheadToRevenue, value: ExceptionTypeEnum.OverheadToRevenue },
+          { text: ExceptionNameEnum.OverheadToExcluded, value: ExceptionTypeEnum.OverheadToExcluded },
+          { text: ExceptionNameEnum.ExcludedToOverhead, value: ExceptionTypeEnum.ExcludedToOverhead },
+          { text: ExceptionNameEnum.ExcludedToRevenue, value: ExceptionTypeEnum.ExcludedToRevenue }
         ];
         break;
     }

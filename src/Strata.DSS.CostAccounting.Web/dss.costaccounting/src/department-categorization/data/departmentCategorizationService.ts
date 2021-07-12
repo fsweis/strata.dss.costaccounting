@@ -1,7 +1,7 @@
 import { IDepartment } from './IDepartment';
-import { R2O, R2E, O2E, O2R, E2O, E2R } from '../constants/ExceptionTypeConstants';
-import { ExceptionTypeEnums } from '../enums/ExceptionTypeEnums';
-
+import { ExceptionNameEnum } from '../enums/ExceptionNameEnum';
+import { ExceptionTypeEnum } from '../enums/ExceptionTypeEnum';
+import { DepartmentTypeEnum } from '../enums/DepartmentTypeEnum';
 const mockData: IDepartment[] = [
   {
     departmentId: 20929,
@@ -9,7 +9,7 @@ const mockData: IDepartment[] = [
     description: 'Line of Business for Claims Costing',
     name: 'Commercial - Line of Business for Claims Costing',
     isClaimsCosting: 0,
-    departmentType: 'Revenue',
+    departmentType: DepartmentTypeEnum.Revenue,
     costingDepartmentTypeException: null
   },
   {
@@ -18,15 +18,15 @@ const mockData: IDepartment[] = [
     description: 'FAMILY PRACTICE',
     name: '59 - 0101 - FAMILY PRACTICE',
     isClaimsCosting: 0,
-    departmentType: 'Revenue',
+    departmentType: DepartmentTypeEnum.Revenue,
     costingDepartmentTypeException: {
       costingDepartmentExceptionTypeId: 665,
       departmentId: 20841,
       costingConfigGuid: '862a9552-8c68-4bae-b3fa-74454e7a9ecb',
       departmentTypeEnum: 1,
-      costingDepartmentType: 'Revenue',
-      deptExceptionTypeName: R2O,
-      deptExceptionType: ExceptionTypeEnums.R2O
+      costingDepartmentType: DepartmentTypeEnum.Revenue,
+      deptExceptionTypeName: ExceptionNameEnum.RevenueToOverhead,
+      deptExceptionType: ExceptionTypeEnum.RevenueToOverhead
     }
   },
   {
@@ -36,7 +36,7 @@ const mockData: IDepartment[] = [
     name: '08_12__F03MBS12_LFF__ - 08_12__1403 MED BLDG S12_LIC FEE 1n1o7__',
     isClaimsCosting: 0,
 
-    departmentType: 'Overhead',
+    departmentType: DepartmentTypeEnum.Overhead,
     costingDepartmentTypeException: null
   },
   {
@@ -45,15 +45,15 @@ const mockData: IDepartment[] = [
     description: '08_10__20 CLMS ADJ LN 20A S10___',
     name: '08_10__20CAJS10___ - 08_10__20 CLMS ADJ LN 20A S10___',
     isClaimsCosting: 0,
-    departmentType: 'Overhead',
+    departmentType: DepartmentTypeEnum.Overhead,
     costingDepartmentTypeException: {
       costingDepartmentExceptionTypeId: 18326,
       departmentId: 50256,
       costingConfigGuid: '862a9552-8c68-4bae-b3fa-74454e7a9ecb',
       departmentTypeEnum: 2,
-      costingDepartmentType: 'Overhead',
-      deptExceptionTypeName: O2E,
-      deptExceptionType: ExceptionTypeEnums.O2E
+      costingDepartmentType: DepartmentTypeEnum.Overhead,
+      deptExceptionTypeName: ExceptionNameEnum.OverheadToExcluded,
+      deptExceptionType: ExceptionTypeEnum.OverheadToExcluded
     }
   },
   {
@@ -62,15 +62,15 @@ const mockData: IDepartment[] = [
     description: 'Aloha Dental Facility Maintenance-Dental',
     name: '08106006581 - Aloha Dental Facility Maintenance-Dental',
     isClaimsCosting: 0,
-    departmentType: 'Overhead',
+    departmentType: DepartmentTypeEnum.Overhead,
     costingDepartmentTypeException: {
       costingDepartmentExceptionTypeId: 19810,
       departmentId: 1749,
       costingConfigGuid: '862a9552-8c68-4bae-b3fa-74454e7a9ecb',
       departmentTypeEnum: 2,
-      costingDepartmentType: 'Overhead',
-      deptExceptionTypeName: O2R,
-      deptExceptionType: ExceptionTypeEnums.O2R
+      costingDepartmentType: DepartmentTypeEnum.Overhead,
+      deptExceptionTypeName: ExceptionNameEnum.OverheadToRevenue,
+      deptExceptionType: ExceptionTypeEnum.OverheadToRevenue
     }
   }
 ];

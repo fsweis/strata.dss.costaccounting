@@ -7,16 +7,13 @@ import { departmentCategorizationService } from './data/departmentCategorization
 import { CostConfigContext } from '../shared/data/CostConfigContext';
 import _ from 'lodash';
 import { IDepartment } from './data/IDepartment';
-import OverheadDepartments from './OverheadDepartments';
-import RevenueDepartments from './RevenueDepartments';
+import FilteredDepartments from './FilteredDepartments';
 import DepartmentExceptions from './DepartmentExceptions';
+import { DepartmentTypeEnum } from './enums/DepartmentTypeEnum';
 
 const DepartmentCategorization: React.FC = () => {
   const [departments, setDepartments] = useState<IDepartment[]>([]);
-
   const [gridLoading, setGridLoading] = useState<boolean>(false);
-  const [overheadDepartmentData, setOverheadDepartmentData] = useState<IDepartment[]>([]);
-  const [revenueDepartmentData, setRevenueDepartmentData] = useState<IDepartment[]>([]);
   const { costConfig } = useContext(CostConfigContext);
 
   useEffect(() => {
@@ -24,18 +21,6 @@ const DepartmentCategorization: React.FC = () => {
       try {
         const departmentArray = await departmentCategorizationService.getDepartmentExceptions();
         setDepartments(departmentArray);
-
-        const overheadDepartments = departmentArray.filter((dept) => dept.departmentType === 'Overhead');
-        const overriddenFromOverheadDepartments = filterDeptArray(departmentArray, 'Overhead', true);
-        const overriddenToOverheadDepartments = filterDeptArray(departmentArray, 'Overhead', false);
-        const overheadDepartmentsToDisplay = overheadDepartments.filter((dept) => !overriddenFromOverheadDepartments.includes(dept)).concat(overriddenToOverheadDepartments);
-        setOverheadDepartmentData(overheadDepartmentsToDisplay);
-
-        const revenueDepartments = departmentArray.filter((dept) => dept.departmentType === 'Revenue');
-        const overriddenFromRevenueDepartments = filterDeptArray(departmentArray, 'Revenue', true);
-        const overriddenToRevenueDepartments = filterDeptArray(departmentArray, 'Revenue', false);
-        const revenueDepartmentsToDisplay = revenueDepartments.filter((dept) => !overriddenFromRevenueDepartments.includes(dept)).concat(overriddenToRevenueDepartments);
-        setRevenueDepartmentData(revenueDepartmentsToDisplay);
       } finally {
         setGridLoading(false);
       }
@@ -43,26 +28,6 @@ const DepartmentCategorization: React.FC = () => {
     setGridLoading(true);
     fetchData();
   }, [costConfig]);
-
-  const filterDeptArray = (departmentArray: IDepartment[], deptType: string, overridden: boolean) => {
-    if (overridden) {
-      return departmentArray.filter(
-        (dept) =>
-          dept.departmentType === deptType &&
-          dept.costingDepartmentTypeException !== null &&
-          dept.costingDepartmentTypeException !== undefined &&
-          !dept.costingDepartmentTypeException.deptExceptionTypeName.includes('to ' + deptType)
-      );
-    } else {
-      return departmentArray.filter(
-        (dept) =>
-          dept.departmentType !== deptType &&
-          dept.costingDepartmentTypeException !== null &&
-          dept.costingDepartmentTypeException !== undefined &&
-          dept.costingDepartmentTypeException.deptExceptionTypeName.includes('to ' + deptType)
-      );
-    }
-  };
 
   return (
     <>
@@ -89,10 +54,10 @@ const DepartmentCategorization: React.FC = () => {
           <DepartmentExceptions departments={departments} gridLoading={gridLoading}></DepartmentExceptions>
         </Tabs.TabPane>
         <Tabs.TabPane key='2' tab='Overhead'>
-          <OverheadDepartments overheadDepartments={overheadDepartmentData}></OverheadDepartments>
+          <FilteredDepartments departments={departments} departmentType={DepartmentTypeEnum.Overhead}></FilteredDepartments>
         </Tabs.TabPane>
         <Tabs.TabPane key='3' tab='Revenue'>
-          <RevenueDepartments revenueDepartments={revenueDepartmentData}></RevenueDepartments>
+          <FilteredDepartments departments={departments} departmentType={DepartmentTypeEnum.Revenue}></FilteredDepartments>
         </Tabs.TabPane>
       </Tabs>
     </>
