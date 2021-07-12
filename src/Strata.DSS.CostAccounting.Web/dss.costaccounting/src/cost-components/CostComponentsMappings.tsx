@@ -14,6 +14,8 @@ import Toast from '@strata/tempo/lib/toast';
 import * as CostComponentMappingsConstants from './constants/CostComponentMappingsConstants';
 import Drawer from '@strata/tempo/lib/drawer';
 import { ICostingConfig } from '../shared/data/ICostingConfig';
+import RouteConfirm from '@strata/tempo/lib/routeconfirm';
+import { getEmptyGuid } from '../shared/Utils';
 
 export interface ICostComponentsMappingsProps {
   costingConfig: ICostingConfig | undefined;
@@ -208,6 +210,14 @@ const CostComponentsMappings: React.FC<ICostComponentsMappingsProps> = (props: I
     //TODO: wait for platform to determine how logic will operate here.
   };
 
+  const handleCellEdit = (costComponent: ICostComponent) => {
+    //add to updated drivers
+    if (!updatedCostComponents.includes(costComponent)) {
+      const costComponentToUpdate = [costComponent].concat(updatedCostComponents);
+      setUpdatedCostComponents(costComponentToUpdate);
+    }
+  };
+
   return (
     <>
       <ActionBar
@@ -240,6 +250,7 @@ const CostComponentsMappings: React.FC<ICostComponentsMappingsProps> = (props: I
         ref={gridRef}
         value={gridCostComponents}
         onCellClick={handleCellClick}
+        onCellEdit={(e) => handleCellEdit(e.rowData)}
       >
         <DataGrid.RowNumber />
         <DataGrid.Column header='Name' field='name' filter width={280} editable sortable align='left' isCellClickable={() => false} />
@@ -295,6 +306,12 @@ const CostComponentsMappings: React.FC<ICostComponentsMappingsProps> = (props: I
       >
         stuff goes in here. Wait for Platform team to build it out.
       </Drawer>
+      <RouteConfirm
+        showPrompt={updatedCostComponents.length > 0 || deletedCostComponentsGuids.length > 0 || gridCostComponents.some((d) => d.costComponentGuid === getEmptyGuid())}
+        title={'Discard unsaved changes?'}
+        okText={'Discard Changes'}
+        cancelText={'Keep Changes'}
+      />
     </>
   );
 };
