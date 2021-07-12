@@ -81,16 +81,22 @@ export const departmentCategorizationService = {
     return Promise.resolve(mockData);
   },
 
-  // getMicroservice: async (id: number): Promise<IMicroservice> => {
-  //   //return await httpGet<IMicroservice>(`id=${id}`);
-  //   return Promise.resolve(mockData.find((item) => item.microserviceId === id));
-  // },
+  saveDepartementExceptions: async (updatedExceptions: IDepartment[], deletedExceptions: number[]): Promise<IDepartment[]> => {
+    console.log(updatedExceptions, deletedExceptions);
+    deletedExceptions.forEach(function (departmentId) {
+      const delIndex = mockData.findIndex((x) => x.departmentId === departmentId);
+      if (delIndex > -1) {
+        mockData.splice(delIndex, 1);
+      }
+    });
+    updatedExceptions.forEach(function (department) {
+      const depIndex = mockData.findIndex((x) => x.departmentId === department.departmentId);
+      if (depIndex > -1) {
+        mockData.splice(depIndex, 1);
+      }
+    });
+    mockData.push(...updatedExceptions);
 
-  saveMicroservice: async (department: IDepartment): Promise<IDepartment> => {
-    if (department.departmentId === 0) {
-      mockData.push(department);
-      department.departmentId = mockData.length;
-    }
-    return Promise.resolve(department);
+    return Promise.resolve(mockData);
   }
 };

@@ -5,7 +5,6 @@ import Tabs from '@strata/tempo/lib/tabs';
 import ButtonMenu from '@strata/tempo/lib/buttonmenu';
 import { departmentCategorizationService } from './data/departmentCategorizationService';
 import { CostConfigContext } from '../shared/data/CostConfigContext';
-import _ from 'lodash';
 import { IDepartment } from './data/IDepartment';
 import FilteredDepartments from './FilteredDepartments';
 import DepartmentExceptions from './DepartmentExceptions';

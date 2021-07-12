@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import Button from '@strata/tempo/lib/button';
 import DataGrid from '@strata/tempo/lib/datagrid';
 import { IDepartment } from './data/IDepartment';
 import { DepartmentTypeEnum } from './enums/DepartmentTypeEnum';
@@ -48,13 +47,7 @@ const FilteredDepartments: React.FC<IFilteredDepartmentsProps> = (props: IFilter
       <DataGrid
         value={filteredDepartmentData}
         pager={{
-          pageSize: 100,
-          extra: (
-            <>
-              <Button>Cancel</Button>
-              <Button type='primary'>Save</Button>
-            </>
-          )
+          pageSize: 100
         }}
       >
         <DataGrid.RowNumber />
