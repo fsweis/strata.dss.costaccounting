@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
+import { useCookies } from 'react-cookie';
 import Menu from '@strata/tempo/lib/menu';
 import ButtonMenu from '@strata/tempo/lib/buttonmenu';
 import { ICostingConfig, newCostConfig } from './data/ICostingConfig';
@@ -19,21 +20,48 @@ const CostMenu: React.FC<ICostMenuProps> = ({ costingConfigsFiltered, costingCon
   const history = useHistory();
   const location = useLocation();
   const viewAndManageModels = 'ViewAndManageModels';
+  const [cookies, setCookie] = useCookies(['strata-costaccounting']);
 
   useEffect(() => {
     const pathConfigGuid = getPathConfigGuid(location.pathname);
 
+    const updateCostingConfig = (config: ICostingConfig) => {
+      setSelectedCostingConfigItem(config);
+      setCookie('CostingConfigGuid', config.costingConfigGuid, { path: '/' });
+    };
+
+    const getDefaultConfig = () => {
+      //get last modified config
+      const arraySort = [...costingConfigsFiltered].sort((a: ICostingConfig, b: ICostingConfig) => {
+        return new Date(b.modifiedAtUtc).getTime() - new Date(a.modifiedAtUtc).getTime();
+      });
+      return arraySort[0];
+    };
+
     if (pathConfigGuid !== '') {
       const config = costingConfigs.find((c) => c.costingConfigGuid === pathConfigGuid);
       if (config && config !== selectedCostingConfigItem) {
-        setSelectedCostingConfigItem(config);
+        updateCostingConfig(config);
       }
     } else {
       if (costingConfigsFiltered.length) {
-        setSelectedCostingConfigItem(costingConfigsFiltered[0]);
+        //check cookie
+        if (cookies.CostingConfigGuid) {
+          const cookieConfig = costingConfigsFiltered.find((c) => c.costingConfigGuid === cookies.CostingConfigGuid);
+          if (cookieConfig && cookieConfig !== selectedCostingConfigItem) {
+            //found last config in cookie
+            updateCostingConfig(cookieConfig);
+          } else if (cookieConfig !== selectedCostingConfigItem) {
+            //last config in cookie invalid, set default
+            updateCostingConfig(getDefaultConfig());
+          }
+        } else {
+          //cookie not found, set default
+          updateCostingConfig(getDefaultConfig());
+        }
       }
     }
-  }, [costingConfigs, costingConfigsFiltered, location, selectedCostingConfigItem]);
+  }, [costingConfigs, costingConfigsFiltered, location, cookies.CostingConfigGuid, selectedCostingConfigItem, setCookie]);
 
   const getActiveUrlKey = () => {
     const currentLocation = '/' + location.pathname.split('/')[1];
