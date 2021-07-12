@@ -110,7 +110,7 @@ const StatisticDrivers: React.FC = () => {
     if (await validateStatisticDrivers()) {
       const guids = updatedDrivers
         .filter((sd) => !deletedDriverGuids.includes(sd.driverConfigGuid))
-        .map(function (sd) {
+        .map((sd) => {
           return sd.driverConfigGuid;
         });
 

@@ -58,7 +58,7 @@ const CostComponentsMappings: React.FC<ICostComponentsMappingsProps> = (props: I
     if (await validateCostComponent()) {
       const guids = updatedCostComponents
         .filter((cc) => !deletedCostComponentsGuids.includes(cc.costComponentGuid))
-        .map(function (cc) {
+        .map((cc) => {
           return cc.costComponentGuid;
         });
 
@@ -211,7 +211,7 @@ const CostComponentsMappings: React.FC<ICostComponentsMappingsProps> = (props: I
   };
 
   const handleCellEdit = (costComponent: ICostComponent) => {
-    //add to updated drivers
+    //add to updated cost components
     if (!updatedCostComponents.includes(costComponent)) {
       const costComponentToUpdate = [costComponent].concat(updatedCostComponents);
       setUpdatedCostComponents(costComponentToUpdate);
