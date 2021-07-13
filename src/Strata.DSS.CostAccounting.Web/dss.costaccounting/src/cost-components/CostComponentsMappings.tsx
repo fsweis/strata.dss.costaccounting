@@ -291,7 +291,7 @@ const CostComponentsMappings: React.FC<ICostComponentsMappingsProps> = (props: I
         title={drawerTitle}
         visible={drawerVisible}
         width={400}
-        onClose={() => handleDrawerCancel}
+        onClose={() => handleDrawerCancel()}
         footer={
           <>
             <Button onClick={handleDrawerCancel}>Cancel</Button>
