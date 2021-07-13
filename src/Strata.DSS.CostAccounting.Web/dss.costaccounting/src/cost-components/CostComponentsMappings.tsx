@@ -33,7 +33,6 @@ const CostComponentsMappings: React.FC<ICostComponentsMappingsProps> = (props: I
   const [drawerTitle, setDrawerTitle] = React.useState<string>('');
 
   useEffect(() => {
-    console.log('use dat effect');
     const fetchData = async () => {
       try {
         setLoading(true);
