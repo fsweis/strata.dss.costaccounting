@@ -11,7 +11,7 @@ import Tooltip from '@strata/tempo/lib/tooltip';
 import { cloneDeep } from 'lodash';
 import Modal from '@strata/tempo/lib/modal';
 import Toast from '@strata/tempo/lib/toast';
-import { MappingFieldNameEnums, MappingFriendlyNameEnums } from './constants/CostComponentMappingsConstants';
+import { MappingFieldNameEnums, MappingFriendlyNameEnums } from './enums/CostComponentMappingEnums';
 import Drawer from '@strata/tempo/lib/drawer';
 import { ICostingConfig } from '../shared/data/ICostingConfig';
 import RouteConfirm from '@strata/tempo/lib/routeconfirm';
