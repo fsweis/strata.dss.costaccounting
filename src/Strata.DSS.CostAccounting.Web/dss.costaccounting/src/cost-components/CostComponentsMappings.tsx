@@ -16,6 +16,7 @@ import Drawer from '@strata/tempo/lib/drawer';
 import { ICostingConfig } from '../shared/data/ICostingConfig';
 import RouteConfirm from '@strata/tempo/lib/routeconfirm';
 import { getEmptyGuid } from '../shared/Utils';
+import { costComponentService } from './data/costComponentService';
 
 export interface ICostComponentsMappingsProps {
   costingConfig: ICostingConfig | undefined;
@@ -36,12 +37,8 @@ const CostComponentsMappings: React.FC<ICostComponentsMappingsProps> = (props: I
     const fetchData = async () => {
       try {
         setLoading(true);
-        const costComponents: ICostComponent[] = [
-          { costComponentGuid: '123', name: 'CostComponent Numero Uno', accounts: [], jobCodes: [], payCodes: [], rollup: '', usingCompensation: false },
-          { costComponentGuid: '456', name: 'Get Kate a passport', accounts: [], jobCodes: [], payCodes: [], rollup: '', usingCompensation: true }
-        ];
-        //const costComponents = await CostComponentService.getCostComponentMappings();
-        //TODO: implement this once the api is built out.
+
+        const costComponents = await costComponentService.getCostComponentMappings();
 
         setCostComponents(costComponents);
         setGridCostComponents(cloneDeep(costComponents));
