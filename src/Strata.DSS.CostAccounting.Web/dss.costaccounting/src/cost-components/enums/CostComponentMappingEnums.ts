@@ -6,6 +6,6 @@ export enum MappingFriendlyNameEnums {
 
 export enum MappingFieldNameEnums {
   Accounts = 'accounts',
-  JobCodes = 'jobcodes',
-  PayCodes = 'paycodes'
+  JobCodes = 'jobCodes',
+  PayCodes = 'payCodes'
 }

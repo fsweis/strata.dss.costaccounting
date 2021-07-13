@@ -182,9 +182,10 @@ const CostComponentsMappings: React.FC<ICostComponentsMappingsProps> = (props: I
 
   const handleCellClick = (cellArgs: any) => {
     let title = '';
+
     if (cellArgs.field === MappingFieldNameEnums.Accounts) {
       title = MappingFriendlyNameEnums.Accounts;
-    } else if (cellArgs.field === MappingFriendlyNameEnums.JobCodes) {
+    } else if (cellArgs.field === MappingFieldNameEnums.JobCodes) {
       title = MappingFriendlyNameEnums.JobCodes;
     } else if (cellArgs.field === MappingFieldNameEnums.PayCodes) {
       title = MappingFriendlyNameEnums.PayCodes;
