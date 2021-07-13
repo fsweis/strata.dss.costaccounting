@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState } from 'react';
 import Button from '@strata/tempo/lib/button';
 import Tooltip from '@strata/tempo/lib/tooltip';
 import ActionBar from '@strata/tempo/lib/actionbar';
@@ -6,34 +6,29 @@ import DataGrid from '@strata/tempo/lib/datagrid';
 import Modal from '@strata/tempo/lib/modal';
 import Toast from '@strata/tempo/lib/toast';
 import { usePageLoader } from '@strata/tempo/lib/pageloader';
-import DropDown, { DropDownValue } from '@strata/tempo/lib/dropdown';
+import DropDown from '@strata/tempo/lib/dropdown';
 import { ICostingDepartmentExceptionType } from './data/ICostingDepartmentExceptionType';
 import { ICostingDepartmentTypeException } from './data/ICostingDepartmentTypeException';
 import { IDepartment, newDepartment } from './data/IDepartment';
 import { ExceptionNameEnum } from './enums/ExceptionNameEnum';
 import { ExceptionTypeEnum } from './enums/ExceptionTypeEnum';
-import { debounce } from 'lodash';
 import { DepartmentTypeEnum } from './enums/DepartmentTypeEnum';
 import { departmentCategorizationService } from './data/departmentCategorizationService';
-import { CostConfigContext } from '../shared/data/CostConfigContext';
 export interface IDepartmentExceptionsProps {
   departments: IDepartment[];
   gridLoading: boolean;
 }
 const DepartmentExceptions: React.FC<IDepartmentExceptionsProps> = (props: IDepartmentExceptionsProps) => {
-  //const [searchValue, setSearchValue] = React.useState(false);
-  const [searchLoading, setSearchLoading] = React.useState(false);
-  //const [searchItems, setSearchItems] = React.useState<IDepartment[]>([]);
+  const { departments, gridLoading } = props;
   const [deletedExceptions, setDeletedExceptions] = useState<number[]>([]);
   const [exceptionDepartmentData, setExceptionDepartmentData] = useState<IDepartment[]>([]);
   const [updatedExceptions, setUpdatedExceptions] = useState<IDepartment[]>([]);
   const gridRef = React.useRef<DataGrid>(null);
   const { setLoading } = usePageLoader();
-  const { costConfig } = useContext(CostConfigContext);
 
   useEffect(() => {
-    setExceptionDepartmentData(props.departments.filter((dept) => dept.costingDepartmentTypeException !== undefined && dept.costingDepartmentTypeException !== null));
-  }, [props.departments]);
+    setExceptionDepartmentData(departments.filter((dept) => dept.costingDepartmentTypeException !== undefined && dept.costingDepartmentTypeException !== null));
+  }, [departments]);
 
   const handleAddRow = () => {
     const newDept: IDepartment = newDepartment();
@@ -51,7 +46,6 @@ const DepartmentExceptions: React.FC<IDepartmentExceptionsProps> = (props: IDepa
   };
 
   const filterDepartments = (cellValue: number, filterValue: string) => {
-    console.log('Filter value ' + filterValue, 'Cell value ' + cellValue);
     if (typeof filterValue === 'string' && filterValue.trim() !== '' && filterValue.trim() !== '-') {
       filterValue = filterValue.toLowerCase().trim();
     } else {
@@ -64,7 +58,6 @@ const DepartmentExceptions: React.FC<IDepartmentExceptionsProps> = (props: IDepa
     const department = exceptionDepartmentData.find((dept) => dept.departmentId === cellValue);
 
     if (department !== undefined) {
-      console.log('Department Id and name:' + department?.departmentId, department?.name, 'found?:' + (department.name.indexOf(filterValue) > -1));
       return department.name.toLowerCase().indexOf(filterValue.toLowerCase()) > -1;
     }
     return false;
@@ -115,20 +108,21 @@ const DepartmentExceptions: React.FC<IDepartmentExceptionsProps> = (props: IDepa
     return items;
   };
 
-  const handleDepartmentChange = (newValue: DropDownValue, currentValue: number) => {
-    //TODO: CAN DUPLICATE EXCEPTIONS BE SAVED?
-    let selectedValue = exceptionDepartmentData.find((d) => d.departmentId === newValue);
-
-    if (selectedValue === undefined) {
-      selectedValue = props.departments.find((d) => d.departmentId === newValue);
-      if (selectedValue !== undefined) {
-        const updatedExceptionDepartments = [selectedValue].concat(exceptionDepartmentData).filter((d) => d.departmentId !== currentValue);
-        setExceptionDepartmentData(updatedExceptionDepartments);
-        //add to updated exceptions
-        if (!updatedExceptions.includes(selectedValue)) {
-          const exceptionsToUpdate = [selectedValue].concat(updatedExceptions);
-          setUpdatedExceptions(exceptionsToUpdate);
-        }
+  const handleDepartmentChange = (newDepartmentId: number, oldDepartment: IDepartment) => {
+    // Can't add exception if there is already an exception
+    // Dropdown should prevent this from happening?
+    if (exceptionDepartmentData.find((d) => d.departmentId === newDepartmentId)) {
+      return;
+    }
+    // Get selected department
+    const selectedDepartment = departments.find((d) => d.departmentId === newDepartmentId);
+    if (selectedDepartment) {
+      const updatedExceptionDepartments = [selectedDepartment].concat(exceptionDepartmentData).filter((d) => d.departmentId !== oldDepartment.departmentId);
+      setExceptionDepartmentData(updatedExceptionDepartments);
+      //add to updated exceptions
+      if (!updatedExceptions.includes(selectedDepartment)) {
+        const exceptionsToUpdate = [selectedDepartment].concat(updatedExceptions);
+        setUpdatedExceptions(exceptionsToUpdate);
       }
     }
   };
@@ -164,25 +158,6 @@ const DepartmentExceptions: React.FC<IDepartmentExceptionsProps> = (props: IDepa
     }
   };
 
-  const handleSearch = (search: string) => {
-    //setSearchValue(true);
-    setSearchLoading(true);
-    ///setSearchItems([]);
-
-    if (search.trim().length === 0) {
-      //setSearchValue(false);
-      setSearchLoading(false);
-      return;
-    }
-    // start API simulation
-    setTimeout(() => {
-      //setSearchItems([]);
-      setSearchLoading(false);
-    }, 1000);
-    // end API simulation
-  };
-  const handleSearchWithDebounce = useMemo(() => debounce(handleSearch, 500), []);
-
   const handleCancel = () => {
     if (updatedExceptions.length > 0 || deletedExceptions.length > 0) {
       Modal.confirm({
@@ -193,7 +168,7 @@ const DepartmentExceptions: React.FC<IDepartmentExceptionsProps> = (props: IDepa
           if (exceptionDepartmentData) {
             setUpdatedExceptions([]);
             setDeletedExceptions([]);
-            setExceptionDepartmentData(props.departments.filter((dept) => dept.costingDepartmentTypeException !== undefined && dept.costingDepartmentTypeException !== null));
+            setExceptionDepartmentData(departments.filter((dept) => dept.costingDepartmentTypeException !== undefined && dept.costingDepartmentTypeException !== null));
           }
           Toast.show({
             message: 'Changes discarded'
@@ -208,7 +183,6 @@ const DepartmentExceptions: React.FC<IDepartmentExceptionsProps> = (props: IDepa
       const saveExceptions = updatedExceptions.filter((dept) => !deletedExceptions.includes(dept.departmentId));
       // Don't actually save if there are no changes
       if (!saveExceptions.length && !deletedExceptions.length) {
-        // TODO: Get exact language here
         Toast.show({
           toastType: 'info',
           message: 'No changes to save'
@@ -229,7 +203,6 @@ const DepartmentExceptions: React.FC<IDepartmentExceptionsProps> = (props: IDepa
           message: 'Changes saved'
         });
       } catch (error) {
-        // TODO: Get exact language here
         Modal.alert({
           title: 'Changes not saved',
           content: 'Try again later. If the problem persists, contact your system administrator.',
@@ -284,7 +257,7 @@ const DepartmentExceptions: React.FC<IDepartmentExceptionsProps> = (props: IDepa
         ref={gridRef}
         dataKey='departmentCode'
         value={exceptionDepartmentData}
-        loading={props.gridLoading}
+        loading={gridLoading}
         pager={{
           pageSize: 100,
           extra: (
@@ -307,19 +280,17 @@ const DepartmentExceptions: React.FC<IDepartmentExceptionsProps> = (props: IDepa
           width={480}
           itemValueField='departmentId'
           itemTextField='name'
-          items={props.departments}
+          items={departments}
           body={(rowData) => (
             <>
-              <DropDown //TODo change this to a server side search
-                onChange={(value) => handleDepartmentChange(value, rowData.departmentId)}
-                width={480}
+              <DropDown //TODO change this to a server side search
                 value={rowData.departmentId !== 0 ? rowData.departmentId : ''}
+                onChange={(value) => handleDepartmentChange(value as number, rowData)}
+                width={480}
                 itemValueField='departmentId'
                 itemTextField='name'
-                items={props.departments}
+                items={departments}
                 showSearch
-                onSearch={handleSearchWithDebounce}
-                notFoundContent={searchLoading ? 'Searching...' : 'Search by name or code'}
               />
             </>
           )}
@@ -341,7 +312,7 @@ const DepartmentExceptions: React.FC<IDepartmentExceptionsProps> = (props: IDepa
             <>
               <DropDown
                 width={200}
-                onChange={(value) => handleExceptionTypeChange(+value, rowData)}
+                onChange={(value) => handleExceptionTypeChange(value as number, rowData)}
                 items={getExceptionTypeOptions(rowData.departmentType)}
                 itemValueField='value'
                 itemTextField='text'
