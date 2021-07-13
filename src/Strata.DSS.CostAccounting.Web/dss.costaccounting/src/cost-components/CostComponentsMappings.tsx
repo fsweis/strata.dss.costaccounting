@@ -250,8 +250,8 @@ const CostComponentsMappings: React.FC<ICostComponentsMappingsProps> = (props: I
         onCellEdit={(e) => handleCellEdit(e.rowData)}
       >
         <DataGrid.RowNumber />
-        <DataGrid.Column header='Name' field='name' filter width={280} editable sortable align='left' isCellClickable={() => false} />
-        <DataGrid.Column header='Accounts' field='accounts' filter width={200} sortable isCellClickable={() => true} customCellValue={(cellArgs) => renderMultipleSelection(cellArgs.row.accounts)} />
+        <DataGrid.Column header='Name' field='name' filter width={280} editable align='left' isCellClickable={() => false} />
+        <DataGrid.Column header='Accounts' field='accounts' filter width={200} isCellClickable={() => true} customCellValue={(cellArgs) => renderMultipleSelection(cellArgs.row.accounts)} />
         <DataGrid.Column header='Job Code' field='jobCodes' filter width={200} isCellClickable={() => true} customCellValue={(cellArgs) => renderMultipleSelection(cellArgs.row.jobCodes)} />
         <DataGrid.Column header='Pay Code' field='payCodes' filter width={200} isCellClickable={() => true} customCellValue={(cellArgs) => renderMultipleSelection(cellArgs.row.payCodes)} />
         <DataGrid.Column
