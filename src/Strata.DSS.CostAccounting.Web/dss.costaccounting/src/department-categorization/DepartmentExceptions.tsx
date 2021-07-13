@@ -81,16 +81,18 @@ const DepartmentExceptions: React.FC<IDepartmentExceptionsProps> = (props: IDepa
       case DepartmentTypeEnum.Revenue:
         items = [
           { text: ExceptionNameEnum.RevenueToExcluded, value: ExceptionTypeEnum.RevenueToExcluded },
-          { text: ExceptionNameEnum.RevenueToOverhead, value: ExceptionTypeEnum.RevenueToOverhead },
-          { text: ExceptionNameEnum.OverheadToExcluded, value: ExceptionTypeEnum.OverheadToExcluded },
-          { text: ExceptionNameEnum.ExcludedToOverhead, value: ExceptionTypeEnum.ExcludedToOverhead }
+          { text: ExceptionNameEnum.RevenueToOverhead, value: ExceptionTypeEnum.RevenueToOverhead }
         ];
         break;
       case DepartmentTypeEnum.Overhead:
         items = [
-          { text: ExceptionNameEnum.RevenueToExcluded, value: ExceptionTypeEnum.RevenueToExcluded },
           { text: ExceptionNameEnum.OverheadToRevenue, value: ExceptionTypeEnum.OverheadToRevenue },
-          { text: ExceptionNameEnum.OverheadToExcluded, value: ExceptionTypeEnum.OverheadToExcluded },
+          { text: ExceptionNameEnum.OverheadToExcluded, value: ExceptionTypeEnum.OverheadToExcluded }
+        ];
+        break;
+      case DepartmentTypeEnum.Excluded:
+        items = [
+          { text: ExceptionNameEnum.ExcludedToOverhead, value: ExceptionTypeEnum.ExcludedToOverhead },
           { text: ExceptionNameEnum.ExcludedToRevenue, value: ExceptionTypeEnum.ExcludedToRevenue }
         ];
         break;
