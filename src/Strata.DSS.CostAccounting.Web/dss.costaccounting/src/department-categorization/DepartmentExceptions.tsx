@@ -8,39 +8,42 @@ import Toast from '@strata/tempo/lib/toast';
 import { usePageLoader } from '@strata/tempo/lib/pageloader';
 import DropDown from '@strata/tempo/lib/dropdown';
 import { ICostingDepartmentExceptionType } from './data/ICostingDepartmentExceptionType';
-import { ICostingDepartmentTypeException } from './data/ICostingDepartmentTypeException';
-import { IDepartment, newDepartment } from './data/IDepartment';
+import { ICostingDepartmentTypeException, newDepartmentException } from './data/ICostingDepartmentTypeException';
+import { IDepartment } from './data/IDepartment';
 import { ExceptionNameEnum } from './enums/ExceptionNameEnum';
 import { ExceptionTypeEnum } from './enums/ExceptionTypeEnum';
+import { DepartmentNameEnum } from './enums/DepartmentNameEnum';
 import { DepartmentTypeEnum } from './enums/DepartmentTypeEnum';
 import { departmentCategorizationService } from './data/departmentCategorizationService';
 export interface IDepartmentExceptionsProps {
+  departmentExceptions: ICostingDepartmentTypeException[];
   departments: IDepartment[];
   gridLoading: boolean;
+  costingConfigGuid: string;
 }
 const DepartmentExceptions: React.FC<IDepartmentExceptionsProps> = (props: IDepartmentExceptionsProps) => {
-  const { departments, gridLoading } = props;
-  const [deletedExceptions, setDeletedExceptions] = useState<number[]>([]);
-  const [exceptionDepartmentData, setExceptionDepartmentData] = useState<IDepartment[]>([]);
-  const [updatedExceptions, setUpdatedExceptions] = useState<IDepartment[]>([]);
+  const { departmentExceptions, gridLoading, departments, costingConfigGuid } = props;
+  const [deletedDepartmentIds, setDeletedDepartmentIds] = useState<number[]>([]);
+  const [updatedDepartmentIds, setUpdatedDepartmentIds] = useState<number[]>([]);
+  const [exceptionDepartmentData, setExceptionDepartmentData] = useState<ICostingDepartmentTypeException[]>([]);
   const gridRef = React.useRef<DataGrid>(null);
   const { setLoading } = usePageLoader();
 
   useEffect(() => {
-    setExceptionDepartmentData(departments.filter((dept) => dept.costingDepartmentTypeException !== undefined && dept.costingDepartmentTypeException !== null));
-  }, [departments]);
+    setExceptionDepartmentData(departmentExceptions);
+  }, [departmentExceptions]);
 
   const handleAddRow = () => {
-    const newDept: IDepartment = newDepartment();
+    const newException: ICostingDepartmentTypeException = newDepartmentException();
     if (exceptionDepartmentData !== undefined) {
-      const updatedDepartExceptions = [newDept].concat(exceptionDepartmentData);
+      const updatedDepartExceptions = [newException].concat(exceptionDepartmentData);
       setExceptionDepartmentData(updatedDepartExceptions);
     }
   };
 
   const handleDelete = (departmentId: number) => {
-    const departmentsToDelete = [departmentId].concat(deletedExceptions);
-    setDeletedExceptions(departmentsToDelete);
+    const departmentsToDelete = [departmentId].concat(deletedDepartmentIds);
+    setDeletedDepartmentIds(departmentsToDelete);
     const updatedExceptionList = exceptionDepartmentData.filter((dept) => dept !== null && dept.departmentId !== departmentId);
     setExceptionDepartmentData(updatedExceptionList);
   };
@@ -63,7 +66,7 @@ const DepartmentExceptions: React.FC<IDepartmentExceptionsProps> = (props: IDepa
     return false;
   };
 
-  const filterExceptionTypes = (cellValue: ICostingDepartmentTypeException, filterValue: string) => {
+  const filterExceptionTypes = (cellValue: string, filterValue: string) => {
     if (typeof filterValue === 'string' && filterValue.trim() !== '' && filterValue.trim() !== '-') {
       filterValue = filterValue.toLowerCase().trim();
     } else {
@@ -72,25 +75,25 @@ const DepartmentExceptions: React.FC<IDepartmentExceptionsProps> = (props: IDepa
     if (cellValue === undefined || cellValue === null) {
       return false;
     }
-    return cellValue.deptExceptionTypeName.toLowerCase().indexOf(filterValue.toLowerCase()) > -1;
+    return cellValue.toLowerCase().indexOf(filterValue.toLowerCase()) > -1;
   };
 
   const getExceptionTypeOptions = (departmentType: string) => {
     let items: ICostingDepartmentExceptionType[];
     switch (departmentType) {
-      case DepartmentTypeEnum.Revenue:
+      case DepartmentNameEnum.Revenue:
         items = [
           { text: ExceptionNameEnum.RevenueToExcluded, value: ExceptionTypeEnum.RevenueToExcluded },
           { text: ExceptionNameEnum.RevenueToOverhead, value: ExceptionTypeEnum.RevenueToOverhead }
         ];
         break;
-      case DepartmentTypeEnum.Overhead:
+      case DepartmentNameEnum.Overhead:
         items = [
           { text: ExceptionNameEnum.OverheadToRevenue, value: ExceptionTypeEnum.OverheadToRevenue },
           { text: ExceptionNameEnum.OverheadToExcluded, value: ExceptionTypeEnum.OverheadToExcluded }
         ];
         break;
-      case DepartmentTypeEnum.Excluded:
+      case DepartmentNameEnum.Excluded:
         items = [
           { text: ExceptionNameEnum.ExcludedToOverhead, value: ExceptionTypeEnum.ExcludedToOverhead },
           { text: ExceptionNameEnum.ExcludedToRevenue, value: ExceptionTypeEnum.ExcludedToRevenue }
@@ -110,67 +113,89 @@ const DepartmentExceptions: React.FC<IDepartmentExceptionsProps> = (props: IDepa
     return items;
   };
 
-  const handleDepartmentChange = (newDepartmentId: number, oldDepartment: IDepartment) => {
+  const handleDepartmentChange = (newDepartmentId: number, exception: ICostingDepartmentTypeException) => {
     // Can't add exception if there is already an exception
     // Dropdown should prevent this from happening?
     if (exceptionDepartmentData.find((d) => d.departmentId === newDepartmentId)) {
+      Modal.alert({
+        title: 'Department Categorization',
+        content: 'An exception for department ' + exception.name + ' already exists.'
+      });
       return;
     }
     // Get selected department
     const selectedDepartment = departments.find((d) => d.departmentId === newDepartmentId);
+
     if (selectedDepartment) {
-      const updatedExceptionDepartments = [selectedDepartment].concat(exceptionDepartmentData).filter((d) => d.departmentId !== oldDepartment.departmentId);
-      setExceptionDepartmentData(updatedExceptionDepartments);
-      //add to updated exceptions
-      if (!updatedExceptions.includes(selectedDepartment)) {
-        const exceptionsToUpdate = [selectedDepartment].concat(updatedExceptions);
-        setUpdatedExceptions(exceptionsToUpdate);
-      }
-    }
-  };
-
-  const handleExceptionTypeChange = (selectedExceptionTypeValue: number, department: IDepartment) => {
-    const exceptionOptions = getExceptionTypeOptions(department.departmentType);
-    const exceptionItem = exceptionOptions.find((x) => x.value === selectedExceptionTypeValue);
-    if (department !== undefined) {
-      const costingDepartmentTypeException = {
-        costingDepartmentExceptionTypeId: department.costingDepartmentTypeException ? department.costingDepartmentTypeException.costingDepartmentExceptionTypeId : 0,
-        departmentId: department.departmentId,
-        costingConfigGuid: department.costingDepartmentTypeException ? department.costingDepartmentTypeException.costingConfigGuid : '',
-        departmentTypeEnum: department.costingDepartmentTypeException ? department.costingDepartmentTypeException.departmentTypeEnum : 0,
-        costingDepartmentType: department.costingDepartmentTypeException ? department.costingDepartmentTypeException.costingDepartmentType : '',
-        deptExceptionTypeName: exceptionItem ? exceptionItem.text : '',
-        deptExceptionType: selectedExceptionTypeValue
-      };
-
-      const updatedExceptionDepartments = exceptionDepartmentData.map((exception) => {
-        if (exception.departmentId === department.departmentId) {
-          return { ...exception, costingDepartmentTypeException: costingDepartmentTypeException };
+      const updatedDepartmentExceptions = exceptionDepartmentData.map((exc) => {
+        if (exc === exception) {
+          return {
+            ...exc,
+            departmentId: selectedDepartment.departmentId,
+            originalDepartmentType: selectedDepartment.departmentType,
+            name: selectedDepartment.name,
+            costingConfigGuid: costingConfigGuid,
+            deptExceptionTypeName: '',
+            deptExceptionType: 0,
+            departmentTypeEnum: 0
+          };
         }
-        return exception;
+        return exc;
       });
-      setExceptionDepartmentData(updatedExceptionDepartments);
+      setExceptionDepartmentData(updatedDepartmentExceptions);
       //add to updated exceptions
-      const updateIndex = updatedExceptions.findIndex((dept) => dept.departmentId === department.departmentId);
-      if (updateIndex > -1) {
-        updatedExceptions.splice(updateIndex, 1);
+      if (!updatedDepartmentIds.includes(exception.departmentId)) {
+        const exceptionsToUpdate = [exception.departmentId].concat(updatedDepartmentIds);
+        setUpdatedDepartmentIds(exceptionsToUpdate);
       }
-      updatedExceptions.push(...updatedExceptionDepartments.filter((x) => x.departmentId === department.departmentId));
-      setUpdatedExceptions(updatedExceptions);
     }
   };
 
+  const handleExceptionTypeChange = (selectedExceptionTypeValue: number, exception: ICostingDepartmentTypeException) => {
+    const exceptionOptions = getExceptionTypeOptions(exception.originalDepartmentType);
+    const exceptionItem = exceptionOptions.find((x) => x.value === selectedExceptionTypeValue);
+    if (exception !== undefined && exceptionItem !== undefined) {
+      const updatedDepartmentExceptions = exceptionDepartmentData.map((exc) => {
+        if (exc === exception) {
+          return {
+            ...exc,
+            deptExceptionTypeName: exceptionItem.text,
+            deptExceptionType: selectedExceptionTypeValue,
+            departmentTypeEnum: getDepartmentExceptionType(exc.originalDepartmentType, exceptionItem.text)
+          };
+        }
+        return exc;
+      });
+      setExceptionDepartmentData(updatedDepartmentExceptions);
+    }
+
+    //add to updated exceptions
+    const updateIndex = updatedDepartmentIds.findIndex((id) => id === exception.departmentId);
+    if (updateIndex === -1) {
+      updatedDepartmentIds.push(exception.departmentId);
+      setUpdatedDepartmentIds(updatedDepartmentIds);
+    }
+  };
+  const getDepartmentExceptionType = (originalDepartmentType: string, exceptionDepartmentType: string) => {
+    if (originalDepartmentType === DepartmentNameEnum.Revenue && exceptionDepartmentType === ExceptionNameEnum.RevenueToOverhead) return DepartmentTypeEnum.Overhead;
+    if (originalDepartmentType === DepartmentNameEnum.Revenue && exceptionDepartmentType === ExceptionNameEnum.RevenueToExcluded) return DepartmentTypeEnum.Excluded;
+    if (originalDepartmentType === DepartmentNameEnum.Overhead && exceptionDepartmentType === ExceptionNameEnum.OverheadToRevenue) return DepartmentTypeEnum.Revenue;
+    if (originalDepartmentType === DepartmentNameEnum.Overhead && exceptionDepartmentType === ExceptionNameEnum.OverheadToExcluded) return DepartmentTypeEnum.Excluded;
+    if (originalDepartmentType === DepartmentNameEnum.Excluded && exceptionDepartmentType === ExceptionNameEnum.ExcludedToRevenue) return DepartmentTypeEnum.Revenue;
+    if (originalDepartmentType === DepartmentNameEnum.Excluded && exceptionDepartmentType === ExceptionNameEnum.ExcludedToOverhead) return DepartmentTypeEnum.Overhead;
+    return 0;
+  };
   const handleCancel = () => {
-    if (updatedExceptions.length > 0 || deletedExceptions.length > 0) {
+    if (updatedDepartmentIds.length > 0 || deletedDepartmentIds.length > 0) {
       Modal.confirm({
         title: 'Discard unsaved changes?',
         okText: 'Discard Changes',
         cancelText: 'Keep Changes',
         onOk() {
           if (exceptionDepartmentData) {
-            setUpdatedExceptions([]);
-            setDeletedExceptions([]);
-            setExceptionDepartmentData(departments.filter((dept) => dept.costingDepartmentTypeException !== undefined && dept.costingDepartmentTypeException !== null));
+            setUpdatedDepartmentIds([]);
+            setDeletedDepartmentIds([]);
+            setExceptionDepartmentData(departmentExceptions);
           }
           Toast.show({
             message: 'Changes discarded'
@@ -181,10 +206,13 @@ const DepartmentExceptions: React.FC<IDepartmentExceptionsProps> = (props: IDepa
   };
 
   const handleSave = async () => {
-    if (await validateStatisticDrivers()) {
-      const saveExceptions = updatedExceptions.filter((dept) => !deletedExceptions.includes(dept.departmentId));
+    if (await validateDepartmentExceptions()) {
+      const saveDepartmentIds = updatedDepartmentIds.filter((departmentId) => !deletedDepartmentIds.includes(departmentId));
+
+      const updatedExceptions = exceptionDepartmentData.filter((d) => saveDepartmentIds.includes(d.departmentId) || d.costingDepartmentExceptionTypeId === 0);
+
       // Don't actually save if there are no changes
-      if (!saveExceptions.length && !deletedExceptions.length) {
+      if (!saveDepartmentIds.length && !deletedDepartmentIds.length) {
         Toast.show({
           toastType: 'info',
           message: 'No changes to save'
@@ -195,11 +223,10 @@ const DepartmentExceptions: React.FC<IDepartmentExceptionsProps> = (props: IDepa
       try {
         setLoading(true);
         //refresh stat drivers from return
-        const departmentExceptions = await departmentCategorizationService.saveDepartementExceptions(updatedExceptions, deletedExceptions);
+        const departmentExceptions = await departmentCategorizationService.saveDepartementExceptions(updatedExceptions, deletedDepartmentIds);
         setExceptionDepartmentData(departmentExceptions);
-        setExceptionDepartmentData(departmentExceptions.filter((dept) => dept.costingDepartmentTypeException !== undefined && dept.costingDepartmentTypeException !== null));
-        setUpdatedExceptions([]);
-        setDeletedExceptions([]);
+        setUpdatedDepartmentIds([]);
+        setDeletedDepartmentIds([]);
         Toast.show({
           toastType: 'success',
           message: 'Changes saved'
@@ -216,19 +243,18 @@ const DepartmentExceptions: React.FC<IDepartmentExceptionsProps> = (props: IDepa
     }
   };
 
-  const validateStatisticDrivers = async () => {
+  const validateDepartmentExceptions = async () => {
     if (!gridRef.current) {
       return false;
     }
     const invalidCells = await gridRef.current.validateGrid();
-
     if (invalidCells.length > 0) {
       const invalidKeys = invalidCells.map((cell) => cell.rowKey);
-      const invalidRows: { rowNumber: number; departmentCode: string }[] = exceptionDepartmentData
-        .map((dept, index) => {
-          return { departmentCode: dept.departmentCode, rowNumber: index };
+      const invalidRows: { rowNumber: number; name: string }[] = exceptionDepartmentData
+        .map((exception, index) => {
+          return { name: exception.name, rowNumber: index };
         })
-        .filter((r) => invalidKeys.includes(r.departmentCode));
+        .filter((r) => invalidKeys.includes(r.name));
 
       const rowNumbers = invalidRows.map((r) => r.rowNumber + 1);
       Modal.alert({
@@ -257,7 +283,7 @@ const DepartmentExceptions: React.FC<IDepartmentExceptionsProps> = (props: IDepa
       <DataGrid
         key='DepartmentExceptionGrid'
         ref={gridRef}
-        dataKey='departmentCode'
+        dataKey='name'
         value={exceptionDepartmentData}
         loading={gridLoading}
         pager={{
@@ -282,7 +308,7 @@ const DepartmentExceptions: React.FC<IDepartmentExceptionsProps> = (props: IDepa
           width={480}
           itemValueField='departmentId'
           itemTextField='name'
-          items={departments}
+          items={departmentExceptions}
           body={(rowData) => (
             <>
               <DropDown //TODO change this to a server side search
@@ -304,27 +330,31 @@ const DepartmentExceptions: React.FC<IDepartmentExceptionsProps> = (props: IDepa
           ]}
         />
         <DataGrid.DropDownColumn
-          field='costingDepartmentTypeException'
+          field='deptExceptionTypeName'
           header='Exception Type'
           filter
           filterMatchMode='custom'
           filterFunction={filterExceptionTypes}
           width={240}
-          body={(rowData) => (
+          body={(rowData: ICostingDepartmentTypeException) => (
             <>
-              <DropDown
-                width={200}
-                onChange={(value) => handleExceptionTypeChange(value as number, rowData)}
-                items={getExceptionTypeOptions(rowData.departmentType)}
-                itemValueField='value'
-                itemTextField='text'
-                value={rowData.costingDepartmentTypeException?.deptExceptionTypeName || ''}
-              />
+              <Tooltip title={rowData.departmentId === 0 ? 'Select a department' : ''}>
+                <DropDown
+                  width={200}
+                  onChange={(value) => handleExceptionTypeChange(value as number, rowData)}
+                  items={getExceptionTypeOptions(rowData.originalDepartmentType)}
+                  itemValueField='value'
+                  itemTextField='text'
+                  disabled={rowData.departmentId === 0}
+                  value={rowData.deptExceptionTypeName || ''}
+                />
+              </Tooltip>
             </>
           )}
           validationRules={[
             {
-              required: true
+              required: true,
+              type: 'string'
             }
           ]}
         />

@@ -1,5 +1,3 @@
-import { ICostingDepartmentTypeException } from './ICostingDepartmentTypeException';
-
 export interface IDepartment {
   departmentId: number;
   departmentCode: string;
@@ -7,7 +5,6 @@ export interface IDepartment {
   description: string;
   name: string;
   isClaimsCosting: number;
-  costingDepartmentTypeException: ICostingDepartmentTypeException | null;
 }
 
 export const newDepartment = (department: Partial<IDepartment> = {}): IDepartment => {
@@ -18,16 +15,7 @@ export const newDepartment = (department: Partial<IDepartment> = {}): IDepartmen
       description: '',
       name: '',
       isClaimsCosting: 0,
-      departmentType: '',
-      costingDepartmentTypeException: {
-        costingDepartmentExceptionTypeId: 0,
-        departmentId: 0,
-        costingConfigGuid: '',
-        departmentTypeEnum: 0,
-        costingDepartmentType: '',
-        deptExceptionTypeName: '',
-        deptExceptionType: 0
-      }
+      departmentType: ''
     },
     ...department
   };

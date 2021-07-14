@@ -8,18 +8,35 @@ import { CostConfigContext } from '../shared/data/CostConfigContext';
 import { IDepartment } from './data/IDepartment';
 import FilteredDepartments from './FilteredDepartments';
 import DepartmentExceptions from './DepartmentExceptions';
-import { DepartmentTypeEnum } from './enums/DepartmentTypeEnum';
+import { DepartmentNameEnum } from './enums/DepartmentNameEnum';
+import { ICostingDepartmentTypeException } from './data/ICostingDepartmentTypeException';
+import { cloneDeep } from 'lodash';
 
 const DepartmentCategorization: React.FC = () => {
-  const [departments, setDepartments] = useState<IDepartment[]>([]);
   const [gridLoading, setGridLoading] = useState<boolean>(false);
   const { costConfig } = useContext(CostConfigContext);
+  const [departmentExceptions, setDepartmentExceptions] = useState<ICostingDepartmentTypeException[]>([]);
+  const [tempDepartmentExceptions, setTempDepartmentExceptions] = useState<ICostingDepartmentTypeException[]>([]);
+  const [departments, setDepartments] = useState<IDepartment[]>([]);
+  const [overheadDepartments, setOverheadDepartments] = useState<IDepartment[]>([]);
+  const [revenueDepartments, setRevenueDepartments] = useState<IDepartment[]>([]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const departmentArray = await departmentCategorizationService.getDepartmentExceptions();
-        setDepartments(departmentArray);
+        if (costConfig) {
+          const [departmentExceptionData, overheadDepartmentData, revenueDepartmentData, departmentData] = await Promise.all([
+            departmentCategorizationService.getDepartmentExceptions(costConfig.costingConfigGuid),
+            departmentCategorizationService.getDepartmentsByType(costConfig.costingConfigGuid, DepartmentNameEnum.Overhead),
+            departmentCategorizationService.getDepartmentsByType(costConfig.costingConfigGuid, DepartmentNameEnum.Revenue),
+            departmentCategorizationService.getDepartments(costConfig.costingConfigGuid)
+          ]);
+          setDepartmentExceptions(departmentExceptionData);
+          setOverheadDepartments(overheadDepartmentData);
+          setRevenueDepartments(revenueDepartmentData);
+          setTempDepartmentExceptions(cloneDeep(departmentExceptionData));
+          setDepartments(departmentData);
+        }
       } finally {
         setGridLoading(false);
       }
@@ -50,13 +67,18 @@ const DepartmentCategorization: React.FC = () => {
       />
       <Tabs defaultActiveKey='1'>
         <Tabs.TabPane key='1' tab='Exceptions'>
-          <DepartmentExceptions departments={departments} gridLoading={gridLoading}></DepartmentExceptions>
+          <DepartmentExceptions
+            departmentExceptions={departmentExceptions}
+            departments={departments}
+            gridLoading={gridLoading}
+            costingConfigGuid={costConfig ? costConfig.costingConfigGuid : ''}
+          ></DepartmentExceptions>
         </Tabs.TabPane>
         <Tabs.TabPane key='2' tab='Overhead'>
-          <FilteredDepartments departments={departments} departmentType={DepartmentTypeEnum.Overhead}></FilteredDepartments>
+          <FilteredDepartments departments={overheadDepartments} departmentType={DepartmentNameEnum.Overhead}></FilteredDepartments>
         </Tabs.TabPane>
         <Tabs.TabPane key='3' tab='Revenue'>
-          <FilteredDepartments departments={departments} departmentType={DepartmentTypeEnum.Revenue}></FilteredDepartments>
+          <FilteredDepartments departments={revenueDepartments} departmentType={DepartmentNameEnum.Revenue}></FilteredDepartments>
         </Tabs.TabPane>
       </Tabs>
     </>

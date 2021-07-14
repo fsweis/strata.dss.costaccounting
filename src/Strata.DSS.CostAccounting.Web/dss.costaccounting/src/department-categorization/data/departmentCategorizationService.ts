@@ -1,16 +1,17 @@
 import { IDepartment } from './IDepartment';
 import { ExceptionNameEnum } from '../enums/ExceptionNameEnum';
 import { ExceptionTypeEnum } from '../enums/ExceptionTypeEnum';
-import { DepartmentTypeEnum } from '../enums/DepartmentTypeEnum';
-const mockData: IDepartment[] = [
+import { DepartmentNameEnum } from '../enums/DepartmentNameEnum';
+import { ICostingDepartmentTypeException } from './ICostingDepartmentTypeException';
+
+const mockDepartmentData: IDepartment[] = [
   {
     departmentId: 20929,
     departmentCode: 'Commercial',
     description: 'Line of Business for Claims Costing',
     name: 'Commercial - Line of Business for Claims Costing',
     isClaimsCosting: 0,
-    departmentType: DepartmentTypeEnum.Revenue,
-    costingDepartmentTypeException: null
+    departmentType: DepartmentNameEnum.Revenue
   },
   {
     departmentId: 20841,
@@ -18,16 +19,7 @@ const mockData: IDepartment[] = [
     description: 'FAMILY PRACTICE',
     name: '59 - 0101 - FAMILY PRACTICE',
     isClaimsCosting: 0,
-    departmentType: DepartmentTypeEnum.Revenue,
-    costingDepartmentTypeException: {
-      costingDepartmentExceptionTypeId: 665,
-      departmentId: 20841,
-      costingConfigGuid: '862a9552-8c68-4bae-b3fa-74454e7a9ecb',
-      departmentTypeEnum: 1,
-      costingDepartmentType: DepartmentTypeEnum.Revenue,
-      deptExceptionTypeName: ExceptionNameEnum.RevenueToOverhead,
-      deptExceptionType: ExceptionTypeEnum.RevenueToOverhead
-    }
+    departmentType: DepartmentNameEnum.Revenue
   },
   {
     departmentId: 50208,
@@ -36,8 +28,7 @@ const mockData: IDepartment[] = [
     name: '08_12__F03MBS12_LFF__ - 08_12__1403 MED BLDG S12_LIC FEE 1n1o7__',
     isClaimsCosting: 0,
 
-    departmentType: DepartmentTypeEnum.Overhead,
-    costingDepartmentTypeException: null
+    departmentType: DepartmentNameEnum.Overhead
   },
   {
     departmentId: 50256,
@@ -45,16 +36,7 @@ const mockData: IDepartment[] = [
     description: '08_10__20 CLMS ADJ LN 20A S10___',
     name: '08_10__20CAJS10___ - 08_10__20 CLMS ADJ LN 20A S10___',
     isClaimsCosting: 0,
-    departmentType: DepartmentTypeEnum.Overhead,
-    costingDepartmentTypeException: {
-      costingDepartmentExceptionTypeId: 18326,
-      departmentId: 50256,
-      costingConfigGuid: '862a9552-8c68-4bae-b3fa-74454e7a9ecb',
-      departmentTypeEnum: 2,
-      costingDepartmentType: DepartmentTypeEnum.Overhead,
-      deptExceptionTypeName: ExceptionNameEnum.OverheadToExcluded,
-      deptExceptionType: ExceptionTypeEnum.OverheadToExcluded
-    }
+    departmentType: DepartmentNameEnum.Overhead
   },
   {
     departmentId: 1749,
@@ -62,41 +44,75 @@ const mockData: IDepartment[] = [
     description: 'Aloha Dental Facility Maintenance-Dental',
     name: '08106006581 - Aloha Dental Facility Maintenance-Dental',
     isClaimsCosting: 0,
-    departmentType: DepartmentTypeEnum.Overhead,
-    costingDepartmentTypeException: {
-      costingDepartmentExceptionTypeId: 19810,
-      departmentId: 1749,
-      costingConfigGuid: '862a9552-8c68-4bae-b3fa-74454e7a9ecb',
-      departmentTypeEnum: 2,
-      costingDepartmentType: DepartmentTypeEnum.Overhead,
-      deptExceptionTypeName: ExceptionNameEnum.OverheadToRevenue,
-      deptExceptionType: ExceptionTypeEnum.OverheadToRevenue
-    }
+    departmentType: DepartmentNameEnum.Overhead
+  }
+];
+
+const mockExceptionData: ICostingDepartmentTypeException[] = [
+  {
+    costingDepartmentExceptionTypeId: 665,
+    departmentId: 20841,
+    costingConfigGuid: '862a9552-8c68-4bae-b3fa-74454e7a9ecb',
+    name: '59 - 0101 - FAMILY PRACTICE',
+    departmentTypeEnum: 1,
+    originalDepartmentType: DepartmentNameEnum.Revenue,
+    deptExceptionTypeName: ExceptionNameEnum.RevenueToOverhead,
+    deptExceptionType: ExceptionTypeEnum.RevenueToOverhead
+  },
+  {
+    costingDepartmentExceptionTypeId: 18326,
+    departmentId: 50256,
+    costingConfigGuid: '862a9552-8c68-4bae-b3fa-74454e7a9ecb',
+    name: '08_10__20CAJS10___ - 08_10__20 CLMS ADJ LN 20A S10___',
+    departmentTypeEnum: 2,
+    originalDepartmentType: DepartmentNameEnum.Overhead,
+    deptExceptionTypeName: ExceptionNameEnum.OverheadToExcluded,
+    deptExceptionType: ExceptionTypeEnum.OverheadToExcluded
+  },
+  {
+    costingDepartmentExceptionTypeId: 19810,
+    departmentId: 1749,
+    costingConfigGuid: '862a9552-8c68-4bae-b3fa-74454e7a9ecb',
+    name: '08106006581 - Aloha Dental Facility Maintenance-Dental',
+    departmentTypeEnum: 0,
+    originalDepartmentType: DepartmentNameEnum.Overhead,
+    deptExceptionTypeName: ExceptionNameEnum.OverheadToRevenue,
+    deptExceptionType: ExceptionTypeEnum.OverheadToRevenue
   }
 ];
 
 export const departmentCategorizationService = {
-  getDepartmentExceptions: (): Promise<IDepartment[]> => {
+  getDepartmentExceptions: (costConfigGuid: string): Promise<ICostingDepartmentTypeException[]> => {
     //return httpGet<IMicroservice[]>('list');
-    return Promise.resolve(mockData);
+    return Promise.resolve(mockExceptionData);
   },
 
-  saveDepartementExceptions: async (updatedExceptions: IDepartment[], deletedExceptions: number[]): Promise<IDepartment[]> => {
-    console.log(updatedExceptions, deletedExceptions);
-    deletedExceptions.forEach(function (departmentId) {
-      const delIndex = mockData.findIndex((x) => x.departmentId === departmentId);
-      if (delIndex > -1) {
-        mockData.splice(delIndex, 1);
-      }
-    });
-    updatedExceptions.forEach(function (department) {
-      const depIndex = mockData.findIndex((x) => x.departmentId === department.departmentId);
-      if (depIndex > -1) {
-        mockData.splice(depIndex, 1);
-      }
-    });
-    mockData.push(...updatedExceptions);
+  getDepartmentsByType: (costingConfigGuid: string, departmentType: DepartmentNameEnum): Promise<IDepartment[]> => {
+    const filterDepartments = mockDepartmentData.filter((dept) => dept.departmentType === departmentType);
+    return Promise.resolve(filterDepartments);
+  },
 
-    return Promise.resolve(mockData);
+  getDepartments: (costingConfigGuid: string): Promise<IDepartment[]> => {
+    return Promise.resolve(mockDepartmentData);
+  },
+
+  saveDepartementExceptions: async (updatedExceptions: ICostingDepartmentTypeException[], deletedExceptions: number[]): Promise<ICostingDepartmentTypeException[]> => {
+    deletedExceptions.forEach(function (departmentId) {
+      const delIndex = mockExceptionData.findIndex((x) => x.departmentId === departmentId);
+      if (delIndex > -1) {
+        mockExceptionData.splice(delIndex, 1);
+      }
+    });
+    updatedExceptions.forEach(function (exception) {
+      const exceptionIndex = mockExceptionData.findIndex((x) => x.departmentId === exception.departmentId);
+      if (exceptionIndex > -1) {
+        mockExceptionData[exceptionIndex] = exception;
+      } else {
+        mockExceptionData.unshift(exception);
+      }
+    });
+    //mockExceptionData.push(...updatedExceptions);
+
+    return Promise.resolve(mockExceptionData);
   }
 };
