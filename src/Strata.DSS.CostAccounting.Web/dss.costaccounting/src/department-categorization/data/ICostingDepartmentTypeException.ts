@@ -1,4 +1,7 @@
+import { getNewGuid } from '../../shared/Utils';
+
 export interface ICostingDepartmentTypeException {
+  displayId: string;
   costingDepartmentExceptionTypeId: number;
   departmentId: number;
   costingConfigGuid: string;
@@ -11,6 +14,7 @@ export interface ICostingDepartmentTypeException {
 export const newDepartmentException = (exception: Partial<ICostingDepartmentTypeException> = {}): ICostingDepartmentTypeException => {
   return {
     ...{
+      displayId: getNewGuid(),
       costingDepartmentExceptionTypeId: 0,
       departmentId: 0,
       costingConfigGuid: '',

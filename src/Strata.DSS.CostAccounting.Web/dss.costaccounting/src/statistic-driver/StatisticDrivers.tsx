@@ -14,10 +14,10 @@ import Text from '@strata/tempo/lib/text';
 import { usePageLoader } from '@strata/tempo/lib/pageloader';
 import { ICellEditorArgs } from '@strata/tempo/lib/datacolumn';
 import { IStatisticDriverSaveData } from './data/IStatisticDriverSaveData';
-import { IStatisticDriver } from './data/IStatisticDriver';
+import { IStatisticDriver, newStatisticDriver } from './data/IStatisticDriver';
 import { statisticDriverService } from './data/statisticDriverService';
 import { IDataSourceLink } from './data/IDataSourceLink';
-import { getEmptyGuid } from '../shared/Utils';
+import { getEmptyGuid, getNewGuid } from '../shared/Utils';
 import cloneDeep from 'lodash/cloneDeep';
 import { IDataSource } from '../shared/data/IDataSource';
 import PatientDriverTreeModal from './PatientDriverTreeModal';
@@ -82,16 +82,8 @@ const StatisticDrivers: React.FC = () => {
   };
 
   const handleAdd = () => {
-    const newDriver: IStatisticDriver = {
-      driverConfigGuid: emptyGuid,
-      dataTableGuid: '',
-      measureGuid: '',
-      hasRules: false,
-      isInverted: false,
-      isUsed: false,
-      name: '',
-      costingType: costConfig?.type ?? 0
-    };
+    const newDriver: IStatisticDriver = newStatisticDriver();
+    newDriver.costingType = costConfig?.type ?? 0;
 
     if (tempStatDrivers !== undefined) {
       const drivers = [newDriver].concat(tempStatDrivers);
@@ -160,7 +152,7 @@ const StatisticDrivers: React.FC = () => {
       const invalidKeys = invalidCells.map((cell) => cell.rowKey);
       const invalidRows: { rowNumber: number; guid: string }[] = tempStatDrivers
         .map((driver, index) => {
-          return { guid: driver.driverConfigGuid, rowNumber: index };
+          return { guid: driver.displayId, rowNumber: index };
         })
         .filter((r) => invalidKeys.includes(r.guid));
 
@@ -204,9 +196,9 @@ const StatisticDrivers: React.FC = () => {
     return measureGuids.includes(cellValue);
   };
 
-  const updateDropDownDrivers = (driverConfigGuid: string, measureGuid: string) => {
+  const updateDropDownDrivers = (displayId: string, measureGuid: string) => {
     const updatedDrivers = tempStatDrivers.map((driver) => {
-      if (driver.driverConfigGuid === driverConfigGuid) {
+      if (driver.displayId === displayId) {
         return { ...driver, measureGuid: measureGuid };
       }
       return driver;
@@ -227,13 +219,13 @@ const StatisticDrivers: React.FC = () => {
       cellEditorArgs.rowData.dataTableGuid = value;
       const defaultValue = dataSourceLinks.filter((x) => x.dataTableGuid === value && x.isFirstSelect === true);
       if (defaultValue !== undefined && defaultValue.length > 0) {
-        const updatedDrivers = updateDropDownDrivers(cellEditorArgs.rowData.driverConfigGuid, defaultValue[0].measureGuid);
+        const updatedDrivers = updateDropDownDrivers(cellEditorArgs.rowData.displayId, defaultValue[0].measureGuid);
         //need to refresh grid data
         setTempStatDrivers(updatedDrivers);
       } else {
         const nonDefaultValue = dataSourceLinks.filter((x) => x.dataTableGuid === value);
         if (nonDefaultValue !== undefined && nonDefaultValue.length > 0) {
-          const updatedDrivers = updateDropDownDrivers(cellEditorArgs.rowData.driverConfigGuid, nonDefaultValue[0].measureGuid);
+          const updatedDrivers = updateDropDownDrivers(cellEditorArgs.rowData.displayId, nonDefaultValue[0].measureGuid);
           //need to refresh grid data
           setTempStatDrivers(updatedDrivers);
         }
@@ -317,7 +309,7 @@ const StatisticDrivers: React.FC = () => {
         ref={gridRef}
         value={tempStatDrivers}
         scrollable
-        dataKey='driverConfigGuid'
+        dataKey='displayId'
         onCellEdit={(e) => handleCellEdit(e.rowData.driverConfigGuid)}
         pager={{
           pageSize: 100,

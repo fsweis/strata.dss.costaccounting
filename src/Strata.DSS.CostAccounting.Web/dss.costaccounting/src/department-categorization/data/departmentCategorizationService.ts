@@ -3,7 +3,7 @@ import { ExceptionNameEnum } from '../enums/ExceptionNameEnum';
 import { ExceptionTypeEnum } from '../enums/ExceptionTypeEnum';
 import { DepartmentNameEnum } from '../enums/DepartmentNameEnum';
 import { ICostingDepartmentTypeException } from './ICostingDepartmentTypeException';
-
+import { getNewGuid } from '../../shared/Utils';
 const mockDepartmentData: IDepartment[] = [
   {
     departmentId: 20929,
@@ -50,6 +50,7 @@ const mockDepartmentData: IDepartment[] = [
 
 const mockExceptionData: ICostingDepartmentTypeException[] = [
   {
+    displayId: getNewGuid(),
     costingDepartmentExceptionTypeId: 665,
     departmentId: 20841,
     costingConfigGuid: '862a9552-8c68-4bae-b3fa-74454e7a9ecb',
@@ -60,6 +61,7 @@ const mockExceptionData: ICostingDepartmentTypeException[] = [
     deptExceptionType: ExceptionTypeEnum.RevenueToOverhead
   },
   {
+    displayId: getNewGuid(),
     costingDepartmentExceptionTypeId: 18326,
     departmentId: 50256,
     costingConfigGuid: '862a9552-8c68-4bae-b3fa-74454e7a9ecb',
@@ -70,6 +72,7 @@ const mockExceptionData: ICostingDepartmentTypeException[] = [
     deptExceptionType: ExceptionTypeEnum.OverheadToExcluded
   },
   {
+    displayId: getNewGuid(),
     costingDepartmentExceptionTypeId: 19810,
     departmentId: 1749,
     costingConfigGuid: '862a9552-8c68-4bae-b3fa-74454e7a9ecb',
@@ -111,7 +114,6 @@ export const departmentCategorizationService = {
         mockExceptionData.unshift(exception);
       }
     });
-    //mockExceptionData.push(...updatedExceptions);
 
     return Promise.resolve(mockExceptionData);
   }

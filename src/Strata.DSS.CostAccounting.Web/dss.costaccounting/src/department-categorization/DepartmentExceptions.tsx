@@ -14,15 +14,15 @@ import { ExceptionNameEnum } from './enums/ExceptionNameEnum';
 import { ExceptionTypeEnum } from './enums/ExceptionTypeEnum';
 import { DepartmentNameEnum } from './enums/DepartmentNameEnum';
 import { DepartmentTypeEnum } from './enums/DepartmentTypeEnum';
-import { departmentCategorizationService } from './data/departmentCategorizationService';
 export interface IDepartmentExceptionsProps {
   departmentExceptions: ICostingDepartmentTypeException[];
   departments: IDepartment[];
   gridLoading: boolean;
   costingConfigGuid: string;
+  saveDepartmentExceptions: (updatedExceptions: ICostingDepartmentTypeException[], deletedDepartmentIds: number[]) => void;
 }
 const DepartmentExceptions: React.FC<IDepartmentExceptionsProps> = (props: IDepartmentExceptionsProps) => {
-  const { departmentExceptions, gridLoading, departments, costingConfigGuid } = props;
+  const { departmentExceptions, gridLoading, departments, costingConfigGuid, saveDepartmentExceptions } = props;
   const [deletedDepartmentIds, setDeletedDepartmentIds] = useState<number[]>([]);
   const [updatedDepartmentIds, setUpdatedDepartmentIds] = useState<number[]>([]);
   const [exceptionDepartmentData, setExceptionDepartmentData] = useState<ICostingDepartmentTypeException[]>([]);
@@ -208,9 +208,7 @@ const DepartmentExceptions: React.FC<IDepartmentExceptionsProps> = (props: IDepa
   const handleSave = async () => {
     if (await validateDepartmentExceptions()) {
       const saveDepartmentIds = updatedDepartmentIds.filter((departmentId) => !deletedDepartmentIds.includes(departmentId));
-
       const updatedExceptions = exceptionDepartmentData.filter((d) => saveDepartmentIds.includes(d.departmentId) || d.costingDepartmentExceptionTypeId === 0);
-
       // Don't actually save if there are no changes
       if (!saveDepartmentIds.length && !deletedDepartmentIds.length) {
         Toast.show({
@@ -222,9 +220,7 @@ const DepartmentExceptions: React.FC<IDepartmentExceptionsProps> = (props: IDepa
 
       try {
         setLoading(true);
-        //refresh stat drivers from return
-        const departmentExceptions = await departmentCategorizationService.saveDepartementExceptions(updatedExceptions, deletedDepartmentIds);
-        setExceptionDepartmentData(departmentExceptions);
+        await saveDepartmentExceptions(updatedExceptions, deletedDepartmentIds);
         setUpdatedDepartmentIds([]);
         setDeletedDepartmentIds([]);
         Toast.show({
@@ -250,11 +246,11 @@ const DepartmentExceptions: React.FC<IDepartmentExceptionsProps> = (props: IDepa
     const invalidCells = await gridRef.current.validateGrid();
     if (invalidCells.length > 0) {
       const invalidKeys = invalidCells.map((cell) => cell.rowKey);
-      const invalidRows: { rowNumber: number; name: string }[] = exceptionDepartmentData
+      const invalidRows: { rowNumber: number; displayId: string }[] = exceptionDepartmentData
         .map((exception, index) => {
-          return { name: exception.name, rowNumber: index };
+          return { displayId: exception.displayId, rowNumber: index };
         })
-        .filter((r) => invalidKeys.includes(r.name));
+        .filter((r) => invalidKeys.includes(r.displayId));
 
       const rowNumbers = invalidRows.map((r) => r.rowNumber + 1);
       Modal.alert({
@@ -283,7 +279,7 @@ const DepartmentExceptions: React.FC<IDepartmentExceptionsProps> = (props: IDepa
       <DataGrid
         key='DepartmentExceptionGrid'
         ref={gridRef}
-        dataKey='name'
+        dataKey='displayId'
         value={exceptionDepartmentData}
         loading={gridLoading}
         pager={{
