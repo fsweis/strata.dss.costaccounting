@@ -111,14 +111,8 @@ const StatisticDrivers: React.FC = () => {
       const guids = updatedDriverGuids.filter((guid) => !deletedDriverGuids.includes(guid));
       const updatedStatDrivers = tempStatDrivers.filter((d) => guids.includes(d.driverConfigGuid) || d.driverConfigGuid === emptyGuid);
 
-      const statDriverSaveData: IStatisticDriverSaveData = {
-        updatedStatDrivers: updatedStatDrivers,
-        deletedStatDrivers: deletedDriverGuids,
-        costingType: costingConfig?.type ?? CostingType.PatientCare
-      };
-
       // Don't actually save if there are no changes
-      if (!statDriverSaveData.updatedStatDrivers.length && !statDriverSaveData.deletedStatDrivers.length) {
+      if (!updatedStatDrivers.length && !deletedDriverGuids.length) {
         // TODO: Get exact language here
         Toast.show({
           toastType: 'info',
@@ -126,6 +120,12 @@ const StatisticDrivers: React.FC = () => {
         });
         return;
       }
+
+      const statDriverSaveData: IStatisticDriverSaveData = {
+        updated: updatedStatDrivers,
+        deletedGuids: deletedDriverGuids,
+        costingType: costingConfig?.type ?? CostingType.PatientCare
+      };
 
       try {
         setLoading(true);
