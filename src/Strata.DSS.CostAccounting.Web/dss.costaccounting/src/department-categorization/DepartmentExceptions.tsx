@@ -350,7 +350,7 @@ const DepartmentExceptions: React.FC<IDepartmentExceptionsProps> = (props: IDepa
             <>
               {cellEditorArgs.rowData.departmentId !== 0 && (
                 <DropDown
-                  width={200}
+                  width={240}
                   onChange={(value) => handleExceptionTypeChange(value as number, cellEditorArgs.rowData)}
                   items={getExceptionTypeOptions(cellEditorArgs.rowData.originalDepartmentType)}
                   itemValueField='value'

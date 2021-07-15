@@ -4,7 +4,7 @@ import Button from '@strata/tempo/lib/button';
 import Tabs from '@strata/tempo/lib/tabs';
 import ButtonMenu from '@strata/tempo/lib/buttonmenu';
 import { departmentCategorizationService } from './data/departmentCategorizationService';
-import { CostConfigContext } from '../shared/data/CostConfigContext';
+import { CostingConfigContext } from '../shared/data/CostingConfigContext';
 import { IDepartment } from './data/IDepartment';
 import FilteredDepartments from './FilteredDepartments';
 import DepartmentExceptions from './DepartmentExceptions';
@@ -13,7 +13,7 @@ import { ICostingDepartmentTypeException } from './data/ICostingDepartmentTypeEx
 
 const DepartmentCategorization: React.FC = () => {
   const [gridLoading, setGridLoading] = useState<boolean>(false);
-  const { costConfig } = useContext(CostConfigContext);
+  const { costingConfig } = useContext(CostingConfigContext);
   const [departmentExceptions, setDepartmentExceptions] = useState<ICostingDepartmentTypeException[]>([]);
   const [departments, setDepartments] = useState<IDepartment[]>([]);
   const [overheadDepartments, setOverheadDepartments] = useState<IDepartment[]>([]);
@@ -22,12 +22,12 @@ const DepartmentCategorization: React.FC = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        if (costConfig) {
+        if (costingConfig) {
           const [departmentExceptionData, overheadDepartmentData, revenueDepartmentData, departmentData] = await Promise.all([
-            departmentCategorizationService.getDepartmentExceptions(costConfig.costingConfigGuid),
-            departmentCategorizationService.getDepartmentsByType(costConfig.costingConfigGuid, DepartmentNameEnum.Overhead),
-            departmentCategorizationService.getDepartmentsByType(costConfig.costingConfigGuid, DepartmentNameEnum.Revenue),
-            departmentCategorizationService.getDepartments(costConfig.costingConfigGuid)
+            departmentCategorizationService.getDepartmentExceptions(costingConfig.costingConfigGuid),
+            departmentCategorizationService.getDepartmentsByType(costingConfig.costingConfigGuid, DepartmentNameEnum.Overhead),
+            departmentCategorizationService.getDepartmentsByType(costingConfig.costingConfigGuid, DepartmentNameEnum.Revenue),
+            departmentCategorizationService.getDepartments(costingConfig.costingConfigGuid)
           ]);
           setDepartmentExceptions(departmentExceptionData);
           setOverheadDepartments(overheadDepartmentData);
@@ -40,15 +40,15 @@ const DepartmentCategorization: React.FC = () => {
     };
     setGridLoading(true);
     fetchData();
-  }, [costConfig]);
+  }, [costingConfig]);
 
   const fetchFilteredDepartments = async () => {
     try {
       setGridLoading(true);
-      if (costConfig) {
+      if (costingConfig) {
         const [overheadDepartmentData, revenueDepartmentData] = await Promise.all([
-          departmentCategorizationService.getDepartmentsByType(costConfig.costingConfigGuid, DepartmentNameEnum.Overhead),
-          departmentCategorizationService.getDepartmentsByType(costConfig.costingConfigGuid, DepartmentNameEnum.Revenue)
+          departmentCategorizationService.getDepartmentsByType(costingConfig.costingConfigGuid, DepartmentNameEnum.Overhead),
+          departmentCategorizationService.getDepartmentsByType(costingConfig.costingConfigGuid, DepartmentNameEnum.Revenue)
         ]);
         setOverheadDepartments(overheadDepartmentData);
         setRevenueDepartments(revenueDepartmentData);
@@ -91,7 +91,7 @@ const DepartmentCategorization: React.FC = () => {
             departmentExceptions={departmentExceptions}
             departments={departments}
             gridLoading={gridLoading}
-            costingConfigGuid={costConfig ? costConfig.costingConfigGuid : ''}
+            costingConfigGuid={costingConfig ? costingConfig.costingConfigGuid : ''}
             saveDepartmentExceptions={saveDepartementExceptions}
           ></DepartmentExceptions>
         </Tabs.TabPane>
