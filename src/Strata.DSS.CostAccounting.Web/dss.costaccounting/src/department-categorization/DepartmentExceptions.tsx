@@ -144,7 +144,6 @@ const DepartmentExceptions: React.FC<IDepartmentExceptionsProps> = (props: IDepa
         }
         return exc;
       });
-      console.log(updatedDepartmentExceptions);
       setExceptionDepartmentData(updatedDepartmentExceptions);
       //add to updated exceptions
       if (!updatedExceptionIds.includes(exception.displayId)) {
@@ -164,7 +163,7 @@ const DepartmentExceptions: React.FC<IDepartmentExceptionsProps> = (props: IDepa
             ...exc,
             deptExceptionTypeName: exceptionItem.text,
             deptExceptionType: selectedExceptionTypeValue,
-            departmentTypeEnum: getDepartmentExceptionType(exc.originalDepartmentType, exceptionItem.text)
+            departmentTypeEnum: getDepartmentExceptionType(exceptionItem.text)
           };
         }
         return exc;
@@ -179,14 +178,21 @@ const DepartmentExceptions: React.FC<IDepartmentExceptionsProps> = (props: IDepa
       setUpdatedExceptionIds(updatedExceptionIds);
     }
   };
-  const getDepartmentExceptionType = (originalDepartmentType: string, exceptionDepartmentType: string) => {
-    if (originalDepartmentType === DepartmentNameEnum.Revenue && exceptionDepartmentType === ExceptionNameEnum.RevenueToOverhead) return DepartmentTypeEnum.Overhead;
-    if (originalDepartmentType === DepartmentNameEnum.Revenue && exceptionDepartmentType === ExceptionNameEnum.RevenueToExcluded) return DepartmentTypeEnum.Excluded;
-    if (originalDepartmentType === DepartmentNameEnum.Overhead && exceptionDepartmentType === ExceptionNameEnum.OverheadToRevenue) return DepartmentTypeEnum.Revenue;
-    if (originalDepartmentType === DepartmentNameEnum.Overhead && exceptionDepartmentType === ExceptionNameEnum.OverheadToExcluded) return DepartmentTypeEnum.Excluded;
-    if (originalDepartmentType === DepartmentNameEnum.Excluded && exceptionDepartmentType === ExceptionNameEnum.ExcludedToRevenue) return DepartmentTypeEnum.Revenue;
-    if (originalDepartmentType === DepartmentNameEnum.Excluded && exceptionDepartmentType === ExceptionNameEnum.ExcludedToOverhead) return DepartmentTypeEnum.Overhead;
-    return DepartmentTypeEnum.Revenue;
+  const getDepartmentExceptionType = (exceptionDepartmentType: string) => {
+    switch (exceptionDepartmentType) {
+      case ExceptionNameEnum.OverheadToRevenue:
+      case ExceptionNameEnum.ExcludedToRevenue:
+        return DepartmentTypeEnum.Revenue;
+      case ExceptionNameEnum.ExcludedToOverhead:
+      case ExceptionNameEnum.RevenueToOverhead:
+        return DepartmentTypeEnum.Overhead;
+      case ExceptionNameEnum.OverheadToExcluded:
+      case ExceptionNameEnum.RevenueToExcluded:
+        return DepartmentTypeEnum.Excluded;
+      default:
+        //should never hit this
+        return DepartmentTypeEnum.Revenue;
+    }
   };
   const handleCancel = () => {
     if (updatedExceptionIds.length > 0 || deletedDepartmentIds.length > 0) {

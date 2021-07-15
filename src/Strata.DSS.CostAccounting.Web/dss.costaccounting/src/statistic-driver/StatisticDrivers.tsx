@@ -50,10 +50,8 @@ const StatisticDrivers: React.FC = () => {
           ]);
           setDataSources(dataSources);
           setDataSourceLinks(dataSourceLinks);
-          //initialized displayId for the grid
-          const newStatisticDrivers = statisticDrivers.map((d) => newStatisticDriver(d));
-          setStatDrivers(newStatisticDrivers);
-          setTempStatDrivers(cloneDeep(newStatisticDrivers));
+          setStatDrivers(statisticDrivers);
+          setTempStatDrivers(cloneDeep(statisticDrivers));
         }
       } finally {
         setGridLoading(false);

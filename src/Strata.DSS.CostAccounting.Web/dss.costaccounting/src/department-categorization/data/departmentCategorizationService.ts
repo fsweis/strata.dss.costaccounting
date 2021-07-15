@@ -87,6 +87,7 @@ const mockExceptionData: ICostingDepartmentTypeException[] = [
 export const departmentCategorizationService = {
   getDepartmentExceptions: (costConfigGuid: string): Promise<ICostingDepartmentTypeException[]> => {
     //return httpGet<IMicroservice[]>('list');
+    //TODO make sure to initialize the displayId //forEach((exc) => (exc.displayId = getNewGuid()));
     return Promise.resolve(mockExceptionData);
   },
 

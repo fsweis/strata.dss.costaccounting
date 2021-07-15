@@ -29,9 +29,7 @@ const DepartmentCategorization: React.FC = () => {
             departmentCategorizationService.getDepartmentsByType(costingConfig.costingConfigGuid, DepartmentNameEnum.Revenue),
             departmentCategorizationService.getDepartments(costingConfig.costingConfigGuid)
           ]);
-          //initialize displayId for the grid
-          const newDepartmentExceptions = departmentExceptionData.map((d) => newDepartmentException(d));
-          setDepartmentExceptions(newDepartmentExceptions);
+          setDepartmentExceptions(departmentExceptionData);
           setOverheadDepartments(overheadDepartmentData);
           setRevenueDepartments(revenueDepartmentData);
           setDepartments(departmentData);
