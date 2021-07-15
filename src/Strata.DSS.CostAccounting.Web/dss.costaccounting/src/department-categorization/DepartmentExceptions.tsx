@@ -58,7 +58,7 @@ const DepartmentExceptions: React.FC<IDepartmentExceptionsProps> = (props: IDepa
     } else {
       return true;
     }
-    if (cellValue === undefined || cellValue === null) {
+    if (cellValue === null) {
       return false;
     }
 
@@ -76,7 +76,7 @@ const DepartmentExceptions: React.FC<IDepartmentExceptionsProps> = (props: IDepa
     } else {
       return true;
     }
-    if (cellValue === undefined || cellValue === null) {
+    if (cellValue === null) {
       return false;
     }
     return cellValue.toLowerCase().indexOf(filterValue.toLowerCase()) > -1;
@@ -134,19 +134,17 @@ const DepartmentExceptions: React.FC<IDepartmentExceptionsProps> = (props: IDepa
     if (selectedDepartment) {
       const updatedDepartmentExceptions = exceptionDepartmentData.map((exc) => {
         if (exc === exception) {
-          return {
-            ...exc,
+          return newDepartmentException({
+            costingDepartmentExceptionTypeId: exc.costingDepartmentExceptionTypeId,
             departmentId: selectedDepartment.departmentId,
             originalDepartmentType: selectedDepartment.departmentType,
             name: selectedDepartment.name,
-            costingConfigGuid: costingConfigGuid,
-            deptExceptionTypeName: '',
-            deptExceptionType: 0,
-            departmentTypeEnum: 0
-          };
+            costingConfigGuid: costingConfigGuid
+          });
         }
         return exc;
       });
+      console.log(updatedDepartmentExceptions);
       setExceptionDepartmentData(updatedDepartmentExceptions);
       //add to updated exceptions
       if (!updatedExceptionIds.includes(exception.displayId)) {
@@ -159,7 +157,7 @@ const DepartmentExceptions: React.FC<IDepartmentExceptionsProps> = (props: IDepa
   const handleExceptionTypeChange = (selectedExceptionTypeValue: number, exception: ICostingDepartmentTypeException) => {
     const exceptionOptions = getExceptionTypeOptions(exception.originalDepartmentType);
     const exceptionItem = exceptionOptions.find((x) => x.value === selectedExceptionTypeValue);
-    if (exception !== undefined && exceptionItem !== undefined) {
+    if (exception !== null && exceptionItem !== undefined) {
       const updatedDepartmentExceptions = exceptionDepartmentData.map((exc) => {
         if (exc === exception) {
           return {
@@ -188,7 +186,7 @@ const DepartmentExceptions: React.FC<IDepartmentExceptionsProps> = (props: IDepa
     if (originalDepartmentType === DepartmentNameEnum.Overhead && exceptionDepartmentType === ExceptionNameEnum.OverheadToExcluded) return DepartmentTypeEnum.Excluded;
     if (originalDepartmentType === DepartmentNameEnum.Excluded && exceptionDepartmentType === ExceptionNameEnum.ExcludedToRevenue) return DepartmentTypeEnum.Revenue;
     if (originalDepartmentType === DepartmentNameEnum.Excluded && exceptionDepartmentType === ExceptionNameEnum.ExcludedToOverhead) return DepartmentTypeEnum.Overhead;
-    return 0;
+    return DepartmentTypeEnum.Revenue;
   };
   const handleCancel = () => {
     if (updatedExceptionIds.length > 0 || deletedDepartmentIds.length > 0) {

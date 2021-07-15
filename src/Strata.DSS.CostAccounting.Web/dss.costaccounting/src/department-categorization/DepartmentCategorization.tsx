@@ -98,10 +98,10 @@ const DepartmentCategorization: React.FC = () => {
           ></DepartmentExceptions>
         </Tabs.TabPane>
         <Tabs.TabPane key='2' tab='Overhead'>
-          <FilteredDepartments departments={overheadDepartments} departmentType={DepartmentNameEnum.Overhead}></FilteredDepartments>
+          <FilteredDepartments departments={overheadDepartments}></FilteredDepartments>
         </Tabs.TabPane>
         <Tabs.TabPane key='3' tab='Revenue'>
-          <FilteredDepartments departments={revenueDepartments} departmentType={DepartmentNameEnum.Revenue}></FilteredDepartments>
+          <FilteredDepartments departments={revenueDepartments}></FilteredDepartments>
         </Tabs.TabPane>
       </Tabs>
     </>
