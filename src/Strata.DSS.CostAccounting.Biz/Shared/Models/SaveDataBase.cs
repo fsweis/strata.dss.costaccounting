@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Strata.DSS.CostAccounting.Biz.StatisticDrivers.Models
+namespace Strata.DSS.CostAccounting.Biz.Shared.Models
 {
     public class SaveDataBase<T>
     {

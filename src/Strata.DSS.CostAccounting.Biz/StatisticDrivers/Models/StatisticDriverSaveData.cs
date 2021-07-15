@@ -1,6 +1,5 @@
 ﻿using Strata.DSS.CostAccounting.Biz.Enums;
-using System;
-using System.Collections.Generic;
+using Strata.DSS.CostAccounting.Biz.Shared.Models;
 
 namespace Strata.DSS.CostAccounting.Biz.StatisticDrivers.Models
 {
