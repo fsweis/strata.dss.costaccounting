@@ -35,9 +35,9 @@ const Navigation: React.FC = () => {
       setCostingConfigs(costingConfigurations);
       if (costingConfigurations.length > 0) {
         const previousFiscalYear = currentFiscalYear - 1;
-        const sorted = costingConfigurations.filter((c) => currentFiscalYear === c.fiscalYearId || previousFiscalYear === c.fiscalYearId).sort((a, b) => a.name.localeCompare(b.name));
-        setCostingConfigsFiltered(sorted);
-        setCostingConfigGuid(sorted[0].costingConfigGuid);
+        const filtered = costingConfigurations.filter((c) => currentFiscalYear === c.fiscalYearId || previousFiscalYear === c.fiscalYearId);
+        setCostingConfigsFiltered(filtered);
+        setCostingConfigGuid(filtered[0]?.costingConfigGuid);
       }
     };
     fetchData();

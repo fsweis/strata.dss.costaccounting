@@ -6,10 +6,12 @@ using Strata.ApiCommunication.Http.MessageHandlers;
 using Strata.CoreLib.Claims.Extensions;
 using Strata.DSS.CostAccounting.Biz.CostAccounting.DbContexts;
 using Strata.DSS.CostAccounting.Biz.CostAccounting.Repositories;
-using Strata.DSS.CostAccounting.Biz.CostingConfigs.Services;using Strata.DSS.CostAccounting.Biz.StatisticDrivers.Repositories;
+using Strata.DSS.CostAccounting.Biz.CostingConfigs.Repositories;
+using Strata.DSS.CostAccounting.Biz.StatisticDrivers.Repositories;
 using Strata.DSS.CostAccounting.Biz.StatisticDrivers.Services;
 using Strata.Hangfire.Configuration;
 using Strata.SMC.Client;
+using Strata.SqlTools.Configuration.Common.AsyncFactory;
 using Strata.SqlTools.Configuration.SqlServer;
 using System;
 using System.Threading;
@@ -28,7 +30,6 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddScoped<IStatisticDriversService, StatisticDriversService>();
             services.AddScoped<IDataSourceService, DataSourceService>();
             services.AddScoped<IDataSourceLinkService, DataSourceLinkService>();
-            services.AddScoped<ICostingConfigService, CostingConfigService>();
 
             services.AddCachedSmcServiceClient();
             services.AddHttpContextAccessor();
@@ -42,6 +43,14 @@ namespace Microsoft.Extensions.DependencyInjection
 #else
                    .WithConnectionString((provider, cancellationToken) => provider.GetConnectionStringFromSmc(cancellationToken));
 #endif
+            });
+
+            services.AddScoped(provider =>
+            {
+                var factory = provider.GetRequiredService<IAsyncDbContextFactory<CostAccountingDbContext>>();
+
+                //we should think about making a repository factory classes and getting the repositories in the controllers
+                return factory.CreateDbContextAsync(default).GetAwaiter().GetResult();
             });
 
             services.ConfigureHangfireOptionsFromAws(options =>

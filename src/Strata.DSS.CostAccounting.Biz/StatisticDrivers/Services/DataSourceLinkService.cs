@@ -1,4 +1,5 @@
 ﻿using Strata.DSS.CostAccounting.Biz.CostAccounting.Constants;
+using Strata.DSS.CostAccounting.Biz.CostAccounting.Models;
 using Strata.DSS.CostAccounting.Biz.CostAccounting.Repositories;
 using Strata.DSS.CostAccounting.Biz.Enums;
 using Strata.DSS.CostAccounting.Biz.StatisticDrivers.Constants;
@@ -18,8 +19,8 @@ namespace Strata.DSS.CostAccounting.Biz.StatisticDrivers.Services
         public DataSourceLinkService(ICostAccountingRepository costaccountingRepository)
         {
             _costAccountingRepository = costaccountingRepository;
-
         }
+
         public async Task<IList<DataSourceLink>> GetDataSourceLinks(CostingType costingType, CancellationToken cancellationToken)
         {
             var measures = await _costAccountingRepository.GetMeasuresAsync(StatisticDriverDataSourceUtil.GetDataTableGuids(costingType == CostingType.Claims), cancellationToken);
@@ -43,7 +44,7 @@ namespace Strata.DSS.CostAccounting.Biz.StatisticDrivers.Services
             return dataSourceLinks.OrderBy(x => x.FriendlyName).ToList();
         }
 
-        private static void ConfigurePatientCareDataSourceLinks(IList<CostAccounting.Models.Measure> measures, IList<CostAccounting.Models.RuleEngineIncludedMeasure> ruleEngineIncludedMeasures, List<DataSourceLink> dataSourceLinks)
+        private static void ConfigurePatientCareDataSourceLinks(IEnumerable<Measure> measures, IEnumerable<RuleEngineIncludedMeasure> ruleEngineIncludedMeasures, List<DataSourceLink> dataSourceLinks)
         {
             //Load Encounter Summary Measures
             var summaryMeasure = measures.Single(x => x.DataTableGuid == DataTableConstants.PatientEncounterSummaryGuid && string.Equals(x.SQLColumnName, MeasureConstants.PES_EncounterRecordNumber_ColumnName));
@@ -68,7 +69,7 @@ namespace Strata.DSS.CostAccounting.Biz.StatisticDrivers.Services
             dataSourceLinks.Add(new DataSourceLink(GL_PAYROLL_DATASOURCE_ID, SDMeasureConstants.Dollars_FriendlyName, GL_PAYROLL_DATASOURCE_ID, true));
         }
 
-        private static void ConfigureClaimsDataSourceLinks(IList<CostAccounting.Models.Measure> measures, List<DataSourceLink> dataSourceLinks)
+        private static void ConfigureClaimsDataSourceLinks(IEnumerable<Measure> measures, List<DataSourceLink> dataSourceLinks)
         {
             // Load Claim Summary Measure
             var claimsMeasure = measures.Single(x => x.DataTableGuid == DataTableConstants.PatientClaimSummaryGuid && string.Equals(x.SQLColumnName, MeasureConstants.PCS_ClaimRecordNumber_ColumnName));

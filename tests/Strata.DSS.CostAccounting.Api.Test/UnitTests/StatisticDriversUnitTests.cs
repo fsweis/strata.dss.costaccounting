@@ -4,7 +4,6 @@ using Moq;
 using NUnit.Framework;
 using Strata.DSS.CostAccounting.Api.Controllers;
 using Strata.DSS.CostAccounting.Biz.CostAccounting.Constants;
-using Strata.DSS.CostAccounting.Biz.CostAccounting.DbContexts;
 using Strata.DSS.CostAccounting.Biz.CostAccounting.Models;
 using Strata.DSS.CostAccounting.Biz.CostAccounting.Repositories;
 using Strata.DSS.CostAccounting.Biz.Enums;
@@ -12,7 +11,6 @@ using Strata.DSS.CostAccounting.Biz.StatisticDrivers.Models;
 using Strata.DSS.CostAccounting.Biz.StatisticDrivers.Repositories;
 using Strata.DSS.CostAccounting.Biz.StatisticDrivers.Services;
 using Strata.DSS.CostAccounting.Client;
-using Strata.SqlTools.Configuration.Common.AsyncFactory;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -80,10 +78,7 @@ namespace Strata.DSS.CostAccounting.Api.Test.UnitTests
             var costAccountingDbContext = TestData.GetJazzSqlContext(connection);
             await TestData.CreateData(costAccountingDbContext);
 
-            var costAccountingDbContextFactory = new Mock<IAsyncDbContextFactory<CostAccountingDbContext>>();
-            costAccountingDbContextFactory.Setup(c => c.CreateDbContextAsync(It.IsAny<CancellationToken>())).ReturnsAsync(costAccountingDbContext);
-
-            var statisticDriversRepository = new StatisticDriversRepository(costAccountingDbContextFactory.Object);
+            var statisticDriversRepository = new StatisticDriversRepository(costAccountingDbContext);
             var costAccountingRepository = new Mock<ICostAccountingRepository>();
             costAccountingRepository.Setup(c => c.GetRuleSetsAsync(It.IsAny<CancellationToken>())).ReturnsAsync(new List<RuleSet>());
             var listPatientCareGuids = new List<Guid>() {

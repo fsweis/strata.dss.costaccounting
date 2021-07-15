@@ -9,7 +9,6 @@ namespace Strata.DSS.CostAccounting.Biz.StatisticDrivers.Services
     public interface IStatisticDriversService
     {
         public Task<IList<StatisticDriver>> LoadStatisticDrivers(CostingType costingType, CancellationToken cancellationToken);
-        public bool ValidateStatisticDrivers(IEnumerable<StatisticDriver> statDrivers);
     }
 }
 
