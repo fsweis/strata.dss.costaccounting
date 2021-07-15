@@ -68,7 +68,7 @@ const DepartmentExceptions: React.FC<IDepartmentExceptionsProps> = (props: IDepa
     return false;
   };
 
-  const filterExceptionTypes = (cellValue: string, filterValue: string) => {
+  const filterExceptionTypes = (cellValue: ExceptionTypeEnum, filterValue: string) => {
     if (typeof filterValue === 'string' && filterValue.trim() !== '' && filterValue.trim() !== '-') {
       filterValue = filterValue.toLowerCase().trim();
     } else {
@@ -77,26 +77,26 @@ const DepartmentExceptions: React.FC<IDepartmentExceptionsProps> = (props: IDepa
     if (cellValue === null) {
       return false;
     }
-    return cellValue.toLowerCase().indexOf(filterValue.toLowerCase()) > -1;
+    const exceptionName = ExceptionTypeEnum[cellValue];
+    return exceptionName.toLowerCase().indexOf(filterValue.toLowerCase()) > -1;
   };
 
-  const getExceptionTypeOptions = (departmentType: string) => {
+  const getExceptionTypeOptions = (departmentType?: DepartmentTypeEnum) => {
     let items: ICostingDepartmentExceptionType[];
-
     switch (departmentType) {
-      case DepartmentTypeEnum[DepartmentTypeEnum.Revenue]:
+      case DepartmentTypeEnum.Revenue:
         items = [
           { text: getExceptionName(ExceptionTypeEnum.RevenueToExcluded), value: ExceptionTypeEnum.RevenueToExcluded },
           { text: getExceptionName(ExceptionTypeEnum.RevenueToOverhead), value: ExceptionTypeEnum.RevenueToOverhead }
         ];
         break;
-      case DepartmentTypeEnum[DepartmentTypeEnum.Overhead]:
+      case DepartmentTypeEnum.Overhead:
         items = [
           { text: getExceptionName(ExceptionTypeEnum.OverheadToRevenue), value: ExceptionTypeEnum.OverheadToRevenue },
           { text: getExceptionName(ExceptionTypeEnum.OverheadToExcluded), value: ExceptionTypeEnum.OverheadToExcluded }
         ];
         break;
-      case DepartmentTypeEnum[DepartmentTypeEnum.Excluded]:
+      case DepartmentTypeEnum.Excluded:
         items = [
           { text: getExceptionName(ExceptionTypeEnum.ExcludedToOverhead), value: ExceptionTypeEnum.ExcludedToOverhead },
           { text: getExceptionName(ExceptionTypeEnum.ExcludedToRevenue), value: ExceptionTypeEnum.ExcludedToRevenue }
@@ -328,15 +328,15 @@ const DepartmentExceptions: React.FC<IDepartmentExceptionsProps> = (props: IDepa
           ]}
         />
         <DataGrid.DropDownColumn
-          field='deptExceptionTypeName'
+          field='deptExceptionType'
           header='Exception Type'
           filter
           filterMatchMode='custom'
           filterFunction={filterExceptionTypes}
           width={240}
-          itemValueField='text'
+          itemValueField={'value'}
           itemTextField='text'
-          items={getExceptionTypeOptions('')}
+          items={getExceptionTypeOptions()}
           isCellEditable={(cellEditorArgs) => cellEditorArgs.rowData.departmentId !== 0}
           editor={(cellEditorArgs) => (
             <>
@@ -347,7 +347,7 @@ const DepartmentExceptions: React.FC<IDepartmentExceptionsProps> = (props: IDepa
                   items={getExceptionTypeOptions(cellEditorArgs.rowData.originalDepartmentType)}
                   itemValueField='value'
                   itemTextField='text'
-                  value={cellEditorArgs.rowData.departmentId !== 0 ? cellEditorArgs.rowData.deptExceptionTypeName : ''}
+                  value={cellEditorArgs.rowData.departmentId !== 0 ? cellEditorArgs.rowData.deptExceptionType : ''}
                 />
               )}
             </>
@@ -355,7 +355,7 @@ const DepartmentExceptions: React.FC<IDepartmentExceptionsProps> = (props: IDepa
           validationRules={[
             {
               required: true,
-              type: 'string'
+              type: 'number'
             }
           ]}
         />

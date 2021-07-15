@@ -1,15 +1,16 @@
 import { getNewGuid } from '../../shared/Utils';
+import { DepartmentTypeEnum } from '../enums/DepartmentTypeEnum';
+import { ExceptionTypeEnum } from '../enums/ExceptionTypeEnum';
 
 export interface ICostingDepartmentTypeException {
   displayId: string;
   costingDepartmentExceptionTypeId: number;
   departmentId: number;
   costingConfigGuid: string;
-  departmentTypeEnum: number;
+  departmentTypeEnum: DepartmentTypeEnum;
   name: string;
-  deptExceptionType: number;
-  deptExceptionTypeName: string;
-  originalDepartmentType: string;
+  deptExceptionType: ExceptionTypeEnum;
+  originalDepartmentType: DepartmentTypeEnum;
 }
 export const newDepartmentException = (exception: Partial<ICostingDepartmentTypeException> = {}): ICostingDepartmentTypeException => {
   return {
@@ -18,11 +19,10 @@ export const newDepartmentException = (exception: Partial<ICostingDepartmentType
       costingDepartmentExceptionTypeId: 0,
       departmentId: 0,
       costingConfigGuid: '',
-      departmentTypeEnum: 0,
+      departmentTypeEnum: DepartmentTypeEnum.Revenue,
       name: '',
-      deptExceptionType: 0,
-      deptExceptionTypeName: '',
-      originalDepartmentType: ''
+      deptExceptionType: ExceptionTypeEnum.RevenueToOverhead,
+      originalDepartmentType: DepartmentTypeEnum.Revenue
     },
     ...exception
   };

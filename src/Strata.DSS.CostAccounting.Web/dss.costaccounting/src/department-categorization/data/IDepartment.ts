@@ -1,7 +1,9 @@
+import { DepartmentTypeEnum } from '../enums/DepartmentTypeEnum';
+
 export interface IDepartment {
   departmentId: number;
   departmentCode: string;
-  departmentType: string;
+  departmentType: DepartmentTypeEnum;
   description: string;
   name: string;
   isClaimsCosting: number;
@@ -15,7 +17,7 @@ export const newDepartment = (department: Partial<IDepartment> = {}): IDepartmen
       description: '',
       name: '',
       isClaimsCosting: 0,
-      departmentType: ''
+      departmentType: DepartmentTypeEnum.Revenue
     },
     ...department
   };

@@ -25,8 +25,8 @@ const DepartmentCategorization: React.FC = () => {
         if (costingConfig) {
           const [departmentExceptionData, overheadDepartmentData, revenueDepartmentData, departmentData] = await Promise.all([
             departmentCategorizationService.getDepartmentExceptions(costingConfig.costingConfigGuid),
-            departmentCategorizationService.getDepartmentsByType(costingConfig.costingConfigGuid, DepartmentTypeEnum[DepartmentTypeEnum.Overhead]),
-            departmentCategorizationService.getDepartmentsByType(costingConfig.costingConfigGuid, DepartmentTypeEnum[DepartmentTypeEnum.Revenue]),
+            departmentCategorizationService.getDepartmentsByType(costingConfig.costingConfigGuid, DepartmentTypeEnum.Overhead),
+            departmentCategorizationService.getDepartmentsByType(costingConfig.costingConfigGuid, DepartmentTypeEnum.Revenue),
             departmentCategorizationService.getDepartments(costingConfig.costingConfigGuid)
           ]);
           setDepartmentExceptions(departmentExceptionData);
@@ -47,8 +47,8 @@ const DepartmentCategorization: React.FC = () => {
       setGridLoading(true);
       if (costingConfig) {
         const [overheadDepartmentData, revenueDepartmentData] = await Promise.all([
-          departmentCategorizationService.getDepartmentsByType(costingConfig.costingConfigGuid, DepartmentTypeEnum[DepartmentTypeEnum.Overhead]),
-          departmentCategorizationService.getDepartmentsByType(costingConfig.costingConfigGuid, DepartmentTypeEnum[DepartmentTypeEnum.Revenue])
+          departmentCategorizationService.getDepartmentsByType(costingConfig.costingConfigGuid, DepartmentTypeEnum.Overhead),
+          departmentCategorizationService.getDepartmentsByType(costingConfig.costingConfigGuid, DepartmentTypeEnum.Revenue)
         ]);
         setOverheadDepartments(overheadDepartmentData);
         setRevenueDepartments(revenueDepartmentData);
