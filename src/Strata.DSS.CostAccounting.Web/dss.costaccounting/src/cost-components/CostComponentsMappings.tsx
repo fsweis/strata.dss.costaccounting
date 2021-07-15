@@ -173,12 +173,13 @@ const CostComponentsMappings: React.FC<ICostComponentsMappingsProps> = (props: I
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleCellClick = (cellArgs: any) => {
     let title = '';
+    const field = cellArgs.field as string;
 
-    if (cellArgs.field === 'accounts') {
+    if (field === 'accounts') {
       title = 'Accounts';
-    } else if (cellArgs.field === 'jobcodes') {
+    } else if (field === 'jobCodes') {
       title = 'Job Codes';
-    } else if (cellArgs.field === 'paycodes') {
+    } else if (field === 'payCodes') {
       title = 'Pay Codes';
     } else {
       return;
@@ -290,6 +291,7 @@ const CostComponentsMappings: React.FC<ICostComponentsMappingsProps> = (props: I
           )}
         />
         <DataGrid.CheckboxColumn field='usingCompensation' header='Using Compensation' editable width={152} />
+        <DataGrid.EmptyColumn />
         <DataGrid.Column
           align='right'
           width={80}
