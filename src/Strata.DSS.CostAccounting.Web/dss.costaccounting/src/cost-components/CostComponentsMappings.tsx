@@ -94,7 +94,7 @@ const CostComponentsMappings: React.FC<ICostComponentsMappingsProps> = (props: I
       const invalidKeys = invalidCells.map((cell) => cell.rowKey);
       const invalidRows: { rowNumber: number; guid: string }[] = gridCostComponents
         .map((costComponent, index) => {
-          return { guid: costComponent.costComponentGuid, rowNumber: index };
+          return { guid: costComponent.displayId, rowNumber: index };
         })
         .filter((r) => invalidKeys.includes(r.guid));
 
@@ -240,7 +240,32 @@ const CostComponentsMappings: React.FC<ICostComponentsMappingsProps> = (props: I
         onCellEdit={(e) => handleCellEdit(e.rowData)}
       >
         <DataGrid.RowNumber />
-        <DataGrid.Column header='Name' field='name' filter width={280} editable align='left' isCellClickable={() => false} />
+        <DataGrid.Column
+          header='Name'
+          field='name'
+          filter
+          width={280}
+          editable
+          align='left'
+          isCellClickable={() => false}
+          validationRules={[
+            {
+              required: true,
+              type: 'string',
+              whitespace: true
+            },
+            {
+              validator: (rule, value, callback, source, options) => {
+                const stringVal: string = value.toString().trim().toLowerCase();
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                const component: ICostComponent = (options as any).cellArgs.rowData;
+                const dupe = gridCostComponents.findIndex((d) => d.name.toLowerCase() === stringVal && d.displayId !== component.displayId) !== -1;
+                return !dupe;
+              },
+              message: 'Enter a unique name'
+            }
+          ]}
+        />
         <DataGrid.Column header='Accounts' field='accounts' filter width={200} isCellClickable={() => true} customCellValue={(cellArgs) => renderMultipleSelection(cellArgs.row.accounts)} />
         <DataGrid.Column header='Job Code' field='jobCodes' filter width={200} isCellClickable={() => true} customCellValue={(cellArgs) => renderMultipleSelection(cellArgs.row.jobCodes)} />
         <DataGrid.Column header='Pay Code' field='payCodes' filter width={200} isCellClickable={() => true} customCellValue={(cellArgs) => renderMultipleSelection(cellArgs.row.payCodes)} />
