@@ -331,7 +331,7 @@ const DepartmentExceptions: React.FC<IDepartmentExceptionsProps> = (props: IDepa
               validator: (rule, value, callback, source, options) => {
                 return value !== 0 && value !== undefined;
               },
-              message: 'Select a department'
+              message: 'Required'
             }
           ]}
         />
