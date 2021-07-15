@@ -14,6 +14,7 @@ import { ExceptionNameEnum } from './enums/ExceptionNameEnum';
 import { ExceptionTypeEnum } from './enums/ExceptionTypeEnum';
 import { DepartmentNameEnum } from './enums/DepartmentNameEnum';
 import { DepartmentTypeEnum } from './enums/DepartmentTypeEnum';
+
 export interface IDepartmentExceptionsProps {
   departmentExceptions: ICostingDepartmentTypeException[];
   departments: IDepartment[];
@@ -116,6 +117,7 @@ const DepartmentExceptions: React.FC<IDepartmentExceptionsProps> = (props: IDepa
   const handleDepartmentChange = (newDepartmentId: number, exception: ICostingDepartmentTypeException) => {
     // Can't add exception if there is already an exception
     // Dropdown should prevent this from happening?
+
     if (exceptionDepartmentData.find((d) => d.departmentId === newDepartmentId)) {
       Modal.alert({
         title: 'Department Categorization',
@@ -279,9 +281,9 @@ const DepartmentExceptions: React.FC<IDepartmentExceptionsProps> = (props: IDepa
       <DataGrid
         key='DepartmentExceptionGrid'
         ref={gridRef}
-        dataKey='displayId'
         value={exceptionDepartmentData}
-        loading={gridLoading}
+        scrollable
+        dataKey='displayId'
         pager={{
           pageSize: 100,
           extra: (
@@ -293,6 +295,7 @@ const DepartmentExceptions: React.FC<IDepartmentExceptionsProps> = (props: IDepa
             </>
           )
         }}
+        loading={gridLoading}
       >
         <DataGrid.RowNumber />
         <DataGrid.DropDownColumn
@@ -304,12 +307,13 @@ const DepartmentExceptions: React.FC<IDepartmentExceptionsProps> = (props: IDepa
           width={480}
           itemValueField='departmentId'
           itemTextField='name'
-          items={departmentExceptions}
-          body={(rowData) => (
+          items={departments}
+          editable
+          editor={(cellEditorArgs) => (
             <>
               <DropDown //TODO change this to a server side search
-                value={rowData.departmentId !== 0 ? rowData.departmentId : ''}
-                onChange={(value) => handleDepartmentChange(value as number, rowData)}
+                value={cellEditorArgs.rowData.departmentId !== 0 ? cellEditorArgs.rowData.departmentId : ''}
+                onChange={(value) => handleDepartmentChange(value as number, cellEditorArgs.rowData as ICostingDepartmentTypeException)}
                 width={480}
                 itemValueField='departmentId'
                 itemTextField='name'
@@ -322,6 +326,12 @@ const DepartmentExceptions: React.FC<IDepartmentExceptionsProps> = (props: IDepa
             {
               required: true,
               type: 'number'
+            },
+            {
+              validator: (rule, value, callback, source, options) => {
+                return value !== 0 && value !== undefined;
+              },
+              message: 'Select a department'
             }
           ]}
         />
@@ -332,19 +342,22 @@ const DepartmentExceptions: React.FC<IDepartmentExceptionsProps> = (props: IDepa
           filterMatchMode='custom'
           filterFunction={filterExceptionTypes}
           width={240}
-          body={(rowData: ICostingDepartmentTypeException) => (
+          itemValueField='text'
+          itemTextField='text'
+          items={getExceptionTypeOptions('')}
+          isCellEditable={(cellEditorArgs) => cellEditorArgs.rowData.departmentId !== 0}
+          editor={(cellEditorArgs) => (
             <>
-              <Tooltip title={rowData.departmentId === 0 ? 'Select a department' : ''}>
+              {cellEditorArgs.rowData.departmentId !== 0 && (
                 <DropDown
                   width={200}
-                  onChange={(value) => handleExceptionTypeChange(value as number, rowData)}
-                  items={getExceptionTypeOptions(rowData.originalDepartmentType)}
+                  onChange={(value) => handleExceptionTypeChange(value as number, cellEditorArgs.rowData)}
+                  items={getExceptionTypeOptions(cellEditorArgs.rowData.originalDepartmentType)}
                   itemValueField='value'
                   itemTextField='text'
-                  disabled={rowData.departmentId === 0}
-                  value={rowData.deptExceptionTypeName || ''}
+                  value={cellEditorArgs.rowData.departmentId !== 0 ? cellEditorArgs.rowData.deptExceptionTypeName : ''}
                 />
-              </Tooltip>
+              )}
             </>
           )}
           validationRules={[
