@@ -2,19 +2,19 @@
 using Strata.DSS.CostAccounting.Biz.CostAccounting.Models;
 using Strata.DSS.CostAccounting.Biz.CostAccounting.Repositories;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Linq;
 
 namespace Strata.DSS.CostAccounting.Api.Controllers
 {
     [ApiController]
     [ApiVersion("1.0")]
     [Route("api/v{api-version:apiVersion}/date")]
-    public class DateController:ControllerBase
+    public class DateController : ControllerBase
     {
         private readonly ICostAccountingRepository _costAccountingRepository;
-        public DateController(ICostingConfigRepository costingConfigRepository, ICostAccountingRepository costAccountingRepository)
+        public DateController(ICostAccountingRepository costAccountingRepository)
         {
             _costAccountingRepository = costAccountingRepository;
         }

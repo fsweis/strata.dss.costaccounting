@@ -1,5 +1,7 @@
 import { getEmptyGuid, getNewGuid } from '../../shared/Utils';
 
+import { CostingType } from '../../shared/enums/CostingTypeEnum';
+
 export interface IStatisticDriver {
   displayId: string;
   driverConfigGuid: string;
@@ -9,7 +11,7 @@ export interface IStatisticDriver {
   isUsed: boolean;
   measureGuid: string;
   name: string;
-  costingType: number;
+  costingType: CostingType;
 }
 
 export const newStatisticDriver = (driver: Partial<IStatisticDriver> = {}): IStatisticDriver => {

@@ -10,12 +10,10 @@ using Strata.ApiLib.Core.Cors.Extensions;
 using Strata.ApiLib.Core.ExceptionHandling.DependencyInjection.Bootstrappers;
 using Strata.ApiLib.Core.Logging.Bootstrappers;
 using Strata.ApiLib.Core.StrataAuthentication.Bootstrappers;
-using Strata.CS;
 using Strata.SwaggerExtensions;
 using System.Diagnostics.CodeAnalysis;
 using System.Net.Mime;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 
 namespace Strata.DSS.CostAccounting.Api
 {
@@ -23,17 +21,10 @@ namespace Strata.DSS.CostAccounting.Api
     public class Startup
     {
         private readonly IConfiguration _configuration;
-        private readonly string _connectionString;
 
         public Startup(IConfiguration configuration)
         {
             _configuration = configuration;
-        }
-
-        public Startup(IConfiguration configuration, string connectionString)
-        {
-            _configuration = configuration;
-            _connectionString = connectionString;
         }
 
         // This method gets called by the runtime. Use this method to add services to the container.
@@ -60,17 +51,16 @@ namespace Strata.DSS.CostAccounting.Api
             {
                 options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
                 options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
-                options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
             })
             .SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
 
-            services.AddAutoMapper(typeof(CostAccountingProfile));
             services.AddCostAccountingServices(_configuration);
             services.AddRouting();
             services.AddSwagger(_configuration);
             services.AddStrataAuthentication(_configuration);
             services.AddStrataCors(_configuration);
             services.AddHealthChecks();
+            services.AddJazzHangfireServiceClient();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
