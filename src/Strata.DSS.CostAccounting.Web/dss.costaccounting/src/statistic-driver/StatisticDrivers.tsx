@@ -32,7 +32,7 @@ const StatisticDrivers: React.FC = () => {
   const [dataSourceLinks, setDataSourceLinks] = useState<IDataSourceLink[]>([]);
   const [patientDriverTreeModalVisible, setPatientDriverTreeModalVisible] = useState<boolean>(false);
   const [deletedDriverGuids, setDeletedDriverGuids] = useState<string[]>([]);
-  const [updatedDrivers, setUpdatedDrivers] = useState<IStatisticDriver[]>([]);
+  const [updatedDriverGuids, setUpdatedDriverGuids] = useState<string[]>([]);
   const gridRef = React.useRef<DataGrid>(null);
   const { setLoading } = usePageLoader();
   const [gridLoading, setGridLoading] = useState<boolean>(false);
@@ -62,14 +62,14 @@ const StatisticDrivers: React.FC = () => {
   }, [costingConfig]);
 
   const handleCancel = () => {
-    if (updatedDrivers.length > 0 || deletedDriverGuids.length > 0 || tempStatDrivers.some((d) => d.driverConfigGuid === emptyGuid)) {
+    if (updatedDriverGuids.length > 0 || deletedDriverGuids.length > 0 || tempStatDrivers.some((d) => d.driverConfigGuid === emptyGuid)) {
       Modal.confirm({
         title: 'Discard unsaved changes?',
         okText: 'Discard Changes',
         cancelText: 'Keep Changes',
         onOk() {
           if (tempStatDrivers) {
-            setUpdatedDrivers([]);
+            setUpdatedDriverGuids([]);
             setDeletedDriverGuids([]);
             const tempStats = cloneDeep(statDrivers);
             setTempStatDrivers(tempStats);
@@ -108,22 +108,11 @@ const StatisticDrivers: React.FC = () => {
 
   const handleSave = async () => {
     if (await validateStatisticDrivers()) {
-      const guids = updatedDrivers
-        .filter((sd) => !deletedDriverGuids.includes(sd.driverConfigGuid))
-        .map((sd) => {
-          return sd.driverConfigGuid;
-        });
-
+      const guids = updatedDriverGuids.filter((guid) => !deletedDriverGuids.includes(guid));
       const updatedStatDrivers = tempStatDrivers.filter((d) => guids.includes(d.driverConfigGuid) || d.driverConfigGuid === emptyGuid);
 
-      const statDriverSaveData: IStatisticDriverSaveData = {
-        updatedStatDrivers: updatedStatDrivers,
-        deletedStatDrivers: deletedDriverGuids,
-        costingType: costingConfig?.type ?? CostingType.PatientCare
-      };
-
       // Don't actually save if there are no changes
-      if (!statDriverSaveData.updatedStatDrivers.length && !statDriverSaveData.deletedStatDrivers.length) {
+      if (!updatedStatDrivers.length && !deletedDriverGuids.length) {
         // TODO: Get exact language here
         Toast.show({
           toastType: 'info',
@@ -132,13 +121,19 @@ const StatisticDrivers: React.FC = () => {
         return;
       }
 
+      const statDriverSaveData: IStatisticDriverSaveData = {
+        updated: updatedStatDrivers,
+        deletedGuids: deletedDriverGuids,
+        costingType: costingConfig?.type ?? CostingType.PatientCare
+      };
+
       try {
         setLoading(true);
         //refresh stat drivers from return
         const statisticDrivers = await statisticDriverService.saveStatisticDrivers(statDriverSaveData);
         setStatDrivers(statisticDrivers);
         setTempStatDrivers(cloneDeep(statisticDrivers));
-        setUpdatedDrivers([]);
+        setUpdatedDriverGuids([]);
         setDeletedDriverGuids([]);
         Toast.show({
           toastType: 'success',
@@ -246,42 +241,42 @@ const StatisticDrivers: React.FC = () => {
       }
     }
     //add to updated drivers
-    if (!updatedDrivers.includes(cellEditorArgs.rowData.driverConfigGuid)) {
-      const driversToUpdate = [cellEditorArgs.rowData].concat(updatedDrivers);
-      setUpdatedDrivers(driversToUpdate);
+    if (!updatedDriverGuids.includes(cellEditorArgs.rowData.driverConfigGuid)) {
+      const driversToUpdate = [cellEditorArgs.rowData.driverConfigGuid].concat(updatedDriverGuids);
+      setUpdatedDriverGuids(driversToUpdate);
     }
   };
 
   const handleDataSourceLinkChange = (cellEditorArgs: ICellEditorArgs, value: string) => {
     cellEditorArgs.rowData.measureGuid = value;
     //add to updated drivers
-    if (!updatedDrivers.includes(cellEditorArgs.rowData)) {
-      const driversToUpdate = [cellEditorArgs.rowData].concat(updatedDrivers);
-      setUpdatedDrivers(driversToUpdate);
+    if (!updatedDriverGuids.includes(cellEditorArgs.rowData.driverConfigGuid)) {
+      const driversToUpdate = [cellEditorArgs.rowData.driverConfigGuid].concat(updatedDriverGuids);
+      setUpdatedDriverGuids(driversToUpdate);
     }
   };
 
-  const handleDelete = (statisticDriver: IStatisticDriver) => {
+  const handleDelete = (driverConfigGuid: string, isNew: boolean) => {
     if (tempStatDrivers !== undefined) {
-      if (statisticDriver.driverConfigGuid === '') {
-        const newUpdatedStatDrivers = updatedDrivers.filter((sd) => sd !== statisticDriver);
-        setUpdatedDrivers(newUpdatedStatDrivers);
+      if (isNew) {
+        const newUpdatedDriverGuids = updatedDriverGuids.filter((guid) => guid !== driverConfigGuid);
+        setUpdatedDriverGuids(newUpdatedDriverGuids);
       } else {
         //add to deleted drivers
-        const driversToDelete = [statisticDriver.driverConfigGuid].concat(deletedDriverGuids);
+        const driversToDelete = [driverConfigGuid].concat(deletedDriverGuids);
         setDeletedDriverGuids(driversToDelete);
       }
       //refresh the grid
-      const newStatDrivers = tempStatDrivers.filter((obj) => obj !== statisticDriver);
+      const newStatDrivers = tempStatDrivers.filter((obj) => obj.driverConfigGuid !== driverConfigGuid);
       setTempStatDrivers(newStatDrivers);
     }
   };
 
-  const handleCellEdit = (statisticDriver: IStatisticDriver) => {
-    //add to updated cost components
-    if (!updatedDrivers.includes(statisticDriver)) {
-      const driversToUpdate = [statisticDriver].concat(updatedDrivers);
-      setUpdatedDrivers(driversToUpdate);
+  const handleCellEdit = (driverConfigGuid: string) => {
+    //add to updated drivers
+    if (!updatedDriverGuids.includes(driverConfigGuid)) {
+      const driversToUpdate = [driverConfigGuid].concat(updatedDriverGuids);
+      setUpdatedDriverGuids(driversToUpdate);
     }
   };
 
@@ -324,7 +319,7 @@ const StatisticDrivers: React.FC = () => {
         value={tempStatDrivers}
         scrollable
         dataKey='driverConfigGuid'
-        onCellEdit={(e) => handleCellEdit(e.rowData)}
+        onCellEdit={(e) => handleCellEdit(e.rowData.driverConfigGuid)}
         pager={{
           pageSize: 100,
           extra: (
@@ -441,7 +436,7 @@ const StatisticDrivers: React.FC = () => {
                 </Button>
               </Tooltip>
               <Tooltip placement='left' title={rowData.isUsed ? "Can't delete drivers in use" : 'Delete'}>
-                <Button type='link' icon='Delete' disabled={rowData.isUsed} onClick={() => handleDelete(rowData)} />
+                <Button type='link' icon='Delete' disabled={rowData.isUsed} onClick={() => handleDelete(rowData.driverConfigGuid, rowData.driverConfigGuid === emptyGuid)} />
               </Tooltip>
             </>
           )}
@@ -454,7 +449,7 @@ const StatisticDrivers: React.FC = () => {
         visible={patientDriverTreeModalVisible}
       ></PatientDriverTreeModal>
       <RouteConfirm
-        showPrompt={updatedDrivers.length > 0 || deletedDriverGuids.length > 0 || tempStatDrivers.some((d) => d.driverConfigGuid === emptyGuid)}
+        showPrompt={updatedDriverGuids.length > 0 || deletedDriverGuids.length > 0 || tempStatDrivers.some((d) => d.driverConfigGuid === emptyGuid)}
         title={'Discard unsaved changes?'}
         okText={'Discard Changes'}
         cancelText={'Keep Changes'}
