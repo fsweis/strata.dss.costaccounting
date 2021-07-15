@@ -7,6 +7,7 @@ import Modal from '@strata/tempo/lib/modal';
 import Toast from '@strata/tempo/lib/toast';
 import { usePageLoader } from '@strata/tempo/lib/pageloader';
 import DropDown from '@strata/tempo/lib/dropdown';
+import RouteConfirm from '@strata/tempo/lib/routeconfirm';
 import { ICostingDepartmentExceptionType } from './data/ICostingDepartmentExceptionType';
 import { ICostingDepartmentTypeException, newDepartmentException } from './data/ICostingDepartmentTypeException';
 import { IDepartment } from './data/IDepartment';
@@ -384,6 +385,12 @@ const DepartmentExceptions: React.FC<IDepartmentExceptionsProps> = (props: IDepa
           )}
         />
       </DataGrid>
+      <RouteConfirm
+        showPrompt={updatedExceptionIds.length > 0 || deletedDepartmentIds.length > 0 || exceptionDepartmentData.some((d) => d.costingDepartmentExceptionTypeId === 0)}
+        title={'Discard unsaved changes?'}
+        okText={'Discard Changes'}
+        cancelText={'Keep Changes'}
+      />
     </>
   );
 };

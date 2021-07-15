@@ -9,7 +9,7 @@ import { IDepartment } from './data/IDepartment';
 import FilteredDepartments from './FilteredDepartments';
 import DepartmentExceptions from './DepartmentExceptions';
 import { DepartmentNameEnum } from './enums/DepartmentNameEnum';
-import { ICostingDepartmentTypeException } from './data/ICostingDepartmentTypeException';
+import { ICostingDepartmentTypeException, newDepartmentException } from './data/ICostingDepartmentTypeException';
 
 const DepartmentCategorization: React.FC = () => {
   const [gridLoading, setGridLoading] = useState<boolean>(false);
@@ -29,7 +29,9 @@ const DepartmentCategorization: React.FC = () => {
             departmentCategorizationService.getDepartmentsByType(costingConfig.costingConfigGuid, DepartmentNameEnum.Revenue),
             departmentCategorizationService.getDepartments(costingConfig.costingConfigGuid)
           ]);
-          setDepartmentExceptions(departmentExceptionData);
+          //initialize displayId for the grid
+          const newDepartmentExceptions = departmentExceptionData.map((d) => newDepartmentException(d));
+          setDepartmentExceptions(newDepartmentExceptions);
           setOverheadDepartments(overheadDepartmentData);
           setRevenueDepartments(revenueDepartmentData);
           setDepartments(departmentData);
