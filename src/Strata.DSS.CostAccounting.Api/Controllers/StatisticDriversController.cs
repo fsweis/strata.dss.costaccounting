@@ -83,12 +83,12 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<IEnumerable<StatisticDriver>>> SaveStatisticDrivers([FromBody] StatisticDriverSaveData statisticDriverSaveData, CancellationToken cancellationToken)
         {
-            if (statisticDriverSaveData.UpdatedStatDrivers.Any())
+            if (statisticDriverSaveData.Updated.Any())
             {
-                await _statisticDriversRepository.UpdateStatisticDriversAsync(statisticDriverSaveData.UpdatedStatDrivers, cancellationToken);
+                await _statisticDriversRepository.UpdateStatisticDriversAsync(statisticDriverSaveData.Updated, cancellationToken);
             }
 
-            if (statisticDriverSaveData.DeletedStatDrivers.Any())
+            if (statisticDriverSaveData.DeletedGuids.Any())
             {
                 await _statisticDriversRepository.DeleteStatisticDriversAsync(statisticDriverSaveData.DeletedGuids, cancellationToken);
             }
