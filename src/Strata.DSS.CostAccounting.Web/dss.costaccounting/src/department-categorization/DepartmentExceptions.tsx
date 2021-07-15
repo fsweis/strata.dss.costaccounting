@@ -25,7 +25,7 @@ export interface IDepartmentExceptionsProps {
 const DepartmentExceptions: React.FC<IDepartmentExceptionsProps> = (props: IDepartmentExceptionsProps) => {
   const { departmentExceptions, gridLoading, departments, costingConfigGuid, saveDepartmentExceptions } = props;
   const [deletedDepartmentIds, setDeletedDepartmentIds] = useState<number[]>([]);
-  const [updatedDepartmentIds, setUpdatedDepartmentIds] = useState<number[]>([]);
+  const [updatedExceptionIds, setUpdatedExceptionIds] = useState<string[]>([]);
   const [exceptionDepartmentData, setExceptionDepartmentData] = useState<ICostingDepartmentTypeException[]>([]);
   const gridRef = React.useRef<DataGrid>(null);
   const { setLoading } = usePageLoader();
@@ -42,10 +42,12 @@ const DepartmentExceptions: React.FC<IDepartmentExceptionsProps> = (props: IDepa
     }
   };
 
-  const handleDelete = (departmentId: number) => {
-    const departmentsToDelete = [departmentId].concat(deletedDepartmentIds);
-    setDeletedDepartmentIds(departmentsToDelete);
-    const updatedExceptionList = exceptionDepartmentData.filter((dept) => dept !== null && dept.departmentId !== departmentId);
+  const handleDelete = (exception: ICostingDepartmentTypeException) => {
+    if (exception.departmentId !== 0 && exception.costingDepartmentExceptionTypeId !== 0) {
+      const departmentsToDelete = [exception.departmentId].concat(deletedDepartmentIds);
+      setDeletedDepartmentIds(departmentsToDelete);
+    }
+    const updatedExceptionList = exceptionDepartmentData.filter((exc) => exc !== null && exc.displayId !== exception.displayId);
     setExceptionDepartmentData(updatedExceptionList);
   };
 
@@ -146,9 +148,9 @@ const DepartmentExceptions: React.FC<IDepartmentExceptionsProps> = (props: IDepa
       });
       setExceptionDepartmentData(updatedDepartmentExceptions);
       //add to updated exceptions
-      if (!updatedDepartmentIds.includes(exception.departmentId)) {
-        const exceptionsToUpdate = [exception.departmentId].concat(updatedDepartmentIds);
-        setUpdatedDepartmentIds(exceptionsToUpdate);
+      if (!updatedExceptionIds.includes(exception.displayId)) {
+        const exceptionsToUpdate = [exception.displayId].concat(updatedExceptionIds);
+        setUpdatedExceptionIds(exceptionsToUpdate);
       }
     }
   };
@@ -172,10 +174,10 @@ const DepartmentExceptions: React.FC<IDepartmentExceptionsProps> = (props: IDepa
     }
 
     //add to updated exceptions
-    const updateIndex = updatedDepartmentIds.findIndex((id) => id === exception.departmentId);
+    const updateIndex = updatedExceptionIds.findIndex((id) => id === exception.displayId);
     if (updateIndex === -1) {
-      updatedDepartmentIds.push(exception.departmentId);
-      setUpdatedDepartmentIds(updatedDepartmentIds);
+      updatedExceptionIds.push(exception.displayId);
+      setUpdatedExceptionIds(updatedExceptionIds);
     }
   };
   const getDepartmentExceptionType = (originalDepartmentType: string, exceptionDepartmentType: string) => {
@@ -188,14 +190,14 @@ const DepartmentExceptions: React.FC<IDepartmentExceptionsProps> = (props: IDepa
     return 0;
   };
   const handleCancel = () => {
-    if (updatedDepartmentIds.length > 0 || deletedDepartmentIds.length > 0) {
+    if (updatedExceptionIds.length > 0 || deletedDepartmentIds.length > 0) {
       Modal.confirm({
         title: 'Discard unsaved changes?',
         okText: 'Discard Changes',
         cancelText: 'Keep Changes',
         onOk() {
           if (exceptionDepartmentData) {
-            setUpdatedDepartmentIds([]);
+            setUpdatedExceptionIds([]);
             setDeletedDepartmentIds([]);
             setExceptionDepartmentData(departmentExceptions);
           }
@@ -209,10 +211,11 @@ const DepartmentExceptions: React.FC<IDepartmentExceptionsProps> = (props: IDepa
 
   const handleSave = async () => {
     if (await validateDepartmentExceptions()) {
-      const saveDepartmentIds = updatedDepartmentIds.filter((departmentId) => !deletedDepartmentIds.includes(departmentId));
-      const updatedExceptions = exceptionDepartmentData.filter((d) => saveDepartmentIds.includes(d.departmentId) || d.costingDepartmentExceptionTypeId === 0);
+      const updatedExceptions = exceptionDepartmentData.filter(
+        (exc) => (updatedExceptionIds.includes(exc.displayId) || exc.costingDepartmentExceptionTypeId === 0) && !deletedDepartmentIds.includes(exc.departmentId)
+      );
       // Don't actually save if there are no changes
-      if (!saveDepartmentIds.length && !deletedDepartmentIds.length) {
+      if (!updatedExceptions.length && !deletedDepartmentIds.length) {
         Toast.show({
           toastType: 'info',
           message: 'No changes to save'
@@ -223,7 +226,7 @@ const DepartmentExceptions: React.FC<IDepartmentExceptionsProps> = (props: IDepa
       try {
         setLoading(true);
         await saveDepartmentExceptions(updatedExceptions, deletedDepartmentIds);
-        setUpdatedDepartmentIds([]);
+        setUpdatedExceptionIds([]);
         setDeletedDepartmentIds([]);
         Toast.show({
           toastType: 'success',
@@ -375,7 +378,7 @@ const DepartmentExceptions: React.FC<IDepartmentExceptionsProps> = (props: IDepa
           body={(rowData) => (
             <>
               <Tooltip placement='left' title='Delete'>
-                <Button type='link' icon='Delete' onClick={() => handleDelete(rowData.departmentId)} />
+                <Button type='link' icon='Delete' onClick={() => handleDelete(rowData)} />
               </Tooltip>
             </>
           )}

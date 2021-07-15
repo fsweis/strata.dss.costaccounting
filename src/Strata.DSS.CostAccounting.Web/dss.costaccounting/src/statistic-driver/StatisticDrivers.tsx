@@ -17,7 +17,7 @@ import { IStatisticDriverSaveData } from './data/IStatisticDriverSaveData';
 import { IStatisticDriver, newStatisticDriver } from './data/IStatisticDriver';
 import { statisticDriverService } from './data/statisticDriverService';
 import { IDataSourceLink } from './data/IDataSourceLink';
-import { getEmptyGuid, getNewGuid } from '../shared/Utils';
+import { getEmptyGuid } from '../shared/Utils';
 import cloneDeep from 'lodash/cloneDeep';
 import { IDataSource } from '../shared/data/IDataSource';
 import PatientDriverTreeModal from './PatientDriverTreeModal';

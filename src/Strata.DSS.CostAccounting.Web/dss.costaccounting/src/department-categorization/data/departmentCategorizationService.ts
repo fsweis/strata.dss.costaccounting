@@ -107,6 +107,9 @@ export const departmentCategorizationService = {
       }
     });
     updatedExceptions.forEach(function (exception) {
+      if (exception.costingDepartmentExceptionTypeId == 0) {
+        exception.costingDepartmentExceptionTypeId = exception.departmentId + 10;
+      }
       const exceptionIndex = mockExceptionData.findIndex((x) => x.departmentId === exception.departmentId);
       if (exceptionIndex > -1) {
         mockExceptionData[exceptionIndex] = exception;
