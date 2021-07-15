@@ -25,7 +25,7 @@ export const newStatisticDriver = (driver: Partial<IStatisticDriver> = {}): ISta
       isInverted: false,
       isUsed: false,
       name: '',
-      costingType: 0
+      costingType: CostingType.PatientCare
     },
     ...driver
   };

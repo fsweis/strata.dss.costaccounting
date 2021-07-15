@@ -84,7 +84,7 @@ const StatisticDrivers: React.FC = () => {
 
   const handleAdd = () => {
     const newDriver: IStatisticDriver = newStatisticDriver();
-    newDriver.costingType = costConfig?.type ?? 0;
+    newDriver.costingType = costingConfig?.type ?? CostingType.PatientCare;
 
     if (tempStatDrivers !== undefined) {
       const drivers = [newDriver].concat(tempStatDrivers);
