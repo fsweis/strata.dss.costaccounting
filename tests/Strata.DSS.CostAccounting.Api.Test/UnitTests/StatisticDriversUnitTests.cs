@@ -61,8 +61,8 @@ namespace Strata.DSS.CostAccounting.Api.Test.UnitTests
             var (controller, _) = await GetTestStatisticDriverController(connection);
 
             var statDriverSaveData = new StatisticDriverSaveData();
-            statDriverSaveData.DeletedStatDrivers = new List<Guid>() { new Guid("4014ab8a-13ab-4708-899d-4f6bc88033e6") };
-            statDriverSaveData.UpdatedStatDrivers = new List<StatisticDriver>() {
+            statDriverSaveData.DeletedGuids = new List<Guid>() { new Guid("4014ab8a-13ab-4708-899d-4f6bc88033e6") };
+            statDriverSaveData.Updated = new List<StatisticDriver>() {
                 new StatisticDriver() {
                     Name = "New Statistic Driver",
                     DriverConfigGuid = Guid.Empty,

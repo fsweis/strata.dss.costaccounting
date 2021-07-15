@@ -4,9 +4,10 @@ using System.Collections.Generic;
 
 namespace Strata.DSS.CostAccounting.Biz.StatisticDrivers.Models
 {
-    public class StatisticDriverSaveData : ICollectionSaveData<StatisticDriver>
+    public class ICollectionSaveData<T>
     {
-        public CostingType CostingType { get; set; }
+        public List<T> Updated { get; set; }
+        public List<Guid> DeletedGuids { get; set; }
     }
 
 }

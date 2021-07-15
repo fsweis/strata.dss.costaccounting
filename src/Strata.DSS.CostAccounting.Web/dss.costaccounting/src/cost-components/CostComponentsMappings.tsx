@@ -4,19 +4,18 @@ import Button from '@strata/tempo/lib/button';
 import { useEffect } from 'react';
 import { useState } from 'react';
 import { ICostComponent, newCostComponent } from './data/ICostComponent';
-import { ICostComponentSaveData } from './data/ICostComponentSaveData';
 import DataGrid from '@strata/tempo/lib/datagrid';
 import DropDown from '@strata/tempo/lib/dropdown';
 import Tooltip from '@strata/tempo/lib/tooltip';
 import { cloneDeep } from 'lodash';
 import Modal from '@strata/tempo/lib/modal';
 import Toast from '@strata/tempo/lib/toast';
-import { MappingFieldNameEnums, MappingFriendlyNameEnums } from './enums/CostComponentMappingEnums';
 import Drawer from '@strata/tempo/lib/drawer';
 import { ICostingConfig } from '../shared/data/ICostingConfig';
 import RouteConfirm from '@strata/tempo/lib/routeconfirm';
 import { getEmptyGuid } from '../shared/Utils';
 import { costComponentService } from './data/costComponentService';
+import { ICollectionSaveData } from '../shared/data/ICollectionSaveData';
 
 export interface ICostComponentsMappingsProps {
   costingConfig: ICostingConfig | undefined;
@@ -29,7 +28,6 @@ const CostComponentsMappings: React.FC<ICostComponentsMappingsProps> = (props: I
   const [gridCostComponents, setGridCostComponents] = useState<ICostComponent[]>([]); //Used for UI
   const [updatedCostComponents, setUpdatedCostComponents] = useState<ICostComponent[]>([]); //Used for create updates. Without creating new guid in frontend need a way to handle deleting and updating new entries.
   const [deletedCostComponentsGuids, setDeletedCostComponentsGuids] = useState<string[]>([]); //Used for delete to server
-
   const [drawerVisible, setDrawerVisible] = React.useState<boolean>(false);
   const [drawerTitle, setDrawerTitle] = React.useState<string>('');
 
@@ -37,9 +35,7 @@ const CostComponentsMappings: React.FC<ICostComponentsMappingsProps> = (props: I
     const fetchData = async () => {
       try {
         setLoading(true);
-
         const costComponents = await costComponentService.getCostComponentMappings();
-
         setCostComponents(costComponents);
         setGridCostComponents(cloneDeep(costComponents));
       } finally {
@@ -51,50 +47,44 @@ const CostComponentsMappings: React.FC<ICostComponentsMappingsProps> = (props: I
   }, [setLoading, props.costingConfig]);
 
   const handleSave = async () => {
-    if (await validateCostComponent()) {
-      const guids = updatedCostComponents
-        .filter((cc) => !deletedCostComponentsGuids.includes(cc.costComponentGuid))
-        .map((cc) => {
-          return cc.costComponentGuid;
-        });
+    if (!(await validateCostComponents())) {
+      return;
+    }
 
-      const costComponents = gridCostComponents.filter((cc) => guids.includes(cc.costComponentGuid) || cc.costComponentGuid === '');
+    if (!updatedCostComponents.length && !deletedCostComponentsGuids.length) {
+      Toast.show({
+        toastType: 'info',
+        message: 'No changes to save'
+      });
+      return;
+    }
 
-      const costComponentSaveData: ICostComponentSaveData = {
-        updatedCostComponents: costComponents,
-        deletedCostComponentsGuids: deletedCostComponentsGuids
-      };
+    const costComponentSaveData: ICollectionSaveData<ICostComponent> = {
+      updated: updatedCostComponents,
+      deletedGuids: deletedCostComponentsGuids
+    };
 
-      if (!costComponentSaveData.updatedCostComponents.length && !costComponentSaveData.deletedCostComponentsGuids.length) {
-        Toast.show({
-          toastType: 'info',
-          message: 'No changes to save'
-        });
-        return;
-      }
+    try {
+      setLoading(true);
 
-      try {
-        setLoading(true);
-
-        //TODO: Implment
-        // const costComponents: ICostComponent[] = []; //await costComponentService.saveCostComponents(costComponentSaveData);
-        // setCostComponents(costComponents);
-        // setGridCostComponents(cloneDeep(costComponents));
-        // setUpdatedCostComponents([]);
-        // setDeletedCostComponentsGuids([]);
-      } catch (error) {
-        Modal.alert({
-          title: 'Changes not saved',
-          content: 'Try again later. If the problem persists, contact your system administrator.',
-          alertType: 'error'
-        });
-      } finally {
-        setLoading(false);
-      }
+      //TODO: Implement
+      // const costComponents: ICostComponent[] = []; //await costComponentService.saveCostComponents(costComponentSaveData);
+      // setCostComponents(costComponents);
+      // setGridCostComponents(cloneDeep(costComponents));
+      // setUpdatedCostComponents([]);
+      // setDeletedCostComponentsGuids([]);
+    } catch (error) {
+      Modal.alert({
+        title: 'Changes not saved',
+        content: 'Try again later. If the problem persists, contact your system administrator.',
+        alertType: 'error'
+      });
+    } finally {
+      setLoading(false);
     }
   };
 
-  const validateCostComponent = async () => {
+  const validateCostComponents = async () => {
     if (!gridRef.current) {
       return false;
     }
@@ -143,7 +133,7 @@ const CostComponentsMappings: React.FC<ICostComponentsMappingsProps> = (props: I
   const handleAddCostComponent = () => {
     const costComponent = newCostComponent();
 
-    if (gridCostComponents !== undefined) {
+    if (gridCostComponents != null) {
       const updatedCostComponents = [costComponent].concat(gridCostComponents);
       setGridCostComponents(updatedCostComponents);
       setUpdatedCostComponents(updatedCostComponents);
@@ -152,23 +142,23 @@ const CostComponentsMappings: React.FC<ICostComponentsMappingsProps> = (props: I
 
   const handleEditRollups = () => {
     //TODO: implement this with modal. Future BLI
-    console.log('edit rollups');
   };
 
   const handleDeleteRow = (costComponent: ICostComponent) => {
-    if (gridCostComponents !== undefined) {
-      if (costComponent.costComponentGuid === '') {
-        const costComponents = updatedCostComponents.filter((cc) => cc !== costComponent);
-        setUpdatedCostComponents(costComponents);
-      } else {
-        const costComponentsToDelete = [costComponent.costComponentGuid].concat(deletedCostComponentsGuids);
-        setDeletedCostComponentsGuids(costComponentsToDelete);
-      }
-
-      //refresh the grid
-      const costComponents = gridCostComponents.filter((obj) => obj !== costComponent);
-      setGridCostComponents(costComponents);
+    if (gridCostComponents == null) {
+      return;
     }
+    if (costComponent.costComponentGuid === '') {
+      const costComponents = updatedCostComponents.filter((cc) => cc.displayId !== costComponent.displayId);
+      setUpdatedCostComponents(costComponents);
+    } else {
+      const costComponentsToDelete = [costComponent.costComponentGuid].concat(deletedCostComponentsGuids);
+      setDeletedCostComponentsGuids(costComponentsToDelete);
+    }
+
+    //refresh the grid
+    const costComponents = gridCostComponents.filter((obj) => obj !== costComponent);
+    setGridCostComponents(costComponents);
   };
 
   const renderMultipleSelection = (accounts: string[]) => {
@@ -180,15 +170,16 @@ const CostComponentsMappings: React.FC<ICostComponentsMappingsProps> = (props: I
     }
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleCellClick = (cellArgs: any) => {
     let title = '';
 
-    if (cellArgs.field === MappingFieldNameEnums.Accounts) {
-      title = MappingFriendlyNameEnums.Accounts;
-    } else if (cellArgs.field === MappingFieldNameEnums.JobCodes) {
-      title = MappingFriendlyNameEnums.JobCodes;
-    } else if (cellArgs.field === MappingFieldNameEnums.PayCodes) {
-      title = MappingFriendlyNameEnums.PayCodes;
+    if (cellArgs.field === 'accounts') {
+      title = 'Accounts';
+    } else if (cellArgs.field === 'jobcodes') {
+      title = 'Job Codes';
+    } else if (cellArgs.field === 'paycodes') {
+      title = 'Pay Codes';
     } else {
       return;
     }
@@ -203,7 +194,6 @@ const CostComponentsMappings: React.FC<ICostComponentsMappingsProps> = (props: I
   };
 
   const handleDrawerSelect = () => {
-    console.log('boom drawer select happened.');
     //TODO: wait for platform to determine how logic will operate here.
   };
 
@@ -243,7 +233,7 @@ const CostComponentsMappings: React.FC<ICostComponentsMappingsProps> = (props: I
             </>
           )
         }}
-        dataKey='costComponentGuid'
+        dataKey='displayId'
         ref={gridRef}
         value={gridCostComponents}
         onCellClick={handleCellClick}
@@ -302,7 +292,7 @@ const CostComponentsMappings: React.FC<ICostComponentsMappingsProps> = (props: I
           </>
         }
       >
-        stuff goes in here. Wait for Platform team to build it out.
+        {/* TODO: Waiting on picker another BLI for picker */}
       </Drawer>
       <RouteConfirm
         showPrompt={updatedCostComponents.length > 0 || deletedCostComponentsGuids.length > 0 || gridCostComponents.some((d) => d.costComponentGuid === getEmptyGuid())}

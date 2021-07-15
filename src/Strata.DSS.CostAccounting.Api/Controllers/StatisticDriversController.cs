@@ -80,11 +80,11 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<IEnumerable<StatisticDriver>>> SaveStatisticDrivers([FromBody] StatisticDriverSaveData statisticDriverSaveData, CancellationToken cancellationToken)
         {
-            if (_statisticDriversService.ValidateStatisticDrivers(statisticDriverSaveData.UpdatedStatDrivers))
+            if (_statisticDriversService.ValidateStatisticDrivers(statisticDriverSaveData.Updated))
             {
-                if (statisticDriverSaveData.UpdatedStatDrivers.Count > 0)
+                if (statisticDriverSaveData.Updated.Count > 0)
                 {
-                    await _statisticDriversRepository.UpdateStatisticDriversAsync(statisticDriverSaveData.UpdatedStatDrivers, cancellationToken);
+                    await _statisticDriversRepository.UpdateStatisticDriversAsync(statisticDriverSaveData.Updated, cancellationToken);
                 }
             }
             else
@@ -92,9 +92,9 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
                 return StatusCode(StatusCodes.Status400BadRequest);
             }
 
-            if (statisticDriverSaveData.DeletedStatDrivers.Count > 0)
+            if (statisticDriverSaveData.DeletedGuids.Count > 0)
             {
-                await _statisticDriversRepository.DeleteStatisticDriversAsync(statisticDriverSaveData.DeletedStatDrivers, cancellationToken);
+                await _statisticDriversRepository.DeleteStatisticDriversAsync(statisticDriverSaveData.DeletedGuids, cancellationToken);
             }
             var statDrivers = await _statisticDriversService.LoadStatisticDrivers(statisticDriverSaveData.CostingType, cancellationToken);
 

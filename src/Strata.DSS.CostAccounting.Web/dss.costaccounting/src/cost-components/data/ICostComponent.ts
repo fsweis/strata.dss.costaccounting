@@ -1,6 +1,8 @@
+import { getNewGuid } from '../../shared/Utils';
 import { ICostComponentAssignment } from './ICostComponentAssignment';
 
 export interface ICostComponent {
+  displayId: string;
   costComponentGuid: string;
   name: string;
   accounts: ICostComponentAssignment[];
@@ -13,6 +15,7 @@ export interface ICostComponent {
 export const newCostComponent = (costComponent: Partial<ICostComponent> = {}): ICostComponent => {
   return {
     ...{
+      displayId: getNewGuid(),
       costComponentGuid: '',
       name: '',
       accounts: [],
