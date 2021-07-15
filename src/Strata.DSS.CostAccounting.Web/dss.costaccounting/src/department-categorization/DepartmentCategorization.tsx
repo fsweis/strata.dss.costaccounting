@@ -8,8 +8,8 @@ import { CostingConfigContext } from '../shared/data/CostingConfigContext';
 import { IDepartment } from './data/IDepartment';
 import FilteredDepartments from './FilteredDepartments';
 import DepartmentExceptions from './DepartmentExceptions';
-import { DepartmentNameEnum } from './enums/DepartmentNameEnum';
-import { ICostingDepartmentTypeException, newDepartmentException } from './data/ICostingDepartmentTypeException';
+import { DepartmentTypeEnum } from './enums/DepartmentTypeEnum';
+import { ICostingDepartmentTypeException } from './data/ICostingDepartmentTypeException';
 
 const DepartmentCategorization: React.FC = () => {
   const [gridLoading, setGridLoading] = useState<boolean>(false);
@@ -25,8 +25,8 @@ const DepartmentCategorization: React.FC = () => {
         if (costingConfig) {
           const [departmentExceptionData, overheadDepartmentData, revenueDepartmentData, departmentData] = await Promise.all([
             departmentCategorizationService.getDepartmentExceptions(costingConfig.costingConfigGuid),
-            departmentCategorizationService.getDepartmentsByType(costingConfig.costingConfigGuid, DepartmentNameEnum.Overhead),
-            departmentCategorizationService.getDepartmentsByType(costingConfig.costingConfigGuid, DepartmentNameEnum.Revenue),
+            departmentCategorizationService.getDepartmentsByType(costingConfig.costingConfigGuid, DepartmentTypeEnum[DepartmentTypeEnum.Overhead]),
+            departmentCategorizationService.getDepartmentsByType(costingConfig.costingConfigGuid, DepartmentTypeEnum[DepartmentTypeEnum.Revenue]),
             departmentCategorizationService.getDepartments(costingConfig.costingConfigGuid)
           ]);
           setDepartmentExceptions(departmentExceptionData);
@@ -47,8 +47,8 @@ const DepartmentCategorization: React.FC = () => {
       setGridLoading(true);
       if (costingConfig) {
         const [overheadDepartmentData, revenueDepartmentData] = await Promise.all([
-          departmentCategorizationService.getDepartmentsByType(costingConfig.costingConfigGuid, DepartmentNameEnum.Overhead),
-          departmentCategorizationService.getDepartmentsByType(costingConfig.costingConfigGuid, DepartmentNameEnum.Revenue)
+          departmentCategorizationService.getDepartmentsByType(costingConfig.costingConfigGuid, DepartmentTypeEnum[DepartmentTypeEnum.Overhead]),
+          departmentCategorizationService.getDepartmentsByType(costingConfig.costingConfigGuid, DepartmentTypeEnum[DepartmentTypeEnum.Revenue])
         ]);
         setOverheadDepartments(overheadDepartmentData);
         setRevenueDepartments(revenueDepartmentData);

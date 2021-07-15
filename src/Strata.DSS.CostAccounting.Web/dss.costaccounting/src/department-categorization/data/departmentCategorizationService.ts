@@ -1,7 +1,6 @@
 import { IDepartment } from './IDepartment';
-import { ExceptionNameEnum } from '../enums/ExceptionNameEnum';
-import { ExceptionTypeEnum } from '../enums/ExceptionTypeEnum';
-import { DepartmentNameEnum } from '../enums/DepartmentNameEnum';
+import { ExceptionTypeEnum, getExceptionName } from '../enums/ExceptionTypeEnum';
+import { DepartmentTypeEnum } from '../enums/DepartmentTypeEnum';
 import { ICostingDepartmentTypeException } from './ICostingDepartmentTypeException';
 import { getNewGuid } from '../../shared/Utils';
 const mockDepartmentData: IDepartment[] = [
@@ -11,7 +10,7 @@ const mockDepartmentData: IDepartment[] = [
     description: 'Line of Business for Claims Costing',
     name: 'Commercial - Line of Business for Claims Costing',
     isClaimsCosting: 0,
-    departmentType: DepartmentNameEnum.Revenue
+    departmentType: DepartmentTypeEnum[DepartmentTypeEnum.Revenue]
   },
   {
     departmentId: 20841,
@@ -19,7 +18,7 @@ const mockDepartmentData: IDepartment[] = [
     description: 'FAMILY PRACTICE',
     name: '59 - 0101 - FAMILY PRACTICE',
     isClaimsCosting: 0,
-    departmentType: DepartmentNameEnum.Revenue
+    departmentType: DepartmentTypeEnum[DepartmentTypeEnum.Revenue]
   },
   {
     departmentId: 50208,
@@ -28,7 +27,7 @@ const mockDepartmentData: IDepartment[] = [
     name: '08_12__F03MBS12_LFF__ - 08_12__1403 MED BLDG S12_LIC FEE 1n1o7__',
     isClaimsCosting: 0,
 
-    departmentType: DepartmentNameEnum.Overhead
+    departmentType: DepartmentTypeEnum[DepartmentTypeEnum.Overhead]
   },
   {
     departmentId: 50256,
@@ -36,7 +35,7 @@ const mockDepartmentData: IDepartment[] = [
     description: '08_10__20 CLMS ADJ LN 20A S10___',
     name: '08_10__20CAJS10___ - 08_10__20 CLMS ADJ LN 20A S10___',
     isClaimsCosting: 0,
-    departmentType: DepartmentNameEnum.Overhead
+    departmentType: DepartmentTypeEnum[DepartmentTypeEnum.Overhead]
   },
   {
     departmentId: 1749,
@@ -44,7 +43,7 @@ const mockDepartmentData: IDepartment[] = [
     description: 'Aloha Dental Facility Maintenance-Dental',
     name: '08106006581 - Aloha Dental Facility Maintenance-Dental',
     isClaimsCosting: 0,
-    departmentType: DepartmentNameEnum.Overhead
+    departmentType: DepartmentTypeEnum[DepartmentTypeEnum.Overhead]
   }
 ];
 
@@ -56,8 +55,8 @@ const mockExceptionData: ICostingDepartmentTypeException[] = [
     costingConfigGuid: '862a9552-8c68-4bae-b3fa-74454e7a9ecb',
     name: '59 - 0101 - FAMILY PRACTICE',
     departmentTypeEnum: 1,
-    originalDepartmentType: DepartmentNameEnum.Revenue,
-    deptExceptionTypeName: ExceptionNameEnum.RevenueToOverhead,
+    originalDepartmentType: DepartmentTypeEnum[DepartmentTypeEnum.Revenue],
+    deptExceptionTypeName: getExceptionName(ExceptionTypeEnum.RevenueToOverhead),
     deptExceptionType: ExceptionTypeEnum.RevenueToOverhead
   },
   {
@@ -67,8 +66,8 @@ const mockExceptionData: ICostingDepartmentTypeException[] = [
     costingConfigGuid: '862a9552-8c68-4bae-b3fa-74454e7a9ecb',
     name: '08_10__20CAJS10___ - 08_10__20 CLMS ADJ LN 20A S10___',
     departmentTypeEnum: 2,
-    originalDepartmentType: DepartmentNameEnum.Overhead,
-    deptExceptionTypeName: ExceptionNameEnum.OverheadToExcluded,
+    originalDepartmentType: DepartmentTypeEnum[DepartmentTypeEnum.Overhead],
+    deptExceptionTypeName: getExceptionName(ExceptionTypeEnum.OverheadToExcluded),
     deptExceptionType: ExceptionTypeEnum.OverheadToExcluded
   },
   {
@@ -78,8 +77,8 @@ const mockExceptionData: ICostingDepartmentTypeException[] = [
     costingConfigGuid: '862a9552-8c68-4bae-b3fa-74454e7a9ecb',
     name: '08106006581 - Aloha Dental Facility Maintenance-Dental',
     departmentTypeEnum: 0,
-    originalDepartmentType: DepartmentNameEnum.Overhead,
-    deptExceptionTypeName: ExceptionNameEnum.OverheadToRevenue,
+    originalDepartmentType: DepartmentTypeEnum[DepartmentTypeEnum.Overhead],
+    deptExceptionTypeName: getExceptionName(ExceptionTypeEnum.OverheadToRevenue),
     deptExceptionType: ExceptionTypeEnum.OverheadToRevenue
   }
 ];
@@ -91,7 +90,7 @@ export const departmentCategorizationService = {
     return Promise.resolve(mockExceptionData);
   },
 
-  getDepartmentsByType: (costingConfigGuid: string, departmentType: DepartmentNameEnum): Promise<IDepartment[]> => {
+  getDepartmentsByType: (costingConfigGuid: string, departmentType: string): Promise<IDepartment[]> => {
     const filterDepartments = mockDepartmentData.filter((dept) => dept.departmentType === departmentType);
     return Promise.resolve(filterDepartments);
   },
@@ -108,7 +107,7 @@ export const departmentCategorizationService = {
       }
     });
     updatedExceptions.forEach(function (exception) {
-      if (exception.costingDepartmentExceptionTypeId == 0) {
+      if (exception.costingDepartmentExceptionTypeId === 0) {
         exception.costingDepartmentExceptionTypeId = exception.departmentId + 10;
       }
       const exceptionIndex = mockExceptionData.findIndex((x) => x.departmentId === exception.departmentId);

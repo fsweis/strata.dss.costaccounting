@@ -11,9 +11,7 @@ import RouteConfirm from '@strata/tempo/lib/routeconfirm';
 import { ICostingDepartmentExceptionType } from './data/ICostingDepartmentExceptionType';
 import { ICostingDepartmentTypeException, newDepartmentException } from './data/ICostingDepartmentTypeException';
 import { IDepartment } from './data/IDepartment';
-import { ExceptionNameEnum } from './enums/ExceptionNameEnum';
-import { ExceptionTypeEnum } from './enums/ExceptionTypeEnum';
-import { DepartmentNameEnum } from './enums/DepartmentNameEnum';
+import { ExceptionTypeEnum, getExceptionDepartment, getExceptionName } from './enums/ExceptionTypeEnum';
 import { DepartmentTypeEnum } from './enums/DepartmentTypeEnum';
 
 export interface IDepartmentExceptionsProps {
@@ -84,33 +82,34 @@ const DepartmentExceptions: React.FC<IDepartmentExceptionsProps> = (props: IDepa
 
   const getExceptionTypeOptions = (departmentType: string) => {
     let items: ICostingDepartmentExceptionType[];
+
     switch (departmentType) {
-      case DepartmentNameEnum.Revenue:
+      case DepartmentTypeEnum[DepartmentTypeEnum.Revenue]:
         items = [
-          { text: ExceptionNameEnum.RevenueToExcluded, value: ExceptionTypeEnum.RevenueToExcluded },
-          { text: ExceptionNameEnum.RevenueToOverhead, value: ExceptionTypeEnum.RevenueToOverhead }
+          { text: getExceptionName(ExceptionTypeEnum.RevenueToExcluded), value: ExceptionTypeEnum.RevenueToExcluded },
+          { text: getExceptionName(ExceptionTypeEnum.RevenueToOverhead), value: ExceptionTypeEnum.RevenueToOverhead }
         ];
         break;
-      case DepartmentNameEnum.Overhead:
+      case DepartmentTypeEnum[DepartmentTypeEnum.Overhead]:
         items = [
-          { text: ExceptionNameEnum.OverheadToRevenue, value: ExceptionTypeEnum.OverheadToRevenue },
-          { text: ExceptionNameEnum.OverheadToExcluded, value: ExceptionTypeEnum.OverheadToExcluded }
+          { text: getExceptionName(ExceptionTypeEnum.OverheadToRevenue), value: ExceptionTypeEnum.OverheadToRevenue },
+          { text: getExceptionName(ExceptionTypeEnum.OverheadToExcluded), value: ExceptionTypeEnum.OverheadToExcluded }
         ];
         break;
-      case DepartmentNameEnum.Excluded:
+      case DepartmentTypeEnum[DepartmentTypeEnum.Excluded]:
         items = [
-          { text: ExceptionNameEnum.ExcludedToOverhead, value: ExceptionTypeEnum.ExcludedToOverhead },
-          { text: ExceptionNameEnum.ExcludedToRevenue, value: ExceptionTypeEnum.ExcludedToRevenue }
+          { text: getExceptionName(ExceptionTypeEnum.ExcludedToOverhead), value: ExceptionTypeEnum.ExcludedToOverhead },
+          { text: getExceptionName(ExceptionTypeEnum.ExcludedToRevenue), value: ExceptionTypeEnum.ExcludedToRevenue }
         ];
         break;
       default:
         items = [
-          { text: ExceptionNameEnum.RevenueToExcluded, value: ExceptionTypeEnum.RevenueToExcluded },
-          { text: ExceptionNameEnum.RevenueToOverhead, value: ExceptionTypeEnum.RevenueToOverhead },
-          { text: ExceptionNameEnum.OverheadToRevenue, value: ExceptionTypeEnum.OverheadToRevenue },
-          { text: ExceptionNameEnum.OverheadToExcluded, value: ExceptionTypeEnum.OverheadToExcluded },
-          { text: ExceptionNameEnum.ExcludedToOverhead, value: ExceptionTypeEnum.ExcludedToOverhead },
-          { text: ExceptionNameEnum.ExcludedToRevenue, value: ExceptionTypeEnum.ExcludedToRevenue }
+          { text: getExceptionName(ExceptionTypeEnum.RevenueToExcluded), value: ExceptionTypeEnum.RevenueToExcluded },
+          { text: getExceptionName(ExceptionTypeEnum.RevenueToOverhead), value: ExceptionTypeEnum.RevenueToOverhead },
+          { text: getExceptionName(ExceptionTypeEnum.OverheadToRevenue), value: ExceptionTypeEnum.OverheadToRevenue },
+          { text: getExceptionName(ExceptionTypeEnum.OverheadToExcluded), value: ExceptionTypeEnum.OverheadToExcluded },
+          { text: getExceptionName(ExceptionTypeEnum.ExcludedToOverhead), value: ExceptionTypeEnum.ExcludedToOverhead },
+          { text: getExceptionName(ExceptionTypeEnum.ExcludedToRevenue), value: ExceptionTypeEnum.ExcludedToRevenue }
         ];
         break;
     }
@@ -163,7 +162,7 @@ const DepartmentExceptions: React.FC<IDepartmentExceptionsProps> = (props: IDepa
             ...exc,
             deptExceptionTypeName: exceptionItem.text,
             deptExceptionType: selectedExceptionTypeValue,
-            departmentTypeEnum: getDepartmentExceptionType(exceptionItem.text)
+            departmentTypeEnum: getExceptionDepartment(exceptionItem.value)
           };
         }
         return exc;
@@ -178,22 +177,7 @@ const DepartmentExceptions: React.FC<IDepartmentExceptionsProps> = (props: IDepa
       setUpdatedExceptionIds(updatedExceptionIds);
     }
   };
-  const getDepartmentExceptionType = (exceptionDepartmentType: string) => {
-    switch (exceptionDepartmentType) {
-      case ExceptionNameEnum.OverheadToRevenue:
-      case ExceptionNameEnum.ExcludedToRevenue:
-        return DepartmentTypeEnum.Revenue;
-      case ExceptionNameEnum.ExcludedToOverhead:
-      case ExceptionNameEnum.RevenueToOverhead:
-        return DepartmentTypeEnum.Overhead;
-      case ExceptionNameEnum.OverheadToExcluded:
-      case ExceptionNameEnum.RevenueToExcluded:
-        return DepartmentTypeEnum.Excluded;
-      default:
-        //should never hit this
-        return DepartmentTypeEnum.Revenue;
-    }
-  };
+
   const handleCancel = () => {
     if (updatedExceptionIds.length > 0 || deletedDepartmentIds.length > 0) {
       Modal.confirm({
