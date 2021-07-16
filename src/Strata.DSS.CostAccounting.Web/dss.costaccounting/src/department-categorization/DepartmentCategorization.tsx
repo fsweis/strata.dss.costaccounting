@@ -1,68 +1,21 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React from 'react';
 import Header from '@strata/tempo/lib/header';
 import Button from '@strata/tempo/lib/button';
 import Tabs from '@strata/tempo/lib/tabs';
 import ButtonMenu from '@strata/tempo/lib/buttonmenu';
-import { departmentCategorizationService } from './data/departmentCategorizationService';
-import { CostingConfigContext } from '../shared/data/CostingConfigContext';
-import { IDepartment } from './data/IDepartment';
 import FilteredDepartments from './FilteredDepartments';
 import DepartmentExceptions from './DepartmentExceptions';
 import { DepartmentTypeEnum } from './enums/DepartmentTypeEnum';
-import { ICostingDepartmentTypeException } from './data/ICostingDepartmentTypeException';
+import { Redirect, Route, Switch, useLocation, useRouteMatch } from 'react-router';
 
 const DepartmentCategorization: React.FC = () => {
-  const [gridLoading, setGridLoading] = useState<boolean>(false);
-  const { costingConfig } = useContext(CostingConfigContext);
-  const [departmentExceptions, setDepartmentExceptions] = useState<ICostingDepartmentTypeException[]>([]);
-  const [departments, setDepartments] = useState<IDepartment[]>([]);
-  const [overheadDepartments, setOverheadDepartments] = useState<IDepartment[]>([]);
-  const [revenueDepartments, setRevenueDepartments] = useState<IDepartment[]>([]);
+  const { path, url } = useRouteMatch();
+  const location = useLocation();
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        if (costingConfig) {
-          const [departmentExceptionData, overheadDepartmentData, revenueDepartmentData, departmentData] = await Promise.all([
-            departmentCategorizationService.getDepartmentExceptions(costingConfig.costingConfigGuid),
-            departmentCategorizationService.getDepartmentsByType(costingConfig.costingConfigGuid, DepartmentTypeEnum.Overhead),
-            departmentCategorizationService.getDepartmentsByType(costingConfig.costingConfigGuid, DepartmentTypeEnum.Revenue),
-            departmentCategorizationService.getDepartments(costingConfig.costingConfigGuid)
-          ]);
-          setDepartmentExceptions(departmentExceptionData);
-          setOverheadDepartments(overheadDepartmentData);
-          setRevenueDepartments(revenueDepartmentData);
-          setDepartments(departmentData);
-        }
-      } finally {
-        setGridLoading(false);
-      }
-    };
-    setGridLoading(true);
-    fetchData();
-  }, [costingConfig]);
-
-  const fetchFilteredDepartments = async () => {
-    try {
-      setGridLoading(true);
-      if (costingConfig) {
-        const [overheadDepartmentData, revenueDepartmentData] = await Promise.all([
-          departmentCategorizationService.getDepartmentsByType(costingConfig.costingConfigGuid, DepartmentTypeEnum.Overhead),
-          departmentCategorizationService.getDepartmentsByType(costingConfig.costingConfigGuid, DepartmentTypeEnum.Revenue)
-        ]);
-        setOverheadDepartments(overheadDepartmentData);
-        setRevenueDepartments(revenueDepartmentData);
-      }
-    } finally {
-      setGridLoading(false);
-    }
-  };
-
-  const handleSaveDepartmentExceptions = async (updatedExceptions: ICostingDepartmentTypeException[], deletedDepartmentIds: number[]) => {
-    //refresh stat drivers from return
-    const departmentExceptions = await departmentCategorizationService.saveDepartementExceptions(updatedExceptions, deletedDepartmentIds);
-    setDepartmentExceptions(departmentExceptions);
-    fetchFilteredDepartments();
+  const getActiveTab = (): string => {
+    const splitLocation = location.pathname.split('/');
+    const currentLocation = splitLocation[splitLocation.length - 1];
+    return currentLocation;
   };
 
   return (
@@ -85,23 +38,17 @@ const DepartmentCategorization: React.FC = () => {
           </>
         }
       />
-      <Tabs defaultActiveKey='1'>
-        <Tabs.TabPane key='1' tab='Exceptions'>
-          <DepartmentExceptions
-            departmentExceptions={departmentExceptions}
-            departments={departments}
-            gridLoading={gridLoading}
-            costingConfigGuid={costingConfig ? costingConfig.costingConfigGuid : ''}
-            onSaveDepartmentExceptions={handleSaveDepartmentExceptions}
-          ></DepartmentExceptions>
-        </Tabs.TabPane>
-        <Tabs.TabPane key='2' tab='Overhead'>
-          <FilteredDepartments departments={overheadDepartments}></FilteredDepartments>
-        </Tabs.TabPane>
-        <Tabs.TabPane key='3' tab='Revenue'>
-          <FilteredDepartments departments={revenueDepartments}></FilteredDepartments>
-        </Tabs.TabPane>
+      <Tabs activeKey={getActiveTab()}>
+        <Tabs.TabPane key='exceptions' tab='Exceptions' href={`${url}/exceptions`} />
+        <Tabs.TabPane key='overhead' tab='Overhead' href={`${url}/overhead`} />
+        <Tabs.TabPane key='revenue' tab='Revenue' href={`${url}/revenue`} />
       </Tabs>
+      <Switch>
+        <Route path={path} exact render={() => <Redirect to={`${url}/exceptions`}></Redirect>} key='default'></Route>
+        <Route path={`${path}/exceptions`} render={() => <DepartmentExceptions></DepartmentExceptions>} key='exceptions'></Route>
+        <Route path={`${path}/overhead`} render={() => <FilteredDepartments departmentType={DepartmentTypeEnum.Overhead}></FilteredDepartments>} key='overhead'></Route>
+        <Route path={`${path}/revenue`} render={() => <FilteredDepartments departmentType={DepartmentTypeEnum.Revenue}></FilteredDepartments>} key='revenue'></Route>
+      </Switch>
     </>
   );
 };
