@@ -8,7 +8,7 @@ import Toast from '@strata/tempo/lib/toast';
 import { usePageLoader } from '@strata/tempo/lib/pageloader';
 import DropDown from '@strata/tempo/lib/dropdown';
 import RouteConfirm from '@strata/tempo/lib/routeconfirm';
-import { ICostingDepartmentExceptionType } from './data/ICostingDepartmentExceptionType';
+import { getExceptionTypeOptions, ICostingDepartmentExceptionType } from './data/ICostingDepartmentExceptionType';
 import { ICostingDepartmentTypeException, newDepartmentException } from './data/ICostingDepartmentTypeException';
 import { IDepartment } from './data/IDepartment';
 import { ExceptionTypeEnum, getExceptionDepartment, getExceptionName } from './enums/ExceptionTypeEnum';
@@ -50,7 +50,7 @@ const DepartmentExceptions: React.FC<IDepartmentExceptionsProps> = (props: IDepa
     setExceptionDepartmentData(updatedExceptionList);
   };
 
-  const filterDepartments = (cellValue: number, filterValue: string) => {
+  const filterDepartments = (cellValue: DepartmentTypeEnum, filterValue: string) => {
     if (typeof filterValue === 'string' && filterValue.trim() !== '' && filterValue.trim() !== '-') {
       filterValue = filterValue.toLowerCase().trim();
     } else {
@@ -79,41 +79,6 @@ const DepartmentExceptions: React.FC<IDepartmentExceptionsProps> = (props: IDepa
     }
     const exceptionName = ExceptionTypeEnum[cellValue];
     return exceptionName.toLowerCase().indexOf(filterValue.toLowerCase()) > -1;
-  };
-
-  const getExceptionTypeOptions = (departmentType?: DepartmentTypeEnum) => {
-    let items: ICostingDepartmentExceptionType[];
-    switch (departmentType) {
-      case DepartmentTypeEnum.Revenue:
-        items = [
-          { text: getExceptionName(ExceptionTypeEnum.RevenueToExcluded), value: ExceptionTypeEnum.RevenueToExcluded },
-          { text: getExceptionName(ExceptionTypeEnum.RevenueToOverhead), value: ExceptionTypeEnum.RevenueToOverhead }
-        ];
-        break;
-      case DepartmentTypeEnum.Overhead:
-        items = [
-          { text: getExceptionName(ExceptionTypeEnum.OverheadToRevenue), value: ExceptionTypeEnum.OverheadToRevenue },
-          { text: getExceptionName(ExceptionTypeEnum.OverheadToExcluded), value: ExceptionTypeEnum.OverheadToExcluded }
-        ];
-        break;
-      case DepartmentTypeEnum.Excluded:
-        items = [
-          { text: getExceptionName(ExceptionTypeEnum.ExcludedToOverhead), value: ExceptionTypeEnum.ExcludedToOverhead },
-          { text: getExceptionName(ExceptionTypeEnum.ExcludedToRevenue), value: ExceptionTypeEnum.ExcludedToRevenue }
-        ];
-        break;
-      default:
-        items = [
-          { text: getExceptionName(ExceptionTypeEnum.RevenueToExcluded), value: ExceptionTypeEnum.RevenueToExcluded },
-          { text: getExceptionName(ExceptionTypeEnum.RevenueToOverhead), value: ExceptionTypeEnum.RevenueToOverhead },
-          { text: getExceptionName(ExceptionTypeEnum.OverheadToRevenue), value: ExceptionTypeEnum.OverheadToRevenue },
-          { text: getExceptionName(ExceptionTypeEnum.OverheadToExcluded), value: ExceptionTypeEnum.OverheadToExcluded },
-          { text: getExceptionName(ExceptionTypeEnum.ExcludedToOverhead), value: ExceptionTypeEnum.ExcludedToOverhead },
-          { text: getExceptionName(ExceptionTypeEnum.ExcludedToRevenue), value: ExceptionTypeEnum.ExcludedToRevenue }
-        ];
-        break;
-    }
-    return items;
   };
 
   const handleDepartmentChange = (newDepartmentId: number, exception: ICostingDepartmentTypeException) => {
@@ -152,10 +117,10 @@ const DepartmentExceptions: React.FC<IDepartmentExceptionsProps> = (props: IDepa
     }
   };
 
-  const handleExceptionTypeChange = (selectedExceptionTypeValue: number, exception: ICostingDepartmentTypeException) => {
+  const handleExceptionTypeChange = (selectedExceptionTypeValue: ExceptionTypeEnum, exception: ICostingDepartmentTypeException) => {
     const exceptionOptions = getExceptionTypeOptions(exception.originalDepartmentType);
     const exceptionItem = exceptionOptions.find((x) => x.value === selectedExceptionTypeValue);
-    if (exception !== null && exceptionItem !== undefined) {
+    if (exception !== null && exceptionItem) {
       const updatedDepartmentExceptions = exceptionDepartmentData.map((exc) => {
         if (exc === exception) {
           return {
@@ -199,37 +164,38 @@ const DepartmentExceptions: React.FC<IDepartmentExceptionsProps> = (props: IDepa
   };
 
   const handleSave = async () => {
-    if (await validateDepartmentExceptions()) {
-      const updatedExceptions = exceptionDepartmentData.filter(
-        (exc) => (updatedExceptionIds.includes(exc.displayId) || exc.costingDepartmentExceptionTypeId === 0) && !deletedDepartmentIds.includes(exc.departmentId)
-      );
-      // Don't actually save if there are no changes
-      if (!updatedExceptions.length && !deletedDepartmentIds.length) {
-        Toast.show({
-          toastType: 'info',
-          message: 'No changes to save'
-        });
-        return;
-      }
+    if (!(await validateDepartmentExceptions())) {
+      return;
+    }
+    const updatedExceptions = exceptionDepartmentData.filter(
+      (exc) => (updatedExceptionIds.includes(exc.displayId) || exc.costingDepartmentExceptionTypeId === 0) && !deletedDepartmentIds.includes(exc.departmentId)
+    );
+    // Don't actually save if there are no changes
+    if (!updatedExceptions.length && !deletedDepartmentIds.length) {
+      Toast.show({
+        toastType: 'info',
+        message: 'No changes to save'
+      });
+      return;
+    }
 
-      try {
-        setLoading(true);
-        await saveDepartmentExceptions(updatedExceptions, deletedDepartmentIds);
-        setUpdatedExceptionIds([]);
-        setDeletedDepartmentIds([]);
-        Toast.show({
-          toastType: 'success',
-          message: 'Changes saved'
-        });
-      } catch (error) {
-        Modal.alert({
-          title: 'Changes not saved',
-          content: 'Try again later. If the problem persists, contact your system administrator.',
-          alertType: 'error'
-        });
-      } finally {
-        setLoading(false);
-      }
+    try {
+      setLoading(true);
+      await saveDepartmentExceptions(updatedExceptions, deletedDepartmentIds);
+      setUpdatedExceptionIds([]);
+      setDeletedDepartmentIds([]);
+      Toast.show({
+        toastType: 'success',
+        message: 'Changes saved'
+      });
+    } catch (error) {
+      Modal.alert({
+        title: 'Changes not saved',
+        content: 'Try again later. If the problem persists, contact your system administrator.',
+        alertType: 'error'
+      });
+    } finally {
+      setLoading(false);
     }
   };
 

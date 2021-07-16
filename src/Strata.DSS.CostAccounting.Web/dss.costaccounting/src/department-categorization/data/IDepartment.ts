@@ -6,7 +6,7 @@ export interface IDepartment {
   departmentType: DepartmentTypeEnum;
   description: string;
   name: string;
-  isClaimsCosting: number;
+  isClaimsCosting: boolean;
 }
 
 export const newDepartment = (department: Partial<IDepartment> = {}): IDepartment => {
@@ -16,7 +16,7 @@ export const newDepartment = (department: Partial<IDepartment> = {}): IDepartmen
       departmentCode: '',
       description: '',
       name: '',
-      isClaimsCosting: 0,
+      isClaimsCosting: false,
       departmentType: DepartmentTypeEnum.Revenue
     },
     ...department

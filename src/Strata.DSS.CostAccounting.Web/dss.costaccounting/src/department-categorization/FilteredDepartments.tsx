@@ -6,15 +6,11 @@ export interface IFilteredDepartmentsProps {
   departments: IDepartment[];
 }
 const FilteredDepartments: React.FC<IFilteredDepartmentsProps> = (props: IFilteredDepartmentsProps) => {
-  const [filteredDepartmentData, setFilteredDepartmentData] = useState<IDepartment[]>([]);
-
-  useEffect(() => {
-    setFilteredDepartmentData(props.departments);
-  }, [props.departments]);
+  const { departments } = props;
   return (
     <>
       <DataGrid
-        value={filteredDepartmentData}
+        value={departments}
         pager={{
           pageSize: 100
         }}

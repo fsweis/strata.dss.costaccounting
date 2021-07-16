@@ -9,7 +9,7 @@ const mockDepartmentData: IDepartment[] = [
     departmentCode: 'Commercial',
     description: 'Line of Business for Claims Costing',
     name: 'Commercial - Line of Business for Claims Costing',
-    isClaimsCosting: 0,
+    isClaimsCosting: false,
     departmentType: DepartmentTypeEnum.Revenue
   },
   {
@@ -17,7 +17,7 @@ const mockDepartmentData: IDepartment[] = [
     departmentCode: '59 - 0101',
     description: 'FAMILY PRACTICE',
     name: '59 - 0101 - FAMILY PRACTICE',
-    isClaimsCosting: 0,
+    isClaimsCosting: false,
     departmentType: DepartmentTypeEnum.Revenue
   },
   {
@@ -25,7 +25,7 @@ const mockDepartmentData: IDepartment[] = [
     departmentCode: '08_12__F03MBS12_LFF__',
     description: 'FAMILY PRACTICE',
     name: '08_12__F03MBS12_LFF__ - 08_12__1403 MED BLDG S12_LIC FEE 1n1o7__',
-    isClaimsCosting: 0,
+    isClaimsCosting: false,
 
     departmentType: DepartmentTypeEnum.Overhead
   },
@@ -34,7 +34,7 @@ const mockDepartmentData: IDepartment[] = [
     departmentCode: '08_10__20CAJS10___',
     description: '08_10__20 CLMS ADJ LN 20A S10___',
     name: '08_10__20CAJS10___ - 08_10__20 CLMS ADJ LN 20A S10___',
-    isClaimsCosting: 0,
+    isClaimsCosting: false,
     departmentType: DepartmentTypeEnum.Overhead
   },
   {
@@ -42,7 +42,7 @@ const mockDepartmentData: IDepartment[] = [
     departmentCode: '8106006581',
     description: 'Aloha Dental Facility Maintenance-Dental',
     name: '08106006581 - Aloha Dental Facility Maintenance-Dental',
-    isClaimsCosting: 0,
+    isClaimsCosting: false,
     departmentType: DepartmentTypeEnum.Overhead
   }
 ];
