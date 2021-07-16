@@ -315,7 +315,7 @@ const DepartmentExceptions: React.FC = () => {
           filterMatchMode='custom'
           filterFunction={filterExceptionTypes}
           width={240}
-          itemValueField={'value'}
+          itemValueField='value'
           itemTextField='text'
           items={getExceptionTypeOptions(DepartmentTypeEnum.All)}
           isCellEditable={(cellEditorArgs) => cellEditorArgs.rowData.departmentId !== 0}
