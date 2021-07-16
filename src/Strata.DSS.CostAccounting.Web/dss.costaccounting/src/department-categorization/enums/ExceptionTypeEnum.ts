@@ -2,19 +2,12 @@ import { DepartmentTypeEnum } from './DepartmentTypeEnum';
 
 export enum ExceptionTypeEnum {
   RevenueToOverhead = 0,
-
   RevenueToExcluded = 1,
-
   OverheadToRevenue = 2,
-
   OverheadToExcluded = 3,
-
   ExcludedToOverhead = 4,
-
   ExcludedToRevenue = 5,
-
   IncludedToExcluded = 9,
-
   ExcludedToIncluded = 10
 }
 
@@ -32,10 +25,8 @@ export const getExceptionName = (value: ExceptionTypeEnum): string => {
       return 'Excluded to Overhead';
     case ExceptionTypeEnum.ExcludedToRevenue:
       return 'Excluded to Revenue';
-
     case ExceptionTypeEnum.IncludedToExcluded:
       return 'Included to Excluded';
-
     case ExceptionTypeEnum.ExcludedToIncluded:
       return 'Excluded to Included';
     default:
