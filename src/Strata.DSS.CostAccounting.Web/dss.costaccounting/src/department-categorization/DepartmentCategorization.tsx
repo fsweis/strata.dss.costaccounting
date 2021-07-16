@@ -58,7 +58,7 @@ const DepartmentCategorization: React.FC = () => {
     }
   };
 
-  const saveDepartementExceptions = async (updatedExceptions: ICostingDepartmentTypeException[], deletedDepartmentIds: number[]) => {
+  const handleSaveDepartmentExceptions = async (updatedExceptions: ICostingDepartmentTypeException[], deletedDepartmentIds: number[]) => {
     //refresh stat drivers from return
     const departmentExceptions = await departmentCategorizationService.saveDepartementExceptions(updatedExceptions, deletedDepartmentIds);
     setDepartmentExceptions(departmentExceptions);
@@ -92,7 +92,7 @@ const DepartmentCategorization: React.FC = () => {
             departments={departments}
             gridLoading={gridLoading}
             costingConfigGuid={costingConfig ? costingConfig.costingConfigGuid : ''}
-            saveDepartmentExceptions={saveDepartementExceptions}
+            onSaveDepartmentExceptions={handleSaveDepartmentExceptions}
           ></DepartmentExceptions>
         </Tabs.TabPane>
         <Tabs.TabPane key='2' tab='Overhead'>

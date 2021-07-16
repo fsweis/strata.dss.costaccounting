@@ -1,5 +1,5 @@
 import { IDepartment } from './IDepartment';
-import { ExceptionTypeEnum, getExceptionName } from '../enums/ExceptionTypeEnum';
+import { ExceptionTypeEnum } from '../enums/ExceptionTypeEnum';
 import { DepartmentTypeEnum } from '../enums/DepartmentTypeEnum';
 import { ICostingDepartmentTypeException } from './ICostingDepartmentTypeException';
 import { getNewGuid } from '../../shared/Utils';
@@ -53,30 +53,30 @@ const mockExceptionData: ICostingDepartmentTypeException[] = [
     costingDepartmentExceptionTypeId: 665,
     departmentId: 20841,
     costingConfigGuid: '862a9552-8c68-4bae-b3fa-74454e7a9ecb',
-    name: '59 - 0101 - FAMILY PRACTICE',
+    departmentName: '59 - 0101 - FAMILY PRACTICE',
     departmentTypeEnum: 1,
     originalDepartmentType: DepartmentTypeEnum.Revenue,
-    deptExceptionType: ExceptionTypeEnum.RevenueToOverhead
+    exceptionType: ExceptionTypeEnum.RevenueToOverhead
   },
   {
     displayId: getNewGuid(),
     costingDepartmentExceptionTypeId: 18326,
     departmentId: 50256,
     costingConfigGuid: '862a9552-8c68-4bae-b3fa-74454e7a9ecb',
-    name: '08_10__20CAJS10___ - 08_10__20 CLMS ADJ LN 20A S10___',
+    departmentName: '08_10__20CAJS10___ - 08_10__20 CLMS ADJ LN 20A S10___',
     departmentTypeEnum: 2,
     originalDepartmentType: DepartmentTypeEnum.Overhead,
-    deptExceptionType: ExceptionTypeEnum.OverheadToExcluded
+    exceptionType: ExceptionTypeEnum.OverheadToExcluded
   },
   {
     displayId: getNewGuid(),
     costingDepartmentExceptionTypeId: 19810,
     departmentId: 1749,
     costingConfigGuid: '862a9552-8c68-4bae-b3fa-74454e7a9ecb',
-    name: '08106006581 - Aloha Dental Facility Maintenance-Dental',
+    departmentName: '08106006581 - Aloha Dental Facility Maintenance-Dental',
     departmentTypeEnum: 0,
     originalDepartmentType: DepartmentTypeEnum.Overhead,
-    deptExceptionType: ExceptionTypeEnum.OverheadToRevenue
+    exceptionType: ExceptionTypeEnum.OverheadToRevenue
   }
 ];
 

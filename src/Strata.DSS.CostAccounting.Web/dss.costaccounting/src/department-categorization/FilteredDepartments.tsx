@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import DataGrid from '@strata/tempo/lib/datagrid';
 import { IDepartment } from './data/IDepartment';
 

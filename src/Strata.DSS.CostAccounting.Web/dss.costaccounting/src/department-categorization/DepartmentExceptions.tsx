@@ -8,10 +8,10 @@ import Toast from '@strata/tempo/lib/toast';
 import { usePageLoader } from '@strata/tempo/lib/pageloader';
 import DropDown from '@strata/tempo/lib/dropdown';
 import RouteConfirm from '@strata/tempo/lib/routeconfirm';
-import { getExceptionTypeOptions, ICostingDepartmentExceptionType } from './data/ICostingDepartmentExceptionType';
+import { getExceptionTypeOptions } from './data/ICostingDepartmentExceptionType';
 import { ICostingDepartmentTypeException, newDepartmentException } from './data/ICostingDepartmentTypeException';
 import { IDepartment } from './data/IDepartment';
-import { ExceptionTypeEnum, getExceptionDepartment, getExceptionName } from './enums/ExceptionTypeEnum';
+import { ExceptionTypeEnum, getExceptionDepartment } from './enums/ExceptionTypeEnum';
 import { DepartmentTypeEnum } from './enums/DepartmentTypeEnum';
 
 export interface IDepartmentExceptionsProps {
@@ -19,10 +19,10 @@ export interface IDepartmentExceptionsProps {
   departments: IDepartment[];
   gridLoading: boolean;
   costingConfigGuid: string;
-  saveDepartmentExceptions: (updatedExceptions: ICostingDepartmentTypeException[], deletedDepartmentIds: number[]) => void;
+  onSaveDepartmentExceptions: (updatedExceptions: ICostingDepartmentTypeException[], deletedDepartmentIds: number[]) => void;
 }
 const DepartmentExceptions: React.FC<IDepartmentExceptionsProps> = (props: IDepartmentExceptionsProps) => {
-  const { departmentExceptions, gridLoading, departments, costingConfigGuid, saveDepartmentExceptions } = props;
+  const { departmentExceptions, gridLoading, departments, costingConfigGuid, onSaveDepartmentExceptions } = props;
   const [deletedDepartmentIds, setDeletedDepartmentIds] = useState<number[]>([]);
   const [updatedExceptionIds, setUpdatedExceptionIds] = useState<string[]>([]);
   const [exceptionDepartmentData, setExceptionDepartmentData] = useState<ICostingDepartmentTypeException[]>([]);
@@ -35,10 +35,8 @@ const DepartmentExceptions: React.FC<IDepartmentExceptionsProps> = (props: IDepa
 
   const handleAddRow = () => {
     const newException: ICostingDepartmentTypeException = newDepartmentException();
-    if (exceptionDepartmentData !== undefined) {
-      const updatedDepartExceptions = [newException].concat(exceptionDepartmentData);
-      setExceptionDepartmentData(updatedDepartExceptions);
-    }
+    const updatedDepartExceptions = [newException].concat(exceptionDepartmentData);
+    setExceptionDepartmentData(updatedDepartExceptions);
   };
 
   const handleDelete = (exception: ICostingDepartmentTypeException) => {
@@ -63,7 +61,7 @@ const DepartmentExceptions: React.FC<IDepartmentExceptionsProps> = (props: IDepa
     const department = exceptionDepartmentData.find((dept) => dept.departmentId === cellValue);
 
     if (department !== undefined) {
-      return department.name.toLowerCase().indexOf(filterValue.toLowerCase()) > -1;
+      return department.departmentName.toLowerCase().indexOf(filterValue.toLowerCase()) > -1;
     }
     return false;
   };
@@ -88,7 +86,7 @@ const DepartmentExceptions: React.FC<IDepartmentExceptionsProps> = (props: IDepa
     if (exceptionDepartmentData.find((d) => d.departmentId === newDepartmentId)) {
       Modal.alert({
         title: 'Department Categorization',
-        content: 'An exception for department ' + exception.name + ' already exists.'
+        content: 'An exception for department ' + exception.departmentName + ' already exists.'
       });
       return;
     }
@@ -102,7 +100,7 @@ const DepartmentExceptions: React.FC<IDepartmentExceptionsProps> = (props: IDepa
             costingDepartmentExceptionTypeId: exc.costingDepartmentExceptionTypeId,
             departmentId: selectedDepartment.departmentId,
             originalDepartmentType: selectedDepartment.departmentType,
-            name: selectedDepartment.name,
+            departmentName: selectedDepartment.name,
             costingConfigGuid: costingConfigGuid
           });
         }
@@ -125,8 +123,7 @@ const DepartmentExceptions: React.FC<IDepartmentExceptionsProps> = (props: IDepa
         if (exc === exception) {
           return {
             ...exc,
-            deptExceptionTypeName: exceptionItem.text,
-            deptExceptionType: selectedExceptionTypeValue,
+            exceptionType: selectedExceptionTypeValue,
             departmentTypeEnum: getExceptionDepartment(exceptionItem.value)
           };
         }
@@ -181,18 +178,12 @@ const DepartmentExceptions: React.FC<IDepartmentExceptionsProps> = (props: IDepa
 
     try {
       setLoading(true);
-      await saveDepartmentExceptions(updatedExceptions, deletedDepartmentIds);
+      await onSaveDepartmentExceptions(updatedExceptions, deletedDepartmentIds);
       setUpdatedExceptionIds([]);
       setDeletedDepartmentIds([]);
       Toast.show({
         toastType: 'success',
         message: 'Changes saved'
-      });
-    } catch (error) {
-      Modal.alert({
-        title: 'Changes not saved',
-        content: 'Try again later. If the problem persists, contact your system administrator.',
-        alertType: 'error'
       });
     } finally {
       setLoading(false);
@@ -294,7 +285,7 @@ const DepartmentExceptions: React.FC<IDepartmentExceptionsProps> = (props: IDepa
           ]}
         />
         <DataGrid.DropDownColumn
-          field='deptExceptionType'
+          field='exceptionType'
           header='Exception Type'
           filter
           filterMatchMode='custom'
@@ -313,7 +304,7 @@ const DepartmentExceptions: React.FC<IDepartmentExceptionsProps> = (props: IDepa
                   items={getExceptionTypeOptions(cellEditorArgs.rowData.originalDepartmentType)}
                   itemValueField='value'
                   itemTextField='text'
-                  value={cellEditorArgs.rowData.departmentId !== 0 ? cellEditorArgs.rowData.deptExceptionType : undefined}
+                  value={cellEditorArgs.rowData.departmentId !== 0 ? cellEditorArgs.rowData.exceptionType : undefined}
                 />
               )}
             </>
