@@ -1,14 +1,11 @@
 ﻿using Strata.DSS.CostAccounting.Biz.Enums;
-using System;
-using System.Collections.Generic;
+using Strata.DSS.CostAccounting.Biz.Shared.Models;
 
 namespace Strata.DSS.CostAccounting.Biz.StatisticDrivers.Models
 {
-    public class StatisticDriverSaveData
+    public class StatisticDriverSaveData : SaveDataBase<StatisticDriver>
     {
         public CostingType CostingType { get; set; }
-        public List<StatisticDriver> UpdatedStatDrivers { get; set; }
-        public List<Guid> DeletedStatDrivers { get; set; }
     }
 
 }
