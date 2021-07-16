@@ -13,6 +13,7 @@ import { ICostingDepartmentTypeException, newDepartmentException } from './data/
 import { IDepartment } from './data/IDepartment';
 import { ExceptionTypeEnum, getExceptionDepartment } from './enums/ExceptionTypeEnum';
 import { DepartmentTypeEnum } from './enums/DepartmentTypeEnum';
+import cloneDeep from 'lodash/cloneDeep';
 
 export interface IDepartmentExceptionsProps {
   departmentExceptions: ICostingDepartmentTypeException[];
@@ -30,7 +31,7 @@ const DepartmentExceptions: React.FC<IDepartmentExceptionsProps> = (props: IDepa
   const { setLoading } = usePageLoader();
 
   useEffect(() => {
-    setExceptionDepartmentData(departmentExceptions);
+    setExceptionDepartmentData(cloneDeep(departmentExceptions));
   }, [departmentExceptions]);
 
   const handleAddRow = () => {
@@ -150,7 +151,7 @@ const DepartmentExceptions: React.FC<IDepartmentExceptionsProps> = (props: IDepa
           if (exceptionDepartmentData) {
             setUpdatedExceptionIds([]);
             setDeletedDepartmentIds([]);
-            setExceptionDepartmentData(departmentExceptions);
+            setExceptionDepartmentData(cloneDeep(departmentExceptions));
           }
           Toast.show({
             message: 'Changes discarded'
