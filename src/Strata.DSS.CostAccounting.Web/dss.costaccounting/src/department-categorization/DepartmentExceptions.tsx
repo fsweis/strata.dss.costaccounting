@@ -347,7 +347,7 @@ const DepartmentExceptions: React.FC<IDepartmentExceptionsProps> = (props: IDepa
                   items={getExceptionTypeOptions(cellEditorArgs.rowData.originalDepartmentType)}
                   itemValueField='value'
                   itemTextField='text'
-                  value={cellEditorArgs.rowData.departmentId !== 0 ? cellEditorArgs.rowData.deptExceptionType : ''}
+                  value={cellEditorArgs.rowData.departmentId !== 0 ? cellEditorArgs.rowData.deptExceptionType : undefined}
                 />
               )}
             </>

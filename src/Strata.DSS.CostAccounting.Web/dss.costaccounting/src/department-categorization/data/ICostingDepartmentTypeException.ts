@@ -9,7 +9,7 @@ export interface ICostingDepartmentTypeException {
   costingConfigGuid: string;
   departmentTypeEnum: DepartmentTypeEnum;
   name: string;
-  deptExceptionType: ExceptionTypeEnum;
+  deptExceptionType?: ExceptionTypeEnum;
   originalDepartmentType: DepartmentTypeEnum;
 }
 export const newDepartmentException = (exception: Partial<ICostingDepartmentTypeException> = {}): ICostingDepartmentTypeException => {
@@ -21,7 +21,7 @@ export const newDepartmentException = (exception: Partial<ICostingDepartmentType
       costingConfigGuid: '',
       departmentTypeEnum: DepartmentTypeEnum.Revenue,
       name: '',
-      deptExceptionType: ExceptionTypeEnum.RevenueToOverhead,
+      deptExceptionType: undefined,
       originalDepartmentType: DepartmentTypeEnum.Revenue
     },
     ...exception
