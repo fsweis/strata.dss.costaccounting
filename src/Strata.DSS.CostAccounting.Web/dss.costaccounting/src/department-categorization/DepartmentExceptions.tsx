@@ -95,20 +95,17 @@ const DepartmentExceptions: React.FC = () => {
   };
 
   const handleDepartmentChange = (newDepartmentId: number, exception: ICostingDepartmentTypeException) => {
-    // Can't add exception if there is already an exception
-    // Dropdown should prevent this from happening?
-    const exceptionExists = departmentExceptionGridData.find((d) => d.departmentId === newDepartmentId);
-    if (exceptionExists) {
-      Modal.alert({
-        title: 'Department Categorization',
-        content: 'An exception for department ' + exceptionExists.departmentName + ' already exists.'
-      });
-      return;
-    }
     // Get selected department
     const selectedDepartment = departmentData.find((d) => d.departmentId === newDepartmentId);
-
     if (selectedDepartment) {
+      // Can't add exception if there is already an exception
+      if (departmentExceptionGridData.find((d) => d.departmentId === newDepartmentId)) {
+        Modal.alert({
+          title: 'Department Categorization',
+          content: 'An exception for department ' + selectedDepartment.name + ' already exists.'
+        });
+        return;
+      }
       const updatedDepartmentExceptions = departmentExceptionGridData.map((exc) => {
         if (exc === exception) {
           return newDepartmentException({
