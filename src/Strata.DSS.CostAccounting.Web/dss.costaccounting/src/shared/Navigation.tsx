@@ -78,7 +78,7 @@ const Navigation: React.FC = () => {
                 <Route path='/statistic-drivers' component={StatisticDrivers} key='statistic-drivers'></Route>
                 <Route path='/cost-audit' component={CostAudit} key='cost-audit'></Route>
                 <Route path='/department-categorization' component={DepartmentCategorization} key='department-categorization'></Route>
-                <Route path='/cost-components' component={CostComponents} key='cost-components'></Route>
+                <Route path='/cost-components/:costingConfigGuid' component={CostComponents} key='cost-components'></Route>
                 <Route path='/variability' component={Variability} key='variability'></Route>
                 <Route path='/reclassification' component={Reclassification} key='reclassification'></Route>
                 <Route path='/overhead-allocation' component={OverheadAllocation} key='overhead-allocation'></Route>
