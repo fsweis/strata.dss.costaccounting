@@ -14,7 +14,7 @@ import Text from '@strata/tempo/lib/text';
 import { usePageLoader } from '@strata/tempo/lib/pageloader';
 import { ICellEditorArgs } from '@strata/tempo/lib/datacolumn';
 import { IStatisticDriverSaveData } from './data/IStatisticDriverSaveData';
-import { IStatisticDriver } from './data/IStatisticDriver';
+import { IStatisticDriver, newStatisticDriver } from './data/IStatisticDriver';
 import { statisticDriverService } from './data/statisticDriverService';
 import { IDataSourceLink } from './data/IDataSourceLink';
 import { getEmptyGuid } from '../shared/Utils';
@@ -83,16 +83,8 @@ const StatisticDrivers: React.FC = () => {
   };
 
   const handleAdd = () => {
-    const newDriver: IStatisticDriver = {
-      driverConfigGuid: emptyGuid,
-      dataTableGuid: '',
-      measureGuid: '',
-      hasRules: false,
-      isInverted: false,
-      isUsed: false,
-      name: '',
-      costingType: costingConfig?.type ?? CostingType.PatientCare
-    };
+    const newDriver: IStatisticDriver = newStatisticDriver();
+    newDriver.costingType = costingConfig?.type ?? CostingType.PatientCare;
 
     if (tempStatDrivers !== undefined) {
       const drivers = [newDriver].concat(tempStatDrivers);
@@ -161,7 +153,7 @@ const StatisticDrivers: React.FC = () => {
       const invalidKeys = invalidCells.map((cell) => cell.rowKey);
       const invalidRows: { rowNumber: number; guid: string }[] = tempStatDrivers
         .map((driver, index) => {
-          return { guid: driver.driverConfigGuid, rowNumber: index };
+          return { guid: driver.displayId, rowNumber: index };
         })
         .filter((r) => invalidKeys.includes(r.guid));
 
@@ -205,9 +197,9 @@ const StatisticDrivers: React.FC = () => {
     return measureGuids.includes(cellValue);
   };
 
-  const updateDropDownDrivers = (driverConfigGuid: string, measureGuid: string) => {
+  const updateDropDownDrivers = (displayId: string, measureGuid: string) => {
     const updatedDrivers = tempStatDrivers.map((driver) => {
-      if (driver.driverConfigGuid === driverConfigGuid) {
+      if (driver.displayId === displayId) {
         return { ...driver, measureGuid: measureGuid };
       }
       return driver;
@@ -228,13 +220,13 @@ const StatisticDrivers: React.FC = () => {
       cellEditorArgs.rowData.dataTableGuid = value;
       const defaultValue = dataSourceLinks.filter((x) => x.dataTableGuid === value && x.isFirstSelect === true);
       if (defaultValue !== undefined && defaultValue.length > 0) {
-        const updatedDrivers = updateDropDownDrivers(cellEditorArgs.rowData.driverConfigGuid, defaultValue[0].measureGuid);
+        const updatedDrivers = updateDropDownDrivers(cellEditorArgs.rowData.displayId, defaultValue[0].measureGuid);
         //need to refresh grid data
         setTempStatDrivers(updatedDrivers);
       } else {
         const nonDefaultValue = dataSourceLinks.filter((x) => x.dataTableGuid === value);
         if (nonDefaultValue !== undefined && nonDefaultValue.length > 0) {
-          const updatedDrivers = updateDropDownDrivers(cellEditorArgs.rowData.driverConfigGuid, nonDefaultValue[0].measureGuid);
+          const updatedDrivers = updateDropDownDrivers(cellEditorArgs.rowData.displayId, nonDefaultValue[0].measureGuid);
           //need to refresh grid data
           setTempStatDrivers(updatedDrivers);
         }
@@ -256,18 +248,18 @@ const StatisticDrivers: React.FC = () => {
     }
   };
 
-  const handleDelete = (driverConfigGuid: string, isNew: boolean) => {
+  const handleDelete = (driver: IStatisticDriver) => {
     if (tempStatDrivers !== undefined) {
-      if (isNew) {
-        const newUpdatedDriverGuids = updatedDriverGuids.filter((guid) => guid !== driverConfigGuid);
+      if (driver.driverConfigGuid === emptyGuid) {
+        const newUpdatedDriverGuids = updatedDriverGuids.filter((guid) => guid !== driver.driverConfigGuid);
         setUpdatedDriverGuids(newUpdatedDriverGuids);
       } else {
         //add to deleted drivers
-        const driversToDelete = [driverConfigGuid].concat(deletedDriverGuids);
+        const driversToDelete = [driver.driverConfigGuid].concat(deletedDriverGuids);
         setDeletedDriverGuids(driversToDelete);
       }
       //refresh the grid
-      const newStatDrivers = tempStatDrivers.filter((obj) => obj.driverConfigGuid !== driverConfigGuid);
+      const newStatDrivers = tempStatDrivers.filter((obj) => obj.displayId !== driver.displayId);
       setTempStatDrivers(newStatDrivers);
     }
   };
@@ -318,7 +310,7 @@ const StatisticDrivers: React.FC = () => {
         ref={gridRef}
         value={tempStatDrivers}
         scrollable
-        dataKey='driverConfigGuid'
+        dataKey='displayId'
         onCellEdit={(e) => handleCellEdit(e.rowData.driverConfigGuid)}
         pager={{
           pageSize: 100,
@@ -436,7 +428,7 @@ const StatisticDrivers: React.FC = () => {
                 </Button>
               </Tooltip>
               <Tooltip placement='left' title={rowData.isUsed ? "Can't delete drivers in use" : 'Delete'}>
-                <Button type='link' icon='Delete' disabled={rowData.isUsed} onClick={() => handleDelete(rowData.driverConfigGuid, rowData.driverConfigGuid === emptyGuid)} />
+                <Button type='link' icon='Delete' disabled={rowData.isUsed} onClick={() => handleDelete(rowData)} />
               </Tooltip>
             </>
           )}
