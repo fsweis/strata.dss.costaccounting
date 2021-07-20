@@ -29,6 +29,7 @@ const Navigation: React.FC = () => {
 
   const location = useLocation();
   const history = useHistory();
+
   useEffect(() => {
     const fetchData = async () => {
       const [costingConfigurations, currentFiscalYear] = await Promise.all([costingConfigService.getCostingConfigs(), systemSettingService.getCurrentFiscalYear()]);
@@ -42,6 +43,7 @@ const Navigation: React.FC = () => {
     };
     fetchData();
   }, []);
+
   useEffect(() => {
     const pathConfigGuid = getPathConfigGuid(location.pathname);
 
@@ -55,6 +57,7 @@ const Navigation: React.FC = () => {
       // history.push(`${splitPath[0]}/${costConfigGuid}`);
     }
   }, [costingConfigGuid, history, location]);
+
   return (
     <>
       <Layout>
@@ -75,18 +78,18 @@ const Navigation: React.FC = () => {
               <Switch>
                 <Route path='/' exact render={() => <Redirect to={`/overview`}></Redirect>} key='default'></Route>
                 <Route path='/overview' component={Overview} key='overview'></Route>
-                <Route path='/statistic-drivers' component={StatisticDrivers} key='statistic-drivers'></Route>
-                <Route path='/cost-audit' component={CostAudit} key='cost-audit'></Route>
-                <Route path='/department-categorization' component={DepartmentCategorization} key='department-categorization'></Route>
-                <Route path='/cost-components' component={CostComponents} key='cost-components'></Route>
-                <Route path='/variability' component={Variability} key='variability'></Route>
-                <Route path='/reclassification' component={Reclassification} key='reclassification'></Route>
-                <Route path='/overhead-allocation' component={OverheadAllocation} key='overhead-allocation'></Route>
-                <Route path='/cost-component-reclassification' component={CostComponentReclassification} key='cost-component-reclassification'></Route>
-                <Route path='/activity-code-designer' component={ActivityCodeDesigner} key='activity-code-designer'></Route>
-                <Route path='/charge-allocation' component={ChargeAllocation} key='charge-allocation'></Route>
-                <Route path='/drop-down-configuration' component={DropdownConfiguration} key='drop-down-configuration'></Route>
-                <Route path='/manual-statistics' component={ManualStatistics} key='manual-statistics'></Route>
+                <Route path='/statistic-drivers/:costingConfigGuid' component={StatisticDrivers} key='statistic-drivers'></Route>
+                <Route path='/cost-audit/:costingConfigGuid' component={CostAudit} key='cost-audit'></Route>
+                <Route path='/department-categorization/:costingConfigGuid' component={DepartmentCategorization} key='department-categorization'></Route>
+                <Route path='/cost-components/:costingConfigGuid' component={CostComponents} key='cost-components'></Route>
+                <Route path='/variability/:costingConfigGuid' component={Variability} key='variability'></Route>
+                <Route path='/reclassification/:costingConfigGuid' component={Reclassification} key='reclassification'></Route>
+                <Route path='/overhead-allocation/:costingConfigGuid' component={OverheadAllocation} key='overhead-allocation'></Route>
+                <Route path='/cost-component-reclassification/:costingConfigGuid' component={CostComponentReclassification} key='cost-component-reclassification'></Route>
+                <Route path='/activity-code-designer/:costingConfigGuid' component={ActivityCodeDesigner} key='activity-code-designer'></Route>
+                <Route path='/charge-allocation/:costingConfigGuid' component={ChargeAllocation} key='charge-allocation'></Route>
+                <Route path='/drop-down-configuration/:costingConfigGuid' component={DropdownConfiguration} key='drop-down-configuration'></Route>
+                <Route path='/manual-statistics/:costingConfigGuid' component={ManualStatistics} key='manual-statistics'></Route>
               </Switch>
             </CostingConfigProvider>
           </Layout.Content>
