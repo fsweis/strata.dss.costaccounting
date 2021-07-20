@@ -35,7 +35,7 @@ namespace Strata.DSS.CostAccounting.Biz.DepartmentCategorization.Repositories
 
         public IEnumerable<Department> GetDepartments(CancellationToken cancellationToken)
         {
-            var departments =  _dbContext.Departments.Where(x => x.IsActive);
+            var departments =  _dbContext.Departments;
             return departments;
         }
 

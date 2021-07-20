@@ -12,7 +12,7 @@ namespace Strata.DSS.CostAccounting.Biz.DepartmentCategorization.Models
         public string Description { get; set; }
         public string Name { get; set; }
         public bool IsClaimsCosting { get; set; }
-        public ExceptionDepartmentType DepartmentType { get ;  }//return the enumeration int
+        public string DepartmentType { get; set; }//return the enumeration int
         public bool IsActive { get; set; }
     }
 }
