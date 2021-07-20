@@ -3,12 +3,15 @@ import { IDataSource } from '../../shared/data/IDataSource';
 import { IDataSourceLink } from './IDataSourceLink';
 import { IStatisticDriver } from './IStatisticDriver';
 import { IStatisticDriverSaveData } from './IStatisticDriverSaveData';
+import { getNewGuid } from '../../shared/Utils';
 
 const { httpGet, httpPost } = getSecureService(appConfig.apiUrl);
 
 export const statisticDriverService = {
-  getStatisticDrivers: (costingType: number): Promise<IStatisticDriver[]> => {
-    return httpGet<IStatisticDriver[]>(`statistic-drivers?costingType=${costingType}`);
+  getStatisticDrivers: async (costingType: number): Promise<IStatisticDriver[]> => {
+    const drivers = await httpGet<IStatisticDriver[]>(`statistic-drivers?costingType=${costingType}`);
+    drivers.forEach((d) => (d.displayId = getNewGuid()));
+    return drivers;
   },
   getDataSources: (costingType: number): Promise<IDataSource[]> => {
     return httpGet<IDataSource[]>(`statistic-drivers/data-sources?costingType=${costingType}`);
