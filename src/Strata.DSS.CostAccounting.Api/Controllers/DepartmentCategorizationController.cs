@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Strata.DSS.CostAccounting.Biz.DepartmentCategorization.Models;
 using Strata.DSS.CostAccounting.Biz.DepartmentCategorization.Repositories;
+using Strata.DSS.CostAccounting.Biz.DepartmentCategorization.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,10 +18,12 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
     public class DepartmentCategorizationController : ControllerBase
     {
         private readonly IDepartmentCategorizationRepository _departmentCategorizationRepository;
-
-        public DepartmentCategorizationController(IDepartmentCategorizationRepository departmentCategorizationRepository)
+        private readonly IDepartmentCategorizationService _departmentCategorizationService;
+        private readonly string[] departmentExceptionFilterValues = { "revenue", "overhead" };
+        public DepartmentCategorizationController(IDepartmentCategorizationRepository departmentCategorizationRepository, IDepartmentCategorizationService departmentCategorizationService)
         {
             _departmentCategorizationRepository = departmentCategorizationRepository;
+            _departmentCategorizationService = departmentCategorizationService;
         }
 
         [HttpGet("departments")]
@@ -54,6 +57,26 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
             }
 
             return Ok(exceptions);
+        }
+
+        [HttpGet("{costingConfigGuid}/filtered-departments/{departmentType}")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(400)]
+        public ActionResult<IEnumerable<CostingDepartmentException>> GetFiltered([FromRoute] Guid costingConfigGuid, [FromRoute] string departmentType, CancellationToken cancellationToken)
+        {
+            if (!departmentExceptionFilterValues.Contains(departmentType.ToLower()))
+            {
+                return BadRequest("Invalid Department Filter: "+departmentType);
+            }
+
+            var filteredDepartments = _departmentCategorizationService.GetDepartmentByType(costingConfigGuid, departmentType,cancellationToken);
+            if (!filteredDepartments.Any())
+            {
+                return NotFound();
+            }
+
+            return Ok(filteredDepartments);
         }
     }
 }
