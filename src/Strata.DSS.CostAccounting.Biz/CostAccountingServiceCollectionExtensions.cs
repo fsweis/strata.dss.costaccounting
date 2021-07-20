@@ -7,6 +7,7 @@ using Strata.CoreLib.Claims.Extensions;
 using Strata.DSS.CostAccounting.Biz.CostAccounting.DbContexts;
 using Strata.DSS.CostAccounting.Biz.CostAccounting.Repositories;
 using Strata.DSS.CostAccounting.Biz.CostingConfigs.Repositories;
+using Strata.DSS.CostAccounting.Biz.DepartmentCategorization.Repositories;
 using Strata.DSS.CostAccounting.Biz.StatisticDrivers.Repositories;
 using Strata.DSS.CostAccounting.Biz.StatisticDrivers.Services;
 using Strata.Hangfire.Configuration;
@@ -26,6 +27,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddScoped<ICostingConfigRepository, CostingConfigRepository>();
             services.AddScoped<IStatisticDriversRepository, StatisticDriversRepository>();
             services.AddScoped<ISystemSettingRepository, SystemSettingRepository>();
+            services.AddScoped<IDepartmentCategorizationRepository, DepartmentCategorizationRepository>();
 
             services.AddScoped<IStatisticDriversService, StatisticDriversService>();
             services.AddScoped<IDataSourceService, DataSourceService>();

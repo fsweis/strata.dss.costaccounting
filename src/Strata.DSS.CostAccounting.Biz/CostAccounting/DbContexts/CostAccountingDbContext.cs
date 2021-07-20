@@ -1,7 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Strata.DSS.CostAccounting.Biz.CostAccounting.Models;
 using Strata.DSS.CostAccounting.Biz.CostingConfigs.Models;
+using Strata.DSS.CostAccounting.Biz.DepartmentCategorization.Enums;
+using Strata.DSS.CostAccounting.Biz.DepartmentCategorization.Models;
 using Strata.DSS.CostAccounting.Biz.StatisticDrivers.Models;
+using System;
+using System.Linq;
 
 namespace Strata.DSS.CostAccounting.Biz.CostAccounting.DbContexts
 {
@@ -14,6 +18,7 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.DbContexts
         {
         }
 
+        private readonly string[] departmentExceptionFilterValues = { "revenue","overhead","excluded" };
         public virtual DbSet<Measure> Measures { get; set; }
         public virtual DbSet<DataTable> DataTables { get; set; }
         public virtual DbSet<RuleSet> RuleSets { get; set; }
@@ -37,6 +42,9 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.DbContexts
         public virtual DbSet<CostingConfigEntityLevelSecurity> CostingConfigEntityLevelSecurities { get; set; }
 
         public virtual DbSet<CostingConfigEntityLinkage> CostingConfigEntityLinkages { get; set; }
+        public virtual DbSet<Department> Departments { get; set; }
+        public virtual DbSet<CostingDepartmentException> DepartmentExceptions { get; set; }
+        public virtual DbSet<CostingDepartmentTypeException> CostingDepartmentTypeExceptions { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -162,6 +170,31 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.DbContexts
             {
                 entity.HasKey(e => e.CostingConfigEntityLinkageId);
                 entity.ToTable("CostingConfigEntityLinkage", "dss");
+            });
+
+            modelBuilder.Entity<Department>(entity =>
+            {
+                entity.HasKey(e => e.DepartmentId);
+                entity.ToTable("DimDepartment", "fw");
+                entity.HasQueryFilter(e => Enum.GetValues(typeof(ExceptionDepartmentType))
+                            .Cast<ExceptionDepartmentType>()
+                            .ToList().Contains(e.DepartmentType));
+            });
+
+            modelBuilder.Entity<CostingDepartmentException>(entity =>
+            {
+                entity.HasKey(e => e.CostingDepartmentExceptionTypeId);
+                entity.ToTable("viewCostingDepartmentTypeException", "dss");
+                entity.Ignore("DisplayId");
+                entity.HasQueryFilter(e => departmentExceptionFilterValues.Contains(e.OriginalDepartmentType.ToLower()));
+            });
+
+            modelBuilder.Entity<CostingDepartmentTypeException>(entity =>
+            {
+                entity.HasKey(e => e.CostingDepartmentExceptionTypeId);
+                entity.ToTable("CostingDepartmentTypeException", "dss");
+                entity.Property(c => c.DepartmentTypeEnum)
+                    .HasConversion<int>();
             });
         }
     }

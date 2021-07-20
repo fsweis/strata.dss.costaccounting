@@ -17,4 +17,8 @@
     <PackageReference Include="Strata.Hangfire.Jazz.Client" Version="0.11.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="DepartmentCategorization\Services\" />
+  </ItemGroup>
+
 </Project>
