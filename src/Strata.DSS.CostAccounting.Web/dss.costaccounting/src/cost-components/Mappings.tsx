@@ -11,17 +11,15 @@ import { cloneDeep } from 'lodash';
 import Modal from '@strata/tempo/lib/modal';
 import Toast from '@strata/tempo/lib/toast';
 import Drawer from '@strata/tempo/lib/drawer';
-import { ICostingConfig } from '../shared/data/ICostingConfig';
+import { useContext } from 'react';
+import { CostingConfigContext } from '../shared/data/CostingConfigContext';
 import RouteConfirm from '@strata/tempo/lib/routeconfirm';
 import { getEmptyGuid } from '../shared/Utils';
 import { costComponentService } from './data/costComponentService';
 import { ICollectionSaveData } from '../shared/data/ICollectionSaveData';
 
-export interface ICostComponentsMappingsProps {
-  costingConfig: ICostingConfig | undefined;
-}
-
-const CostComponentsMappings: React.FC<ICostComponentsMappingsProps> = (props: ICostComponentsMappingsProps) => {
+const Mappings: React.FC = () => {
+  const { costingConfig } = useContext(CostingConfigContext);
   const [loading, setLoading] = React.useState(false);
   const gridRef = React.useRef<DataGrid>(null);
   const [costComponents, setCostComponents] = useState<ICostComponent[]>([]); //Used for initial load and reset(cancel)
@@ -44,7 +42,7 @@ const CostComponentsMappings: React.FC<ICostComponentsMappingsProps> = (props: I
     };
 
     fetchData();
-  }, [setLoading, props.costingConfig]);
+  }, [setLoading, costingConfig]);
 
   const handleSave = async () => {
     if (!(await validateCostComponents())) {
@@ -331,4 +329,4 @@ const CostComponentsMappings: React.FC<ICostComponentsMappingsProps> = (props: I
   );
 };
 
-export default CostComponentsMappings;
+export default Mappings;
