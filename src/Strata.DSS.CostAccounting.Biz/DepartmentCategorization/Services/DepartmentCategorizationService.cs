@@ -28,9 +28,9 @@ namespace Strata.DSS.CostAccounting.Biz.DepartmentCategorization.Services
                                                     .Where(deptAndExcept => deptAndExcept.Except.CostingConfigGuid == costingConfigGuid);
 
             //remove the departments that have exceptions
-            var departmentsToRemove = deptsWithExceptions.Where(x => x.Except.DepartmentTypeEnum != (ExceptionDepartmentType)Enum.Parse(typeof(ExceptionDepartmentType), departmentType)).Select(x => x.Dept);
-            var departmentsToAdd = deptsWithExceptions.Where(x => x.Except.DepartmentTypeEnum == (ExceptionDepartmentType)Enum.Parse(typeof(ExceptionDepartmentType), departmentType)).Select(x => x.Dept);
-            var departmentsScrubbed = _dbContext.Departments.Where(x => x.DepartmentType == departmentType).Except(departmentsToRemove).Union(departmentsToAdd);
+            var departmentsToRemove = deptsWithExceptions.Where(x => x.Except.DepartmentTypeEnum != (ExceptionDepartmentType)int.Parse(departmentType)).Select(x => x.Dept);
+            var departmentsToAdd = deptsWithExceptions.Where(x => x.Except.DepartmentTypeEnum == (ExceptionDepartmentType)int.Parse(departmentType)).Select(x => x.Dept);
+            var departmentsScrubbed = _dbContext.Departments.Where(x => x.DepartmentType == ((ExceptionDepartmentType)int.Parse(departmentType)).ToString()).Except(departmentsToRemove).Union(departmentsToAdd);
 
             return departmentsScrubbed;
         }

@@ -36,7 +36,7 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
             return departments;
         }
 
-        [HttpGet("{searchTerm}/search")]
+        [HttpGet("search/{searchTerm}")]
         [ProducesResponseType(200)]
         [ProducesResponseType(404)]
         public IEnumerable<Department> GetDepartmentsBySearchTerm([FromRoute] string searchTerm, CancellationToken cancellationToken)
