@@ -111,7 +111,7 @@ const DepartmentExceptions: React.FC = () => {
           return newDepartmentException({
             costingDepartmentExceptionTypeId: exc.costingDepartmentExceptionTypeId,
             departmentId: selectedDepartment.departmentId,
-            originalDepartmentType: selectedDepartment.departmentType,
+            originalDepartmentTypeAsEnum: selectedDepartment.departmentType,
             departmentName: selectedDepartment.name,
             costingConfigGuid: costingConfig?.costingConfigGuid
           });
@@ -135,7 +135,7 @@ const DepartmentExceptions: React.FC = () => {
   };
 
   const handleExceptionTypeChange = (selectedExceptionTypeValue: ExceptionTypeEnum, exception: ICostingDepartmentTypeException) => {
-    const exceptionOptions = getExceptionTypeOptions(exception.originalDepartmentType);
+    const exceptionOptions = getExceptionTypeOptions(exception.originalDepartmentTypeAsEnum);
     const exceptionItem = exceptionOptions.find((x) => x.value === selectedExceptionTypeValue);
     if (exception !== null && exceptionItem) {
       const updatedDepartmentExceptions = departmentExceptionGridData.map((exc) => {
@@ -322,7 +322,7 @@ const DepartmentExceptions: React.FC = () => {
                 <DropDown
                   width={240}
                   onChange={(value) => handleExceptionTypeChange(value as number, cellEditorArgs.rowData)}
-                  items={getExceptionTypeOptions(cellEditorArgs.rowData.originalDepartmentType)}
+                  items={getExceptionTypeOptions(cellEditorArgs.rowData.OriginalDepartmentTypeAsEnum)}
                   itemValueField='value'
                   itemTextField='text'
                   value={cellEditorArgs.rowData.departmentId !== 0 ? cellEditorArgs.rowData.exceptionType : undefined}

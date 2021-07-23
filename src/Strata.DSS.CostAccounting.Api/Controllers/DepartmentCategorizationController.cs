@@ -48,15 +48,9 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
 
         [HttpGet("{costingConfigGuid}/exceptions")]
         [ProducesResponseType(200)]
-        [ProducesResponseType(404)]
         public ActionResult<IEnumerable<CostingDepartmentException>> GetExceptions([FromRoute] Guid costingConfigGuid, CancellationToken cancellationToken)
         {
             var exceptions = _departmentCategorizationRepository.GetDepartmentExceptions(costingConfigGuid, cancellationToken);
-            if(!exceptions.Any())
-            {
-                return NotFound();
-            }
-
             return Ok(exceptions);
         }
 

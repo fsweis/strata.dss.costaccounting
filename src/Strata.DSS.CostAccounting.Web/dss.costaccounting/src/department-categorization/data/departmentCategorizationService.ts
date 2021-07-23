@@ -1,6 +1,6 @@
 import { IDepartment } from './IDepartment';
 import { appConfig, getSecureService } from '@strata/core/lib';
-import { ExceptionTypeEnum } from '../enums/ExceptionTypeEnum';
+import { ExceptionTypeEnum, getExceptionType } from '../enums/ExceptionTypeEnum';
 import { DepartmentTypeEnum } from '../enums/DepartmentTypeEnum';
 import { ICostingDepartmentTypeException } from './ICostingDepartmentTypeException';
 import { getNewGuid } from '../../shared/Utils';
@@ -57,7 +57,7 @@ const mockExceptionData: ICostingDepartmentTypeException[] = [
     costingConfigGuid: '862a9552-8c68-4bae-b3fa-74454e7a9ecb',
     departmentName: '59 - 0101 - FAMILY PRACTICE',
     departmentTypeEnum: 1,
-    originalDepartmentType: DepartmentTypeEnum.Revenue,
+    originalDepartmentTypeAsEnum: DepartmentTypeEnum.Revenue,
     exceptionType: ExceptionTypeEnum.RevenueToOverhead
   },
   {
@@ -67,7 +67,7 @@ const mockExceptionData: ICostingDepartmentTypeException[] = [
     costingConfigGuid: '862a9552-8c68-4bae-b3fa-74454e7a9ecb',
     departmentName: '08_10__20CAJS10___ - 08_10__20 CLMS ADJ LN 20A S10___',
     departmentTypeEnum: 2,
-    originalDepartmentType: DepartmentTypeEnum.Overhead,
+    originalDepartmentTypeAsEnum: DepartmentTypeEnum.Overhead,
     exceptionType: ExceptionTypeEnum.OverheadToExcluded
   },
   {
@@ -77,7 +77,7 @@ const mockExceptionData: ICostingDepartmentTypeException[] = [
     costingConfigGuid: '862a9552-8c68-4bae-b3fa-74454e7a9ecb',
     departmentName: '08106006581 - Aloha Dental Facility Maintenance-Dental',
     departmentTypeEnum: 0,
-    originalDepartmentType: DepartmentTypeEnum.Overhead,
+    originalDepartmentTypeAsEnum: DepartmentTypeEnum.Overhead,
     exceptionType: ExceptionTypeEnum.OverheadToRevenue
   }
 ];
@@ -88,7 +88,10 @@ export const departmentCategorizationService = {
     //TODO make sure to initialize the displayId //forEach((exc) => (exc.displayId = getNewGuid()));
     //return Promise.resolve(mockExceptionData);
     const exceptions = await httpGet<ICostingDepartmentTypeException[]>(`department-categorization/${costingConfigGuid}/exceptions`);
-    exceptions.forEach((e) => (e.displayId = getNewGuid()));
+    exceptions.forEach((e) => {
+      e.displayId = getNewGuid();
+      e.exceptionType = getExceptionType(e.originalDepartmentTypeAsEnum, e.departmentTypeEnum);
+    });
     return exceptions;
   },
 
