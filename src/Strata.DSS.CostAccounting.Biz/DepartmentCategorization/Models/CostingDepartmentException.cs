@@ -12,6 +12,6 @@ namespace Strata.DSS.CostAccounting.Biz.DepartmentCategorization.Models
         public ExceptionDepartmentType DepartmentTypeEnum { get ; set; }
         public string OriginalDepartmentType { get ; set; } //getter only return department type enum
         public ExceptionDepartmentType OriginalDepartmentTypeAsEnum { get => (ExceptionDepartmentType)Enum.Parse(typeof(ExceptionDepartmentType), this.OriginalDepartmentType);  }
-    public Guid DisplayId { get; set; }
+   
     }
 }

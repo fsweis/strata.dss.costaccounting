@@ -1,8 +1,10 @@
 import { IDepartment } from './IDepartment';
+import { appConfig, getSecureService } from '@strata/core/lib';
 import { ExceptionTypeEnum } from '../enums/ExceptionTypeEnum';
 import { DepartmentTypeEnum } from '../enums/DepartmentTypeEnum';
 import { ICostingDepartmentTypeException } from './ICostingDepartmentTypeException';
 import { getNewGuid } from '../../shared/Utils';
+const { httpGet, httpPost, httpDelete } = getSecureService(appConfig.apiUrl);
 const mockDepartmentData: IDepartment[] = [
   {
     departmentId: 20929,
@@ -81,39 +83,56 @@ const mockExceptionData: ICostingDepartmentTypeException[] = [
 ];
 
 export const departmentCategorizationService = {
-  getDepartmentExceptions: (costConfigGuid: string): Promise<ICostingDepartmentTypeException[]> => {
+  getDepartmentExceptions: async (costingConfigGuid: string): Promise<ICostingDepartmentTypeException[]> => {
     //return httpGet<IMicroservice[]>('list');
     //TODO make sure to initialize the displayId //forEach((exc) => (exc.displayId = getNewGuid()));
-    return Promise.resolve(mockExceptionData);
+    //return Promise.resolve(mockExceptionData);
+    const exceptions = await httpGet<ICostingDepartmentTypeException[]>(`department-categorization/${costingConfigGuid}/exceptions`);
+    exceptions.forEach((e) => (e.displayId = getNewGuid()));
+    return exceptions;
   },
 
   getDepartmentsByType: (costingConfigGuid: string, departmentType: DepartmentTypeEnum): Promise<IDepartment[]> => {
-    const filterDepartments = mockDepartmentData.filter((dept) => dept.departmentType === departmentType);
-    return Promise.resolve(filterDepartments);
+    // const filterDepartments = mockDepartmentData.filter((dept) => dept.departmentType === departmentType);
+    // return Promise.resolve(filterDepartments);
+    return httpGet<IDepartment[]>(`department-categorization/${costingConfigGuid}/filtered-departments/${departmentType}`);
   },
 
   getDepartments: (costingConfigGuid: string): Promise<IDepartment[]> => {
-    return Promise.resolve(mockDepartmentData);
+    return httpGet<IDepartment[]>('department-categorization/departments');
   },
 
   saveDepartementExceptions: async (updatedExceptions: ICostingDepartmentTypeException[], deletedExceptions: number[]): Promise<ICostingDepartmentTypeException[]> => {
-    deletedExceptions.forEach(function (departmentId) {
-      const delIndex = mockExceptionData.findIndex((x) => x.departmentId === departmentId);
-      if (delIndex > -1) {
-        mockExceptionData.splice(delIndex, 1);
-      }
-    });
-    updatedExceptions.forEach(function (exception) {
-      if (exception.costingDepartmentExceptionTypeId === 0) {
-        exception.costingDepartmentExceptionTypeId = exception.departmentId + 10;
-      }
-      const exceptionIndex = mockExceptionData.findIndex((x) => x.departmentId === exception.departmentId);
-      if (exceptionIndex > -1) {
-        mockExceptionData[exceptionIndex] = exception;
-      } else {
-        mockExceptionData.unshift(exception);
-      }
-    });
+    // deletedExceptions.forEach(function (departmentId) {
+    //   const delIndex = mockExceptionData.findIndex((x) => x.departmentId === departmentId);
+    //   if (delIndex > -1) {
+    //     mockExceptionData.splice(delIndex, 1);
+    //   }
+    // });
+    const deleteConfigInit: RequestInit = {
+      method: 'DELETE',
+      body: JSON.stringify(deletedExceptions)
+    };
+
+    httpDelete(`department-categorization/`, deleteConfigInit);
+
+    // updatedExceptions.forEach(function (exception) {
+    //   if (exception.costingDepartmentExceptionTypeId === 0) {
+    //     exception.costingDepartmentExceptionTypeId = exception.departmentId + 10;
+    //   }
+    //   const exceptionIndex = mockExceptionData.findIndex((x) => x.departmentId === exception.departmentId);
+    //   if (exceptionIndex > -1) {
+    //     mockExceptionData[exceptionIndex] = exception;
+    //   } else {
+    //     mockExceptionData.unshift(exception);
+    //   }
+    // });
+    const updateConfigInit: RequestInit = {
+      method: 'POST',
+      body: JSON.stringify(updatedExceptions)
+    };
+
+    httpPost(`department-categorization/`, updateConfigInit);
 
     return Promise.resolve(mockExceptionData);
   }

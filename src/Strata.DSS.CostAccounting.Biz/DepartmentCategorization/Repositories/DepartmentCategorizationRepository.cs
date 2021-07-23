@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace Strata.DSS.CostAccounting.Biz.DepartmentCategorization.Repositories
 {
@@ -17,14 +18,38 @@ namespace Strata.DSS.CostAccounting.Biz.DepartmentCategorization.Repositories
         {
             _dbContext = dbContext;
         }
-        public Task AddOrUpdateDepartmentException(List<CostingDepartmentTypeException> costingDepartmentTypeExceptions, CancellationToken cancellationToken)
+        public async Task AddOrUpdateDepartmentException(List<CostingDepartmentTypeException> costingDepartmentTypeExceptions, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            var departmentExceptionsToAdd = costingDepartmentTypeExceptions.Where(x => x.CostingDepartmentExceptionTypeId == 0).ToList();
+            var departmentExceptionsToUpdate = costingDepartmentTypeExceptions.Where(x => x.CostingDepartmentExceptionTypeId != 0).ToList();
+
+            try
+            {
+                if (departmentExceptionsToAdd.Any())
+                {
+                    departmentExceptionsToAdd.ForEach((x) => _dbContext.Entry<CostingDepartmentTypeException>(x).State = EntityState.Added);
+                }
+
+                if (departmentExceptionsToUpdate.Any())
+                {
+                    departmentExceptionsToUpdate.ForEach((x) => _dbContext.Entry<CostingDepartmentTypeException>(x).State = EntityState.Modified);
+                }
+            }
+            catch (Exception e)
+            {
+
+                throw;
+            }
+
+            await _dbContext.SaveChangesAsync(cancellationToken);
         }
 
-        public Task DeleteDepartmentException(List<Guid> costingDepartmentTypeExceptionGuids, CancellationToken cancellationToken)
+        public async Task DeleteDepartmentExceptions(List<int> costingDepartmentTypeExceptionIds, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            var departmentsExceptionsToDelete = _dbContext.CostingDepartmentTypeExceptions.Where(x => costingDepartmentTypeExceptionIds.Contains(x.CostingDepartmentExceptionTypeId));
+            _dbContext.CostingDepartmentTypeExceptions.RemoveRange(departmentsExceptionsToDelete);
+
+            await _dbContext.SaveChangesAsync(cancellationToken);
         }
 
         public IEnumerable<CostingDepartmentException> GetDepartmentExceptions(Guid costingConfigGuid, CancellationToken cancellationToken)

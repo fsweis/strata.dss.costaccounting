@@ -182,8 +182,7 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.DbContexts
             modelBuilder.Entity<CostingDepartmentException>(entity =>
             {
                 entity.HasKey(e => e.CostingDepartmentExceptionTypeId);
-                entity.ToTable("viewCostingDepartmentTypeException", "dss");
-                entity.Ignore("DisplayId");
+                entity.ToTable("viewCostingDepartmentTypeException", "dss");                
                 entity.HasQueryFilter(e => departmentExceptionFilterValues.Contains(e.OriginalDepartmentType.ToLower()));
             });
 

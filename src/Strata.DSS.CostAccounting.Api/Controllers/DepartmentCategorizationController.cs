@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Strata.DSS.CostAccounting.Biz.DepartmentCategorization.Enums;
 using Strata.DSS.CostAccounting.Biz.DepartmentCategorization.Models;
 using Strata.DSS.CostAccounting.Biz.DepartmentCategorization.Repositories;
 using Strata.DSS.CostAccounting.Biz.DepartmentCategorization.Services;
@@ -64,12 +65,7 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
         [ProducesResponseType(404)]
         [ProducesResponseType(400)]
         public ActionResult<IEnumerable<CostingDepartmentException>> GetFiltered([FromRoute] Guid costingConfigGuid, [FromRoute] string departmentType, CancellationToken cancellationToken)
-        {
-            if (!departmentExceptionFilterValues.Contains(departmentType.ToLower()))
-            {
-                return BadRequest("Invalid Department Filter: "+departmentType);
-            }
-
+        {      
             var filteredDepartments = _departmentCategorizationService.GetDepartmentByType(costingConfigGuid, departmentType,cancellationToken);
             if (!filteredDepartments.Any())
             {
@@ -77,6 +73,23 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
             }
 
             return Ok(filteredDepartments);
+        }
+    
+        [HttpPost]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<ActionResult> SaveDepartmentException([FromBody] List<CostingDepartmentTypeException> departmentExceptions, CancellationToken cancellationToken)
+        {
+            await _departmentCategorizationRepository.AddOrUpdateDepartmentException(departmentExceptions, cancellationToken);
+            return Ok();
+        }
+
+        [HttpDelete]
+        [ProducesResponseType(200)]
+        public async Task<ActionResult> DeleteDepartmentException([FromBody]List<int> departmentExceptionIds, CancellationToken cancellationToken)
+        {
+            await _departmentCategorizationRepository.DeleteDepartmentExceptions(departmentExceptionIds, cancellationToken);
+            return Ok();
         }
     }
 }
