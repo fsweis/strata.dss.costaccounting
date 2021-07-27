@@ -20,7 +20,6 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
     {
         private readonly IDepartmentCategorizationRepository _departmentCategorizationRepository;
         private readonly IDepartmentCategorizationService _departmentCategorizationService;
-        private readonly string[] departmentExceptionFilterValues = { "revenue", "overhead" };
         public DepartmentCategorizationController(IDepartmentCategorizationRepository departmentCategorizationRepository, IDepartmentCategorizationService departmentCategorizationService)
         {
             _departmentCategorizationRepository = departmentCategorizationRepository;
