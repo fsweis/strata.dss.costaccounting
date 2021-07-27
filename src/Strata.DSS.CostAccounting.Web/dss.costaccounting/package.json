@@ -3,9 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@strata/core": "0.0.29",
+    "@strata/core": "0.0.32",
     "@strata/eslint-config": "^3.0.0",
-    "@strata/navbar": "0.0.52",
+    "@strata/navbar": "0.0.56",
     "@strata/tempo": "^4.9.0",
     "@types/jest": "^26.0.19",
     "@types/node": "^14.14.20",

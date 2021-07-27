@@ -14,6 +14,10 @@ const CostingConfigProvider: React.FC<ICostingConfigProviderProps> = ({ costingC
 
   useEffect(() => {
     const fetchData = async () => {
+      // Need to check for null or empty string
+      if (costingConfigGuid == null || costingConfigGuid === '') {
+        return;
+      }
       const costingConfig = await costingConfigService.getCostingConfig(costingConfigGuid);
       setConfig(costingConfig);
     };

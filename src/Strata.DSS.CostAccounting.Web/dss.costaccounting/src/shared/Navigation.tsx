@@ -31,6 +31,8 @@ const Navigation: React.FC = () => {
   const history = useHistory();
 
   useEffect(() => {
+    const pathConfigGuid = getPathConfigGuid(location.pathname);
+
     const fetchData = async () => {
       const [costingConfigurations, currentFiscalYear] = await Promise.all([costingConfigService.getCostingConfigs(), systemSettingService.getCurrentFiscalYear()]);
       setCostingConfigs(costingConfigurations);
@@ -38,25 +40,24 @@ const Navigation: React.FC = () => {
         const previousFiscalYear = currentFiscalYear - 1;
         const filtered = costingConfigurations.filter((c) => currentFiscalYear === c.fiscalYearId || previousFiscalYear === c.fiscalYearId);
         setCostingConfigsFiltered(filtered);
-        setCostingConfigGuid(filtered[0]?.costingConfigGuid);
+        if (filtered.length > 0 && pathConfigGuid === '') {
+          setCostingConfigGuid(filtered[0].costingConfigGuid);
+        }
       }
     };
-    fetchData();
-  }, []);
 
-  useEffect(() => {
-    const pathConfigGuid = getPathConfigGuid(location.pathname);
+    if (!costingConfigs || !costingConfigs.length) {
+      fetchData();
+    }
 
-    if (pathConfigGuid !== '') {
-      if (pathConfigGuid !== costingConfigGuid) {
-        setCostingConfigGuid(pathConfigGuid);
-      }
+    if (pathConfigGuid !== '' && pathConfigGuid !== costingConfigGuid) {
+      setCostingConfigGuid(pathConfigGuid);
     } else {
       // TODO: something here to redirect path without guid to path with guid?
       // This doesn't work but leaving so you know not to try it
       // history.push(`${splitPath[0]}/${costConfigGuid}`);
     }
-  }, [costingConfigGuid, history, location]);
+  }, [costingConfigGuid, costingConfigs, history, location]);
 
   return (
     <>

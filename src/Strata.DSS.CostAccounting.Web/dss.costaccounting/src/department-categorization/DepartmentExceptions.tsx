@@ -15,7 +15,6 @@ import { DepartmentTypeEnum, getExceptionType, calculateExceptionType } from './
 import cloneDeep from 'lodash/cloneDeep';
 import { CostingConfigContext } from '../shared/data/CostingConfigContext';
 import { departmentCategorizationService } from './data/departmentCategorizationService';
-import { getNewGuid } from '../shared/Utils';
 
 const DepartmentExceptions: React.FC = () => {
   const [deletedDepartmentIds, setDeletedDepartmentIds] = useState<number[]>([]);
@@ -31,7 +30,6 @@ const DepartmentExceptions: React.FC = () => {
     const fetchData = async () => {
       try {
         setIsLoading(true);
-
         if (costingConfig) {
           const [departmentExceptionData, departmentData] = await Promise.all([
             departmentCategorizationService.getDepartmentExceptions(costingConfig.costingConfigGuid),
