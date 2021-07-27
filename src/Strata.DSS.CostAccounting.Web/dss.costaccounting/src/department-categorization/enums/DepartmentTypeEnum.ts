@@ -4,8 +4,11 @@ export enum DepartmentTypeEnum {
   Revenue = 0,
   Overhead = 1,
   Excluded = 2,
+  RevenueAndOverhead = 3,
+  ClaimsIncluded = 4,
+  ClaimsExcluded = 5,
   // For UI Only
-  All
+  NotSpecified
 }
 
 export const getExceptionType = (departmentType: DepartmentTypeEnum): ExceptionTypeEnum[] => {
@@ -32,4 +35,32 @@ export const getExceptionType = (departmentType: DepartmentTypeEnum): ExceptionT
       break;
   }
   return items;
+};
+
+export const calculateExceptionType = (orignal: DepartmentTypeEnum, exception: DepartmentTypeEnum): ExceptionTypeEnum | undefined => {
+  if (orignal === DepartmentTypeEnum.Revenue) {
+    if (exception === DepartmentTypeEnum.Overhead) {
+      return ExceptionTypeEnum.RevenueToOverhead;
+    } else {
+      return ExceptionTypeEnum.RevenueToExcluded;
+    }
+  }
+
+  if (orignal === DepartmentTypeEnum.Overhead) {
+    if (exception === DepartmentTypeEnum.Revenue) {
+      return ExceptionTypeEnum.OverheadToRevenue;
+    } else {
+      return ExceptionTypeEnum.OverheadToExcluded;
+    }
+  }
+
+  if (orignal === DepartmentTypeEnum.Excluded) {
+    if (exception === DepartmentTypeEnum.Revenue) {
+      return ExceptionTypeEnum.ExcludedToRevenue;
+    } else {
+      return ExceptionTypeEnum.ExcludedToOverhead;
+    }
+  }
+
+  return ExceptionTypeEnum.Unknown;
 };

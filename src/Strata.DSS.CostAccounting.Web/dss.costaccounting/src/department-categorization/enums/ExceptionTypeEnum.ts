@@ -8,7 +8,8 @@ export enum ExceptionTypeEnum {
   ExcludedToOverhead = 4,
   ExcludedToRevenue = 5,
   IncludedToExcluded = 9,
-  ExcludedToIncluded = 10
+  ExcludedToIncluded = 10,
+  Unknown
 }
 
 export const getExceptionName = (value: ExceptionTypeEnum): string => {
@@ -30,36 +31,8 @@ export const getExceptionName = (value: ExceptionTypeEnum): string => {
     case ExceptionTypeEnum.ExcludedToIncluded:
       return 'Excluded to Included';
     default:
-      return ExceptionTypeEnum[value];
+      return 'Unknown';
   }
-};
-
-export const getExceptionType = (orignal: DepartmentTypeEnum, exception: DepartmentTypeEnum): ExceptionTypeEnum | undefined => {
-  if (orignal === DepartmentTypeEnum.Revenue) {
-    if (exception === DepartmentTypeEnum.Overhead) {
-      return ExceptionTypeEnum.RevenueToOverhead;
-    } else if (exception === DepartmentTypeEnum.Excluded) {
-      return ExceptionTypeEnum.RevenueToExcluded;
-    }
-  }
-
-  if (orignal === DepartmentTypeEnum.Overhead) {
-    if (exception === DepartmentTypeEnum.Revenue) {
-      return ExceptionTypeEnum.OverheadToRevenue;
-    } else if (exception === DepartmentTypeEnum.Excluded) {
-      return ExceptionTypeEnum.OverheadToExcluded;
-    }
-  }
-
-  if (orignal === DepartmentTypeEnum.Excluded) {
-    if (exception === DepartmentTypeEnum.Revenue) {
-      return ExceptionTypeEnum.ExcludedToRevenue;
-    } else if (exception === DepartmentTypeEnum.Overhead) {
-      return ExceptionTypeEnum.ExcludedToOverhead;
-    }
-  }
-
-  return undefined;
 };
 
 export const getExceptionDepartment = (exception: ExceptionTypeEnum): DepartmentTypeEnum => {

@@ -68,22 +68,26 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
 
             return Ok(filteredDepartments);
         }
-    
-        [HttpPost]
+
+        [HttpPost("")]
         [ProducesResponseType(200)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult> SaveDepartmentException([FromBody] List<CostingDepartmentTypeException> departmentExceptions, CancellationToken cancellationToken)
+        public async Task<ActionResult<IEnumerable<CostingDepartmentTypeException>>> SaveDepartmentExceptionData([FromBody] CostingDepartmentTypeExceptionSaveData departmentExceptionsData, CancellationToken cancellationToken)
         {
-            await _departmentCategorizationRepository.AddOrUpdateDepartmentException(departmentExceptions, cancellationToken);
-            return Ok();
+            try
+            {
+                if (departmentExceptionsData.Updated.Any())
+                    await _departmentCategorizationRepository.AddOrUpdateDepartmentException(departmentExceptionsData.Updated, cancellationToken);
+                if (departmentExceptionsData.DeletedIds.Any())
+                    await _departmentCategorizationRepository.DeleteDepartmentExceptions(departmentExceptionsData.CostingConfigGuid, departmentExceptionsData.DeletedIds, cancellationToken);
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            return Ok(_departmentCategorizationRepository.GetDepartmentExceptions(departmentExceptionsData.CostingConfigGuid, cancellationToken));
         }
 
-        [HttpDelete]
-        [ProducesResponseType(200)]
-        public async Task<ActionResult> DeleteDepartmentException([FromBody]List<int> departmentExceptionIds, CancellationToken cancellationToken)
-        {
-            await _departmentCategorizationRepository.DeleteDepartmentExceptions(departmentExceptionIds, cancellationToken);
-            return Ok();
-        }
     }
 }

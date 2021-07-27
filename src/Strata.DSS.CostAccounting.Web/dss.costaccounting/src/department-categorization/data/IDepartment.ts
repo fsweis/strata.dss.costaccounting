@@ -3,10 +3,11 @@ import { DepartmentTypeEnum } from '../enums/DepartmentTypeEnum';
 export interface IDepartment {
   departmentId: number;
   departmentCode: string;
-  departmentType: DepartmentTypeEnum;
+  departmentType: string;
   description: string;
   name: string;
   isClaimsCosting: boolean;
+  departmentTypeAsEnum: DepartmentTypeEnum;
 }
 
 export const newDepartment = (department: Partial<IDepartment> = {}): IDepartment => {
@@ -17,7 +18,8 @@ export const newDepartment = (department: Partial<IDepartment> = {}): IDepartmen
       description: '',
       name: '',
       isClaimsCosting: false,
-      departmentType: DepartmentTypeEnum.Revenue
+      departmentType: '',
+      departmentTypeAsEnum: DepartmentTypeEnum.NotSpecified
     },
     ...department
   };

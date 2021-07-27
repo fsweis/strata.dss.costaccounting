@@ -10,9 +10,9 @@ namespace Strata.DSS.CostAccounting.Biz.DepartmentCategorization.Repositories
     {
         public IEnumerable<CostingDepartmentException> GetDepartmentExceptions (Guid costingConfigGuid, CancellationToken cancellationToken);
         public IEnumerable<Department> GetDepartments(CancellationToken cancellationToken);
-        public IEnumerable<Department> GetDepartmentsBySearch(string searchString, CancellationToken cancellationToken);
+        public IEnumerable<Department> GetDepartmentsBySearch(string searchString, CancellationToken cancellationToken);        
         public Task AddOrUpdateDepartmentException(List<CostingDepartmentTypeException> costingDepartmentTypeExceptions, CancellationToken cancellationToken);
-        public Task DeleteDepartmentExceptions(List<int> costingDepartmentTypeExceptionIds, CancellationToken cancellationToken);
+        public Task DeleteDepartmentExceptions(Guid costConfigGuid, List<int> departmentIds, CancellationToken cancellationToken);
 
     }
 }

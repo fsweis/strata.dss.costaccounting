@@ -176,6 +176,7 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.DbContexts
             {
                 entity.HasKey(e => e.DepartmentId);
                 entity.ToTable("DimDepartment", "fw");
+                entity.Ignore("DepartmentTypeAsEnum");
                 entity.HasQueryFilter(e => departmentExceptionFilterValues.Contains(e.DepartmentType.ToLower()));
             });
 
