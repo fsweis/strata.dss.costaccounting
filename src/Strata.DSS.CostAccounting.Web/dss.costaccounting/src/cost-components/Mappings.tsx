@@ -52,7 +52,6 @@ const Mappings: React.FC = () => {
           setRollups(costComponentRollups);
           setTempRollups(cloneDeep(costComponentRollups));
           setCostingConfigGuid(costingConfig.costingConfigGuid);
-          console.log(costingConfig.costingConfigGuid);
         }
       } finally {
         setLoading(false);
@@ -79,8 +78,6 @@ const Mappings: React.FC = () => {
       updated: updatedCostComponents,
       deletedGuids: deletedCostComponentsGuids
     };
-
-    console.log(costingConfigGuid);
 
     const costComponentRollupSaveData: ICostComponentRollupSaveData = {
       updated: updatedRollups,
