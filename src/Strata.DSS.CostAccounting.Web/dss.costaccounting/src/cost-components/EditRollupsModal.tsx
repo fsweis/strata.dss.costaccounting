@@ -7,59 +7,45 @@ import cloneDeep from 'lodash/cloneDeep';
 import DataGrid from '@strata/tempo/lib/datagrid';
 import Tooltip from '@strata/tempo/lib/tooltip';
 import { getEmptyGuid } from '../shared/Utils';
-import Toast from '@strata/tempo/lib/toast';
 import { ICostComponentRollup, newCostComponentRollup } from './data/ICostComponentRollup';
 
 export interface IEditRollupsModalProps {
   rollups: ICostComponentRollup[];
+  updatedRollups: ICostComponentRollup[];
+  deletedRollupGuids: string[];
+  costingConfigGuid: string;
   visible: boolean;
   onCancel: () => void;
-  onOk: (updatedRollups: ICostComponentRollup[], deletedRollupsGuids: string[]) => void;
+  onOk: (tempRollups: ICostComponentRollup[], updatedRollups: ICostComponentRollup[], deletedRollupsGuids: string[]) => void;
 }
 
 const EditRollupsModal: React.FC<IEditRollupsModalProps> = (props: IEditRollupsModalProps) => {
   const gridRef = React.useRef<DataGrid>(null);
   const [updatedRollups, setUpdatedRollups] = useState<ICostComponentRollup[]>([]);
-  const [deletedRollupsGuids, setDeletedRollupsGuids] = useState<string[]>([]);
+  const [deletedGuids, setDeletedGuids] = useState<string[]>([]);
   const [gridRollups, setGridRollups] = useState<ICostComponentRollup[]>([]);
   const emptyGuid = getEmptyGuid();
 
   useEffect(() => {
     setGridRollups(cloneDeep(props.rollups));
-    setUpdatedRollups([]);
-    setDeletedRollupsGuids([]);
-  }, [props.rollups]);
+    setUpdatedRollups(cloneDeep(props.updatedRollups));
+    setDeletedGuids(props.deletedRollupGuids);
+  }, [props.rollups, props.updatedRollups, props.deletedRollupGuids]);
 
   const handleCancel = () => {
-    if (updatedRollups.length > 0 || deletedRollupsGuids.length > 0 || gridRollups.some((d) => d.costComponentRollupGuid === emptyGuid)) {
-      Modal.confirm({
-        title: 'Discard unsaved changes?',
-        okText: 'Discard Changes',
-        cancelText: 'Keep Changes',
-        onOk() {
-          if (gridRollups) {
-            setUpdatedRollups([]);
-            setDeletedRollupsGuids([]);
-            const newGridRollups = cloneDeep(props.rollups);
-            setGridRollups(newGridRollups);
-            props.onCancel();
-          }
-          Toast.show({
-            message: 'Changes discarded'
-          });
-        }
-      });
-    } else {
-      props.onCancel();
-    }
+    props.onCancel();
   };
 
   const handleOk = async () => {
-    if (updatedRollups.length > 0 || deletedRollupsGuids.length > 0 || gridRollups.some((d) => d.costComponentRollupGuid === emptyGuid)) {
+    if (updatedRollups.length > 0 || deletedGuids.length > 0 || gridRollups.some((d) => d.costComponentRollupGuid === emptyGuid)) {
       if (await validateRollups()) {
-        const rollupsNotDeleted = updatedRollups.filter((rollup) => !deletedRollupsGuids.includes(rollup.costComponentRollupGuid));
+        const rollupsNotDeleted = updatedRollups.filter((rollup) => !deletedGuids.includes(rollup.costComponentRollupGuid));
         const rollupsToUpdate = gridRollups.filter((d) => rollupsNotDeleted.includes(d) || d.costComponentRollupGuid === emptyGuid);
-        props.onOk(rollupsToUpdate, deletedRollupsGuids);
+        props.onOk(
+          gridRollups.sort((a, b) => (a.name.toLowerCase() > b.name.toLowerCase() ? 1 : -1)),
+          rollupsToUpdate,
+          deletedGuids
+        );
       }
     } else {
       props.onCancel();
@@ -91,28 +77,32 @@ const EditRollupsModal: React.FC<IEditRollupsModalProps> = (props: IEditRollupsM
   };
 
   const handleAddRollup = () => {
-    const rollup = newCostComponentRollup();
+    const rollup = newCostComponentRollup({ costingConfigGuid: props.costingConfigGuid });
     if (gridRollups != null) {
       const updatedRollups = [rollup].concat(gridRollups);
       setGridRollups(updatedRollups);
-      setUpdatedRollups(updatedRollups);
     }
   };
 
   const handleDeleteRow = (rollup: ICostComponentRollup) => {
-    if (gridRollups == null) {
-      return;
-    }
-    if (rollup.costComponentRollupGuid === '') {
-      const costComponents = updatedRollups.filter((cc) => cc.displayId !== rollup.displayId);
-      setUpdatedRollups(costComponents);
+    if (rollup.isUsed) {
+      Modal.alert({
+        title: 'Cost Components',
+        content: "You can't delete this cost component rollup because it contains an existing cost component.",
+        alertType: 'info'
+      });
     } else {
-      const rollupsToDelete = [rollup.costComponentRollupGuid].concat(deletedRollupsGuids);
-      setDeletedRollupsGuids(rollupsToDelete);
+      if (rollup.costComponentRollupGuid === emptyGuid) {
+        const costComponents = updatedRollups.filter((cc) => cc.displayId !== rollup.displayId);
+        setUpdatedRollups(costComponents);
+      } else {
+        const rollupsToDelete = [rollup.costComponentRollupGuid].concat(deletedGuids);
+        setDeletedGuids(rollupsToDelete);
+      }
+      //refresh the grid
+      const rollups = gridRollups.filter((obj) => obj !== rollup);
+      setGridRollups(rollups);
     }
-    //refresh the grid
-    const rollups = gridRollups.filter((obj) => obj !== rollup);
-    setGridRollups(rollups);
   };
 
   const handleCellEdit = (rollup: ICostComponentRollup) => {

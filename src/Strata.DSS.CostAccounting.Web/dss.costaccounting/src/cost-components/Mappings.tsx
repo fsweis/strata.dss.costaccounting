@@ -20,6 +20,7 @@ import { ICollectionSaveData } from '../shared/data/ICollectionSaveData';
 import EditRollupsModal from './EditRollupsModal';
 import { ICostComponentRollup } from './data/ICostComponentRollup';
 import { ICellEditorArgs } from '@strata/tempo/lib/datacolumn';
+import { ICostComponentRollupSaveData } from './data/ICostComponentRollupSaveData';
 
 const Mappings: React.FC = () => {
   const { costingConfig } = useContext(CostingConfigContext);
@@ -33,7 +34,10 @@ const Mappings: React.FC = () => {
   const [drawerTitle, setDrawerTitle] = React.useState<string>('');
   const [editRollupsModalVisible, setEditRollupsModalVisible] = React.useState<boolean>(false);
   const [rollups, setRollups] = useState<ICostComponentRollup[]>([]); //Used for initial load and reset(cancel)
-
+  const [tempRollups, setTempRollups] = useState<ICostComponentRollup[]>([]); //Used for manage rollup UI
+  const [updatedRollups, setUpdatedRollups] = useState<ICostComponentRollup[]>([]); //Used for rollup updates
+  const [deletedRollupGuids, setDeletedRollupGuids] = useState<string[]>([]); //Used for delete rollupsto server
+  const [costingConfigGuid, setCostingConfigGuid] = useState<string>('');
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -46,6 +50,9 @@ const Mappings: React.FC = () => {
           setCostComponents(costComponents);
           setGridCostComponents(cloneDeep(costComponents));
           setRollups(costComponentRollups);
+          setTempRollups(cloneDeep(costComponentRollups));
+          setCostingConfigGuid(costingConfig.costingConfigGuid);
+          console.log(costingConfig.costingConfigGuid);
         }
       } finally {
         setLoading(false);
@@ -60,7 +67,7 @@ const Mappings: React.FC = () => {
       return;
     }
 
-    if (!updatedCostComponents.length && !deletedCostComponentsGuids.length) {
+    if (!updatedCostComponents.length && !deletedCostComponentsGuids.length && !updatedRollups.length && !deletedRollupGuids.length) {
       Toast.show({
         toastType: 'info',
         message: 'No changes to save'
@@ -73,6 +80,14 @@ const Mappings: React.FC = () => {
       deletedGuids: deletedCostComponentsGuids
     };
 
+    console.log(costingConfigGuid);
+
+    const costComponentRollupSaveData: ICostComponentRollupSaveData = {
+      updated: updatedRollups,
+      deletedGuids: deletedRollupGuids,
+      costingConfigGuid: costingConfigGuid
+    };
+
     try {
       setLoading(true);
 
@@ -82,6 +97,17 @@ const Mappings: React.FC = () => {
       // setGridCostComponents(cloneDeep(costComponents));
       // setUpdatedCostComponents([]);
       // setDeletedCostComponentsGuids([]);
+
+      //refresh rollups from return
+      const costComponentRollups = await costComponentService.saveCostComponentRollups(costComponentRollupSaveData);
+      setRollups(costComponentRollups);
+      setTempRollups(cloneDeep(costComponentRollups));
+      setUpdatedRollups([]);
+      setDeletedRollupGuids([]);
+      Toast.show({
+        toastType: 'success',
+        message: 'Changes saved'
+      });
     } catch (error) {
       Modal.alert({
         title: 'Changes not saved',
@@ -119,7 +145,7 @@ const Mappings: React.FC = () => {
   };
 
   const handleCancel = () => {
-    if (updatedCostComponents.length > 0 || deletedCostComponentsGuids.length > 0) {
+    if (updatedCostComponents.length > 0 || deletedCostComponentsGuids.length > 0 || !updatedRollups.length || !deletedRollupGuids.length) {
       Modal.confirm({
         title: 'Discard unsaved changes?',
         okText: 'Discard Changes',
@@ -130,6 +156,10 @@ const Mappings: React.FC = () => {
             setDeletedCostComponentsGuids([]);
             const tempStats = cloneDeep(costComponents);
             setGridCostComponents(tempStats);
+            //clear Rollups
+            setTempRollups(cloneDeep(rollups));
+            setUpdatedRollups([]);
+            setDeletedRollupGuids([]);
           }
           Toast.show({
             message: 'Changes discarded'
@@ -237,8 +267,10 @@ const Mappings: React.FC = () => {
     }
   };
 
-  const handleSaveRollups = (updatedRollups: ICostComponentRollup[], deletedRollupsGuids: string[]) => {
-    console.log(updatedRollups, deletedRollupsGuids);
+  const handleSaveRollups = (newTempRollups: ICostComponentRollup[], updatedRollups: ICostComponentRollup[], deletedGuids: string[]) => {
+    setTempRollups(newTempRollups);
+    setUpdatedRollups(updatedRollups);
+    setDeletedRollupGuids(deletedGuids);
     setEditRollupsModalVisible(false);
   };
 
@@ -317,7 +349,7 @@ const Mappings: React.FC = () => {
           editable
           itemValueField='costComponentRollupGuid'
           itemTextField='name'
-          items={rollups}
+          items={tempRollups}
           editor={(cellEditorArgs) => (
             <>
               <DropDown
@@ -326,7 +358,7 @@ const Mappings: React.FC = () => {
                 itemValueField='costComponentRollupGuid'
                 itemTextField='name'
                 value={cellEditorArgs.rowData.rollup}
-                items={rollups}
+                items={tempRollups}
               />
             </>
           )}
@@ -351,7 +383,15 @@ const Mappings: React.FC = () => {
           )}
         />
       </DataGrid>
-      <EditRollupsModal rollups={rollups} onCancel={() => setEditRollupsModalVisible(false)} onOk={handleSaveRollups} visible={editRollupsModalVisible}></EditRollupsModal>
+      <EditRollupsModal
+        rollups={tempRollups}
+        updatedRollups={updatedRollups}
+        deletedRollupGuids={deletedRollupGuids}
+        costingConfigGuid={costingConfigGuid}
+        onCancel={() => setEditRollupsModalVisible(false)}
+        onOk={handleSaveRollups}
+        visible={editRollupsModalVisible}
+      ></EditRollupsModal>
       <Drawer
         title={drawerTitle}
         visible={drawerVisible}
