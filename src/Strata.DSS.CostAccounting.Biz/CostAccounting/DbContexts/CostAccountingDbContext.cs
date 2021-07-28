@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Strata.DSS.CostAccounting.Biz.CostAccounting.Models;
+using Strata.DSS.CostAccounting.Biz.CostComponents.Models;
 using Strata.DSS.CostAccounting.Biz.CostingConfigs.Models;
 using Strata.DSS.CostAccounting.Biz.StatisticDrivers.Models;
 
@@ -37,6 +38,7 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.DbContexts
         public virtual DbSet<CostingConfigEntityLevelSecurity> CostingConfigEntityLevelSecurities { get; set; }
 
         public virtual DbSet<CostingConfigEntityLinkage> CostingConfigEntityLinkages { get; set; }
+        public virtual DbSet<CostComponentRollup> CostComponentRollups { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -162,6 +164,12 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.DbContexts
             {
                 entity.HasKey(e => e.CostingConfigEntityLinkageId);
                 entity.ToTable("CostingConfigEntityLinkage", "dss");
+            });
+
+            modelBuilder.Entity<CostComponentRollup>(entity =>
+            {
+                entity.HasKey(e => e.CostComponentRollupGuid);
+                entity.ToTable("CostComponentRollup", "dss");
             });
         }
     }

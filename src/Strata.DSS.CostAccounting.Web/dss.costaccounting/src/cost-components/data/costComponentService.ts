@@ -2,6 +2,8 @@ import { appConfig, getSecureService } from '@strata/core/lib';
 import { ICollectionSaveData } from '../../shared/data/ICollectionSaveData';
 import { getNewGuid } from '../../shared/Utils';
 import { ICostComponent } from './ICostComponent';
+import { ICostComponentRollup } from './ICostComponentRollup';
+import { ICostComponentRollupSaveData } from './ICostComponentRollupSaveData';
 
 const { httpGet, httpPost } = getSecureService(appConfig.apiUrl);
 
@@ -17,5 +19,11 @@ export const costComponentService = {
   },
   saveCostComponentMappings: (costComponentSaveData: ICollectionSaveData<ICostComponent>): Promise<ICostComponent[]> => {
     return httpPost<ICostComponent[]>('cost-components/', costComponentSaveData);
+  },
+  getCostComponentRollups: (costingConfigGuid: string): Promise<ICostComponentRollup[]> => {
+    return httpGet<ICostComponentRollup[]>(`cost-components/rollups?costingConfigGuid=${costingConfigGuid}`);
+  },
+  saveCostComponentRollups: (costComponentRollupSaveData: ICostComponentRollupSaveData): Promise<ICostComponentRollup[]> => {
+    return httpPost<ICostComponentRollup[]>('cost-components/rollups', costComponentRollupSaveData);
   }
 };

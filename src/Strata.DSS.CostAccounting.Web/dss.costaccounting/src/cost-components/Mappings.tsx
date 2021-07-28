@@ -17,6 +17,8 @@ import RouteConfirm from '@strata/tempo/lib/routeconfirm';
 import { getEmptyGuid } from '../shared/Utils';
 import { costComponentService } from './data/costComponentService';
 import { ICollectionSaveData } from '../shared/data/ICollectionSaveData';
+import EditRollupsModal from './EditRollupsModal';
+import { ICostComponentRollup } from './data/ICostComponentRollup';
 
 const Mappings: React.FC = () => {
   const { costingConfig } = useContext(CostingConfigContext);
@@ -28,14 +30,22 @@ const Mappings: React.FC = () => {
   const [deletedCostComponentsGuids, setDeletedCostComponentsGuids] = useState<string[]>([]); //Used for delete to server
   const [drawerVisible, setDrawerVisible] = React.useState<boolean>(false);
   const [drawerTitle, setDrawerTitle] = React.useState<string>('');
+  const [editRollupsModalVisible, setEditRollupsModalVisible] = React.useState<boolean>(false);
+  const [rollups, setRollups] = useState<ICostComponentRollup[]>([]); //Used for initial load and reset(cancel)
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const costComponents = await costComponentService.getCostComponentMappings();
-        setCostComponents(costComponents);
-        setGridCostComponents(cloneDeep(costComponents));
+        if (costingConfig && costingConfig.type !== undefined) {
+          const [costComponents, costComponentRollups] = await Promise.all([
+            costComponentService.getCostComponentMappings(),
+            costComponentService.getCostComponentRollups(costingConfig.costingConfigGuid)
+          ]);
+          setCostComponents(costComponents);
+          setGridCostComponents(cloneDeep(costComponents));
+          setRollups(costComponentRollups);
+        }
       } finally {
         setLoading(false);
       }
@@ -139,7 +149,7 @@ const Mappings: React.FC = () => {
   };
 
   const handleEditRollups = () => {
-    //TODO: implement this with modal. Future BLI
+    setEditRollupsModalVisible(true);
   };
 
   const handleDeleteRow = (costComponent: ICostComponent) => {
@@ -302,7 +312,7 @@ const Mappings: React.FC = () => {
           )}
         />
       </DataGrid>
-
+      <EditRollupsModal rollups={rollups} onCancel={() => setEditRollupsModalVisible(false)} onOk={() => setEditRollupsModalVisible(false)} visible={editRollupsModalVisible}></EditRollupsModal>
       <Drawer
         title={drawerTitle}
         visible={drawerVisible}
