@@ -114,7 +114,7 @@ const DepartmentExceptions: React.FC = () => {
             originalDepartmentTypeAsEnum: selectedDepartment.departmentTypeAsEnum,
             departmentName: selectedDepartment.name,
             costingConfigGuid: costingConfig?.costingConfigGuid,
-            exceptionType: calculateExceptionType(selectedDepartment.departmentTypeAsEnum, 100)
+            exceptionType: calculateExceptionType(selectedDepartment.departmentTypeAsEnum, DepartmentTypeEnum.NotSpecified)
           });
         }
         return exc;
@@ -181,7 +181,7 @@ const DepartmentExceptions: React.FC = () => {
   };
 
   const handleSave = async () => {
-    if (!(await validateDepartmentExceptions())) {
+    if (!(await validateDepartmentExceptions()) || costingConfig == null) {
       return;
     }
     const updatedExceptions = departmentExceptionGridData.filter(
@@ -206,7 +206,7 @@ const DepartmentExceptions: React.FC = () => {
     });
 
     const saveData: ICostingDepartmentTypeExceptionSaveData = {
-      costingConfigGuid: costingConfig?.costingConfigGuid,
+      costingConfigGuid: costingConfig.costingConfigGuid,
       deletedIds: deletedDepartmentIds,
       updated: updatedExceptionsAsDepartmentType,
       deletedGuids: []

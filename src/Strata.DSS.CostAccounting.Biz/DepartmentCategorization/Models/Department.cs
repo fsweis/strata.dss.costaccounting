@@ -14,6 +14,5 @@ namespace Strata.DSS.CostAccounting.Biz.DepartmentCategorization.Models
         public bool IsClaimsCosting { get; set; }
         public string DepartmentType { get; set; }//return the enumeration int
         public ExceptionDepartmentType DepartmentTypeAsEnum { get => (ExceptionDepartmentType)Enum.Parse(typeof(ExceptionDepartmentType), this.DepartmentType); }
-        public bool IsActive { get; set; }
     }
 }
