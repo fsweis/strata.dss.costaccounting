@@ -1,39 +1,93 @@
 import React from 'react';
 import Spacing from '@strata/tempo/lib/spacing';
 import Modal from '@strata/tempo/lib/modal';
-import Input from '@strata/tempo/lib/input';
 import Button from '@strata/tempo/lib/button';
-import { useEffect, useState, ChangeEvent } from 'react';
+import { useEffect, useState } from 'react';
 import cloneDeep from 'lodash/cloneDeep';
 import DataGrid from '@strata/tempo/lib/datagrid';
 import Tooltip from '@strata/tempo/lib/tooltip';
+import { getEmptyGuid } from '../shared/Utils';
+import Toast from '@strata/tempo/lib/toast';
 import { ICostComponentRollup, newCostComponentRollup } from './data/ICostComponentRollup';
 
 export interface IEditRollupsModalProps {
   rollups: ICostComponentRollup[];
   visible: boolean;
   onCancel: () => void;
-  onOk: () => void;
+  onOk: (updatedRollups: ICostComponentRollup[], deletedRollupsGuids: string[]) => void;
 }
 
 const EditRollupsModal: React.FC<IEditRollupsModalProps> = (props: IEditRollupsModalProps) => {
-  const [loading, setLoading] = React.useState(false);
   const gridRef = React.useRef<DataGrid>(null);
-  const [updatedRollups, setUpdatedRollups] = useState<ICostComponentRollup[]>([]); //Used for create updates. Without creating new guid in frontend need a way to handle deleting and updating new entries.
-  const [deletedRollupsGuids, setDeletedRollupsGuids] = useState<string[]>([]); //Used for delete to server
-  const [gridRollups, setGridRollups] = useState<ICostComponentRollup[]>([]); //Used for UI
+  const [updatedRollups, setUpdatedRollups] = useState<ICostComponentRollup[]>([]);
+  const [deletedRollupsGuids, setDeletedRollupsGuids] = useState<string[]>([]);
+  const [gridRollups, setGridRollups] = useState<ICostComponentRollup[]>([]);
+  const emptyGuid = getEmptyGuid();
 
   useEffect(() => {
-    console.log(props.rollups);
     setGridRollups(cloneDeep(props.rollups));
+    setUpdatedRollups([]);
+    setDeletedRollupsGuids([]);
   }, [props.rollups]);
 
   const handleCancel = () => {
-    props.onCancel();
+    if (updatedRollups.length > 0 || deletedRollupsGuids.length > 0 || gridRollups.some((d) => d.costComponentRollupGuid === emptyGuid)) {
+      Modal.confirm({
+        title: 'Discard unsaved changes?',
+        okText: 'Discard Changes',
+        cancelText: 'Keep Changes',
+        onOk() {
+          if (gridRollups) {
+            setUpdatedRollups([]);
+            setDeletedRollupsGuids([]);
+            const newGridRollups = cloneDeep(props.rollups);
+            setGridRollups(newGridRollups);
+            props.onCancel();
+          }
+          Toast.show({
+            message: 'Changes discarded'
+          });
+        }
+      });
+    } else {
+      props.onCancel();
+    }
   };
 
-  const handleOk = () => {
-    props.onOk();
+  const handleOk = async () => {
+    if (updatedRollups.length > 0 || deletedRollupsGuids.length > 0 || gridRollups.some((d) => d.costComponentRollupGuid === emptyGuid)) {
+      if (await validateRollups()) {
+        const rollupsNotDeleted = updatedRollups.filter((rollup) => !deletedRollupsGuids.includes(rollup.costComponentRollupGuid));
+        const rollupsToUpdate = gridRollups.filter((d) => rollupsNotDeleted.includes(d) || d.costComponentRollupGuid === emptyGuid);
+        props.onOk(rollupsToUpdate, deletedRollupsGuids);
+      }
+    } else {
+      props.onCancel();
+    }
+  };
+
+  const validateRollups = async () => {
+    if (!gridRef.current) {
+      return false;
+    }
+    const invalidCells = await gridRef.current.validateGrid();
+    if (invalidCells.length > 0) {
+      const invalidKeys = invalidCells.map((cell) => cell.rowKey);
+      const invalidRows: { rowNumber: number; guid: string }[] = gridRollups
+        .map((rollup, index) => {
+          return { guid: rollup.displayId, rowNumber: index };
+        })
+        .filter((r) => invalidKeys.includes(r.guid));
+
+      const rowNumbers = invalidRows.map((r) => r.rowNumber + 1);
+      Modal.alert({
+        title: 'Changes not saved',
+        content: `Fix errors in rows: ${rowNumbers.join(', ')}`,
+        alertType: 'error'
+      });
+      return false;
+    }
+    return true;
   };
 
   const handleAddRollup = () => {
@@ -49,11 +103,11 @@ const EditRollupsModal: React.FC<IEditRollupsModalProps> = (props: IEditRollupsM
     if (gridRollups == null) {
       return;
     }
-    if (rollup.costComponentRollupGUID === '') {
+    if (rollup.costComponentRollupGuid === '') {
       const costComponents = updatedRollups.filter((cc) => cc.displayId !== rollup.displayId);
       setUpdatedRollups(costComponents);
     } else {
-      const rollupsToDelete = [rollup.costComponentRollupGUID].concat(deletedRollupsGuids);
+      const rollupsToDelete = [rollup.costComponentRollupGuid].concat(deletedRollupsGuids);
       setDeletedRollupsGuids(rollupsToDelete);
     }
     //refresh the grid
@@ -78,7 +132,6 @@ const EditRollupsModal: React.FC<IEditRollupsModalProps> = (props: IEditRollupsM
         </Spacing>
         <DataGrid
           key='rollupsGrid'
-          loading={loading}
           pager={{
             pageSize: 10
           }}

@@ -19,6 +19,7 @@ import { costComponentService } from './data/costComponentService';
 import { ICollectionSaveData } from '../shared/data/ICollectionSaveData';
 import EditRollupsModal from './EditRollupsModal';
 import { ICostComponentRollup } from './data/ICostComponentRollup';
+import { ICellEditorArgs } from '@strata/tempo/lib/datacolumn';
 
 const Mappings: React.FC = () => {
   const { costingConfig } = useContext(CostingConfigContext);
@@ -214,6 +215,33 @@ const Mappings: React.FC = () => {
     }
   };
 
+  const filterRollup = (cellValue: string, filterValue: string) => {
+    if (typeof filterValue === 'string' && filterValue.trim() !== '' && filterValue.trim() !== '-') {
+      filterValue = filterValue.toLowerCase().trim();
+    } else {
+      return true;
+    }
+    if (cellValue === undefined || cellValue === null) {
+      return false;
+    }
+    const rollupFound = rollups.filter((l) => l.name.toLowerCase().includes(filterValue)).map((l) => l.costComponentRollupGuid);
+    return rollupFound.includes(cellValue);
+  };
+
+  const handleRollupChange = (cellEditorArgs: ICellEditorArgs, value: string) => {
+    cellEditorArgs.rowData.costComponentRollupGuid = value;
+    //add to updated drivers
+    if (!updatedCostComponents.includes(cellEditorArgs.rowData)) {
+      const costComponentsToUpdate = [cellEditorArgs.rowData].concat(updatedCostComponents);
+      setUpdatedCostComponents(costComponentsToUpdate);
+    }
+  };
+
+  const handleSaveRollups = (updatedRollups: ICostComponentRollup[], deletedRollupsGuids: string[]) => {
+    console.log(updatedRollups, deletedRollupsGuids);
+    setEditRollupsModalVisible(false);
+  };
+
   return (
     <>
       <ActionBar
@@ -278,25 +306,36 @@ const Mappings: React.FC = () => {
         <DataGrid.Column header='Accounts' field='accounts' filter width={200} isCellClickable={() => true} customCellValue={(cellArgs) => renderMultipleSelection(cellArgs.row.accounts)} />
         <DataGrid.Column header='Job Code' field='jobCodes' filter width={200} isCellClickable={() => true} customCellValue={(cellArgs) => renderMultipleSelection(cellArgs.row.jobCodes)} />
         <DataGrid.Column header='Pay Code' field='payCodes' filter width={200} isCellClickable={() => true} customCellValue={(cellArgs) => renderMultipleSelection(cellArgs.row.payCodes)} />
-        <DataGrid.Column
+        <DataGrid.DropDownColumn
+          field='costComponentRollupGuid'
           header='Rollup'
           filter
           width={200}
           isCellClickable={() => false}
-          body={(rowData) => (
+          filterMatchMode='custom'
+          filterFunction={filterRollup}
+          editable
+          itemValueField='costComponentRollupGuid'
+          itemTextField='name'
+          items={rollups}
+          editor={(cellEditorArgs) => (
             <>
               <DropDown
-                width={200}
-                items={[
-                  { text: 'Option A', value: 1 },
-                  { text: 'Option B', value: 2 },
-                  { text: 'Option C', value: 3 },
-                  { text: 'Option D', value: 4 }
-                ]}
-                value={rowData.rollup}
+                onChange={(value) => handleRollupChange(cellEditorArgs, value.toString())}
+                width={300}
+                itemValueField='costComponentRollupGuid'
+                itemTextField='name'
+                value={cellEditorArgs.rowData.rollup}
+                items={rollups}
               />
             </>
           )}
+          validationRules={[
+            {
+              required: true,
+              type: 'string'
+            }
+          ]}
         />
         <DataGrid.CheckboxColumn field='usingCompensation' header='Using Compensation' editable width={152} />
         <DataGrid.EmptyColumn />
@@ -312,7 +351,7 @@ const Mappings: React.FC = () => {
           )}
         />
       </DataGrid>
-      <EditRollupsModal rollups={rollups} onCancel={() => setEditRollupsModalVisible(false)} onOk={() => setEditRollupsModalVisible(false)} visible={editRollupsModalVisible}></EditRollupsModal>
+      <EditRollupsModal rollups={rollups} onCancel={() => setEditRollupsModalVisible(false)} onOk={handleSaveRollups} visible={editRollupsModalVisible}></EditRollupsModal>
       <Drawer
         title={drawerTitle}
         visible={drawerVisible}

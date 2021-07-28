@@ -1,7 +1,7 @@
-import { getNewGuid } from '../../shared/Utils';
+import { getEmptyGuid, getNewGuid } from '../../shared/Utils';
 export interface ICostComponentRollup {
   displayId: string;
-  costComponentRollupGUID: string;
+  costComponentRollupGuid: string;
   name: string;
   isExcluded: boolean;
   isUsed: boolean;
@@ -11,7 +11,7 @@ export const newCostComponentRollup = (costComponentRollup: Partial<ICostCompone
   return {
     ...{
       displayId: getNewGuid(),
-      costComponentRollupGUID: '',
+      costComponentRollupGuid: getEmptyGuid(),
       name: '',
       isExcluded: false,
       isUsed: false
