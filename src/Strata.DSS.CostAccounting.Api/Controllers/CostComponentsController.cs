@@ -60,9 +60,9 @@ namespace Strata.DSS.CostAccounting.Api.Controllers
                 await _costComponentsRepository.DeleteCostComponentRollupsAsync(costComponentRollupSaveData.DeletedGuids, cancellationToken);
             }
 
-            var statDrivers = await _costComponentsRepository.GetCostComponentRollupsAsync(costComponentRollupSaveData.CostingConfigGuid, cancellationToken);
+            var costComponentRollups = await _costComponentsRepository.GetCostComponentRollupsAsync(costComponentRollupSaveData.CostingConfigGuid, cancellationToken);
 
-            return Ok(statDrivers);
+            return Ok(costComponentRollups);
         }
     }
 }

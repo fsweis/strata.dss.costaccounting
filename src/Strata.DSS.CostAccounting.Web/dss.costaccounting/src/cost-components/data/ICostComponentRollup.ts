@@ -4,6 +4,7 @@ export interface ICostComponentRollup {
   costComponentRollupGUID: string;
   name: string;
   isExcluded: boolean;
+  isUsed: boolean;
 }
 
 export const newCostComponentRollup = (costComponentRollup: Partial<ICostComponentRollup> = {}): ICostComponentRollup => {
@@ -12,8 +13,8 @@ export const newCostComponentRollup = (costComponentRollup: Partial<ICostCompone
       displayId: getNewGuid(),
       costComponentRollupGUID: '',
       name: '',
-
-      isExcluded: false
+      isExcluded: false,
+      isUsed: false
     },
     ...costComponentRollup
   };

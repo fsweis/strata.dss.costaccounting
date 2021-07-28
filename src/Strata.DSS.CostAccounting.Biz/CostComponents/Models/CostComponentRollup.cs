@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
 
 namespace Strata.DSS.CostAccounting.Biz.CostComponents.Models
@@ -10,6 +11,8 @@ namespace Strata.DSS.CostAccounting.Biz.CostComponents.Models
         public Guid CostComponentRollupGuid { get; set; }
         public Guid CostingConfigGuid { get; set; }
         public bool IsExcluded{ get; set; }
+        [NotMapped]
+        public bool IsUsed { get; set; }
     }
 }
 

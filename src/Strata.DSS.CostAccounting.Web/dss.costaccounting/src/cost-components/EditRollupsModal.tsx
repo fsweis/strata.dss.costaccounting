@@ -25,6 +25,7 @@ const EditRollupsModal: React.FC<IEditRollupsModalProps> = (props: IEditRollupsM
 
   useEffect(() => {
     console.log(props.rollups);
+    setGridRollups(cloneDeep(props.rollups));
   }, [props.rollups]);
 
   const handleCancel = () => {
@@ -79,14 +80,13 @@ const EditRollupsModal: React.FC<IEditRollupsModalProps> = (props: IEditRollupsM
           key='rollupsGrid'
           loading={loading}
           pager={{
-            pageSize: 100
+            pageSize: 10
           }}
           dataKey='displayId'
           ref={gridRef}
           value={gridRollups}
           onCellEdit={(e) => handleCellEdit(e.rowData)}
         >
-          <DataGrid.RowNumber />
           <DataGrid.Column
             header='Name'
             field='name'

@@ -39,6 +39,7 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.DbContexts
 
         public virtual DbSet<CostingConfigEntityLinkage> CostingConfigEntityLinkages { get; set; }
         public virtual DbSet<CostComponentRollup> CostComponentRollups { get; set; }
+        public virtual DbSet<CostComponent> CostComponents { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -170,6 +171,12 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.DbContexts
             {
                 entity.HasKey(e => e.CostComponentRollupGuid);
                 entity.ToTable("CostComponentRollup", "dss");
+            });
+
+            modelBuilder.Entity<CostComponent>(entity =>
+            {
+                entity.HasKey(e => e.CostComponentId);
+                entity.ToTable("DimCostComponent", "dss");
             });
         }
     }

@@ -23,7 +23,18 @@ namespace Strata.DSS.CostAccounting.Biz.CostComponents.Repositories
 
         public async Task<IEnumerable<CostComponentRollup>> GetCostComponentRollupsAsync(Guid costingConfigGuid, CancellationToken cancellationToken)
         {
+           
             var rollups = await _dbContext.CostComponentRollups.Where(cr => cr.CostComponentRollupGuid != Guid.Empty && cr.CostingConfigGuid == costingConfigGuid).OrderBy(dr => dr.Name).ToListAsync(cancellationToken);
+            var usedRollupGuids = await _dbContext.CostComponents.Where(cr => cr.CostComponentRollupGuid != Guid.Empty && cr.CostingConfigGuid == costingConfigGuid).OrderBy(dr => dr.Name).Select(x => x.CostComponentRollupGuid).Distinct().ToListAsync(cancellationToken);
+            foreach (var rollup in rollups)
+            {
+                var isUsed = false;
+                if (usedRollupGuids.Any(x => x == rollup.CostComponentRollupGuid))
+                {
+                    isUsed = true;
+                }
+                rollup.IsUsed = isUsed;
+            }
             return rollups;
         }
 
