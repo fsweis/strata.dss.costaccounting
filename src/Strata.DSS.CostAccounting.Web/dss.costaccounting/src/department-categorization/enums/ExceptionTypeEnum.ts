@@ -9,7 +9,7 @@ export enum ExceptionTypeEnum {
   ExcludedToRevenue = 5,
   IncludedToExcluded = 9,
   ExcludedToIncluded = 10,
-  Unknown
+  NotSpecified
 }
 
 export const getExceptionName = (value: ExceptionTypeEnum): string => {
@@ -31,7 +31,7 @@ export const getExceptionName = (value: ExceptionTypeEnum): string => {
     case ExceptionTypeEnum.ExcludedToIncluded:
       return 'Excluded to Included';
     default:
-      return 'Unknown';
+      return 'Not Specified';
   }
 };
 

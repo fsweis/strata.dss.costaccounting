@@ -62,5 +62,5 @@ export const calculateExceptionType = (orignal: DepartmentTypeEnum, exception: D
     }
   }
 
-  return ExceptionTypeEnum.Unknown;
+  return ExceptionTypeEnum.NotSpecified;
 };
