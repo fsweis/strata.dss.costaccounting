@@ -6,49 +6,32 @@ import { useEffect, useState } from 'react';
 import cloneDeep from 'lodash/cloneDeep';
 import DataGrid from '@strata/tempo/lib/datagrid';
 import Tooltip from '@strata/tempo/lib/tooltip';
-import { getEmptyGuid } from '../shared/Utils';
 import { ICostComponentRollup, newCostComponentRollup } from './data/ICostComponentRollup';
 
 export interface IEditRollupsModalProps {
   rollups: ICostComponentRollup[];
-  updatedRollups: ICostComponentRollup[];
-  deletedRollupGuids: string[];
   costingConfigGuid: string;
   visible: boolean;
   onCancel: () => void;
-  onOk: (tempRollups: ICostComponentRollup[], updatedRollups: ICostComponentRollup[], deletedRollupsGuids: string[]) => void;
+  onOk: (tempRollups: ICostComponentRollup[]) => void;
 }
 
 const EditRollupsModal: React.FC<IEditRollupsModalProps> = (props: IEditRollupsModalProps) => {
   const gridRef = React.useRef<DataGrid>(null);
-  const [updatedRollups, setUpdatedRollups] = useState<ICostComponentRollup[]>([]);
-  const [deletedGuids, setDeletedGuids] = useState<string[]>([]);
+
   const [gridRollups, setGridRollups] = useState<ICostComponentRollup[]>([]);
-  const emptyGuid = getEmptyGuid();
 
   useEffect(() => {
     setGridRollups(cloneDeep(props.rollups));
-    setUpdatedRollups(cloneDeep(props.updatedRollups));
-    setDeletedGuids(props.deletedRollupGuids);
-  }, [props.rollups, props.updatedRollups, props.deletedRollupGuids]);
+  }, [props.rollups]);
 
   const handleCancel = () => {
     props.onCancel();
   };
 
   const handleOk = async () => {
-    if (updatedRollups.length > 0 || deletedGuids.length > 0 || gridRollups.some((d) => d.costComponentRollupGuid === emptyGuid)) {
-      if (await validateRollups()) {
-        const rollupsNotDeleted = updatedRollups.filter((rollup) => !deletedGuids.includes(rollup.costComponentRollupGuid));
-        const rollupsToUpdate = gridRollups.filter((d) => rollupsNotDeleted.includes(d) || d.costComponentRollupGuid === emptyGuid);
-        props.onOk(
-          gridRollups.sort((a, b) => (a.name.toLowerCase() > b.name.toLowerCase() ? 1 : -1)),
-          rollupsToUpdate,
-          deletedGuids
-        );
-      }
-    } else {
-      props.onCancel();
+    if (await validateRollups()) {
+      props.onOk(gridRollups.sort((a, b) => a.name.localeCompare(b.name)));
     }
   };
 
@@ -92,26 +75,11 @@ const EditRollupsModal: React.FC<IEditRollupsModalProps> = (props: IEditRollupsM
         alertType: 'info'
       });
     } else {
-      if (rollup.costComponentRollupGuid === emptyGuid) {
-        const costComponents = updatedRollups.filter((cc) => cc.displayId !== rollup.displayId);
-        setUpdatedRollups(costComponents);
-      } else {
-        const rollupsToDelete = [rollup.costComponentRollupGuid].concat(deletedGuids);
-        setDeletedGuids(rollupsToDelete);
-      }
-      //refresh the grid
       const rollups = gridRollups.filter((obj) => obj !== rollup);
       setGridRollups(rollups);
     }
   };
 
-  const handleCellEdit = (rollup: ICostComponentRollup) => {
-    //add to updated cost components
-    if (!updatedRollups.includes(rollup)) {
-      const rollupsToUpdate = [rollup].concat(updatedRollups);
-      setUpdatedRollups(rollupsToUpdate);
-    }
-  };
   return (
     <>
       <Modal title='Edit Rollups' visible={props.visible} onCancel={handleCancel} width='large' onOk={handleOk} okText='Done' removeBodyPadding>
@@ -128,7 +96,6 @@ const EditRollupsModal: React.FC<IEditRollupsModalProps> = (props: IEditRollupsM
           dataKey='displayId'
           ref={gridRef}
           value={gridRollups}
-          onCellEdit={(e) => handleCellEdit(e.rowData)}
         >
           <DataGrid.Column
             header='Name'
@@ -155,7 +122,7 @@ const EditRollupsModal: React.FC<IEditRollupsModalProps> = (props: IEditRollupsM
               }
             ]}
           />
-          <DataGrid.CheckboxColumn field='excluded' header='Excluded' editable width={152} />
+          <DataGrid.CheckboxColumn field='isExcluded' header='Excluded' editable width={152} />
           <DataGrid.EmptyColumn />
           <DataGrid.Column
             align='right'
