@@ -11,6 +11,6 @@ namespace Strata.DSS.CostAccounting.Biz.CostAccounting.Models
         public Guid CostComponentRollupGuid { get; set; }
         public int CostComponentId { get; set; }
         public int SortOrder { get; set; }
-        public Boolean IsUsingCompensation { get; set; }
+        public bool IsUsingCompensation { get; set; }
     }
 }

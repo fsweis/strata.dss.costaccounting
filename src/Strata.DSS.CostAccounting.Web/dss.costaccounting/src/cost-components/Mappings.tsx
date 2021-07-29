@@ -81,7 +81,6 @@ const Mappings: React.FC = () => {
     }
     const updatedRollups: ICostComponentRollup[] = getUpdatedRollups();
     const deletedRollupGuids: string[] = getDeletedRollupGuids();
-    console.log(updatedRollups, deletedRollupGuids);
     if (!updatedCostComponents.length && !deletedCostComponentsGuids.length && !updatedRollups.length && !deletedRollupGuids.length) {
       Toast.show({
         toastType: 'info',
