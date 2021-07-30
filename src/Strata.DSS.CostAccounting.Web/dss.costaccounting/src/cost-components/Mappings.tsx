@@ -18,7 +18,7 @@ import { getEmptyGuid } from '../shared/Utils';
 import { costComponentService } from './data/costComponentService';
 import { ICollectionSaveData } from '../shared/data/ICollectionSaveData';
 import EditRollupsModal from './EditRollupsModal';
-import { ICostComponentRollup } from './data/ICostComponentRollup';
+import { ICostComponentRollup, findUpdatedRollups, findDeletedRollupGuids } from './data/ICostComponentRollup';
 import { ICellEditorArgs } from '@strata/tempo/lib/datacolumn';
 import { ICostComponentRollupSaveData } from './data/ICostComponentRollupSaveData';
 
@@ -65,17 +65,8 @@ const Mappings: React.FC = () => {
 
   useEffect(() => {
     //update rollups
-    const updatedCCRollups = tempRollups.filter((x) => {
-      if (x.costComponentRollupGuid === emptyGuid) {
-        return true;
-      }
-      return rollups.find((y) => {
-        return y.costComponentRollupGuid === x.costComponentRollupGuid && (y.name !== x.name || y.isExcluded !== x.isExcluded);
-      });
-    });
-    const deletedCCRollupGuids = rollups
-      .filter((x) => !tempRollups.some((y) => y.costComponentRollupGuid === x.costComponentRollupGuid && y.costComponentRollupGuid !== emptyGuid))
-      .map((z) => z.costComponentRollupGuid);
+    const updatedCCRollups = findUpdatedRollups(tempRollups, rollups);
+    const deletedCCRollupGuids = findDeletedRollupGuids(tempRollups, rollups);
     setUpdatedRollups(updatedCCRollups);
     setDeletedRollupGuids(deletedCCRollupGuids);
   }, [tempRollups, rollups, emptyGuid]);

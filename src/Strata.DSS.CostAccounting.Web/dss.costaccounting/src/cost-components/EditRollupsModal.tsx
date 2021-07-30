@@ -6,7 +6,8 @@ import { useEffect, useState } from 'react';
 import cloneDeep from 'lodash/cloneDeep';
 import DataGrid from '@strata/tempo/lib/datagrid';
 import Tooltip from '@strata/tempo/lib/tooltip';
-import { ICostComponentRollup, newCostComponentRollup } from './data/ICostComponentRollup';
+import Toast from '@strata/tempo/lib/toast';
+import { ICostComponentRollup, newCostComponentRollup, findUpdatedRollups, findDeletedRollupGuids } from './data/ICostComponentRollup';
 
 export interface IEditRollupsModalProps {
   rollups: ICostComponentRollup[];
@@ -26,7 +27,23 @@ const EditRollupsModal: React.FC<IEditRollupsModalProps> = (props: IEditRollupsM
   }, [props.rollups]);
 
   const handleCancel = () => {
-    props.onCancel();
+    const updatedRollups = findUpdatedRollups(gridRollups, props.rollups);
+    const deletedRollupGuids = findDeletedRollupGuids(gridRollups, props.rollups);
+    if (updatedRollups.length > 0 || deletedRollupGuids.length > 0) {
+      Modal.confirm({
+        title: 'Discard unsaved changes?',
+        okText: 'Discard Changes',
+        cancelText: 'Keep Changes',
+        onOk() {
+          //clear Rollups
+          setGridRollups(cloneDeep(props.rollups));
+          Toast.show({
+            message: 'Changes discarded'
+          });
+          props.onCancel();
+        }
+      });
+    }
   };
 
   const handleOk = async () => {
