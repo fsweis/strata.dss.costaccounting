@@ -27,13 +27,31 @@ const EditRollupsModal: React.FC<IEditRollupsModalProps> = (props: IEditRollupsM
   }, [props.rollups]);
 
   const handleCancel = () => {
-    setGridRollups(cloneDeep(props.rollups));
-    props.onCancel();
+    const updatedRollups = findUpdatedRollups(gridRollups, props.rollups);
+    const deletedRollupGuids = findDeletedRollupGuids(gridRollups, props.rollups);
+    console.log(updatedRollups, deletedRollupGuids);
+    if (updatedRollups.length > 0 || deletedRollupGuids.length > 0) {
+      Modal.confirm({
+        title: 'Discard unsaved changes?',
+        okText: 'Discard Changes',
+        cancelText: 'Keep Changes',
+        onOk() {
+          //clear Rollups
+          setGridRollups(cloneDeep(props.rollups));
+          Toast.show({
+            message: 'Changes discarded'
+          });
+          props.onCancel();
+        }
+      });
+    } else {
+      props.onCancel();
+    }
   };
 
   const handleOk = async () => {
     if (await validateRollups()) {
-      props.onOk(gridRollups.sort((a, b) => a.name.localeCompare(b.name)));
+      props.onOk(cloneDeep(gridRollups.sort((a, b) => a.name.localeCompare(b.name))));
     }
   };
 
