@@ -6,6 +6,7 @@ using Strata.ApiCommunication.Http.MessageHandlers;
 using Strata.CoreLib.Claims.Extensions;
 using Strata.DSS.CostAccounting.Biz.CostAccounting.DbContexts;
 using Strata.DSS.CostAccounting.Biz.CostAccounting.Repositories;
+using Strata.DSS.CostAccounting.Biz.CostComponents.Repositories;
 using Strata.DSS.CostAccounting.Biz.CostingConfigs.Repositories;
 using Strata.DSS.CostAccounting.Biz.StatisticDrivers.Repositories;
 using Strata.DSS.CostAccounting.Biz.StatisticDrivers.Services;
@@ -26,6 +27,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddScoped<ICostingConfigRepository, CostingConfigRepository>();
             services.AddScoped<IStatisticDriversRepository, StatisticDriversRepository>();
             services.AddScoped<ISystemSettingRepository, SystemSettingRepository>();
+            services.AddScoped<ICostComponentsRepository, CostComponentsRepository>();
 
             services.AddScoped<IStatisticDriversService, StatisticDriversService>();
             services.AddScoped<IDataSourceService, DataSourceService>();

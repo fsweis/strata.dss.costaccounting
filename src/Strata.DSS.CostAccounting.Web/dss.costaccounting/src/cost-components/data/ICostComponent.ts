@@ -8,7 +8,7 @@ export interface ICostComponent {
   accounts: ICostComponentAssignment[];
   jobCodes: ICostComponentAssignment[];
   payCodes: ICostComponentAssignment[];
-  rollup: string;
+  costComponentRollupGuid: string;
   usingCompensation: boolean;
 }
 
@@ -21,7 +21,7 @@ export const newCostComponent = (costComponent: Partial<ICostComponent> = {}): I
       accounts: [],
       jobCodes: [],
       payCodes: [],
-      rollup: '',
+      costComponentRollupGuid: '',
       usingCompensation: false
     },
     ...costComponent
