@@ -18,7 +18,7 @@ import { getEmptyGuid } from '../shared/Utils';
 import { costComponentService } from './data/costComponentService';
 import { ICollectionSaveData } from '../shared/data/ICollectionSaveData';
 import EditRollupsModal from './EditRollupsModal';
-import { ICostComponentRollup, newCostComponentRollup } from './data/ICostComponentRollup';
+import { ICostComponentRollup } from './data/ICostComponentRollup';
 import { ICellEditorArgs } from '@strata/tempo/lib/datacolumn';
 import { ICostComponentRollupSaveData } from './data/ICostComponentRollupSaveData';
 
@@ -35,6 +35,8 @@ const Mappings: React.FC = () => {
   const [editRollupsModalVisible, setEditRollupsModalVisible] = React.useState<boolean>(false);
   const [rollups, setRollups] = useState<ICostComponentRollup[]>([]); //Used for initial load and reset(cancel)
   const [tempRollups, setTempRollups] = useState<ICostComponentRollup[]>([]); //Used for manage rollup UI
+  const [updatedRollups, setUpdatedRollups] = useState<ICostComponentRollup[]>([]);
+  const [deletedRollupGuids, setDeletedRollupGuids] = useState<string[]>([]);
   const [costingConfigGuid, setCostingConfigGuid] = useState<string>('');
   const emptyGuid = getEmptyGuid();
 
@@ -61,9 +63,9 @@ const Mappings: React.FC = () => {
     fetchData();
   }, [setLoading, costingConfig]);
 
-  const getUpdatedRollups = (): ICostComponentRollup[] => {
-    //return rollups that are new (emptyGUID) or differ in properties
-    return tempRollups.filter((x) => {
+  useEffect(() => {
+    //update rollups
+    const updatedCCRollups = tempRollups.filter((x) => {
       if (x.costComponentRollupGuid === emptyGuid) {
         return true;
       }
@@ -71,16 +73,17 @@ const Mappings: React.FC = () => {
         return y.costComponentRollupGuid === x.costComponentRollupGuid && (y.name !== x.name || y.isExcluded !== x.isExcluded);
       });
     });
-  };
-  const getDeletedRollupGuids = (): string[] => {
-    return rollups.filter((x) => !tempRollups.some((y) => y.costComponentRollupGuid === x.costComponentRollupGuid && y.costComponentRollupGuid !== emptyGuid)).map((z) => z.costComponentRollupGuid);
-  };
+    const deletedCCRollupGuids = rollups
+      .filter((x) => !tempRollups.some((y) => y.costComponentRollupGuid === x.costComponentRollupGuid && y.costComponentRollupGuid !== emptyGuid))
+      .map((z) => z.costComponentRollupGuid);
+    setUpdatedRollups(updatedCCRollups);
+    setDeletedRollupGuids(deletedCCRollupGuids);
+  }, [tempRollups, rollups, emptyGuid]);
+
   const handleSave = async () => {
     if (!(await validateCostComponents())) {
       return;
     }
-    const updatedRollups: ICostComponentRollup[] = getUpdatedRollups();
-    const deletedRollupGuids: string[] = getDeletedRollupGuids();
     if (!updatedCostComponents.length && !deletedCostComponentsGuids.length && !updatedRollups.length && !deletedRollupGuids.length) {
       Toast.show({
         toastType: 'info',
@@ -156,9 +159,7 @@ const Mappings: React.FC = () => {
   };
 
   const handleCancel = () => {
-    const updatedRollups: ICostComponentRollup[] = getUpdatedRollups();
-    const deletedRollupGuids: string[] = getDeletedRollupGuids();
-    if (updatedCostComponents.length > 0 || deletedCostComponentsGuids.length > 0 || !updatedRollups.length || !deletedRollupGuids.length) {
+    if (updatedCostComponents.length > 0 || deletedCostComponentsGuids.length > 0 || updatedRollups.length > 0 || deletedRollupGuids.length > 0) {
       Modal.confirm({
         title: 'Discard unsaved changes?',
         okText: 'Discard Changes',
@@ -276,6 +277,17 @@ const Mappings: React.FC = () => {
       const costComponentsToUpdate = [cellEditorArgs.rowData].concat(updatedCostComponents);
       setUpdatedCostComponents(costComponentsToUpdate);
     }
+    //check rollups for IsUsed
+    const newRollups = tempRollups.map((x) => {
+      if (gridCostComponents.find((y) => y.costComponentRollupGuid === x.costComponentRollupGuid) && x.isUsed === false) {
+        x.isUsed = true;
+      } else if (!gridCostComponents.find((y) => y.costComponentRollupGuid === x.costComponentRollupGuid) && x.isUsed === true) {
+        x.isUsed = false;
+      }
+      return x;
+    });
+
+    setTempRollups(newRollups);
   };
 
   const handleSaveRollups = (newTempRollups: ICostComponentRollup[]) => {
@@ -416,7 +428,13 @@ const Mappings: React.FC = () => {
         {/* TODO: Waiting on picker another BLI for picker */}
       </Drawer>
       <RouteConfirm
-        showPrompt={updatedCostComponents.length > 0 || deletedCostComponentsGuids.length > 0 || gridCostComponents.some((d) => d.costComponentGuid === emptyGuid)}
+        showPrompt={
+          updatedCostComponents.length > 0 ||
+          deletedCostComponentsGuids.length > 0 ||
+          updatedRollups.length > 0 ||
+          deletedRollupGuids.length > 0 ||
+          gridCostComponents.some((d) => d.costComponentGuid === emptyGuid)
+        }
         title={'Discard unsaved changes?'}
         okText={'Discard Changes'}
         cancelText={'Keep Changes'}
