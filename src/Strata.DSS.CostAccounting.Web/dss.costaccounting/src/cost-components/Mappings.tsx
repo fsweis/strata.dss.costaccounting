@@ -42,7 +42,7 @@ const Mappings: React.FC = () => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        if (costingConfig && costingConfig.type !== undefined) {
+        if (costingConfig && costingConfig.costingConfigGuid !== undefined) {
           const [costComponents, costComponentRollups] = await Promise.all([
             costComponentService.getCostComponentMappings(),
             costComponentService.getCostComponentRollups(costingConfig.costingConfigGuid)
