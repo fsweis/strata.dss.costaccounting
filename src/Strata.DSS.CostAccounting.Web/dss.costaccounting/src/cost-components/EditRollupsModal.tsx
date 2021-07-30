@@ -43,6 +43,8 @@ const EditRollupsModal: React.FC<IEditRollupsModalProps> = (props: IEditRollupsM
           props.onCancel();
         }
       });
+    } else {
+      props.onCancel();
     }
   };
 
